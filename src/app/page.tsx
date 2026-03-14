@@ -7,10 +7,9 @@ export default function Home() {
     <>
       {/* ===== HERO (Flag Layout) ===== */}
       <section className="relative min-h-screen flex items-center pt-[98px] pb-20 overflow-hidden bg-white">
-        {/* Stars field - left side */}
+        {/* Stars field - full width on mobile, angled on desktop */}
         <div
-          className="absolute top-0 left-0 w-full md:w-[48%] h-full bg-flag-blue overflow-hidden"
-          style={{ clipPath: "polygon(0 0, 100% 0, 88% 100%, 0 100%)" }}
+          className="absolute top-0 left-0 w-full h-full md:w-[48%] bg-flag-blue overflow-hidden md:[clip-path:polygon(0_0,100%_0,88%_100%,0_100%)]"
         >
           <div className="absolute inset-0 text-white/[0.06] text-xl leading-[2.8rem] tracking-widest overflow-hidden pointer-events-none p-4">
             {"★ ".repeat(200)}
