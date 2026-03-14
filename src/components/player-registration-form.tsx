@@ -350,6 +350,15 @@ export function PlayerRegistrationForm() {
       code_of_conduct: form.code_of_conduct,
     };
 
+    if (!supabase) {
+      setSubmitting(false);
+      setErrors({
+        submit:
+          "Registration is temporarily unavailable while setup is completed. Please try again shortly.",
+      });
+      return;
+    }
+
     const { error } = await supabase
       .from("tryout_registrations")
       .insert(payload);

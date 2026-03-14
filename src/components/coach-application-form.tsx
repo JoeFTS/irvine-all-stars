@@ -284,6 +284,14 @@ export function CoachApplicationForm() {
       submitted_at: new Date().toISOString(),
     };
 
+    if (!supabase) {
+      setSubmitting(false);
+      setSubmitError(
+        "Applications are temporarily unavailable while setup is completed. Please try again shortly."
+      );
+      return;
+    }
+
     const { error } = await supabase
       .from("coach_applications")
       .insert(payload);
