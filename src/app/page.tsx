@@ -49,8 +49,7 @@ export default function Home() {
             </h1>
             <p className="text-white/70 text-lg leading-relaxed max-w-md mx-auto lg:mx-0 mb-8">
               Irvine Pony Baseball All-Stars. Six divisions of talent, one
-              standard of excellence. Fair tryouts, independent evaluation, and a
-              summer your family will never forget.
+              standard of excellence, and a summer your family will never forget.
             </p>
             <div className="flex gap-3 flex-wrap justify-center lg:justify-start">
               <Link
@@ -208,7 +207,7 @@ export default function Home() {
             How All-Stars Works
           </h2>
           <p className="text-gray-600 text-lg max-w-xl mb-10">
-            Four phases. Total transparency. Zero politics.
+            Four phases. Clear process from start to finish.
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-5">
             {[

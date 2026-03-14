@@ -93,9 +93,7 @@ export default function CoachesPage() {
             Coach Selection
           </h1>
           <p className="text-white/60 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
-            A fair, transparent process built on merit. Every applicant is
-            evaluated on the same 100-point rubric — no politics, no
-            favoritism.
+            Every applicant is evaluated on the same 100-point rubric.
           </p>
         </div>
       </section>
