@@ -1,39 +1,49 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Link from "next/link";
-import { useAuth } from "@/contexts/auth-context";
+import { supabase } from "@/lib/supabase";
 import { StripeDivider } from "@/components/stripe-divider";
 
 export default function LoginPage() {
-  const { signIn, role } = useAuth();
-  const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [submitting, setSubmitting] = useState(false);
+  const [status, setStatus] = useState<string>("idle");
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    setSubmitting(true);
+    setStatus("signing-in");
+
+    if (!supabase) {
+      setError("Supabase not configured");
+      setStatus("idle");
+      return;
+    }
 
     try {
-      const { error: signInError } = await signIn(email, password);
+      setStatus("calling signInWithPassword...");
+      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
       if (signInError) {
-        setError(signInError);
-        setSubmitting(false);
+        setError(signInError.message);
+        setStatus("idle");
         return;
       }
 
-      // Use window.location for reliable redirect (avoids Next.js router issues)
+      setStatus("success! redirecting...");
+
+      // Hard redirect
       const params = new URLSearchParams(window.location.search);
-      const redirect = params.get("redirect") || "/portal";
+      const redirect = params.get("redirect") || "/admin";
       window.location.href = redirect;
     } catch (err) {
-      setError(err instanceof Error ? err.message : "An unexpected error occurred");
-      setSubmitting(false);
+      setError(err instanceof Error ? err.message : "Unexpected error");
+      setStatus("idle");
     }
   }
 
@@ -62,6 +72,13 @@ export default function LoginPage() {
               {error && (
                 <div className="bg-flag-red/10 border border-flag-red/30 text-flag-red rounded px-4 py-3 text-sm">
                   {error}
+                </div>
+              )}
+
+              {/* Debug status */}
+              {status !== "idle" && (
+                <div className="bg-blue-50 border border-blue-200 text-blue-700 rounded px-4 py-3 text-sm">
+                  Status: {status}
                 </div>
               )}
 
@@ -103,10 +120,10 @@ export default function LoginPage() {
 
               <button
                 type="submit"
-                disabled={submitting}
+                disabled={status !== "idle"}
                 className="w-full bg-flag-blue hover:bg-flag-blue-mid text-white font-display font-bold uppercase tracking-wider py-3 rounded transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {submitting ? "Signing in..." : "Sign In"}
+                {status !== "idle" ? "Signing in..." : "Sign In"}
               </button>
             </form>
 
