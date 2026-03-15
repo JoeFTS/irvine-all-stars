@@ -13,7 +13,7 @@ interface Registration {
   parent_phone: string;
   player_first_name: string;
   player_last_name: string;
-  player_dob: string;
+  player_date_of_birth: string;
   division: string;
   primary_position: string;
   secondary_position: string | null;
@@ -24,11 +24,11 @@ interface Registration {
   medical_conditions: string | null;
   emergency_contact_name: string;
   emergency_contact_phone: string;
-  photo_release: boolean;
-  liability_waiver: boolean;
-  code_of_conduct: boolean;
+  photo_release_consent: boolean;
+  liability_waiver_consent: boolean;
+  parent_code_of_conduct: boolean;
   status: Status;
-  created_at: string;
+  submitted_at: string;
 }
 
 const DIVISIONS = [
@@ -80,7 +80,7 @@ export default function RegistrationsPage() {
     const { data, error } = await supabase
       .from("tryout_registrations")
       .select("*")
-      .order("created_at", { ascending: false });
+      .order("submitted_at", { ascending: false });
 
     if (!error && data) {
       setRegistrations(data);
@@ -258,7 +258,7 @@ export default function RegistrationsPage() {
                       <span>{reg.division}</span>
                       <span>{reg.primary_position}</span>
                       <span>
-                        {new Date(reg.created_at).toLocaleDateString()}
+                        {new Date(reg.submitted_at).toLocaleDateString()}
                       </span>
                     </div>
                   </div>
@@ -311,7 +311,7 @@ export default function RegistrationsPage() {
                         <div>
                           <span className="text-gray-400">DOB:</span>{" "}
                           <span className="text-charcoal">
-                            {new Date(reg.player_dob).toLocaleDateString()}
+                            {new Date(reg.player_date_of_birth).toLocaleDateString()}
                           </span>
                         </div>
                         <div>
@@ -423,30 +423,30 @@ export default function RegistrationsPage() {
                       <div className="flex flex-wrap gap-3 text-xs">
                         <span
                           className={`px-2 py-1 rounded ${
-                            reg.photo_release
+                            reg.photo_release_consent
                               ? "bg-green-100 text-green-700"
                               : "bg-gray-100 text-gray-400"
                           }`}
                         >
-                          Photo Release: {reg.photo_release ? "Yes" : "No"}
+                          Photo Release: {reg.photo_release_consent ? "Yes" : "No"}
                         </span>
                         <span
                           className={`px-2 py-1 rounded ${
-                            reg.liability_waiver
+                            reg.liability_waiver_consent
                               ? "bg-green-100 text-green-700"
                               : "bg-gray-100 text-gray-400"
                           }`}
                         >
-                          Liability: {reg.liability_waiver ? "Yes" : "No"}
+                          Liability: {reg.liability_waiver_consent ? "Yes" : "No"}
                         </span>
                         <span
                           className={`px-2 py-1 rounded ${
-                            reg.code_of_conduct
+                            reg.parent_code_of_conduct
                               ? "bg-green-100 text-green-700"
                               : "bg-gray-100 text-gray-400"
                           }`}
                         >
-                          Code of Conduct: {reg.code_of_conduct ? "Yes" : "No"}
+                          Code of Conduct: {reg.parent_code_of_conduct ? "Yes" : "No"}
                         </span>
                       </div>
                     </div>
