@@ -19,18 +19,22 @@ export default function LoginPage() {
     setError(null);
     setSubmitting(true);
 
-    const { error: signInError } = await signIn(email, password);
-    if (signInError) {
-      setError(signInError);
-      setSubmitting(false);
-      return;
-    }
+    try {
+      const { error: signInError } = await signIn(email, password);
+      if (signInError) {
+        setError(signInError);
+        setSubmitting(false);
+        return;
+      }
 
-    // Redirect based on URL param or default to portal
-    const params = new URLSearchParams(window.location.search);
-    const redirect = params.get("redirect") || "/portal";
-    router.push(redirect);
-    router.refresh();
+      // Use window.location for reliable redirect (avoids Next.js router issues)
+      const params = new URLSearchParams(window.location.search);
+      const redirect = params.get("redirect") || "/portal";
+      window.location.href = redirect;
+    } catch (err) {
+      setError(err instanceof Error ? err.message : "An unexpected error occurred");
+      setSubmitting(false);
+    }
   }
 
   return (
