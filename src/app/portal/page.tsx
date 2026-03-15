@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { supabase } from "@/lib/supabase";
 import { StripeDivider } from "@/components/stripe-divider";
@@ -108,10 +109,18 @@ const quickLinks = [
 /* ------------------------------------------------------------------ */
 
 export default function PortalPage() {
+  const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
+
+  // Client-side auth guard
+  useEffect(() => {
+    if (!authLoading && !user) {
+      router.push("/auth/login?redirect=/portal");
+    }
+  }, [authLoading, user, router]);
 
   useEffect(() => {
     if (!user || !supabase) {

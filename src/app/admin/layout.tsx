@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   ClipboardList,
@@ -9,6 +9,7 @@ import {
   BarChart3,
   Megaphone,
 } from "lucide-react";
+import { useAuth } from "@/contexts/auth-context";
 
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
@@ -24,6 +25,29 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const { user, role, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="pt-[98px] min-h-screen bg-off-white flex items-center justify-center">
+        <p className="text-gray-500">Loading...</p>
+      </div>
+    );
+  }
+
+  if (!user) {
+    router.push(`/auth/login?redirect=${pathname}`);
+    return null;
+  }
+
+  if (role !== "admin") {
+    return (
+      <div className="pt-[98px] min-h-screen bg-off-white flex items-center justify-center">
+        <p className="text-flag-red font-semibold">Access denied. Admin role required.</p>
+      </div>
+    );
+  }
 
   function isActive(href: string) {
     if (href === "/admin") return pathname === "/admin";
