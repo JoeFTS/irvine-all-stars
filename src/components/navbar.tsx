@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Menu, X } from "lucide-react";
+import { useAuth } from "@/contexts/auth-context";
 
 const navLinks = [
   { href: "/coaches", label: "Coaches" },
@@ -14,6 +15,11 @@ const navLinks = [
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const { user, role, signOut } = useAuth();
+
+  const portalLink = role === "admin"
+    ? { href: "/admin", label: "Admin Panel" }
+    : { href: "/portal", label: "Parent Portal" };
 
   return (
     <>
@@ -54,12 +60,22 @@ export function Navbar() {
           ))}
           <li>
             <Link
-              href="/portal"
+              href={portalLink.href}
               className="bg-flag-red hover:bg-flag-red-dark text-white px-4 py-2 rounded text-sm font-bold uppercase tracking-wide transition-colors"
             >
-              Parent Portal
+              {portalLink.label}
             </Link>
           </li>
+          {user && (
+            <li>
+              <button
+                onClick={() => { signOut(); window.location.href = "/"; }}
+                className="text-white/50 hover:text-white text-xs font-semibold uppercase tracking-wide transition-colors"
+              >
+                Sign Out
+              </button>
+            </li>
+          )}
         </ul>
 
         {/* Mobile Toggle */}
@@ -89,13 +105,23 @@ export function Navbar() {
             ))}
             <li className="mt-4">
               <Link
-                href="/portal"
+                href={portalLink.href}
                 onClick={() => setMobileOpen(false)}
                 className="block bg-flag-red text-white text-center py-3 rounded font-display text-lg uppercase tracking-wider font-bold"
               >
-                Parent Portal
+                {portalLink.label}
               </Link>
             </li>
+            {user && (
+              <li className="mt-2">
+                <button
+                  onClick={() => { signOut(); setMobileOpen(false); window.location.href = "/"; }}
+                  className="block w-full text-white/50 hover:text-white text-center py-3 font-display text-sm uppercase tracking-wider"
+                >
+                  Sign Out
+                </button>
+              </li>
+            )}
           </ul>
         </div>
       )}

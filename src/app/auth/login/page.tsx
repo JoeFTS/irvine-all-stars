@@ -34,10 +34,26 @@ export default function LoginPage() {
         return;
       }
 
-      // Hard redirect — default to admin for admin users
+      // Check role to determine default redirect
       const params = new URLSearchParams(window.location.search);
-      const redirect = params.get("redirect") || "/admin";
-      window.location.href = redirect;
+      const explicitRedirect = params.get("redirect");
+
+      if (explicitRedirect) {
+        window.location.href = explicitRedirect;
+      } else {
+        // Fetch role to determine where to go
+        const { data: { user: authUser } } = await supabase.auth.getUser();
+        if (authUser) {
+          const { data: profile } = await supabase
+            .from("profiles")
+            .select("role")
+            .eq("id", authUser.id)
+            .single();
+          window.location.href = profile?.role === "admin" ? "/admin" : "/portal";
+        } else {
+          window.location.href = "/portal";
+        }
+      }
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unexpected error");
       setSubmitting(false);
