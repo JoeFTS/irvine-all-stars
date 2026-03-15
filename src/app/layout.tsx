@@ -3,6 +3,7 @@ import { Oswald, Barlow } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
+import { AuthProvider } from "@/contexts/auth-context";
 
 const oswald = Oswald({
   variable: "--font-oswald",
@@ -41,9 +42,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className={`${oswald.variable} ${barlow.variable} antialiased`}>
-        <Navbar />
-        <main>{children}</main>
-        <Footer />
+        <AuthProvider>
+          <Navbar />
+          <main>{children}</main>
+          <Footer />
+        </AuthProvider>
       </body>
     </html>
   );

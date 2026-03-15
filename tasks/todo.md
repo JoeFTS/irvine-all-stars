@@ -16,20 +16,24 @@
 - [x] Implement footer
 - [x] Build homepage (flag hero, divisions, stats, how-it-works, CTA)
 
-## Phase 2: Content Pages + Coach Application (MVP Launch) 🔄
+## Phase 2: Content Pages + Forms (MVP Launch) ✅
 - [x] /coaches page (selection policy, rubric, application process)
 - [x] /tryouts page (schedule, scoring, parent info)
 - [x] /timeline page (visual 6-phase timeline)
 - [x] /faq page (14 questions, accordion component)
 - [x] /documents page (downloadable docs grid)
 - [x] /updates page (announcements feed)
-- [ ] Set up Supabase schema (irvine_allstars in ProjectHub)
-- [ ] /apply/coach — Coach Application Form (multi-step wizard)
-- [ ] /apply/player — Player/Family Tryout Registration Form
-- [ ] Deploy MVP with forms live
-- [ ] Verify forms submit to Supabase correctly
+- [x] Set up Supabase schema (irvine_allstars in ProjectHub)
+- [x] /apply/coach — Coach Application Form (4-step wizard: Contact → Experience → Philosophy → Submit)
+- [x] /apply/player — Player/Family Tryout Registration Form (3-step wizard)
+- [x] Confirmation email API (/api/send-confirmation) with branded HTML templates
+- [x] Deploy MVP with forms live
+- [x] Division names corrected (9U-Mustang, 12U-Bronco)
+- [x] /portal placeholder page
+- [ ] Connect email sending (Resend/SendGrid integration — currently logging only)
+- [ ] Test full form submission end-to-end on production
 
-## Phase 3: Auth + Evaluator Scoring
+## Phase 3: Auth + Evaluator Scoring ← NEXT
 - [ ] Supabase auth (email + password)
 - [ ] Profiles table with roles (admin, coach, evaluator, parent)
 - [ ] Login page (/auth/login)
@@ -67,5 +71,5 @@
 - [ ] Post-Season Survey
 
 ---
-**Current Focus:** Phase 2 — Supabase schema + coach/player forms
-**Last Updated:** 2026-03-13
+**Current Focus:** Phase 2 wrap-up (email integration, e2e testing) → Phase 3 (Auth + Evaluator Scoring)
+**Last Updated:** 2026-03-14
