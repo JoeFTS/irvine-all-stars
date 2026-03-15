@@ -1,0 +1,1053 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Irvine PONY All-Stars — Brand Identity System</title>
+<link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Barlow:wght@400;500;600;700&family=Barlow+Condensed:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0A2342;
+    --royal-blue: #1D4ED8;
+    --red: #C1121F;
+    --gold: #F4B400;
+    --white: #FFFFFF;
+    --off-white: #F9FAFB;
+    --gray: #E5E7EB;
+    --charcoal: #1F2937;
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'Barlow', sans-serif;
+    color: var(--charcoal);
+    background: var(--white);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ─── Cover ─── */
+  .cover {
+    background: var(--navy);
+    color: var(--white);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 3rem 2rem;
+    position: relative;
+    overflow: hidden;
+  }
+  .cover::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: repeating-linear-gradient(
+      0deg,
+      transparent,
+      transparent 60px,
+      rgba(255,255,255,0.015) 60px,
+      rgba(255,255,255,0.015) 61px
+    );
+  }
+  .cover-stars { color: var(--gold); font-size: 1.5rem; letter-spacing: 0.5rem; margin-bottom: 1.5rem; position: relative; }
+  .cover h1 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    line-height: 1.1;
+    position: relative;
+  }
+  .cover h1 span { color: var(--red); }
+  .cover .subtitle {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: rgba(255,255,255,0.5);
+    margin-top: 1.5rem;
+    position: relative;
+  }
+  .cover-line {
+    width: 80px;
+    height: 3px;
+    background: var(--red);
+    margin: 2rem auto 0;
+    position: relative;
+  }
+
+  /* ─── Navigation ─── */
+  .toc {
+    background: var(--off-white);
+    border-bottom: 1px solid var(--gray);
+    padding: 2rem;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+  }
+  .toc-inner {
+    max-width: 900px;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    justify-content: center;
+  }
+  .toc a {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.7rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    color: var(--navy);
+    text-decoration: none;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid var(--gray);
+    border-radius: 4px;
+    transition: all 0.2s;
+    font-weight: 600;
+  }
+  .toc a:hover { background: var(--navy); color: var(--white); border-color: var(--navy); }
+
+  /* ─── Section Layout ─── */
+  .section { padding: 5rem 2rem; max-width: 900px; margin: 0 auto; }
+  .section-alt { background: var(--off-white); }
+  .section-dark { background: var(--navy); color: var(--white); }
+  .section-dark .section { max-width: 900px; }
+  .section-red { background: var(--red); color: var(--white); }
+
+  .section-label {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.75rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.2em;
+    color: var(--red);
+    margin-bottom: 0.5rem;
+  }
+  .section-dark .section-label { color: var(--gold); }
+  .section-red .section-label { color: rgba(255,255,255,0.6); }
+
+  h2 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 2rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+    line-height: 1.15;
+    margin-bottom: 2rem;
+  }
+
+  h3 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 500;
+    font-size: 1.25rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-top: 2.5rem;
+    margin-bottom: 0.75rem;
+    color: var(--navy);
+  }
+  .section-dark h3 { color: var(--gold); }
+
+  p { margin-bottom: 1rem; }
+
+  /* ─── Cards ─── */
+  .card {
+    background: var(--white);
+    border: 1px solid var(--gray);
+    border-radius: 12px;
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+  }
+  .section-dark .card { background: rgba(255,255,255,0.06); border-color: rgba(255,255,255,0.1); }
+
+  .card-title {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+    margin-bottom: 0.5rem;
+    color: var(--navy);
+  }
+  .section-dark .card-title { color: var(--white); }
+
+  .card-subtitle {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    color: var(--red);
+    margin-bottom: 0.5rem;
+    font-weight: 600;
+  }
+
+  /* ─── Color Swatches ─── */
+  .swatch-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(140px, 1fr));
+    gap: 1rem;
+    margin: 1.5rem 0;
+  }
+  .swatch {
+    border-radius: 12px;
+    overflow: hidden;
+    border: 1px solid var(--gray);
+  }
+  .swatch-color {
+    height: 80px;
+    display: flex;
+    align-items: flex-end;
+    padding: 0.5rem;
+  }
+  .swatch-info {
+    padding: 0.75rem;
+    background: var(--white);
+  }
+  .swatch-name {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .swatch-hex {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.75rem;
+    color: #6B7280;
+    letter-spacing: 0.05em;
+  }
+
+  /* ─── Tables ─── */
+  table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 1.5rem 0;
+    font-size: 0.9rem;
+  }
+  th {
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.7rem;
+    text-align: left;
+    padding: 0.75rem 1rem;
+    background: var(--navy);
+    color: var(--white);
+  }
+  th:first-child { border-radius: 6px 0 0 0; }
+  th:last-child { border-radius: 0 6px 0 0; }
+  td {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--gray);
+    vertical-align: top;
+  }
+  tr:last-child td { border-bottom: none; }
+  .section-dark th { background: rgba(255,255,255,0.1); }
+  .section-dark td { border-color: rgba(255,255,255,0.08); }
+
+  /* ─── Lists ─── */
+  ul, ol { margin: 0.75rem 0 1.25rem 1.25rem; }
+  li { margin-bottom: 0.4rem; }
+
+  /* ─── Badges ─── */
+  .badge {
+    display: inline-block;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-weight: 600;
+    font-size: 0.65rem;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    padding: 0.25rem 0.6rem;
+    border-radius: 4px;
+    margin-right: 0.25rem;
+  }
+  .badge-navy { background: var(--navy); color: var(--white); }
+  .badge-red { background: var(--red); color: var(--white); }
+  .badge-blue { background: var(--royal-blue); color: var(--white); }
+  .badge-gold { background: var(--gold); color: var(--navy); }
+  .badge-gray { background: var(--gray); color: var(--charcoal); }
+
+  /* ─── Blockquotes ─── */
+  blockquote {
+    border-left: 4px solid var(--red);
+    padding: 1rem 1.5rem;
+    background: var(--off-white);
+    margin: 1.5rem 0;
+    border-radius: 0 8px 8px 0;
+    font-style: italic;
+  }
+  .section-dark blockquote { background: rgba(255,255,255,0.05); border-left-color: var(--gold); }
+
+  /* ─── Code blocks ─── */
+  pre {
+    background: #111827;
+    color: #E5E7EB;
+    padding: 1.25rem;
+    border-radius: 8px;
+    overflow-x: auto;
+    font-size: 0.8rem;
+    line-height: 1.6;
+    margin: 1rem 0;
+  }
+  code { font-family: 'SF Mono', 'Fira Code', monospace; }
+  p code, li code {
+    background: var(--off-white);
+    padding: 0.15rem 0.4rem;
+    border-radius: 4px;
+    font-size: 0.85em;
+    color: var(--navy);
+    border: 1px solid var(--gray);
+  }
+  .section-dark p code { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.15); color: var(--white); }
+
+  /* ─── Logo Concepts Grid ─── */
+  .concept-grid { display: grid; grid-template-columns: 1fr; gap: 1.5rem; margin: 1.5rem 0; }
+  @media (min-width: 640px) { .concept-grid { grid-template-columns: 1fr 1fr; } }
+  .concept-card {
+    border: 1px solid var(--gray);
+    border-radius: 12px;
+    overflow: hidden;
+    transition: transform 0.2s, box-shadow 0.2s;
+  }
+  .concept-card:hover { transform: translateY(-2px); box-shadow: 0 8px 24px rgba(10,35,66,0.1); }
+  .concept-header {
+    background: var(--navy);
+    color: var(--white);
+    padding: 1.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .concept-number {
+    font-family: 'Oswald', sans-serif;
+    font-size: 2rem;
+    font-weight: 700;
+    color: var(--gold);
+    line-height: 1;
+  }
+  .concept-name {
+    font-family: 'Oswald', sans-serif;
+    font-size: 1.1rem;
+    font-weight: 600;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .concept-body { padding: 1.25rem; }
+  .concept-body p { font-size: 0.9rem; margin-bottom: 0.5rem; }
+  .concept-body strong { color: var(--navy); }
+
+  .winner-card {
+    border: 3px solid var(--gold);
+    background: linear-gradient(135deg, rgba(244,180,0,0.04) 0%, var(--white) 100%);
+  }
+  .winner-card .concept-header { background: linear-gradient(135deg, var(--navy) 0%, #0F3460 100%); }
+  .winner-badge {
+    font-family: 'Barlow Condensed', sans-serif;
+    background: var(--gold);
+    color: var(--navy);
+    font-size: 0.6rem;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+    padding: 0.2rem 0.6rem;
+    border-radius: 3px;
+  }
+
+  /* ─── Tagline List ─── */
+  .tagline-list { list-style: none; margin-left: 0; counter-reset: tagline; }
+  .tagline-list li {
+    counter-increment: tagline;
+    padding: 1rem 1.25rem;
+    border: 1px solid var(--gray);
+    border-radius: 8px;
+    margin-bottom: 0.75rem;
+    display: flex;
+    gap: 1rem;
+    align-items: baseline;
+    transition: transform 0.15s;
+  }
+  .tagline-list li:hover { transform: translateX(4px); }
+  .tagline-list li::before {
+    content: counter(tagline);
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 1.25rem;
+    color: var(--red);
+    min-width: 1.5rem;
+  }
+  .tagline-main {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 600;
+    font-size: 1.1rem;
+    text-transform: uppercase;
+    letter-spacing: 0.02em;
+    color: var(--navy);
+  }
+  .tagline-note { font-size: 0.85rem; color: #6B7280; margin-top: 0.25rem; }
+
+  /* ─── Prompt blocks ─── */
+  .prompt-block {
+    background: #111827;
+    border-radius: 10px;
+    padding: 1.25rem;
+    margin-bottom: 1rem;
+    position: relative;
+  }
+  .prompt-number {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 0.75rem;
+    color: var(--gold);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    margin-bottom: 0.5rem;
+  }
+  .prompt-text {
+    color: #D1D5DB;
+    font-size: 0.85rem;
+    line-height: 1.6;
+    font-style: italic;
+  }
+
+  /* ─── Checklist ─── */
+  .checklist { list-style: none; margin-left: 0; }
+  .checklist li {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--gray);
+    display: flex;
+    gap: 0.75rem;
+    align-items: flex-start;
+    font-size: 0.95rem;
+  }
+  .checklist li::before {
+    content: '☐';
+    font-size: 1.1rem;
+    color: var(--royal-blue);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* ─── Sprint Table ─── */
+  .sprint-day {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    color: var(--navy);
+    white-space: nowrap;
+  }
+
+  /* ─── Divider ─── */
+  .divider {
+    display: flex;
+    height: 6px;
+  }
+  .divider span { flex: 1; }
+  .divider .d-red { background: var(--red); }
+  .divider .d-white { background: var(--white); }
+  .divider .d-blue { background: var(--navy); }
+
+  /* ─── Footer ─── */
+  .footer {
+    background: var(--navy);
+    color: rgba(255,255,255,0.4);
+    text-align: center;
+    padding: 3rem 2rem;
+    font-family: 'Barlow Condensed', sans-serif;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.15em;
+  }
+
+  /* ─── Responsive ─── */
+  @media (max-width: 640px) {
+    .section { padding: 3rem 1.25rem; }
+    h2 { font-size: 1.6rem; }
+    .swatch-grid { grid-template-columns: repeat(2, 1fr); }
+    table { font-size: 0.75rem; }
+    th, td { padding: 0.5rem; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════ COVER ═══════════════════ -->
+<div class="cover">
+  <div class="cover-stars">&#9733; &#9733; &#9733;</div>
+  <h1>Irvine PONY<br><span>All-Stars</span></h1>
+  <p class="subtitle">Complete Brand Identity System</p>
+  <div class="cover-line"></div>
+</div>
+
+<div class="divider"><span class="d-red"></span><span class="d-white"></span><span class="d-blue"></span><span class="d-white"></span><span class="d-red"></span></div>
+
+<!-- ═══════════════════ TOC ═══════════════════ -->
+<div class="toc">
+  <div class="toc-inner">
+    <a href="#foundation">Foundation</a>
+    <a href="#logos">Logo Concepts</a>
+    <a href="#colors">Colors</a>
+    <a href="#typography">Typography</a>
+    <a href="#visual">Visual Direction</a>
+    <a href="#voice">Voice & Messaging</a>
+    <a href="#package">Identity Package</a>
+    <a href="#prompts">AI Prompts</a>
+    <a href="#directions">Recommendations</a>
+    <a href="#sprint">Sprint Plan</a>
+    <a href="#checklist">Checklist</a>
+  </div>
+</div>
+
+<!-- ═══════════════════ 1. FOUNDATION ═══════════════════ -->
+<div id="foundation">
+  <div class="section">
+    <p class="section-label">Section 01</p>
+    <h2>Brand Identity Foundation</h2>
+
+    <h3>Brand Archetype: The Hero</h3>
+    <p>The Hero archetype fits perfectly. Heroes are driven by competence, courage, and mastery. They prove their worth through action and inspire others to rise. In youth baseball, every player is on a hero's journey — from first practice to the tournament stage. Parents see their children becoming stronger, more disciplined, more confident. The organization is the arena where that transformation happens.</p>
+
+    <h3>Brand Personality Traits</h3>
+    <div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(160px,1fr)); gap:0.75rem; margin:1rem 0;">
+      <div class="card" style="text-align:center;"><div class="card-title" style="color:var(--red);">Competitive</div><p style="font-size:0.85rem;margin:0;">We play to win. Every drill, every at-bat, every inning matters.</p></div>
+      <div class="card" style="text-align:center;"><div class="card-title" style="color:var(--red);">Disciplined</div><p style="font-size:0.85rem;margin:0;">Fundamentals first. No shortcuts. Earn your spot.</p></div>
+      <div class="card" style="text-align:center;"><div class="card-title" style="color:var(--red);">Confident</div><p style="font-size:0.85rem;margin:0;">Quiet intensity, not arrogance.</p></div>
+      <div class="card" style="text-align:center;"><div class="card-title" style="color:var(--red);">Family-Oriented</div><p style="font-size:0.85rem;margin:0;">Parents, players, and coaches are one team.</p></div>
+      <div class="card" style="text-align:center;"><div class="card-title" style="color:var(--red);">Energetic</div><p style="font-size:0.85rem;margin:0;">High tempo. Hustle is non-negotiable.</p></div>
+    </div>
+
+    <h3>Core Brand Promise</h3>
+    <blockquote>"We develop confident, competitive young athletes through elite coaching, disciplined preparation, and a community that treats every family like their own."</blockquote>
+
+    <h3>3 Key Emotions</h3>
+    <div style="display:flex; gap:1rem; margin:1rem 0; flex-wrap:wrap;">
+      <div style="flex:1; min-width:140px; text-align:center; padding:1.5rem 1rem; background:var(--navy); color:var(--white); border-radius:10px;"><div style="font-family:'Oswald'; font-size:2rem; font-weight:700; color:var(--gold);">1</div><div style="font-family:'Oswald'; font-weight:600; text-transform:uppercase; letter-spacing:0.05em;">Pride</div><p style="font-size:0.8rem; opacity:0.7; margin:0.5rem 0 0;">"My kid is part of something special."</p></div>
+      <div style="flex:1; min-width:140px; text-align:center; padding:1.5rem 1rem; background:var(--navy); color:var(--white); border-radius:10px;"><div style="font-family:'Oswald'; font-size:2rem; font-weight:700; color:var(--gold);">2</div><div style="font-family:'Oswald'; font-weight:600; text-transform:uppercase; letter-spacing:0.05em;">Trust</div><p style="font-size:0.8rem; opacity:0.7; margin:0.5rem 0 0;">"These coaches care about my child."</p></div>
+      <div style="flex:1; min-width:140px; text-align:center; padding:1.5rem 1rem; background:var(--navy); color:var(--white); border-radius:10px;"><div style="font-family:'Oswald'; font-size:2rem; font-weight:700; color:var(--gold);">3</div><div style="font-family:'Oswald'; font-weight:600; text-transform:uppercase; letter-spacing:0.05em;">Excitement</div><p style="font-size:0.8rem; opacity:0.7; margin:0.5rem 0 0;">"I can't wait for the next game."</p></div>
+    </div>
+
+    <h3>Positioning Statement</h3>
+    <p>For Orange County families who want more than recreational baseball, Irvine PONY All-Stars is the elite youth program that combines tournament-level competition with character development and genuine community — unlike travel ball programs that prioritize winning over growth, we build complete players and lasting family connections.</p>
+
+    <h3>What Differentiates Us</h3>
+    <ul>
+      <li><strong>Transparent selection</strong> — 100-point rubric, independent evaluators, no politics</li>
+      <li><strong>Family-first culture</strong> — Parents are partners, not spectators</li>
+      <li><strong>Development over trophies</strong> — We measure success in growth, not just wins</li>
+      <li><strong>Community roots</strong> — We're Irvine. Not a faceless travel org.</li>
+      <li><strong>Structured compliance</strong> — Digital binders, clear expectations, professional operations</li>
+    </ul>
+
+    <h3>One Defining Brand Word</h3>
+    <div style="text-align:center; padding:2rem; background:var(--navy); border-radius:12px; margin:1rem 0;">
+      <div style="font-family:'Oswald'; font-weight:700; font-size:4rem; color:var(--white); text-transform:uppercase; letter-spacing:0.15em;">GRIT</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"><span class="d-red"></span><span class="d-white"></span><span class="d-blue"></span><span class="d-white"></span><span class="d-red"></span></div>
+
+<!-- ═══════════════════ 2. LOGOS ═══════════════════ -->
+<div class="section-dark" id="logos">
+  <div class="section">
+    <p class="section-label">Section 02</p>
+    <h2>Logo Concept Generation</h2>
+
+    <div class="concept-grid">
+      <div class="concept-card winner-card">
+        <div class="concept-header">
+          <div><div class="concept-number">01</div><div class="concept-name">The Shield</div></div>
+          <span class="winner-badge">&#9733; Recommended</span>
+        </div>
+        <div class="concept-body">
+          <p><strong>Visual:</strong> Shield shape containing a stylized baseball diamond, "IRVINE" arched at top, "ALL-STARS" at bottom. Stars flanking the shield.</p>
+          <p><strong>Shape:</strong> Shield = protection, honor, tradition. Diamond = the playing field.</p>
+          <p><strong>Emotion:</strong> Authority + tradition + pride.</p>
+          <p><strong>Scaling:</strong> Standalone icon on hats/jerseys. Full lockup for headers. Shield-only for app icon/favicon.</p>
+          <p><strong>Timeless:</strong> Shield crests have worked for centuries (Premier League, NFL, MLB).</p>
+        </div>
+      </div>
+
+      <div class="concept-card">
+        <div class="concept-header">
+          <div><div class="concept-number">02</div><div class="concept-name">The Star Diamond</div></div>
+        </div>
+        <div class="concept-body">
+          <p><strong>Visual:</strong> Five-pointed star with baseball diamond integrated into its center. Negative space creates the basepaths.</p>
+          <p><strong>Shape:</strong> Star = excellence, aspiration. Diamond = the field. Sharp, angular, modern.</p>
+          <p><strong>Emotion:</strong> Modern + elite + aspirational.</p>
+          <p><strong>Scaling:</strong> Star icon works at any size. Embroiders well on hats.</p>
+          <p><strong>Timeless:</strong> Stars are universal. Geometric construction prevents trendiness.</p>
+        </div>
+      </div>
+
+      <div class="concept-card">
+        <div class="concept-header">
+          <div><div class="concept-number">03</div><div class="concept-name">The Banner</div></div>
+        </div>
+        <div class="concept-body">
+          <p><strong>Visual:</strong> Horizontal ribbon with "IRVINE ALL-STARS" in bold type, flanked by stars. Baseball centered above.</p>
+          <p><strong>Shape:</strong> Ribbon = championship. Horizontal = stability.</p>
+          <p><strong>Emotion:</strong> Championship + tradition + Americana.</p>
+          <p><strong>Scaling:</strong> Wide for jerseys/headers. Stacks for hats. Stars as micro-icons.</p>
+          <p><strong>Timeless:</strong> Pennant shapes are embedded in baseball DNA since the 1900s.</p>
+        </div>
+      </div>
+
+      <div class="concept-card">
+        <div class="concept-header">
+          <div><div class="concept-number">04</div><div class="concept-name">The Monogram</div></div>
+        </div>
+        <div class="concept-body">
+          <p><strong>Visual:</strong> Interlocking "IAS" in a circular badge with stars. Clean, sophisticated, premium.</p>
+          <p><strong>Shape:</strong> Circle = unity. Interlocking letters = teamwork.</p>
+          <p><strong>Emotion:</strong> Premium + exclusive + professional.</p>
+          <p><strong>Scaling:</strong> Perfect for hats, jersey patches, social avatars.</p>
+          <p><strong>Timeless:</strong> Most enduring logo format in sports (Yankees, Giants, Dodgers).</p>
+        </div>
+      </div>
+
+      <div class="concept-card" style="grid-column: 1 / -1;">
+        <div class="concept-header">
+          <div><div class="concept-number">05</div><div class="concept-name">The Batter's Star</div></div>
+        </div>
+        <div class="concept-body">
+          <p><strong>Visual:</strong> Batter silhouette in mid-swing, integrated into a star shape. Dynamic and action-oriented. <strong>Shape:</strong> Star = All-Stars. Batter = the sport. Diagonal lines = motion. <strong>Emotion:</strong> Action + energy + excitement. <strong>Scaling:</strong> Full mark on jerseys, simplified star for small sizes. <strong>Timeless:</strong> Action silhouettes are classic (NBA's Jerry West, MLB's batter logo).</p>
+        </div>
+      </div>
+    </div>
+
+    <h3>Why The Shield Wins</h3>
+    <blockquote>The shield delivers on every brand requirement simultaneously. It communicates authority (parents trust it), tradition (it feels established, not startup-y), and honor (players feel they've earned something). It scales perfectly from favicon to billboard. It differentiates Irvine PONY All-Stars from typical clip-art-heavy youth leagues while still feeling accessible to families. The shield says: "We take this seriously. Your child is in good hands." The Star Diamond (Concept 2) is the strong runner-up and could serve as the secondary/icon mark.</blockquote>
+  </div>
+</div>
+
+<div class="divider"><span class="d-red"></span><span class="d-white"></span><span class="d-blue"></span><span class="d-white"></span><span class="d-red"></span></div>
+
+<!-- ═══════════════════ 3. COLORS ═══════════════════ -->
+<div id="colors">
+  <div class="section">
+    <p class="section-label">Section 03</p>
+    <h2>Color Palette System</h2>
+
+    <div class="swatch-grid">
+      <div class="swatch">
+        <div class="swatch-color" style="background:#0A2342;"></div>
+        <div class="swatch-info"><div class="swatch-name">Navy</div><div class="swatch-hex">#0A2342 — Primary</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#1D4ED8;"></div>
+        <div class="swatch-info"><div class="swatch-name">Royal Blue</div><div class="swatch-hex">#1D4ED8 — Secondary</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#C1121F;"></div>
+        <div class="swatch-info"><div class="swatch-name">Red</div><div class="swatch-hex">#C1121F — Secondary</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#F4B400;"></div>
+        <div class="swatch-info"><div class="swatch-name">Gold</div><div class="swatch-hex">#F4B400 — Accent</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#FFFFFF; border-bottom:1px solid #E5E7EB;"></div>
+        <div class="swatch-info"><div class="swatch-name">White</div><div class="swatch-hex">#FFFFFF</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#F9FAFB; border-bottom:1px solid #E5E7EB;"></div>
+        <div class="swatch-info"><div class="swatch-name">Off-White</div><div class="swatch-hex">#F9FAFB</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#E5E7EB;"></div>
+        <div class="swatch-info"><div class="swatch-name">Light Gray</div><div class="swatch-hex">#E5E7EB — Neutral</div></div>
+      </div>
+      <div class="swatch">
+        <div class="swatch-color" style="background:#1F2937;"></div>
+        <div class="swatch-info"><div class="swatch-name">Charcoal</div><div class="swatch-hex">#1F2937 — Text</div></div>
+      </div>
+    </div>
+
+    <h3>Contrast & Accessibility</h3>
+    <table>
+      <tr><th>Combination</th><th>Ratio</th><th>Grade</th></tr>
+      <tr><td>Navy on White</td><td>16.75:1</td><td><span class="badge badge-navy">AAA</span></td></tr>
+      <tr><td>Royal Blue on White</td><td>6.54:1</td><td><span class="badge badge-blue">AA</span></td></tr>
+      <tr><td>Red on White</td><td>7.12:1</td><td><span class="badge badge-red">AA</span></td></tr>
+      <tr><td>Gold on Navy</td><td>8.14:1</td><td><span class="badge badge-gold">AAA</span></td></tr>
+      <tr><td>White on Navy</td><td>16.75:1</td><td><span class="badge badge-navy">AAA</span></td></tr>
+      <tr><td>Gold on White</td><td>2.87:1</td><td><span class="badge badge-gray">FAIL — icons only</span></td></tr>
+    </table>
+
+    <h3>Usage Rules</h3>
+    <table>
+      <tr><th>Context</th><th>Primary</th><th>Accent</th><th>Background</th></tr>
+      <tr><td>Website nav</td><td>Navy</td><td>White text</td><td>—</td></tr>
+      <tr><td>Primary buttons</td><td>Royal Blue</td><td>White text</td><td>—</td></tr>
+      <tr><td>CTA buttons</td><td>Red</td><td>White text</td><td>—</td></tr>
+      <tr><td>Cards</td><td>—</td><td>—</td><td>White + gray border</td></tr>
+      <tr><td>Badges/awards</td><td>Gold</td><td>Navy text</td><td>—</td></tr>
+      <tr><td>Jerseys/print</td><td>Navy + White</td><td>Red accent</td><td>—</td></tr>
+    </table>
+
+    <h3>Combinations to Avoid</h3>
+    <ul>
+      <li>Red + Blue side-by-side without white separator</li>
+      <li>Gold as body text on any background</li>
+      <li>Red as a large background area</li>
+      <li>Light gray text on white (fails contrast)</li>
+      <li>Any neon, purple, green, or pastel as dominant</li>
+    </ul>
+  </div>
+</div>
+
+<div class="divider"><span class="d-red"></span><span class="d-white"></span><span class="d-blue"></span><span class="d-white"></span><span class="d-red"></span></div>
+
+<!-- ═══════════════════ 4. TYPOGRAPHY ═══════════════════ -->
+<div class="section-alt" id="typography">
+  <div class="section">
+    <p class="section-label">Section 04</p>
+    <h2>Typography Direction</h2>
+
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1.5rem; margin:1.5rem 0;">
+      <div class="card">
+        <div class="card-subtitle">Display Font</div>
+        <div style="font-family:'Oswald'; font-weight:700; font-size:2.5rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--navy); line-height:1.1;">Oswald Bold</div>
+        <p style="font-size:0.85rem; color:#6B7280; margin-top:0.5rem;">Headlines, logo, buttons. Bold 700, Medium 500. Google Fonts (free).</p>
+      </div>
+      <div class="card">
+        <div class="card-subtitle">Body Font</div>
+        <div style="font-family:'Barlow'; font-weight:400; font-size:1.5rem; color:var(--charcoal); line-height:1.4;">Barlow Regular</div>
+        <p style="font-size:0.85rem; color:#6B7280; margin-top:0.5rem;">Body text, descriptions. Regular 400, Semi-Bold 600. Google Fonts (free).</p>
+      </div>
+    </div>
+
+    <h3>Font Hierarchy</h3>
+    <table>
+      <tr><th>Element</th><th>Font</th><th>Weight</th><th>Size</th><th>Tracking</th><th>Transform</th></tr>
+      <tr><td>H1</td><td>Oswald</td><td>700</td><td>36–48px</td><td>0.05em</td><td>UPPERCASE</td></tr>
+      <tr><td>H2</td><td>Oswald</td><td>700</td><td>28–36px</td><td>0.04em</td><td>UPPERCASE</td></tr>
+      <tr><td>H3</td><td>Oswald</td><td>500</td><td>20–24px</td><td>0.03em</td><td>UPPERCASE</td></tr>
+      <tr><td>Body</td><td>Barlow</td><td>400</td><td>16px</td><td>0</td><td>normal</td></tr>
+      <tr><td>Caption</td><td>Barlow Condensed</td><td>500</td><td>12–14px</td><td>0.08em</td><td>UPPERCASE</td></tr>
+      <tr><td>Button</td><td>Oswald</td><td>600</td><td>14px</td><td>0.1em</td><td>UPPERCASE</td></tr>
+    </table>
+
+    <h3>Live Type Samples</h3>
+    <div class="card" style="margin:1rem 0;">
+      <div style="font-family:'Oswald'; font-weight:700; font-size:2.5rem; text-transform:uppercase; letter-spacing:0.05em; color:var(--navy); line-height:1.1;">Earn Your Stars</div>
+      <div style="font-family:'Oswald'; font-weight:700; font-size:1.75rem; text-transform:uppercase; letter-spacing:0.04em; color:var(--navy); line-height:1.15; margin-top:0.75rem;">Tournament Season 2026</div>
+      <div style="font-family:'Oswald'; font-weight:500; font-size:1.25rem; text-transform:uppercase; letter-spacing:0.03em; color:var(--navy); margin-top:0.75rem;">Player Development Program</div>
+      <p style="margin-top:1rem;">We develop confident, competitive young athletes through elite coaching, disciplined preparation, and a community that treats every family like their own.</p>
+      <div style="margin-top:1rem; display:flex; gap:0.75rem;">
+        <span style="display:inline-block; background:var(--royal-blue); color:white; font-family:'Oswald'; font-weight:600; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.1em; padding:0.6rem 1.25rem; border-radius:6px;">Register Now</span>
+        <span style="display:inline-block; background:var(--red); color:white; font-family:'Oswald'; font-weight:600; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.1em; padding:0.6rem 1.25rem; border-radius:6px;">Apply to Coach</span>
+      </div>
+    </div>
+
+    <h3>Mistake to Avoid</h3>
+    <blockquote><strong>Over-styling with script/cursive baseball fonts.</strong> Teams slap on "baseball script" fonts that feel like Little League clip-art. It screams recreational, not elite. Stick to clean, bold sans-serifs. The type should feel like a pro franchise, not a t-ball trophy shop.</blockquote>
+  </div>
+</div>
+
+<div class="divider"><span class="d-red"></span><span class="d-white"></span><span class="d-blue"></span><span class="d-white"></span><span class="d-red"></span></div>
+
+<!-- ═══════════════════ 5. VISUAL ═══════════════════ -->
+<div id="visual">
+  <div class="section">
+    <p class="section-label">Section 05</p>
+    <h2>Visual Direction Guide</h2>
+
+    <div style="text-align:center; padding:2rem; background:var(--navy); border-radius:12px; margin:0 0 2rem;">
+      <div style="font-family:'Barlow Condensed'; font-size:0.7rem; color:var(--gold); text-transform:uppercase; letter-spacing:0.2em; margin-bottom:0.5rem;">Aesthetic North Star</div>
+      <div style="font-family:'Oswald'; font-weight:700; font-size:2.5rem; color:var(--white); text-transform:uppercase; letter-spacing:0.08em;">Bold. Clean. Earned.</div>
+    </div>
+
+    <h3>Photography Style</h3>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin:1rem 0;">
+      <div class="card" style="border-left:4px solid #22C55E;">
+        <div class="card-title" style="color:#22C55E;">Do</div>
+        <ul style="font-size:0.9rem;">
+          <li>Action shots: batting, fielding, running</li>
+          <li>Candid team moments: huddles, high-fives</li>
+          <li>Natural outdoor light, golden hour heroes</li>
+          <li>Low angles on players (makes them powerful)</li>
+          <li>Show genuine emotion and diversity naturally</li>
+        </ul>
+      </div>
+      <div class="card" style="border-left:4px solid var(--red);">
+        <div class="card-title" style="color:var(--red);">Don't</div>
+        <ul style="font-size:0.9rem;">
+          <li>Staged stock-photo poses</li>
+          <li>Overly filtered/saturated images</li>
+          <li>Dark/moody editing</li>
+          <li>Adults dominating frame over kids</li>
+          <li>Empty fields without people</li>
+        </ul>
+      </div>
+    </div>
+
+    <h3>Icons & Illustration</h3>
+    <p>Simple line icons (2px stroke, navy or white). Geometric, not organic. Use Lucide icons. No clip-art, no cartoon mascots, no flame/lightning effects.</p>
+
+    <h3>Layout Principles</h3>
+    <ul>
+      <li><strong>Spacing:</strong> Generous whitespace. Min 24px between sections, 16px between cards.</li>
+      <li><strong>Hierarchy:</strong> One focal point per section. Headline → subtext → CTA, always.</li>
+      <li><strong>Cards:</strong> Consistent padding (24-32px), subtle borders, 8-12px corners.</li>
+      <li><strong>Grid:</strong> 12-column desktop, single column mobile. Max width: 1280px.</li>
+      <li><strong>Rhythm:</strong> Alternate white and off-white (#F9FAFB) section backgrounds.</li>
+    </ul>
+
+    <h3>3 Social Post Concepts</h3>
+    <div style="display:grid; grid-template-columns: repeat(3, 1fr); gap:1rem; margin:1rem 0;">
+      <div class="card" style="text-align:center;">
+        <div class="card-subtitle">Weekly</div>
+        <div class="card-title">Player Spotlight</div>
+        <p style="font-size:0.8rem;">Navy bg, player photo, name + stats, gold star accent.</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div class="card-subtitle">Pre-Tournament</div>
+        <div class="card-title">Game Day</div>
+        <p style="font-size:0.8rem;">Red accent bar, schedule/location on white, navy footer.</p>
+      </div>
+      <div class="card" style="text-align:center;">
+        <div class="card-subtitle">2-3x/Week</div>
+        <div class="card-title">The Grind</div>
+        <p style="font-size:0.8rem;">Practice photo, navy overlay, motivational one-liner.</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"><span class="d-red"></span><span class="d-white"></span><span class="d-blue"></span><span class="d-white"></span><span class="d-red"></span></div>
+
+<!-- ═══════════════════ 6. VOICE ═══════════════════ -->
+<div class="section-dark" id="voice">
+  <div class="section">
+    <p class="section-label">Section 06</p>
+    <h2>Brand Voice & Messaging</h2>
+
+    <h3>Voice Dimensions</h3>
+    <table>
+      <tr><th>Dimension</th><th>We Are</th><th>We Are Not</th></tr>
+      <tr><td><strong>Confident</strong></td><td>Direct, assured, clear</td><td>Arrogant, boastful</td></tr>
+      <tr><td><strong>Warm</strong></td><td>Welcoming, inclusive, family-first</td><td>Soft, wishy-washy, over-casual</td></tr>
+      <tr><td><strong>Driven</strong></td><td>Action-oriented, high-standards</td><td>Aggressive, demanding, elitist</td></tr>
+      <tr><td><strong>Authentic</strong></td><td>Real, grounded, no BS</td><td>Overly polished, corporate</td></tr>
+    </table>
+
+    <h3>Top 10 Taglines</h3>
+    <ol class="tagline-list">
+      <li><div><div class="tagline-main">"Earn Your Stars."</div><div class="tagline-note">Double meaning: earn your spot + earn the star on your chest.</div></div></li>
+      <li><div><div class="tagline-main">"Built Different. Built Together."</div><div class="tagline-note">Individual development + team/family culture.</div></div></li>
+      <li><div><div class="tagline-main">"Where Hustle Meets Home."</div><div class="tagline-note">Competitive drive + family community in five words.</div></div></li>
+      <li><div><div class="tagline-main">"Grit. Growth. Game Day."</div><div class="tagline-note">Three-word rhythm — practice to performance.</div></div></li>
+      <li><div><div class="tagline-main">"Raise Your Game. Raise Your Family."</div><div class="tagline-note">Dual appeal to players and parents.</div></div></li>
+      <li><div><div class="tagline-main">"This Is How Stars Are Made."</div><div class="tagline-note">Story-driven. Process, not just talent.</div></div></li>
+      <li><div><div class="tagline-main">"Every Rep. Every Inning. Every Player."</div><div class="tagline-note">Relentless development focus.</div></div></li>
+      <li><div><div class="tagline-main">"Play Hard. Play Smart. Play Together."</div><div class="tagline-note">Clear values in three beats.</div></div></li>
+      <li><div><div class="tagline-main">"The Standard Is The Standard."</div><div class="tagline-note">Discipline-forward sports philosophy.</div></div></li>
+      <li><div><div class="tagline-main">"Irvine's Finest Take The Field."</div><div class="tagline-note">Local pride + action.</div></div></li>
+    </ol>
+
+    <h3>Elevator Pitch</h3>
+    <div class="card">
+      <div class="card-subtitle">One Sentence</div>
+      <p>Irvine PONY All-Stars develops confident, competitive young athletes through elite coaching, fair selection, and a family-first community that makes tournament baseball the best experience of their lives.</p>
+    </div>
+    <div class="card">
+      <div class="card-subtitle">One Paragraph</div>
+      <p>Every summer, hundreds of young players across Irvine earn a shot at something bigger than their regular season. Irvine PONY All-Stars takes that opportunity seriously. Our program runs on a foundation of fair, transparent selection using independent evaluators and a 100-point rubric — no politics, no favorites. Once teams are built, our coaches focus on development: teaching fundamentals, building game IQ, and instilling the discipline and grit that tournament baseball demands. But we're more than a competitive program. We're a community of families who show up for each other — in the stands, in the dugout, and long after the final out.</p>
+    </div>
+
+    <h3>Words to Use / Avoid</h3>
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:1rem; margin:1rem 0;">
+      <div class="card" style="border-left:4px solid #22C55E;">
+        <div class="card-title" style="color:#22C55E;">Use Often</div>
+        <p style="font-size:0.9rem;">development, compete, earn, hustle, fundamentals, community, character, confidence, prepared, family</p>
+      </div>
+      <div class="card" style="border-left:4px solid var(--red);">
+        <div class="card-title" style="color:var(--red);">Avoid</div>
+        <p style="font-size:0.9rem;">elite (overused), guarantee, exclusive, dominate, crush, destroy, cheap, basic, just, try</p>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"><span class="d-red"></span><span class="d-white"></span><span class="d-blue"></span><span class="d-white"></span><span class="d-red"></span></div>
+
+<!-- ═══════════════════ 7. PACKAGE ═══════════════════ -->
+<div id="package">
+  <div class="section">
+    <p class="section-label">Section 07</p>
+    <h2>Identity Package</h2>
+
+    <h3>Color Tokens</h3>
+    <pre><code>--color-navy: #0A2342;
+--color-royal-blue: #1D4ED8;
+--color-red: #C1121F;
+--color-gold: #F4B400;
+--color-white: #FFFFFF;
+--color-off-white: #F9FAFB;
+--color-gray: #E5E7EB;
+--color-charcoal: #1F2937;</code></pre>
+
+    <h3>Typography Tokens</h3>
+    <pre><code>--font-display: 'Oswald', sans-serif;
+--font-body: 'Barlow', sans-serif;
+--font-condensed: 'Barlow Condensed', sans-serif;</code></pre>
+
+    <h3>UI Components</h3>
+    <div style="display:flex; flex-wrap:wrap; gap:0.75rem; margin:1.5rem 0;">
+      <span style="display:inline-block; background:var(--royal-blue); color:white; font-family:'Oswald'; font-weight:600; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.1em; padding:0.7rem 1.5rem; border-radius:6px; cursor:pointer;">Primary Button</span>
+      <span style="display:inline-block; background:var(--red); color:white; font-family:'Oswald'; font-weight:600; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.1em; padding:0.7rem 1.5rem; border-radius:6px; cursor:pointer;">CTA Button</span>
+      <span style="display:inline-block; background:transparent; color:var(--navy); font-family:'Oswald'; font-weight:600; font-size:0.8rem; text-transform:uppercase; letter-spacing:0.1em; padding:0.6rem 1.5rem; border-radius:6px; border:2px solid var(--navy); cursor:pointer;">Ghost Button</span>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:0.5rem; margin:1rem 0;">
+      <span class="badge badge-navy">Navy Badge</span>
+      <span class="badge badge-red">Red Badge</span>
+      <span class="badge badge-blue">Blue Badge</span>
+      <span class="badge badge-gold">Gold Badge</span>
+      <span class="badge badge-gray">Gray Badge</span>
+    </div>
+
+    <h3>3 Non-Negotiable Rules</h3>
+    <div class="card" style="border-left:4px solid var(--red); margin-bottom:0.75rem;">
+      <p style="margin:0;"><strong>1.</strong> Never use the logo on a busy/patterned background. Always on solid navy, white, or with sufficient contrast.</p>
+    </div>
+    <div class="card" style="border-left:4px solid var(--red); margin-bottom:0.75rem;">
+      <p style="margin:0;"><strong>2.</strong> Never use more than 2 brand colors in a single composition (plus white/gray neutrals). Navy + Red is the power combo.</p>
+    </div>
+    <div class="card" style="border-left:4px solid var(--red);">
+      <p style="margin:0;"><strong>3.</strong> Never use script, cursive, or decorative fonts. Oswald and Barlow only. No exceptions.</p>
+    </div>
+  </div>
+</div>
+
+<div class="divider"><span class="d-red"></span><span class="d-white"></span><span class="d-blue"></span><span class="d-white"></span><span class="d-red"></span></div>
+
+<!-- ═══════════════════ 8. PROMPTS ═══════════════════ -->
+<div class="section-dark" id="prompts">
+  <div class="section">
+    <p class="section-label">Section 08</p>
+    <h2>AI Prompt Pack</h2>
+
+    <h3>Logo Generation (Top 5)</h3>
+    <div class="prompt-block">
+      <div class="prompt-number">Prompt 1 — Shield Logo</div>
+      <div class="prompt-text">"Design a clean, modern sports logo for 'Irvine All-Stars' youth baseball organization. Shield shape containing a stylized baseball diamond. Navy blue (#0A2342) and white primary colors with red (#C1121F) accent. Bold condensed sans-serif typography. Two small five-pointed stars flanking the shield. Minimal, geometric, premium sports branding. No clip-art, no flames, no cartoon elements. White background. Vector style. --ar 1:1"</div>
+    </div>
+    <div class="prompt-block">
+      <div class="prompt-number">Prompt 2 — Shield Crest</div>
+      <div class="prompt-text">"Create a professional baseball team crest logo. Shield emblem with 'IRVINE' arched at top and 'ALL-STARS' at bottom. Baseball diamond integrated into shield center. Color palette: navy (#0A2342), white, red (#C1121F), gold (#F4B400) stars. Clean geometric construction. Looks great embroidered on a hat. No gradients, no 3D effects. Flat modern design. --ar 1:1"</div>
+    </div>
+    <div class="prompt-block">
+      <div class="prompt-number">Prompt 3 — Star Diamond</div>
+      <div class="prompt-text">"Create a bold sports logo featuring a five-pointed star with a baseball diamond integrated into its center. Text reads 'IRVINE ALL-STARS'. Navy (#0A2342) and white with red (#C1121F) accent. Modern geometric style. Looks professional on jerseys and hats. No cartoon elements, no flames, no busy details. --ar 1:1"</div>
+    </div>
+    <div class="prompt-block">
+      <div class="prompt-number">Prompt 4 — Hat Monogram</div>
+      <div class="prompt-text">"Design a logo that works on a dark navy baseball cap. 'IA' monogram with a star above. White and red (#C1121F) on navy (#0A2342) background. Clean stitchable design for embroidery. Minimal detail, maximum impact at small scale. --ar 1:1"</div>
+    </div>
+    <div class="prompt-block">
+      <div class="prompt-number">Prompt 5 — Pennant Banner</div>
+      <div class="prompt-text">"Design a championship-style pennant banner logo for 'IRVINE ALL-STARS' youth baseball. Horizontal ribbon with bold typography. Two gold (#F4B400) stars flanking the text. Navy (#0A2342) primary, red (#C1121F) banner accent, white text. Classic American baseball aesthetic updated for modern use. --ar 3:1"</div>
+    </div>
+
+    <h3>Hero Banner (Top 3)</h3>
+    <div class="prompt-block">
+      <div class="prompt-number">Hero 1 — Golden Hour</div>
+      <div class="prompt-text">"Website hero banner for youth baseball organization. Wide cinematic shot of baseball diamond at golden hour with dramatic sky. Young player in batting stance (silhouette). Navy (#0A2342) gradient overlay from left. Premium sports website aesthetic. --ar 21:9"</div>
+    </div>
+    <div class="prompt-block">
+      <div class="prompt-number">Hero 2 — Aerial Field</div>
+      <div class="prompt-text">"Aerial view of a pristine baseball diamond with chalk lines and manicured grass. Warm golden hour lighting. Slightly desaturated for overlay compatibility. No people, no text — just the field. Cinematic, aspirational. --ar 21:9"</div>
+    </div>
+    <div class="prompt-block">
+      <div class="prompt-number">Hero 3 — Dugout</div>
+      <div class="prompt-text">"Youth baseball team in dugout, focused and ready. Natural lighting, warm tones. Composition leaves right third empty for text overlay. Genuine emotion — determination and camaraderie. --ar 21:9"</div>
+    </div>
+  </div>
+</div>
+
+<div class="divider"><span class="d-red"></span><span class="d-white"></span><span class="d-blue"></span><span class="d-white"></span><span class="d-red"></span></div>
+
+<!-- ═══════════════════ A. DIRECTIONS ═══════════════════ -->
+<div class="section-alt" id="directions">
+  <div class="section">
+    <p class="section-label">Recommendations</p>
+    <h2>Top 3 Directions</h2>
+
+    <div class="card" style="border-left:4px solid var(--gold); margin-bottom:1rem;">
+      <div class="card-subtitle">Direction 1 — Highest Impact</div>
+      <div class="card-title">"The Shield" Logo + Full Brand System</div>
+      <p>Most versatile, strongest differentiation from rec leagues. Shield as primary mark, star diamond as secondary/icon.</p>
+    </div>
+    <div class="card" style="border-left:4px solid var(--royal-blue); margin-bottom:1rem;">
+      <div class="card-subtitle">Direction 2 — Premium Feel</div>
+      <div class="card-title">Motion System + Premium Interactions</div>
+      <p>Page transitions, stagger reveals, hover lifts. Makes the site feel like a pro franchise, not a volunteer league.</p>
+    </div>
+    <div class="card" style="border-left:4px solid var(--red);">
+      <div class="card-subtitle">Direction 3 — Content Strategy</div>
+      <div class="card-title">Photography-First Content</div>
+      <p>Real action photography at practices and tournaments. One photographer at 2-3 events = months of premium content.</p>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════ B. SPRINT ═══════════════════ -->
+<div id="sprint">
+  <div class="section">
+    <p class="section-label">Execution</p>
+    <h2>7-Day Sprint Plan</h2>
+    <table>
+      <tr><th>Day</th><th>Deliverables</th></tr>
+      <tr><td class="sprint-day">Day 1</td><td>Generate logo concepts with imagegen. Pick shield direction. Create primary + icon + secondary lockups.</td></tr>
+      <tr><td class="sprint-day">Day 2</td><td>Update Tailwind config with new color tokens. Confirm Oswald + Barlow fonts. Update CSS variables site-wide.</td></tr>
+      <tr><td class="sprint-day">Day 3</td><td>Implement motion system (page transitions, stagger reveals, hover lifts). Create reusable animation components.</td></tr>
+      <tr><td class="sprint-day">Day 4</td><td>Redesign homepage hero with new brand system. New section headers, updated stat cards, new CTA styling.</td></tr>
+      <tr><td class="sprint-day">Day 5</td><td>Update all sub-pages with new typography hierarchy and section patterns.</td></tr>
+      <tr><td class="sprint-day">Day 6</td><td>Create social templates (3). Generate hero images. Update favicon + OG images.</td></tr>
+      <tr><td class="sprint-day">Day 7</td><td>QA on all pages (desktop + mobile). Contrast/accessibility audit. Deploy.</td></tr>
+    </table>
+  </div>
+</div>
+
+<div class="divider"><span class="d-red"></span><span class="d-white"></span><span class="d-blue"></span><span class="d-white"></span><span class="d-red"></span></div>
+
+<!-- ═══════════════════ C. CHECKLIST ═══════════════════ -->
+<div class="section-alt" id="checklist">
+  <div class="section">
+    <p class="section-label">Quick Start</p>
+    <h2>Implementation Checklist</h2>
+    <ul class="checklist">
+      <li>Generate shield logo with imagegen (primary + icon versions)</li>
+      <li>Update <code>tailwind.config.ts</code> with new color tokens</li>
+      <li>Confirm Oswald + Barlow fonts loaded</li>
+      <li>Create motion token file (<code>src/lib/motion.ts</code>)</li>
+      <li>Build <code>&lt;PageTransition&gt;</code>, <code>&lt;StaggerReveal&gt;</code>, <code>&lt;HoverLift&gt;</code> components</li>
+      <li>Update navbar to navy (#0A2342) background</li>
+      <li>Update buttons: Royal Blue primary, Red CTA</li>
+      <li>Update section header pattern (red label + navy heading + gray subtext)</li>
+      <li>Generate hero banner image with imagegen</li>
+      <li>Update favicon and OG image with new logo</li>
+      <li>Create 3 social media post templates</li>
+      <li>Run Lighthouse accessibility audit</li>
+      <li>Deploy and verify on mobile</li>
+    </ul>
+  </div>
+</div>
+
+<!-- ═══════════════════ FOOTER ═══════════════════ -->
+<div class="divider"><span class="d-red"></span><span class="d-white"></span><span class="d-blue"></span><span class="d-white"></span><span class="d-red"></span></div>
+<div class="footer">
+  <p>Irvine PONY All-Stars &mdash; Brand Identity System &mdash; 2026</p>
+  <p style="margin-top:0.5rem; opacity:0.5;">Confidential &bull; For internal use only</p>
+</div>
+
+</body>
+</html>
