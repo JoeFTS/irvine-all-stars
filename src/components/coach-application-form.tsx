@@ -539,7 +539,7 @@ export function CoachApplicationForm() {
         </div>
 
         <div>
-          <Label htmlFor="years_experience">Years of Coaching Experience</Label>
+          <Label htmlFor="years_experience">Seasons of Coaching Experience</Label>
           <input
             id="years_experience"
             type="number"
