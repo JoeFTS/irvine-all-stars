@@ -3,10 +3,6 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 
-/* ──────────────────────────────────────────────
-   Types
-   ────────────────────────────────────────────── */
-
 interface FormData {
   // Step 1 — Contact
   full_name: string;
@@ -15,13 +11,8 @@ interface FormData {
   address: string;
 
   // Step 2 — Experience
-  division_preference: string;
-  second_choice_division: string;
-  willing_any_division: boolean;
+  current_division: string;
   years_experience: string;
-  certifications: string;
-  playing_experience: string;
-  highest_level_played: string;
   previous_allstar_experience: string;
 
   // Step 3 — Philosophy
@@ -30,26 +21,7 @@ interface FormData {
   communication_style: string;
   tournament_experience: string;
 
-  // Step 4 — Staff & References
-  ac1_name: string;
-  ac1_phone: string;
-  ac1_email: string;
-  ac2_name: string;
-  ac2_phone: string;
-  ac2_email: string;
-  ac3_name: string;
-  ac3_phone: string;
-  ac3_email: string;
-  ref1_name: string;
-  ref1_phone: string;
-  ref1_email: string;
-  ref1_relationship: string;
-  ref2_name: string;
-  ref2_phone: string;
-  ref2_email: string;
-  ref2_relationship: string;
-
-  // Step 5 — Compliance
+  // Step 4 — Compliance & Submit
   consent_background_check: boolean;
   consent_safety_certs: boolean;
   agree_pony_rules: boolean;
@@ -65,35 +37,13 @@ const INITIAL_DATA: FormData = {
   email: "",
   phone: "",
   address: "",
-  division_preference: "",
-  second_choice_division: "",
-  willing_any_division: false,
+  current_division: "",
   years_experience: "",
-  certifications: "",
-  playing_experience: "",
-  highest_level_played: "",
   previous_allstar_experience: "",
   coaching_philosophy: "",
   player_development_approach: "",
   communication_style: "",
   tournament_experience: "",
-  ac1_name: "",
-  ac1_phone: "",
-  ac1_email: "",
-  ac2_name: "",
-  ac2_phone: "",
-  ac2_email: "",
-  ac3_name: "",
-  ac3_phone: "",
-  ac3_email: "",
-  ref1_name: "",
-  ref1_phone: "",
-  ref1_email: "",
-  ref1_relationship: "",
-  ref2_name: "",
-  ref2_phone: "",
-  ref2_email: "",
-  ref2_relationship: "",
   consent_background_check: false,
   consent_safety_certs: false,
   agree_pony_rules: false,
@@ -107,11 +57,10 @@ const INITIAL_DATA: FormData = {
 const STORAGE_KEY = "coach_application_draft";
 
 const STEPS = [
-  { label: "Contact", shortLabel: "1" },
-  { label: "Experience", shortLabel: "2" },
-  { label: "Philosophy", shortLabel: "3" },
-  { label: "Staff", shortLabel: "4" },
-  { label: "Submit", shortLabel: "5" },
+  { label: "Contact" },
+  { label: "Experience" },
+  { label: "Philosophy" },
+  { label: "Submit" },
 ];
 
 const DIVISIONS = [
@@ -122,19 +71,6 @@ const DIVISIONS = [
   "11U-Bronco",
   "12U-Pony",
 ];
-
-const DIVISIONS_WITH_NO_PREF = [...DIVISIONS, "No preference"];
-
-const LEVELS_PLAYED = [
-  "Recreational",
-  "High School",
-  "College",
-  "Professional",
-];
-
-/* ──────────────────────────────────────────────
-   Shared UI components
-   ────────────────────────────────────────────── */
 
 function Label({
   htmlFor,
@@ -166,9 +102,7 @@ function FieldError({ message }: { message?: string }) {
   return <p className="text-flag-red text-sm mt-1">{message}</p>;
 }
 
-/* ──────────────────────────────────────────────
-   Main Component
-   ────────────────────────────────────────────── */
+const TOTAL_STEPS = 4;
 
 export function CoachApplicationForm() {
   const [step, setStep] = useState(0);
@@ -178,21 +112,20 @@ export function CoachApplicationForm() {
   const [submitted, setSubmitted] = useState(false);
   const [submitError, setSubmitError] = useState("");
 
-  // Load draft from localStorage
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
         const parsed = JSON.parse(saved);
         setFormData((prev) => ({ ...prev, ...parsed.data }));
-        if (typeof parsed.step === "number") setStep(parsed.step);
+        if (typeof parsed.step === "number" && parsed.step < TOTAL_STEPS)
+          setStep(parsed.step);
       }
     } catch {
       // ignore
     }
   }, []);
 
-  // Save draft to localStorage on change
   const saveDraft = useCallback(
     (data: FormData, currentStep: number) => {
       try {
@@ -213,7 +146,6 @@ export function CoachApplicationForm() {
 
   function update(field: keyof FormData, value: string | boolean) {
     setFormData((prev) => ({ ...prev, [field]: value }));
-    // Clear field error on change
     if (errors[field]) {
       setErrors((prev) => {
         const next = { ...prev };
@@ -222,8 +154,6 @@ export function CoachApplicationForm() {
       });
     }
   }
-
-  /* ── Validation ── */
 
   function validateStep(s: number): boolean {
     const errs: Record<string, string> = {};
@@ -237,14 +167,11 @@ export function CoachApplicationForm() {
     }
 
     if (s === 1) {
-      if (!formData.division_preference)
-        errs.division_preference = "Select a division";
+      if (!formData.current_division)
+        errs.current_division = "Select your current division";
     }
 
-    // Step 2 (philosophy) — no strict required fields, but we encourage content
-    // Step 3 (staff) — no strict required fields
-
-    if (s === 4) {
+    if (s === 3) {
       if (!formData.consent_background_check)
         errs.consent_background_check = "Required";
       if (!formData.consent_safety_certs)
@@ -260,7 +187,7 @@ export function CoachApplicationForm() {
 
   function handleNext() {
     if (validateStep(step)) {
-      setStep((s) => Math.min(s + 1, 4));
+      setStep((s) => Math.min(s + 1, TOTAL_STEPS - 1));
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }
@@ -271,23 +198,40 @@ export function CoachApplicationForm() {
   }
 
   async function handleSubmit() {
-    if (!validateStep(4)) return;
+    if (!validateStep(3)) return;
 
     setSubmitting(true);
     setSubmitError("");
 
     const payload = {
-      ...formData,
-      years_experience: formData.years_experience
+      full_name: formData.full_name,
+      email: formData.email,
+      phone: formData.phone,
+      address: formData.address,
+      division_preference: formData.current_division,
+      years_coaching: formData.years_experience
         ? Number(formData.years_experience)
         : null,
+      previous_allstar_experience: formData.previous_allstar_experience,
+      coaching_philosophy: formData.coaching_philosophy,
+      player_development_approach: formData.player_development_approach,
+      communication_style: formData.communication_style,
+      tournament_experience: formData.tournament_experience,
+      background_check_consent: formData.consent_background_check,
+      safety_cert_consent: formData.consent_safety_certs,
+      pony_rules_consent: formData.agree_pony_rules,
+      ipb_policies_consent: formData.agree_ipb_policies,
+      full_season_commitment: formData.commit_full_season,
+      why_manage: formData.why_manage,
+      unique_qualities: formData.unique_qualities,
+      additional_comments: formData.additional_comments,
       submitted_at: new Date().toISOString(),
     };
 
     if (!supabase) {
       setSubmitting(false);
       setSubmitError(
-        "Applications are temporarily unavailable while setup is completed. Please try again shortly."
+        "Applications are temporarily unavailable. Please try again shortly."
       );
       return;
     }
@@ -296,18 +240,35 @@ export function CoachApplicationForm() {
       .from("coach_applications")
       .insert(payload);
 
-    setSubmitting(false);
-
     if (error) {
       console.error("Submit error:", error);
+      setSubmitting(false);
       setSubmitError(
-        "Something went wrong submitting your application. Please try again. If the problem persists, contact the All-Stars coordinator."
+        "Something went wrong submitting your application. Please try again. If the problem persists, contact AllStars@irvinepony.com."
       );
-    } else {
-      setSubmitted(true);
-      localStorage.removeItem(STORAGE_KEY);
-      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
     }
+
+    // Send confirmation email
+    try {
+      await fetch("/api/send-confirmation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "coach",
+          name: formData.full_name,
+          email: formData.email,
+          division: formData.current_division,
+        }),
+      });
+    } catch {
+      // Email failure shouldn't block submission
+    }
+
+    setSubmitting(false);
+    setSubmitted(true);
+    localStorage.removeItem(STORAGE_KEY);
+    window.scrollTo({ top: 0, behavior: "smooth" });
   }
 
   /* ── Success state ── */
@@ -320,8 +281,10 @@ export function CoachApplicationForm() {
           Application Submitted
         </h2>
         <p className="text-gray-600 text-lg leading-relaxed max-w-lg mx-auto mb-8">
-          Thank you, {formData.full_name}! Your coach application has been
-          received.
+          Thank you, {formData.full_name}! Your coach application for{" "}
+          <strong>{formData.current_division}</strong> has been received. A
+          confirmation email has been sent to{" "}
+          <strong>{formData.email}</strong>.
         </p>
 
         <div className="bg-off-white rounded-lg p-6 md:p-8 text-left max-w-md mx-auto">
@@ -339,7 +302,7 @@ export function CoachApplicationForm() {
             <li className="flex gap-3">
               <span className="text-flag-red shrink-0">&#9733;</span>
               <span>
-                References will be contacted and background checks initiated.
+                Background checks will be initiated.
               </span>
             </li>
             <li className="flex gap-3">
@@ -352,11 +315,22 @@ export function CoachApplicationForm() {
             <li className="flex gap-3">
               <span className="text-flag-red shrink-0">&#9733;</span>
               <span>
-                You will be notified of the final decision via email at{" "}
-                <strong>{formData.email}</strong>.
+                You will be notified of the final decision via email.
               </span>
             </li>
           </ul>
+
+          <div className="mt-6 pt-4 border-t border-gray-200">
+            <p className="text-gray-600 text-sm">
+              Questions? Contact the All-Stars Coordinator at{" "}
+              <a
+                href="mailto:AllStars@irvinepony.com"
+                className="text-flag-blue font-semibold hover:underline"
+              >
+                AllStars@irvinepony.com
+              </a>
+            </p>
+          </div>
         </div>
       </div>
     );
@@ -366,10 +340,12 @@ export function CoachApplicationForm() {
 
   const progressBar = (
     <div className="mb-8 md:mb-10">
-      {/* Desktop progress */}
       <div className="hidden sm:flex items-center justify-between mb-2">
         {STEPS.map((s, i) => (
-          <div key={s.label} className="flex items-center flex-1 last:flex-none">
+          <div
+            key={s.label}
+            className="flex items-center flex-1 last:flex-none"
+          >
             <div className="flex flex-col items-center">
               <div
                 className={`w-10 h-10 rounded-full flex items-center justify-center font-display text-sm font-bold transition-colors ${
@@ -401,11 +377,10 @@ export function CoachApplicationForm() {
         ))}
       </div>
 
-      {/* Mobile progress */}
       <div className="sm:hidden">
         <div className="flex items-center justify-between mb-3">
           <span className="font-display text-sm font-semibold uppercase tracking-wide text-charcoal">
-            Step {step + 1} of 5
+            Step {step + 1} of {TOTAL_STEPS}
           </span>
           <span className="font-display text-sm font-semibold uppercase tracking-wide text-flag-red">
             {STEPS[step].label}
@@ -414,7 +389,7 @@ export function CoachApplicationForm() {
         <div className="w-full bg-gray-200 rounded-full h-2">
           <div
             className="bg-flag-blue h-2 rounded-full transition-all duration-300"
-            style={{ width: `${((step + 1) / 5) * 100}%` }}
+            style={{ width: `${((step + 1) / TOTAL_STEPS) * 100}%` }}
           />
         </div>
       </div>
@@ -422,6 +397,8 @@ export function CoachApplicationForm() {
   );
 
   /* ── Navigation buttons ── */
+
+  const lastStep = TOTAL_STEPS - 1;
 
   const navButtons = (
     <div className="flex justify-between gap-4 mt-8">
@@ -437,7 +414,7 @@ export function CoachApplicationForm() {
         <div />
       )}
 
-      {step < 4 ? (
+      {step < lastStep ? (
         <button
           type="button"
           onClick={handleNext}
@@ -452,7 +429,7 @@ export function CoachApplicationForm() {
           disabled={submitting}
           className="px-8 py-3.5 rounded bg-flag-red text-white font-display text-sm font-semibold uppercase tracking-widest hover:bg-flag-red-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-w-[160px]"
         >
-          {submitting ? "Submitting..." : "Submit Application ★"}
+          {submitting ? "Submitting..." : "Submit Application \u2605"}
         </button>
       )}
     </div>
@@ -537,62 +514,28 @@ export function CoachApplicationForm() {
           Experience &amp; Background
         </h2>
         <p className="text-gray-600 text-sm leading-relaxed mb-4">
-          Tell us about your coaching and playing background.
+          Tell us about your coaching background. You may only apply to coach
+          the All-Star team in the division you are currently coaching.
         </p>
 
         <div>
-          <Label htmlFor="division_preference" required>
-            Division Preference
+          <Label htmlFor="current_division" required>
+            Current Division Coaching
           </Label>
           <select
-            id="division_preference"
+            id="current_division"
             className={selectClasses}
-            value={formData.division_preference}
-            onChange={(e) => update("division_preference", e.target.value)}
+            value={formData.current_division}
+            onChange={(e) => update("current_division", e.target.value)}
           >
-            <option value="">Select a division...</option>
+            <option value="">Select your current division...</option>
             {DIVISIONS.map((d) => (
               <option key={d} value={d}>
                 {d}
               </option>
             ))}
           </select>
-          <FieldError message={errors.division_preference} />
-        </div>
-
-        <div>
-          <Label htmlFor="second_choice_division">
-            Second Choice Division
-          </Label>
-          <select
-            id="second_choice_division"
-            className={selectClasses}
-            value={formData.second_choice_division}
-            onChange={(e) => update("second_choice_division", e.target.value)}
-          >
-            <option value="">Select a division...</option>
-            {DIVISIONS_WITH_NO_PREF.map((d) => (
-              <option key={d} value={d}>
-                {d}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div className="flex items-center gap-3 py-1">
-          <input
-            id="willing_any_division"
-            type="checkbox"
-            className="w-5 h-5 rounded border-gray-200 text-flag-blue focus:ring-flag-blue/20 shrink-0"
-            checked={formData.willing_any_division}
-            onChange={(e) => update("willing_any_division", e.target.checked)}
-          />
-          <label
-            htmlFor="willing_any_division"
-            className="text-charcoal text-base cursor-pointer"
-          >
-            I am willing to coach any division
-          </label>
+          <FieldError message={errors.current_division} />
         </div>
 
         <div>
@@ -610,47 +553,6 @@ export function CoachApplicationForm() {
         </div>
 
         <div>
-          <Label htmlFor="certifications">Coaching Certifications</Label>
-          <input
-            id="certifications"
-            type="text"
-            className={inputClasses}
-            placeholder="e.g. PONY Coaching Cert, First Aid/CPR"
-            value={formData.certifications}
-            onChange={(e) => update("certifications", e.target.value)}
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="playing_experience">Playing Experience</Label>
-          <textarea
-            id="playing_experience"
-            rows={4}
-            className={inputClasses}
-            placeholder="Describe your playing background..."
-            value={formData.playing_experience}
-            onChange={(e) => update("playing_experience", e.target.value)}
-          />
-        </div>
-
-        <div>
-          <Label htmlFor="highest_level_played">Highest Level Played</Label>
-          <select
-            id="highest_level_played"
-            className={selectClasses}
-            value={formData.highest_level_played}
-            onChange={(e) => update("highest_level_played", e.target.value)}
-          >
-            <option value="">Select level...</option>
-            {LEVELS_PLAYED.map((l) => (
-              <option key={l} value={l}>
-                {l}
-              </option>
-            ))}
-          </select>
-        </div>
-
-        <div>
           <Label htmlFor="previous_allstar_experience">
             Previous All-Star Experience
           </Label>
@@ -658,7 +560,7 @@ export function CoachApplicationForm() {
             id="previous_allstar_experience"
             rows={4}
             className={inputClasses}
-            placeholder="Describe any previous All-Star coaching or playing experience..."
+            placeholder="Describe any previous All-Star coaching experience..."
             value={formData.previous_allstar_experience}
             onChange={(e) =>
               update("previous_allstar_experience", e.target.value)
@@ -735,157 +637,6 @@ export function CoachApplicationForm() {
   }
 
   function renderStep3() {
-    return (
-      <div className="space-y-6">
-        <h2 className="font-display text-xl md:text-2xl font-bold uppercase tracking-wide mb-1">
-          Staff &amp; References
-        </h2>
-        <p className="text-gray-600 text-sm leading-relaxed mb-4">
-          Provide your proposed coaching staff and two references.
-        </p>
-
-        {/* Assistant Coaches */}
-        {[1, 2, 3].map((n) => (
-          <div
-            key={`ac${n}`}
-            className="bg-white rounded-lg border border-gray-200 p-5 md:p-6"
-          >
-            <h3 className="font-display text-base font-semibold uppercase tracking-wide mb-4">
-              Assistant Coach {n}
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div>
-                <Label htmlFor={`ac${n}_name`}>Name</Label>
-                <input
-                  id={`ac${n}_name`}
-                  type="text"
-                  className={inputClasses}
-                  placeholder="Full name"
-                  value={
-                    formData[`ac${n}_name` as keyof FormData] as string
-                  }
-                  onChange={(e) =>
-                    update(`ac${n}_name` as keyof FormData, e.target.value)
-                  }
-                />
-              </div>
-              <div>
-                <Label htmlFor={`ac${n}_phone`}>Phone</Label>
-                <input
-                  id={`ac${n}_phone`}
-                  type="tel"
-                  className={inputClasses}
-                  placeholder="(949) 555-1234"
-                  value={
-                    formData[`ac${n}_phone` as keyof FormData] as string
-                  }
-                  onChange={(e) =>
-                    update(`ac${n}_phone` as keyof FormData, e.target.value)
-                  }
-                />
-              </div>
-              <div>
-                <Label htmlFor={`ac${n}_email`}>Email</Label>
-                <input
-                  id={`ac${n}_email`}
-                  type="email"
-                  className={inputClasses}
-                  placeholder="email@example.com"
-                  value={
-                    formData[`ac${n}_email` as keyof FormData] as string
-                  }
-                  onChange={(e) =>
-                    update(`ac${n}_email` as keyof FormData, e.target.value)
-                  }
-                />
-              </div>
-            </div>
-          </div>
-        ))}
-
-        {/* References */}
-        {[1, 2].map((n) => (
-          <div
-            key={`ref${n}`}
-            className="bg-white rounded-lg border border-gray-200 p-5 md:p-6"
-          >
-            <h3 className="font-display text-base font-semibold uppercase tracking-wide mb-4">
-              Reference {n}
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-              <div>
-                <Label htmlFor={`ref${n}_name`}>Name</Label>
-                <input
-                  id={`ref${n}_name`}
-                  type="text"
-                  className={inputClasses}
-                  placeholder="Full name"
-                  value={
-                    formData[`ref${n}_name` as keyof FormData] as string
-                  }
-                  onChange={(e) =>
-                    update(`ref${n}_name` as keyof FormData, e.target.value)
-                  }
-                />
-              </div>
-              <div>
-                <Label htmlFor={`ref${n}_phone`}>Phone</Label>
-                <input
-                  id={`ref${n}_phone`}
-                  type="tel"
-                  className={inputClasses}
-                  placeholder="(949) 555-1234"
-                  value={
-                    formData[`ref${n}_phone` as keyof FormData] as string
-                  }
-                  onChange={(e) =>
-                    update(`ref${n}_phone` as keyof FormData, e.target.value)
-                  }
-                />
-              </div>
-              <div>
-                <Label htmlFor={`ref${n}_email`}>Email</Label>
-                <input
-                  id={`ref${n}_email`}
-                  type="email"
-                  className={inputClasses}
-                  placeholder="email@example.com"
-                  value={
-                    formData[`ref${n}_email` as keyof FormData] as string
-                  }
-                  onChange={(e) =>
-                    update(`ref${n}_email` as keyof FormData, e.target.value)
-                  }
-                />
-              </div>
-              <div>
-                <Label htmlFor={`ref${n}_relationship`}>Relationship</Label>
-                <input
-                  id={`ref${n}_relationship`}
-                  type="text"
-                  className={inputClasses}
-                  placeholder="e.g. League President, Parent"
-                  value={
-                    formData[
-                      `ref${n}_relationship` as keyof FormData
-                    ] as string
-                  }
-                  onChange={(e) =>
-                    update(
-                      `ref${n}_relationship` as keyof FormData,
-                      e.target.value
-                    )
-                  }
-                />
-              </div>
-            </div>
-          </div>
-        ))}
-      </div>
-    );
-  }
-
-  function renderStep4() {
     const checkboxItems: {
       field: keyof FormData;
       label: string;
@@ -1004,8 +755,6 @@ export function CoachApplicationForm() {
     );
   }
 
-  /* ── Render ── */
-
   return (
     <div>
       {progressBar}
@@ -1015,7 +764,6 @@ export function CoachApplicationForm() {
         {step === 1 && renderStep1()}
         {step === 2 && renderStep2()}
         {step === 3 && renderStep3()}
-        {step === 4 && renderStep4()}
 
         {navButtons}
       </div>
