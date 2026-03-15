@@ -66,10 +66,10 @@ const STEPS = [
 const DIVISIONS = [
   "7U-Shetland",
   "8U-Pinto",
-  "9U",
+  "9U-Mustang",
   "10U-Mustang",
   "11U-Bronco",
-  "12U-Pony",
+  "12U-Bronco",
 ];
 
 function Label({

@@ -14,10 +14,10 @@ const STEPS = ["Player Info", "Details", "Submit"] as const;
 const DIVISIONS = [
   { value: "7U-Shetland", label: "7U - Shetland", minAge: 6, maxAge: 7 },
   { value: "8U-Pinto", label: "8U - Pinto", minAge: 7, maxAge: 8 },
-  { value: "9U", label: "9U", minAge: 8, maxAge: 9 },
+  { value: "9U-Mustang", label: "9U - Mustang", minAge: 8, maxAge: 9 },
   { value: "10U-Mustang", label: "10U - Mustang", minAge: 9, maxAge: 10 },
   { value: "11U-Bronco", label: "11U - Bronco", minAge: 10, maxAge: 11 },
-  { value: "12U-Pony", label: "12U - Pony", minAge: 11, maxAge: 12 },
+  { value: "12U-Bronco", label: "12U - Bronco", minAge: 11, maxAge: 12 },
 ] as const;
 
 const POSITIONS = [
@@ -428,10 +428,10 @@ export function PlayerRegistrationForm() {
               <strong>May 10:</strong> 7U Shetland &amp; 8U Pinto tryouts
             </p>
             <p>
-              <strong>May 11:</strong> 9U &amp; 10U Mustang tryouts
+              <strong>May 11:</strong> 9U Mustang &amp; 10U Mustang tryouts
             </p>
             <p>
-              <strong>May 12:</strong> 11U Bronco &amp; 12U Pony tryouts
+              <strong>May 12:</strong> 11U Bronco &amp; 12U Bronco tryouts
             </p>
             <p>
               <strong>Mid-May:</strong> Roster announcements &amp; practices
