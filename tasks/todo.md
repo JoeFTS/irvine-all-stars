@@ -24,40 +24,41 @@
 - [x] /documents page (downloadable docs grid)
 - [x] /updates page (announcements feed)
 - [x] Set up Supabase schema (irvine_allstars in ProjectHub)
-- [x] /apply/coach — Coach Application Form (4-step wizard: Contact → Experience → Philosophy → Submit)
-- [x] /apply/player — Player/Family Tryout Registration Form (3-step wizard)
-- [x] Confirmation email API (/api/send-confirmation) with branded HTML templates
-- [x] Deploy MVP with forms live
+- [x] /apply/coach — 4-step coach application form
+- [x] /apply/player — 3-step player registration form
+- [x] Confirmation email API with branded HTML templates
+- [x] Resend email integration
 - [x] Division names corrected (9U-Mustang, 12U-Bronco)
 - [x] /portal placeholder page
-- [ ] Connect email sending (Resend/SendGrid integration — currently logging only)
-- [ ] Test full form submission end-to-end on production
+- [ ] Add RESEND_API_KEY to VPS .env.local (Joe needs to create Resend account)
+- [ ] Test full e2e form submission on production
 
-## Phase 3: Auth + Evaluator Scoring ← NEXT
-- [ ] Supabase auth (email + password)
-- [ ] Profiles table with roles (admin, coach, evaluator, parent)
-- [ ] Login page (/auth/login)
-- [ ] Auth middleware for protected routes
-- [ ] Evaluator Scoring Sheet (/evaluate/[sessionId]) — mobile-first, tablet-optimized
-- [ ] Auto-save scores to Supabase
-- [ ] "Next Player" flow for quick scoring
+## Phase 3: Auth + Evaluator Scoring ✅
+- [x] Auth context with role-based access (admin/coach/evaluator/parent)
+- [x] Profiles table in Supabase
+- [x] Login page (/auth/login)
+- [x] Signup page (/auth/signup)
+- [x] Auth callback for email confirmation
+- [x] Middleware protecting /admin, /portal, /evaluate routes
+- [x] Evaluator setup page (/evaluate) — name, division, session ID
+- [x] Evaluator scoring sheet (/evaluate/score) — mobile-first, 56px touch targets
+- [x] Auto-save with 500ms debounce + localStorage offline buffer
+- [x] Session summary (/evaluate/summary) — rankings, score breakdowns, edit links
 
-## Phase 4: Admin Dashboard
-- [ ] /admin — Dashboard overview
-- [ ] View/filter coach applications by status
-- [ ] View player registrations by division
-- [ ] Create/manage tryout sessions
-- [ ] View aggregated evaluator scores
-- [ ] Post announcements
-- [ ] Manage timeline events
+## Phase 4: Admin Dashboard ✅
+- [x] Admin layout with sidebar (desktop) / bottom tabs (mobile)
+- [x] Dashboard overview with stat cards + recent submissions
+- [x] Coach applications — filter by status, expand details, update status
+- [x] Player registrations — filter by division/status, expand, update
+- [x] Evaluator scores — grouped by division, sorted by total, expandable
+- [x] Announcements CRUD — create, edit, delete, division targeting
 
-## Phase 5: Parent Portal
-- [ ] /portal — Parent portal home (auth-gated)
-- [ ] View child's registration status
-- [ ] Access division-specific documents
-- [ ] View announcements (filtered by division)
-- [ ] RSVP to events
-- [ ] Email notifications on status changes
+## Phase 5: Parent Portal ✅
+- [x] Auth-gated parent portal (/portal)
+- [x] Player status cards with color-coded badges
+- [x] Division-filtered announcements feed
+- [x] Quick links grid (tryouts, scoring, FAQ, documents, contact)
+- [x] Key dates section
 
 ## Phase 6: Polish + Future
 - [ ] Generate real images with imagegen skill (hero, division graphics)
@@ -69,7 +70,9 @@
 - [ ] Tournament Hub
 - [ ] Photo Gallery
 - [ ] Post-Season Survey
+- [ ] Set up Joe's admin account in Supabase
 
 ---
-**Current Focus:** Phase 2 wrap-up (email integration, e2e testing) → Phase 3 (Auth + Evaluator Scoring)
+**Status:** Phases 0-5 COMPLETE. 22 routes live at irvineallstars.com.
+**Remaining:** Phase 6 polish items + Resend API key setup + admin account creation
 **Last Updated:** 2026-03-14

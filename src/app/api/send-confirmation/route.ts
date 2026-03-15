@@ -90,7 +90,7 @@ export async function POST(request: NextRequest) {
 
     if (resend) {
       const { error } = await resend.emails.send({
-        from: "Irvine All-Stars <noreply@irvineallstars.com>",
+        from: "Irvine All-Stars <AllStars@irvineallstars.com>",
         to: [email],
         subject,
         html: htmlContent,
