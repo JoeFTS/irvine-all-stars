@@ -12,13 +12,13 @@ const announcements = [
     date: "March 13, 2026",
     tag: "Welcome",
     title: "2026 All-Stars Season Is Here!",
-    body: "The 2026 Irvine Pony Baseball All-Stars season is officially underway. This summer, six divisions of players will compete across Southern California in one of the most exciting youth baseball experiences available. Our commitment remains the same: fair tryouts, independent evaluation, and a transparent selection process from top to bottom. Stay tuned to this page for all the latest updates as the season unfolds.",
+    body: "The 2026 Irvine Pony Baseball All-Stars season is officially underway. This summer, ten divisions of players will compete across Southern California in one of the most exciting youth baseball experiences available. Our commitment remains the same: fair tryouts, independent evaluation, and a transparent selection process from top to bottom. Stay tuned to this page for all the latest updates as the season unfolds.",
   },
   {
     date: "March 10, 2026",
     tag: "Coaches",
     title: "Coach Applications Now Open",
-    body: "Are you ready to lead an All-Stars team this summer? Coach applications are now being accepted for all six divisions. Head to the Coach Application page to submit your interest. All applicants will be evaluated using a standardized 100-point rubric and interviewed by the selection committee. The application deadline will be announced soon, so don\u2019t wait to get started.",
+    body: "Are you ready to lead an All-Stars team this summer? Coach applications are now being accepted for all ten divisions. Head to the Coach Application page to submit your interest. All applicants will be evaluated using a standardized 100-point rubric and interviewed by the selection committee. The application deadline will be announced soon, so don\u2019t wait to get started.",
   },
   {
     date: "March 7, 2026",

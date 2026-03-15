@@ -180,8 +180,8 @@ export default function Home() {
       <section className="bg-flag-blue py-10 px-6 md:px-10">
         <div className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {[
-            { number: "6", label: "Divisions" },
-            { number: "72", label: "Roster Spots" },
+            { number: "10", label: "Divisions" },
+            { number: "120", label: "Roster Spots" },
             { number: "100", label: "Point Rubric" },
             { number: "Fair", label: "& Transparent" },
           ].map((stat) => (

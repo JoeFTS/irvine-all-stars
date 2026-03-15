@@ -167,10 +167,11 @@ const faqSections: FaqSection[] = [
         question: "What divisions are there?",
         answer: (
           <>
-            Irvine All-Stars fields six divisions: 7U (Shetland), 8U
-            (Pinto), 9U (Pinto), 10U (Mustang), 11U (Mustang), and 12U
-            (Bronco). Each division has its own tryout schedule, coaching staff,
-            and tournament calendar.
+            Irvine All-Stars fields ten divisions: 5U Shetland, 6U
+            Shetland, 7U Pinto Machine Pitch, 7U Pinto Kid Pitch, 8U Pinto
+            Machine Pitch, 8U Pinto Kid Pitch, 9U Mustang, 10U Mustang, 11U
+            Bronco, and 12U Bronco. Each division has its own tryout schedule,
+            coaching staff, and tournament calendar.
           </>
         ),
       },

@@ -80,7 +80,7 @@ function StatusBadge({ status }: { status: string }) {
 const keyDates = [
   { date: "Mar 15", label: "Coach applications open" },
   { date: "Apr 1", label: "Player registration opens" },
-  { date: "May 10", label: "7U & 8U tryouts" },
+  { date: "May 10", label: "5U, 6U, 7U & 8U tryouts" },
   { date: "May 11", label: "9U & 10U tryouts" },
   { date: "May 12", label: "11U & 12U tryouts" },
   { date: "Mid-May", label: "Rosters finalized & families notified" },

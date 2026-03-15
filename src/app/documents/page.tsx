@@ -30,7 +30,7 @@ const coachDocuments = [
 const playerDocuments = [
   {
     title: "Player Selection Policy",
-    description: "Board-approved policy governing how All-Stars rosters are built across all six divisions.",
+    description: "Board-approved policy governing how All-Stars rosters are built across all ten divisions.",
   },
   {
     title: "Parent Information Packet",

@@ -12,8 +12,12 @@ const STORAGE_KEY = "irvine-allstars-player-draft";
 const STEPS = ["Player Info", "Details", "Submit"] as const;
 
 const DIVISIONS = [
-  { value: "7U-Shetland", label: "7U - Shetland", minAge: 6, maxAge: 7 },
-  { value: "8U-Pinto", label: "8U - Pinto", minAge: 7, maxAge: 8 },
+  { value: "5U-Shetland", label: "5U - Shetland", minAge: 4, maxAge: 5 },
+  { value: "6U-Shetland", label: "6U - Shetland", minAge: 5, maxAge: 6 },
+  { value: "7U MP-Pinto", label: "7U MP - Pinto Machine Pitch", minAge: 6, maxAge: 7 },
+  { value: "7U KP-Pinto", label: "7U KP - Pinto Kid Pitch", minAge: 6, maxAge: 7 },
+  { value: "8U MP-Pinto", label: "8U MP - Pinto Machine Pitch", minAge: 7, maxAge: 8 },
+  { value: "8U KP-Pinto", label: "8U KP - Pinto Kid Pitch", minAge: 7, maxAge: 8 },
   { value: "9U-Mustang", label: "9U - Mustang", minAge: 8, maxAge: 9 },
   { value: "10U-Mustang", label: "10U - Mustang", minAge: 9, maxAge: 10 },
   { value: "11U-Bronco", label: "11U - Bronco", minAge: 10, maxAge: 11 },
