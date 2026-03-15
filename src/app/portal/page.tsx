@@ -20,6 +20,17 @@ interface Registration {
   created_at: string;
 }
 
+interface PlayerDocument {
+  id: string;
+  registration_id: string;
+  document_type: string;
+}
+
+interface PlayerContract {
+  id: string;
+  registration_id: string;
+}
+
 interface Announcement {
   id: string;
   title: string;
@@ -113,6 +124,8 @@ export default function PortalPage() {
   const { user, loading: authLoading } = useAuth();
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [documents, setDocuments] = useState<PlayerDocument[]>([]);
+  const [contracts, setContracts] = useState<PlayerContract[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
 
   // Client-side auth guard
@@ -142,6 +155,25 @@ export default function PortalPage() {
 
       const regData = (regs ?? []) as Registration[];
       setRegistrations(regData);
+
+      // Fetch compliance data (documents + contracts) for all registrations
+      if (regData.length > 0) {
+        const regIds = regData.map((r) => r.id);
+
+        const [docsResult, contractsResult] = await Promise.all([
+          supabase!
+            .from("player_documents")
+            .select("id, registration_id, document_type")
+            .in("registration_id", regIds),
+          supabase!
+            .from("player_contracts")
+            .select("id, registration_id")
+            .in("registration_id", regIds),
+        ]);
+
+        setDocuments((docsResult.data ?? []) as PlayerDocument[]);
+        setContracts((contractsResult.data ?? []) as PlayerContract[]);
+      }
 
       // Determine divisions for filtering announcements
       const playerDivisions = regData.map((r) => r.division);
@@ -262,6 +294,174 @@ export default function PortalPage() {
       </section>
 
       <StripeDivider />
+
+      {/* ===== COMPLIANCE CHECKLIST ===== */}
+      {!dataLoading && registrations.length > 0 && (
+        <section className="bg-white py-12 md:py-16 px-6 md:px-10">
+          <div className="max-w-4xl mx-auto">
+            <p className="font-display text-sm font-semibold text-flag-red uppercase tracking-[3px] mb-2">
+              &#9733; Action Items
+            </p>
+            <h2 className="font-display text-2xl md:text-3xl font-bold uppercase tracking-wide mb-6">
+              What&apos;s Needed From You
+            </h2>
+
+            <div className="space-y-4">
+              {registrations.map((reg) => {
+                const hasBirthCert = documents.some(
+                  (d) =>
+                    d.registration_id === reg.id &&
+                    d.document_type === "birth_certificate"
+                );
+                const hasPhoto = documents.some(
+                  (d) =>
+                    d.registration_id === reg.id &&
+                    d.document_type === "player_photo"
+                );
+                const hasContract = contracts.some(
+                  (c) => c.registration_id === reg.id
+                );
+
+                const items = [
+                  { label: "Register for tryouts", done: true, href: "#" },
+                  {
+                    label: "Upload birth certificate",
+                    done: hasBirthCert,
+                    href: "/portal/documents",
+                  },
+                  {
+                    label: "Upload player photo",
+                    done: hasPhoto,
+                    href: "/portal/documents",
+                  },
+                  {
+                    label: "Sign player contract",
+                    done: hasContract,
+                    href: "/portal/contract",
+                  },
+                ];
+
+                const completedCount = items.filter((i) => i.done).length;
+                const totalCount = items.length;
+                const progressPct = Math.round(
+                  (completedCount / totalCount) * 100
+                );
+                const allDone = completedCount === totalCount;
+
+                return (
+                  <div
+                    key={reg.id}
+                    className="bg-white rounded-lg border border-gray-200 p-5 md:p-6"
+                  >
+                    {/* Player header */}
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
+                      <div className="flex items-center gap-3">
+                        <h3 className="font-display text-xl font-bold uppercase tracking-wide">
+                          {reg.player_name}
+                        </h3>
+                        <span className="inline-block text-xs uppercase tracking-wider px-2.5 py-1 rounded border font-display font-semibold bg-flag-blue/10 text-flag-blue border-flag-blue/30">
+                          {reg.division}
+                        </span>
+                      </div>
+                      {allDone ? (
+                        <span className="inline-flex items-center gap-1.5 text-xs font-display font-semibold uppercase tracking-wider text-green-700 bg-green-50 border border-green-300 px-2.5 py-1 rounded">
+                          <svg
+                            className="h-3.5 w-3.5"
+                            fill="none"
+                            viewBox="0 0 24 24"
+                            stroke="currentColor"
+                            strokeWidth={2.5}
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              d="M5 13l4 4L19 7"
+                            />
+                          </svg>
+                          All Complete
+                        </span>
+                      ) : (
+                        <span className="inline-flex items-center gap-1.5 text-xs font-display font-semibold uppercase tracking-wider text-orange-700 bg-orange-50 border border-orange-300 px-2.5 py-1 rounded">
+                          Action Needed
+                        </span>
+                      )}
+                    </div>
+
+                    {/* Progress bar */}
+                    <div className="mb-4">
+                      <div className="flex items-center justify-between text-xs text-gray-500 mb-1.5">
+                        <span>
+                          {completedCount} of {totalCount} complete
+                        </span>
+                        <span>{progressPct}%</span>
+                      </div>
+                      <div className="h-2 w-full rounded-full bg-gray-100 overflow-hidden">
+                        <div
+                          className={`h-full rounded-full transition-all duration-500 ${
+                            allDone ? "bg-green-500" : "bg-flag-blue"
+                          }`}
+                          style={{ width: `${progressPct}%` }}
+                        />
+                      </div>
+                    </div>
+
+                    {/* Checklist items */}
+                    <ul className="space-y-2">
+                      {items.map((item) => (
+                        <li key={item.label}>
+                          {item.done ? (
+                            <div className="flex items-center gap-3 text-sm text-green-700">
+                              <svg
+                                className="h-5 w-5 shrink-0 text-green-500"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth={2.5}
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M9 12.75L11.25 15 15 9.75M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
+                                />
+                              </svg>
+                              <span className="line-through opacity-60">
+                                {item.label}
+                              </span>
+                            </div>
+                          ) : (
+                            <Link
+                              href={item.href}
+                              className="flex items-center gap-3 text-sm text-charcoal hover:text-flag-blue transition-colors group"
+                            >
+                              <div className="h-5 w-5 shrink-0 rounded-full border-2 border-gray-300 group-hover:border-flag-blue transition-colors" />
+                              <span className="font-medium">
+                                {item.label}
+                              </span>
+                              <svg
+                                className="h-3.5 w-3.5 text-gray-400 group-hover:text-flag-blue transition-colors ml-auto"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth={2}
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M8.25 4.5l7.5 7.5-7.5 7.5"
+                                />
+                              </svg>
+                            </Link>
+                          )}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* ===== MY PLAYER'S STATUS ===== */}
       <section className="bg-off-white py-12 md:py-16 px-6 md:px-10">

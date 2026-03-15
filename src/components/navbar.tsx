@@ -20,6 +20,8 @@ export function Navbar() {
 
   const portalLink = role === "admin"
     ? { href: "/admin", label: "Admin Panel" }
+    : role === "coach"
+    ? { href: "/coach", label: "Coach Dashboard" }
     : { href: "/portal", label: "Parent Portal" };
 
   async function handleSignOut() {

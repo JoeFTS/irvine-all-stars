@@ -49,7 +49,13 @@ export default function LoginPage() {
             .select("role")
             .eq("id", authUser.id)
             .single();
-          window.location.href = profile?.role === "admin" ? "/admin" : "/portal";
+          if (profile?.role === "admin") {
+            window.location.href = "/admin";
+          } else if (profile?.role === "coach") {
+            window.location.href = "/coach";
+          } else {
+            window.location.href = "/portal";
+          }
         } else {
           window.location.href = "/portal";
         }

@@ -1,0 +1,378 @@
+"use client";
+
+import { useEffect, useState, useCallback } from "react";
+import { useAuth } from "@/contexts/auth-context";
+import { supabase } from "@/lib/supabase";
+import { CheckCircle2, AlertTriangle, BookOpen } from "lucide-react";
+
+interface AgreementRecord {
+  id: string;
+  agreement_type: string;
+  coach_name: string;
+  acknowledged_at: string;
+}
+
+const DIVISIONS = [
+  { key: "shetland", label: "Shetland", subtitle: "5U, 6U" },
+  { key: "pinto_machine", label: "Pinto Machine Pitch", subtitle: "7U MP, 8U MP" },
+  { key: "pinto_kid", label: "Pinto Kid Pitch", subtitle: "7U KP, 8U KP" },
+  { key: "mustang_bronco", label: "Mustang / Bronco", subtitle: "9U-12U" },
+] as const;
+
+const COMMON_RULES = {
+  title: "TOURNAMENT BASEBALL RULES: KNOW THE RULES!",
+  sections: [
+    {
+      heading: "Manager & Coaching Staff Responsibilities",
+      content:
+        "Manager & Coaching staff's responsibility. We do not play by your League Rules. Study the rules thoroughly. If you have questions, ask your League President, Player Agent, Division Director, or a PONY Field Director PRIOR to stepping onto the field. Rules will NOT be answered during your game. Manager needs to have rules at all tournament games.",
+    },
+    {
+      heading: "Manager & Coaching Staff Conduct",
+      items: [
+        "Responsible for knowing the rules & controlling team & fans",
+        "Be a good example — don't get ejected!",
+        "Only coaches on the Affidavit are allowed on the playing field, in the dugout, or bullpen",
+        "Coaching staff may NOT leave the dugout area during the game (no visiting fans, watching from backstop, going to snack bar)",
+        "Managers and coaches ejected must leave the BallPark",
+        "Must be in baseball pants, closed-toe shoes, and jersey/league shirt",
+        "Meet with PONY Director 60 minutes prior to your first game at each level",
+      ],
+    },
+  ],
+  reminders: [
+    "This document does not replace meeting with the on-site PONY Director 60 minutes prior to your first game",
+    "Know your pitching & batting rules thoroughly BEFORE tournament play",
+    "NO CIF or Local League Rules apply",
+  ],
+};
+
+const DIVISION_SPECIFIC: Record<
+  string,
+  { note: string; ruleBooks: string[] }
+> = {
+  shetland: {
+    note: "Shetland — West Zone Tournament Supplemental Rules apply.",
+    ruleBooks: [
+      "PONY Baseball Rule Book (Blue Pages)",
+      "PONY Baseball Rule (White Pages)",
+      "Official MLB Baseball Rules",
+      "Shetland West Zone Tournament Supplemental Rules",
+    ],
+  },
+  pinto_machine: {
+    note: "Supplement Rules (Pinto Machine) apply. Check rules regarding balls in play hitting the machine or coach specifically.",
+    ruleBooks: [
+      "PONY Baseball Rule Book (Blue Pages)",
+      "PONY Baseball Rule (White Pages)",
+      "Official MLB Baseball Rules",
+      "Pinto Machine Pitch Supplemental Rules",
+    ],
+  },
+  pinto_kid: {
+    note: "Pinto Pitch — West Zone Tournament Supplemental Rules apply. Know by heart the bat 9 play 9 rules regarding substitutions, pitch counts, and rest day language.",
+    ruleBooks: [
+      "PONY Baseball Rule Book (Blue Pages)",
+      "PONY Baseball Rule (White Pages)",
+      "Official MLB Baseball Rules",
+      "Pinto Kid Pitch West Zone Tournament Supplemental Rules",
+    ],
+  },
+  mustang_bronco: {
+    note: "PONY Baseball Rule Book (Blue Pages), PONY Baseball Rule (White Pages), Official MLB Baseball Rules apply.",
+    ruleBooks: [
+      "PONY Baseball Rule Book (Blue Pages)",
+      "PONY Baseball Rule (White Pages)",
+      "Official MLB Baseball Rules",
+    ],
+  },
+};
+
+export default function TournamentRulesPage() {
+  const { user } = useAuth();
+  const [agreements, setAgreements] = useState<AgreementRecord[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [activeDivision, setActiveDivision] = useState<string>("shetland");
+  const [coachName, setCoachName] = useState("");
+  const [checked, setChecked] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+
+  const fetchAgreements = useCallback(async () => {
+    if (!supabase || !user) return;
+    try {
+      const { data, error } = await supabase
+        .from("tournament_agreements")
+        .select("*")
+        .eq("coach_id", user.id);
+      if (!error && data) {
+        setAgreements(data as AgreementRecord[]);
+      }
+    } catch {
+      // silently fail
+    } finally {
+      setLoading(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    fetchAgreements();
+  }, [fetchAgreements]);
+
+  // Reset form when switching divisions
+  useEffect(() => {
+    setChecked(false);
+    setCoachName("");
+  }, [activeDivision]);
+
+  const getAgreement = (divKey: string) =>
+    agreements.find((a) => a.agreement_type === divKey);
+
+  const handleSubmit = async () => {
+    if (!supabase || !user || !checked || !coachName.trim()) return;
+
+    setSubmitting(true);
+    const now = new Date().toISOString();
+
+    const existing = getAgreement(activeDivision);
+
+    if (existing) {
+      await supabase
+        .from("tournament_agreements")
+        .update({
+          coach_name: coachName.trim(),
+          acknowledged_at: now,
+        })
+        .eq("id", existing.id);
+    } else {
+      await supabase.from("tournament_agreements").insert({
+        coach_id: user.id,
+        agreement_type: activeDivision,
+        coach_name: coachName.trim(),
+        acknowledged_at: now,
+      });
+    }
+
+    await fetchAgreements();
+    setSubmitting(false);
+    setChecked(false);
+    setCoachName("");
+  };
+
+  const divisionConfig = DIVISION_SPECIFIC[activeDivision];
+  const existingAgreement = getAgreement(activeDivision);
+
+  return (
+    <div className="p-6 md:p-10 max-w-3xl">
+      {/* Header */}
+      <p className="font-display text-sm font-semibold text-flag-red uppercase tracking-[3px] mb-1">
+        Coach
+      </p>
+      <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide mb-4">
+        Pre-Tournament Rules
+      </h1>
+      <p className="text-gray-600 mb-6">
+        Read and acknowledge the rules for your division before tournament play
+        begins.
+      </p>
+
+      {/* Division Tabs */}
+      <div className="flex flex-wrap gap-2 mb-8">
+        {DIVISIONS.map((div) => {
+          const isActive = activeDivision === div.key;
+          const isAcknowledged = !!getAgreement(div.key);
+          return (
+            <button
+              key={div.key}
+              onClick={() => setActiveDivision(div.key)}
+              className={`relative px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors border ${
+                isActive
+                  ? "bg-flag-blue text-white border-flag-blue"
+                  : "bg-white text-charcoal border-gray-200 hover:border-flag-blue hover:text-flag-blue"
+              }`}
+            >
+              <span>{div.label}</span>
+              <span className="block text-[10px] font-normal opacity-70">
+                {div.subtitle}
+              </span>
+              {isAcknowledged && (
+                <span className="absolute -top-1 -right-1 w-4 h-4 bg-green-500 rounded-full flex items-center justify-center">
+                  <CheckCircle2 size={10} className="text-white" />
+                </span>
+              )}
+            </button>
+          );
+        })}
+      </div>
+
+      {loading ? (
+        <p className="text-gray-500">Loading rules...</p>
+      ) : (
+        <div className="space-y-6">
+          {/* Common Rules */}
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100 bg-flag-red/5">
+              <h2 className="font-display text-lg font-bold uppercase tracking-wide text-flag-red">
+                {COMMON_RULES.title}
+              </h2>
+            </div>
+            <div className="px-6 py-5 space-y-5">
+              {COMMON_RULES.sections.map((section) => (
+                <div key={section.heading}>
+                  <h3 className="font-display text-sm font-bold uppercase tracking-wider text-charcoal mb-2">
+                    {section.heading}
+                  </h3>
+                  {"content" in section && section.content && (
+                    <p className="text-sm text-gray-700 leading-relaxed mb-3">
+                      {section.content}
+                    </p>
+                  )}
+                  {"items" in section && section.items && (
+                    <ul className="space-y-1.5">
+                      {section.items.map((item, i) => (
+                        <li
+                          key={i}
+                          className="flex items-start gap-2 text-sm text-gray-700"
+                        >
+                          <span className="mt-1.5 w-1.5 h-1.5 rounded-full bg-flag-blue shrink-0" />
+                          {item}
+                        </li>
+                      ))}
+                    </ul>
+                  )}
+                </div>
+              ))}
+
+              {/* Important Reminders */}
+              <div className="bg-amber-50 border-l-4 border-amber-400 rounded-r-lg p-4">
+                <div className="flex items-start gap-2 mb-2">
+                  <AlertTriangle
+                    size={18}
+                    className="text-amber-600 mt-0.5 shrink-0"
+                  />
+                  <h3 className="font-display text-sm font-bold uppercase tracking-wider text-amber-800">
+                    Important Reminders
+                  </h3>
+                </div>
+                <ul className="space-y-1.5 ml-6">
+                  {COMMON_RULES.reminders.map((reminder, i) => (
+                    <li key={i} className="text-sm text-amber-900 font-medium">
+                      {reminder}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Division-Specific Rules */}
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100">
+              <h2 className="font-display text-lg font-bold uppercase tracking-wide text-charcoal">
+                {DIVISIONS.find((d) => d.key === activeDivision)?.label} Rules
+              </h2>
+            </div>
+            <div className="px-6 py-5 space-y-4">
+              {/* Division note */}
+              <div className="bg-blue-50 border-l-4 border-flag-blue rounded-r-lg p-4">
+                <p className="text-sm text-charcoal font-medium leading-relaxed">
+                  {divisionConfig.note}
+                </p>
+              </div>
+
+              {/* Applicable Rule Books */}
+              <div>
+                <h3 className="font-display text-sm font-bold uppercase tracking-wider text-charcoal mb-2">
+                  Applicable Rule Books
+                </h3>
+                <ul className="space-y-1.5">
+                  {divisionConfig.ruleBooks.map((book) => (
+                    <li
+                      key={book}
+                      className="flex items-center gap-2 text-sm text-gray-700"
+                    >
+                      <BookOpen size={14} className="text-flag-blue shrink-0" />
+                      {book}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Acknowledgment Section */}
+          <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
+            <div className="px-6 py-4 border-b border-gray-100">
+              <h2 className="font-display text-lg font-bold uppercase tracking-wide text-charcoal">
+                Acknowledgment
+              </h2>
+            </div>
+            <div className="px-6 py-5">
+              {existingAgreement ? (
+                <div className="flex items-center gap-3 bg-green-50 border border-green-200 rounded-lg p-4">
+                  <CheckCircle2 className="text-green-600 shrink-0" size={24} />
+                  <div>
+                    <p className="text-green-800 font-semibold">
+                      Acknowledged on{" "}
+                      {new Date(
+                        existingAgreement.acknowledged_at
+                      ).toLocaleDateString()}
+                    </p>
+                    <p className="text-green-700 text-sm">
+                      Signed by: {existingAgreement.coach_name}
+                    </p>
+                  </div>
+                </div>
+              ) : (
+                <div className="space-y-4">
+                  {/* Checkbox */}
+                  <label className="flex items-start gap-3 cursor-pointer group">
+                    <input
+                      type="checkbox"
+                      checked={checked}
+                      onChange={(e) => setChecked(e.target.checked)}
+                      className="mt-0.5 w-5 h-5 rounded border-gray-300 text-flag-blue focus:ring-flag-blue cursor-pointer"
+                    />
+                    <span className="text-sm text-charcoal leading-relaxed group-hover:text-flag-blue transition-colors">
+                      I have read and understand the tournament rules for the{" "}
+                      <strong>
+                        {DIVISIONS.find((d) => d.key === activeDivision)?.label}
+                      </strong>{" "}
+                      division.
+                    </span>
+                  </label>
+
+                  {/* Digital Signature */}
+                  <div>
+                    <label
+                      htmlFor="coach-name"
+                      className="block text-sm font-semibold text-charcoal font-display uppercase tracking-wide mb-1"
+                    >
+                      Type your full name as digital signature
+                    </label>
+                    <input
+                      id="coach-name"
+                      type="text"
+                      value={coachName}
+                      onChange={(e) => setCoachName(e.target.value)}
+                      placeholder="e.g. John Smith"
+                      className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-charcoal placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-flag-blue focus:border-transparent"
+                    />
+                  </div>
+
+                  {/* Submit */}
+                  <button
+                    onClick={handleSubmit}
+                    disabled={!checked || !coachName.trim() || submitting}
+                    className="w-full sm:w-auto px-6 py-3 bg-flag-blue text-white font-display font-bold uppercase tracking-wider text-sm rounded-lg hover:bg-flag-blue/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {submitting ? "Submitting..." : "Acknowledge Rules"}
+                  </button>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
