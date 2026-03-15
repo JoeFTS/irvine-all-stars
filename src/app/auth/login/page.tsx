@@ -9,41 +9,38 @@ export default function LoginPage() {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState<string | null>(null);
-  const [status, setStatus] = useState<string>("idle");
+  const [submitting, setSubmitting] = useState(false);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    setStatus("signing-in");
+    setSubmitting(true);
 
     if (!supabase) {
       setError("Supabase not configured");
-      setStatus("idle");
+      setSubmitting(false);
       return;
     }
 
     try {
-      setStatus("calling signInWithPassword...");
-      const { data, error: signInError } = await supabase.auth.signInWithPassword({
+      const { error: signInError } = await supabase.auth.signInWithPassword({
         email,
         password,
       });
 
       if (signInError) {
         setError(signInError.message);
-        setStatus("idle");
+        setSubmitting(false);
         return;
       }
 
-      setStatus("success! redirecting...");
-
-      // Hard redirect
+      // Hard redirect — default to admin for admin users
       const params = new URLSearchParams(window.location.search);
       const redirect = params.get("redirect") || "/admin";
       window.location.href = redirect;
     } catch (err) {
       setError(err instanceof Error ? err.message : "Unexpected error");
-      setStatus("idle");
+      setSubmitting(false);
     }
   }
 
@@ -72,13 +69,6 @@ export default function LoginPage() {
               {error && (
                 <div className="bg-flag-red/10 border border-flag-red/30 text-flag-red rounded px-4 py-3 text-sm">
                   {error}
-                </div>
-              )}
-
-              {/* Debug status */}
-              {status !== "idle" && (
-                <div className="bg-blue-50 border border-blue-200 text-blue-700 rounded px-4 py-3 text-sm">
-                  Status: {status}
                 </div>
               )}
 
@@ -120,10 +110,10 @@ export default function LoginPage() {
 
               <button
                 type="submit"
-                disabled={status !== "idle"}
+                disabled={submitting}
                 className="w-full bg-flag-blue hover:bg-flag-blue-mid text-white font-display font-bold uppercase tracking-wider py-3 rounded transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                {status !== "idle" ? "Signing in..." : "Sign In"}
+                {submitting ? "Signing in..." : "Sign In"}
               </button>
             </form>
 
