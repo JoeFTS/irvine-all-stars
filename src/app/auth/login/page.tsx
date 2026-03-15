@@ -26,16 +26,11 @@ export default function LoginPage() {
       return;
     }
 
-    // Small delay to let auth state propagate, then redirect
-    // Role may not be available immediately, so we redirect and let
-    // the target page handle role-based access
-    setTimeout(() => {
-      if (role === "admin") {
-        router.push("/admin");
-      } else {
-        router.push("/portal");
-      }
-    }, 300);
+    // Redirect based on URL param or default to portal
+    const params = new URLSearchParams(window.location.search);
+    const redirect = params.get("redirect") || "/portal";
+    router.push(redirect);
+    router.refresh();
   }
 
   return (
