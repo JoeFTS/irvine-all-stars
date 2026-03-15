@@ -198,7 +198,10 @@ export function CoachApplicationForm() {
   }
 
   async function handleSubmit() {
-    if (!validateStep(3)) return;
+    if (!validateStep(3)) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
 
     setSubmitting(true);
     setSubmitError("");

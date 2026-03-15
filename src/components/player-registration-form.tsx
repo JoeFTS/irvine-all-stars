@@ -325,7 +325,10 @@ export function PlayerRegistrationForm() {
   }
 
   async function handleSubmit() {
-    if (!validateStep(2)) return;
+    if (!validateStep(2)) {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+      return;
+    }
     setSubmitting(true);
 
     const payload = {
@@ -334,7 +337,7 @@ export function PlayerRegistrationForm() {
       parent_phone: form.parent_phone.trim(),
       player_first_name: form.player_first_name.trim(),
       player_last_name: form.player_last_name.trim(),
-      player_dob: form.player_dob,
+      player_date_of_birth: form.player_dob,
       division: form.division,
       primary_position: form.primary_position,
       secondary_position: form.secondary_position || null,
@@ -345,9 +348,9 @@ export function PlayerRegistrationForm() {
       medical_conditions: form.medical_conditions.trim() || null,
       emergency_contact_name: form.emergency_contact_name.trim(),
       emergency_contact_phone: form.emergency_contact_phone.trim(),
-      photo_release: form.photo_release,
-      liability_waiver: form.liability_waiver,
-      code_of_conduct: form.code_of_conduct,
+      photo_release_consent: form.photo_release,
+      liability_waiver_consent: form.liability_waiver,
+      parent_code_of_conduct: form.code_of_conduct,
     };
 
     if (!supabase) {
