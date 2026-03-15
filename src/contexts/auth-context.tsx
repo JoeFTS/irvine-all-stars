@@ -41,13 +41,17 @@ export function useAuth() {
 
 async function fetchRole(userId: string): Promise<UserRole | null> {
   if (!supabase) return null;
-  const { data, error } = await supabase
-    .from("profiles")
-    .select("role")
-    .eq("id", userId)
-    .single();
-  if (error || !data) return null;
-  return data.role as UserRole;
+  try {
+    const { data, error } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", userId)
+      .single();
+    if (error || !data) return null;
+    return data.role as UserRole;
+  } catch {
+    return null;
+  }
 }
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -61,31 +65,31 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
-    // Get initial session
-    supabase.auth.getSession().then(async ({ data: { session } }) => {
-      if (session?.user) {
-        setUser(session.user);
-        const userRole = await fetchRole(session.user.id);
-        setRole(userRole);
-      }
-      setLoading(false);
-    });
-
-    // Listen for auth changes
+    // Use onAuthStateChange exclusively — it fires INITIAL_SESSION on mount
     const {
       data: { subscription },
-    } = supabase.auth.onAuthStateChange(async (_event, session) => {
+    } = supabase.auth.onAuthStateChange(async (event, session) => {
       if (session?.user) {
         setUser(session.user);
-        const userRole = await fetchRole(session.user.id);
-        setRole(userRole);
+        // Fetch role without blocking loading state
+        fetchRole(session.user.id).then((r) => {
+          setRole(r);
+          setLoading(false);
+        });
       } else {
         setUser(null);
         setRole(null);
+        setLoading(false);
       }
     });
 
-    return () => subscription.unsubscribe();
+    // Safety timeout — never stay in loading state forever
+    const timeout = setTimeout(() => setLoading(false), 5000);
+
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timeout);
+    };
   }, []);
 
   const signIn = useCallback(
