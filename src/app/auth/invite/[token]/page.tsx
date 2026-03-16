@@ -10,6 +10,9 @@ interface Invite {
   email: string;
   role: string;
   division: string | null;
+  parent_name: string | null;
+  child_first_name: string | null;
+  child_last_name: string | null;
   token: string;
   used: boolean;
   created_at: string;
@@ -46,7 +49,7 @@ export default function InviteSignupPage({
 
       const { data, error: fetchError } = await supabase
         .from("invites")
-        .select("*")
+        .select("id, email, role, division, parent_name, child_first_name, child_last_name, token, used, created_at, expires_at")
         .eq("token", token)
         .single();
 
@@ -68,6 +71,9 @@ export default function InviteSignupPage({
       }
 
       setInviteState({ status: "valid", invite });
+      if (invite.parent_name) {
+        setName(invite.parent_name);
+      }
     }
 
     checkToken();
@@ -136,10 +142,41 @@ export default function InviteSignupPage({
         .update({ used: true })
         .eq("token", token);
 
-      // 4. Success
+      // 4. Auto-create or link registration for the child
+      if (inviteState.invite.role === "parent" && inviteState.invite.child_first_name && inviteState.invite.child_last_name) {
+        // Check if registration already exists (second parent case)
+        const { data: existingReg } = await supabase
+          .from("tryout_registrations")
+          .select("id, secondary_parent_email")
+          .eq("player_first_name", inviteState.invite.child_first_name.trim())
+          .eq("player_last_name", inviteState.invite.child_last_name.trim())
+          .maybeSingle();
+
+        if (existingReg) {
+          // Second parent — add as secondary email if not already set
+          if (!existingReg.secondary_parent_email) {
+            await supabase
+              .from("tryout_registrations")
+              .update({ secondary_parent_email: inviteState.invite.email })
+              .eq("id", existingReg.id);
+          }
+        } else {
+          // First parent — create partial registration
+          await supabase.from("tryout_registrations").insert({
+            parent_name: name,
+            parent_email: inviteState.invite.email,
+            player_first_name: inviteState.invite.child_first_name.trim(),
+            player_last_name: inviteState.invite.child_last_name.trim(),
+            division: inviteState.invite.division || "",
+            status: "registered",
+          });
+        }
+      }
+
+      // 5. Success
       setSuccess(true);
       setTimeout(() => {
-        window.location.href = "/auth/login";
+        window.location.href = "/portal";
       }, 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unexpected error occurred.");
@@ -274,6 +311,11 @@ export default function InviteSignupPage({
             {inviteState.invite.role === "coach" && inviteState.invite.division && (
               <p className="text-flag-blue text-sm font-semibold mt-2">
                 You&apos;ve been invited to coach the {inviteState.invite.division} division
+              </p>
+            )}
+            {inviteState.invite.child_first_name && (
+              <p className="text-flag-blue text-sm font-semibold mt-1">
+                Setting up tryout access for {inviteState.invite.child_first_name} {inviteState.invite.child_last_name}
               </p>
             )}
           </div>

@@ -150,7 +150,7 @@ export default function PortalPage() {
         .select(
           "id, player_name, division, primary_position, status, created_at"
         )
-        .eq("parent_email", user!.email ?? "")
+        .or(`parent_email.eq.${user!.email},secondary_parent_email.eq.${user!.email}`)
         .order("created_at", { ascending: false });
 
       const regData = (regs ?? []) as Registration[];

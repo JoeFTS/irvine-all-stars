@@ -1,43 +1,53 @@
-import type { Metadata } from "next";
-import { StripeDivider } from "@/components/stripe-divider";
-import { PlayerRegistrationForm } from "@/components/player-registration-form";
+"use client";
 
-export const metadata: Metadata = {
-  title: "Register for Tryouts",
-  description:
-    "Register your player for Irvine Pony Baseball All-Stars tryouts. Complete the 3-step form to secure your spot.",
-};
+import { useAuth } from "@/contexts/auth-context";
+import Link from "next/link";
+import { PlayerRegistrationForm } from "@/components/player-registration-form";
+import { StripeDivider } from "@/components/stripe-divider";
 
 export default function ApplyPlayerPage() {
-  return (
-    <>
-      {/* ===== HERO ===== */}
-      <section className="relative bg-flag-blue pt-[98px] pb-12 md:pb-16 px-6 md:px-10 overflow-hidden">
-        <div className="absolute inset-0 text-white/[0.04] text-xl leading-[2.8rem] tracking-widest overflow-hidden pointer-events-none p-4">
-          {"★ ".repeat(200)}
-        </div>
-        <div className="relative z-10 max-w-4xl mx-auto text-center pt-10 md:pt-14">
-          <p className="font-display text-sm font-semibold text-star-gold-bright uppercase tracking-[3px] mb-3">
-            &#9733; Step Up to the Plate
-          </p>
-          <h1 className="font-display text-4xl md:text-6xl font-bold text-white uppercase tracking-wide mb-4">
-            Tryout Registration
-          </h1>
-          <p className="text-white/60 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
-            Register your player for 2026 All-Stars tryouts. Takes about 3
-            minutes.
-          </p>
-        </div>
-      </section>
+  const { user, loading } = useAuth();
 
-      <StripeDivider />
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-off-white pt-[98px] flex items-center justify-center">
+        <p className="text-gray-500">Loading...</p>
+      </div>
+    );
+  }
 
-      {/* ===== FORM ===== */}
-      <section className="bg-off-white py-10 md:py-16 px-4 md:px-10">
-        <div className="max-w-3xl mx-auto">
-          <PlayerRegistrationForm />
+  if (!user) {
+    return (
+      <div className="min-h-screen bg-off-white pt-[98px]">
+        <StripeDivider />
+        <div className="flex items-center justify-center px-4 py-16">
+          <div className="w-full max-w-md text-center">
+            <div className="flex items-center justify-center gap-2 mb-4">
+              <span className="text-star-gold-bright text-lg">&#9733;</span>
+              <h1 className="font-display text-3xl font-bold text-flag-blue uppercase tracking-wider">
+                Invitation Required
+              </h1>
+              <span className="text-star-gold-bright text-lg">&#9733;</span>
+            </div>
+            <div className="bg-white border border-gray-200 rounded-lg p-8">
+              <p className="text-gray-600 mb-4">
+                Tryout registration for Irvine All-Stars is by invitation only. If your child has been selected for tryouts, you will receive an email invitation with a link to create your account and register.
+              </p>
+              <p className="text-gray-600 mb-6">
+                Already have an account?
+              </p>
+              <Link
+                href="/auth/login"
+                className="inline-block bg-flag-blue hover:bg-flag-blue-mid text-white font-display font-bold uppercase tracking-wider py-3 px-6 rounded transition-colors"
+              >
+                Sign In
+              </Link>
+            </div>
+          </div>
         </div>
-      </section>
-    </>
-  );
+      </div>
+    );
+  }
+
+  return <PlayerRegistrationForm />;
 }

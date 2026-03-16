@@ -121,7 +121,7 @@ export default function ContractPage() {
       const { data: regs } = await supabase!
         .from("tryout_registrations")
         .select("id, player_name, division")
-        .eq("parent_email", user!.email ?? "")
+        .or(`parent_email.eq.${user!.email},secondary_parent_email.eq.${user!.email}`)
         .order("created_at", { ascending: false });
 
       const regData = (regs ?? []) as Registration[];

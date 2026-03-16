@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
-import { Mail, RefreshCw } from "lucide-react";
+import { Mail, RefreshCw, Upload, Download } from "lucide-react";
 
 const DIVISION_OPTIONS = [
   "5U-Shetland",
@@ -22,10 +22,22 @@ interface Invite {
   email: string;
   role: string;
   division: string | null;
+  parent_name: string | null;
+  child_first_name: string | null;
+  child_last_name: string | null;
   token: string;
   used: boolean;
   created_at: string;
   expires_at: string;
+}
+
+interface CsvRow {
+  parent_name: string;
+  parent_email: string;
+  child_first_name: string;
+  child_last_name: string;
+  division: string;
+  status: "pending" | "sent" | "duplicate" | "error";
 }
 
 function getStatus(invite: Invite): "used" | "expired" | "pending" {
@@ -45,14 +57,64 @@ const roleStyles = {
   parent: "bg-flag-blue/10 text-flag-blue",
 };
 
+const csvStatusStyles = {
+  pending: "bg-gray-100 text-gray-500",
+  sent: "bg-green-100 text-green-800",
+  duplicate: "bg-yellow-100 text-yellow-800",
+  error: "bg-red-100 text-red-800",
+};
+
+function parseCSV(text: string): CsvRow[] {
+  const lines = text.trim().split("\n");
+  const header = lines[0].toLowerCase();
+  // Detect separator (comma or tab)
+  const sep = header.includes("\t") ? "\t" : ",";
+
+  return lines
+    .slice(1)
+    .map((line) => {
+      const cols = line.split(sep).map((c) => c.trim().replace(/^"|"$/g, ""));
+      return {
+        parent_name: cols[0] || "",
+        parent_email: cols[1]?.toLowerCase() || "",
+        child_first_name: cols[2] || "",
+        child_last_name: cols[3] || "",
+        division: cols[4] || "",
+        status: "pending" as const,
+      };
+    })
+    .filter((row) => row.parent_email); // Skip empty rows
+}
+
+function downloadTemplate() {
+  const csv =
+    "parent_name,parent_email,child_first_name,child_last_name,division\nJane Smith,jane@example.com,Tommy,Smith,9U-Mustang\n";
+  const blob = new Blob([csv], { type: "text/csv" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = "invite-template.csv";
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 export default function AdminInvitesPage() {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<"coach" | "parent">("coach");
   const [division, setDivision] = useState<string>("");
+  const [parentName, setParentName] = useState("");
+  const [childFirstName, setChildFirstName] = useState("");
+  const [childLastName, setChildLastName] = useState("");
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [invites, setInvites] = useState<Invite[]>([]);
   const [loading, setLoading] = useState(true);
+
+  // CSV bulk upload state
+  const [csvRows, setCsvRows] = useState<CsvRow[]>([]);
+  const [csvSending, setCsvSending] = useState(false);
+  const [csvProgress, setCsvProgress] = useState(0);
+  const [csvResults, setCsvResults] = useState<{ sent: number; duplicates: number; failed: number } | null>(null);
 
   const fetchInvites = useCallback(async () => {
     if (!supabase) return;
@@ -77,10 +139,18 @@ export default function AdminInvitesPage() {
     setSending(true);
 
     try {
+      const payload: Record<string, string> = { email, role };
+      if (division) payload.division = division;
+      if (role === "parent") {
+        if (parentName) payload.parent_name = parentName;
+        if (childFirstName) payload.child_first_name = childFirstName;
+        if (childLastName) payload.child_last_name = childLastName;
+      }
+
       const res = await fetch("/api/send-invite", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, role, ...(role === "coach" && division ? { division } : {}) }),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
@@ -91,6 +161,9 @@ export default function AdminInvitesPage() {
       setMessage({ type: "success", text: `Invite sent to ${email}!` });
       setEmail("");
       setDivision("");
+      setParentName("");
+      setChildFirstName("");
+      setChildLastName("");
       fetchInvites();
     } catch (err) {
       setMessage({
@@ -105,10 +178,16 @@ export default function AdminInvitesPage() {
   async function handleResend(invite: Invite) {
     setMessage(null);
     try {
+      const payload: Record<string, string> = { email: invite.email, role: invite.role };
+      if (invite.division) payload.division = invite.division;
+      if (invite.parent_name) payload.parent_name = invite.parent_name;
+      if (invite.child_first_name) payload.child_first_name = invite.child_first_name;
+      if (invite.child_last_name) payload.child_last_name = invite.child_last_name;
+
       const res = await fetch("/api/send-invite", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: invite.email, role: invite.role, ...(invite.division ? { division: invite.division } : {}) }),
+        body: JSON.stringify(payload),
       });
 
       if (!res.ok) {
@@ -124,6 +203,66 @@ export default function AdminInvitesPage() {
         text: err instanceof Error ? err.message : "Failed to resend invite",
       });
     }
+  }
+
+  function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setCsvResults(null);
+    const reader = new FileReader();
+    reader.onload = (evt) => {
+      const text = evt.target?.result as string;
+      const rows = parseCSV(text);
+      setCsvRows(rows);
+    };
+    reader.readAsText(file);
+  }
+
+  async function sendAll() {
+    setCsvSending(true);
+    setCsvResults(null);
+    let sent = 0,
+      duplicates = 0,
+      failed = 0;
+
+    const updatedRows = [...csvRows];
+
+    for (let i = 0; i < updatedRows.length; i++) {
+      setCsvProgress(i + 1);
+      const row = updatedRows[i];
+      try {
+        const res = await fetch("/api/send-invite", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            email: row.parent_email,
+            role: "parent",
+            division: row.division,
+            parent_name: row.parent_name,
+            child_first_name: row.child_first_name,
+            child_last_name: row.child_last_name,
+          }),
+        });
+        if (res.ok) {
+          sent++;
+          updatedRows[i] = { ...row, status: "sent" };
+        } else if (res.status === 409) {
+          duplicates++;
+          updatedRows[i] = { ...row, status: "duplicate" };
+        } else {
+          failed++;
+          updatedRows[i] = { ...row, status: "error" };
+        }
+      } catch {
+        failed++;
+        updatedRows[i] = { ...row, status: "error" };
+      }
+      setCsvRows([...updatedRows]);
+    }
+
+    setCsvSending(false);
+    setCsvResults({ sent, duplicates, failed });
+    fetchInvites();
   }
 
   return (
@@ -159,46 +298,50 @@ export default function AdminInvitesPage() {
         <h2 className="font-display text-lg font-bold text-charcoal uppercase tracking-wider mb-4">
           New Invite
         </h2>
-        <form onSubmit={handleSend} className="flex flex-col sm:flex-row gap-4 items-end">
-          <div className="flex-1">
-            <label
-              htmlFor="invite-email"
-              className="block text-sm font-semibold text-charcoal uppercase tracking-wide mb-1.5 font-display"
-            >
-              Email
-            </label>
-            <input
-              id="invite-email"
-              type="email"
-              required
-              value={email}
-              onChange={(e) => setEmail(e.target.value)}
-              className="w-full border border-gray-200 rounded px-4 py-2.5 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
-              placeholder="coach@example.com"
-            />
-          </div>
-          <div className="w-full sm:w-40">
-            <label
-              htmlFor="invite-role"
-              className="block text-sm font-semibold text-charcoal uppercase tracking-wide mb-1.5 font-display"
-            >
-              Role
-            </label>
-            <select
-              id="invite-role"
-              value={role}
-              onChange={(e) => {
-                const newRole = e.target.value as "coach" | "parent";
-                setRole(newRole);
-                if (newRole !== "coach") setDivision("");
-              }}
-              className="w-full border border-gray-200 rounded px-4 py-2.5 text-charcoal bg-white focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
-            >
-              <option value="coach">Coach</option>
-              <option value="parent">Parent</option>
-            </select>
-          </div>
-          {role === "coach" && (
+        <form onSubmit={handleSend} className="space-y-4">
+          <div className="flex flex-col sm:flex-row gap-4 items-end">
+            <div className="flex-1">
+              <label
+                htmlFor="invite-email"
+                className="block text-sm font-semibold text-charcoal uppercase tracking-wide mb-1.5 font-display"
+              >
+                Email
+              </label>
+              <input
+                id="invite-email"
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                className="w-full border border-gray-200 rounded px-4 py-2.5 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+                placeholder="coach@example.com"
+              />
+            </div>
+            <div className="w-full sm:w-40">
+              <label
+                htmlFor="invite-role"
+                className="block text-sm font-semibold text-charcoal uppercase tracking-wide mb-1.5 font-display"
+              >
+                Role
+              </label>
+              <select
+                id="invite-role"
+                value={role}
+                onChange={(e) => {
+                  const newRole = e.target.value as "coach" | "parent";
+                  setRole(newRole);
+                  if (newRole === "coach") {
+                    setParentName("");
+                    setChildFirstName("");
+                    setChildLastName("");
+                  }
+                }}
+                className="w-full border border-gray-200 rounded px-4 py-2.5 text-charcoal bg-white focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+              >
+                <option value="coach">Coach</option>
+                <option value="parent">Parent</option>
+              </select>
+            </div>
             <div className="w-full sm:w-48">
               <label
                 htmlFor="invite-division"
@@ -215,20 +358,214 @@ export default function AdminInvitesPage() {
               >
                 <option value="">Select division...</option>
                 {DIVISION_OPTIONS.map((d) => (
-                  <option key={d} value={d}>{d}</option>
+                  <option key={d} value={d}>
+                    {d}
+                  </option>
                 ))}
               </select>
             </div>
+          </div>
+
+          {/* Parent-specific fields */}
+          {role === "parent" && (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label
+                  htmlFor="invite-parent-name"
+                  className="block text-sm font-semibold text-charcoal uppercase tracking-wide mb-1.5 font-display"
+                >
+                  Parent Name
+                </label>
+                <input
+                  id="invite-parent-name"
+                  type="text"
+                  required
+                  value={parentName}
+                  onChange={(e) => setParentName(e.target.value)}
+                  className="w-full border border-gray-200 rounded px-4 py-2.5 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+                  placeholder="Jane Smith"
+                />
+              </div>
+              <div className="grid grid-cols-2 gap-3">
+                <div>
+                  <label
+                    htmlFor="invite-child-first"
+                    className="block text-sm font-semibold text-charcoal uppercase tracking-wide mb-1.5 font-display"
+                  >
+                    Child First Name
+                  </label>
+                  <input
+                    id="invite-child-first"
+                    type="text"
+                    required
+                    value={childFirstName}
+                    onChange={(e) => setChildFirstName(e.target.value)}
+                    className="w-full border border-gray-200 rounded px-4 py-2.5 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+                    placeholder="Tommy"
+                  />
+                </div>
+                <div>
+                  <label
+                    htmlFor="invite-child-last"
+                    className="block text-sm font-semibold text-charcoal uppercase tracking-wide mb-1.5 font-display"
+                  >
+                    Child Last Name
+                  </label>
+                  <input
+                    id="invite-child-last"
+                    type="text"
+                    required
+                    value={childLastName}
+                    onChange={(e) => setChildLastName(e.target.value)}
+                    className="w-full border border-gray-200 rounded px-4 py-2.5 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+                    placeholder="Smith"
+                  />
+                </div>
+              </div>
+            </div>
           )}
-          <button
-            type="submit"
-            disabled={sending}
-            className="w-full sm:w-auto bg-flag-red hover:bg-flag-red-dark text-white font-display font-bold uppercase tracking-wider py-2.5 px-6 rounded transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
-          >
-            <Mail size={16} />
-            {sending ? "Sending..." : "Send Invite"}
-          </button>
+
+          <div className="flex justify-end">
+            <button
+              type="submit"
+              disabled={sending}
+              className="w-full sm:w-auto bg-flag-red hover:bg-flag-red-dark text-white font-display font-bold uppercase tracking-wider py-2.5 px-6 rounded transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            >
+              <Mail size={16} />
+              {sending ? "Sending..." : "Send Invite"}
+            </button>
+          </div>
         </form>
+      </div>
+
+      {/* CSV Bulk Upload */}
+      <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8">
+        <p className="text-flag-red font-display text-xs font-bold uppercase tracking-widest mb-1">
+          Bulk Import
+        </p>
+        <h2 className="font-display text-lg font-bold text-charcoal uppercase tracking-wider mb-2">
+          Upload CSV
+        </h2>
+        <p className="text-gray-500 text-sm mb-4">
+          Upload a CSV file to send multiple parent invites at once.
+        </p>
+
+        <div className="flex flex-wrap gap-3 items-center mb-4">
+          <button
+            onClick={downloadTemplate}
+            className="inline-flex items-center gap-2 text-sm font-display font-semibold text-flag-blue hover:text-flag-blue-mid uppercase tracking-wide transition-colors"
+          >
+            <Download size={15} />
+            Download Template CSV
+          </button>
+        </div>
+
+        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center mb-4">
+          <Upload size={24} className="mx-auto text-gray-400 mb-2" />
+          <p className="text-sm text-gray-500 mb-2">Choose a CSV file or drag and drop</p>
+          <input
+            type="file"
+            accept=".csv"
+            onChange={handleFileUpload}
+            className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-flag-blue/10 file:text-flag-blue hover:file:bg-flag-blue/20 file:cursor-pointer"
+          />
+        </div>
+
+        {/* Preview table */}
+        {csvRows.length > 0 && (
+          <>
+            <div className="overflow-x-auto mb-4">
+              <table className="w-full text-sm">
+                <thead>
+                  <tr className="border-b border-gray-100 text-left">
+                    <th className="px-4 py-2 font-display font-semibold text-charcoal uppercase tracking-wide text-xs">
+                      Parent Name
+                    </th>
+                    <th className="px-4 py-2 font-display font-semibold text-charcoal uppercase tracking-wide text-xs">
+                      Email
+                    </th>
+                    <th className="px-4 py-2 font-display font-semibold text-charcoal uppercase tracking-wide text-xs">
+                      Child First
+                    </th>
+                    <th className="px-4 py-2 font-display font-semibold text-charcoal uppercase tracking-wide text-xs">
+                      Child Last
+                    </th>
+                    <th className="px-4 py-2 font-display font-semibold text-charcoal uppercase tracking-wide text-xs">
+                      Division
+                    </th>
+                    <th className="px-4 py-2 font-display font-semibold text-charcoal uppercase tracking-wide text-xs">
+                      Status
+                    </th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {csvRows.map((row, i) => (
+                    <tr key={i} className="border-b border-gray-50 hover:bg-gray-50/50">
+                      <td className="px-4 py-2 text-charcoal">{row.parent_name}</td>
+                      <td className="px-4 py-2 text-charcoal">{row.parent_email}</td>
+                      <td className="px-4 py-2 text-charcoal">{row.child_first_name}</td>
+                      <td className="px-4 py-2 text-charcoal">{row.child_last_name}</td>
+                      <td className="px-4 py-2 text-charcoal">{row.division}</td>
+                      <td className="px-4 py-2">
+                        <span
+                          className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize ${csvStatusStyles[row.status]}`}
+                        >
+                          {row.status}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+
+            {/* Progress bar */}
+            {csvSending && (
+              <div className="mb-4">
+                <div className="flex justify-between text-xs text-gray-500 mb-1">
+                  <span>Sending invites...</span>
+                  <span>
+                    {csvProgress}/{csvRows.length}
+                  </span>
+                </div>
+                <div className="w-full bg-gray-200 rounded-full h-2">
+                  <div
+                    className="bg-flag-blue h-2 rounded-full transition-all duration-300"
+                    style={{ width: `${(csvProgress / csvRows.length) * 100}%` }}
+                  />
+                </div>
+              </div>
+            )}
+
+            {/* Results summary */}
+            {csvResults && (
+              <div className="mb-4 rounded px-4 py-3 text-sm bg-gray-50 border border-gray-200">
+                <span className="text-green-700 font-semibold">{csvResults.sent} sent</span>
+                {csvResults.duplicates > 0 && (
+                  <span className="text-yellow-700 font-semibold ml-3">
+                    {csvResults.duplicates} duplicates
+                  </span>
+                )}
+                {csvResults.failed > 0 && (
+                  <span className="text-red-700 font-semibold ml-3">
+                    {csvResults.failed} failed
+                  </span>
+                )}
+              </div>
+            )}
+
+            <button
+              onClick={sendAll}
+              disabled={csvSending}
+              className="bg-flag-red hover:bg-flag-red-dark text-white font-display font-bold uppercase tracking-wider py-2.5 px-6 rounded transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+            >
+              <Mail size={16} />
+              {csvSending
+                ? `Sending ${csvProgress}/${csvRows.length}...`
+                : `Send All (${csvRows.length} invites)`}
+            </button>
+          </>
+        )}
       </div>
 
       {/* Sent Invites List */}
@@ -253,6 +590,12 @@ export default function AdminInvitesPage() {
                   </th>
                   <th className="px-6 py-3 font-display font-semibold text-charcoal uppercase tracking-wide text-xs">
                     Role
+                  </th>
+                  <th className="px-6 py-3 font-display font-semibold text-charcoal uppercase tracking-wide text-xs">
+                    Parent Name
+                  </th>
+                  <th className="px-6 py-3 font-display font-semibold text-charcoal uppercase tracking-wide text-xs">
+                    Child Name
                   </th>
                   <th className="px-6 py-3 font-display font-semibold text-charcoal uppercase tracking-wide text-xs">
                     Status
@@ -280,11 +623,19 @@ export default function AdminInvitesPage() {
                         >
                           {invite.role}
                         </span>
-                        {invite.role === "coach" && invite.division && (
+                        {invite.division && (
                           <span className="inline-block ml-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
                             {invite.division}
                           </span>
                         )}
+                      </td>
+                      <td className="px-6 py-3 text-charcoal">
+                        {invite.parent_name || "\u2014"}
+                      </td>
+                      <td className="px-6 py-3 text-charcoal">
+                        {invite.child_first_name && invite.child_last_name
+                          ? `${invite.child_first_name} ${invite.child_last_name}`
+                          : "\u2014"}
                       </td>
                       <td className="px-6 py-3">
                         <span
