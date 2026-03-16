@@ -10,6 +10,7 @@ import {
   BarChart3,
   Megaphone,
   Mail,
+  Calendar,
 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 
@@ -20,6 +21,7 @@ const navItems = [
   { href: "/admin/scores", label: "Scores", icon: BarChart3 },
   { href: "/admin/announcements", label: "Announcements", icon: Megaphone },
   { href: "/admin/teams", label: "Teams", icon: Users2 },
+  { href: "/admin/tryouts", label: "Tryouts", icon: Calendar },
   { href: "/admin/invites", label: "Invites", icon: Mail },
 ];
 

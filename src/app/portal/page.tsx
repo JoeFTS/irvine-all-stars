@@ -44,6 +44,22 @@ interface Announcement {
   created_at: string;
 }
 
+interface TryoutSession {
+  id: string;
+  division: string;
+  session_date: string;
+  start_time: string;
+  end_time: string | null;
+  location: string;
+  field: string | null;
+}
+
+interface TryoutAssignment {
+  id: string;
+  session_id: string;
+  registration_id: string;
+}
+
 /* ------------------------------------------------------------------ */
 /*  Status badge helper                                                */
 /* ------------------------------------------------------------------ */
@@ -74,6 +90,14 @@ const statusConfig: Record<string, { label: string; classes: string }> = {
     classes: "bg-orange-50 text-orange-700 border-orange-300",
   },
 };
+
+function formatTime(time: string): string {
+  const [h, m] = time.split(":");
+  const hour = parseInt(h);
+  const ampm = hour >= 12 ? "PM" : "AM";
+  const displayHour = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
+  return `${displayHour}:${m} ${ampm}`;
+}
 
 function StatusBadge({ status }: { status: string }) {
   const cfg = statusConfig[status] ?? {
@@ -131,6 +155,8 @@ export default function PortalPage() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [documents, setDocuments] = useState<PlayerDocument[]>([]);
   const [contracts, setContracts] = useState<PlayerContract[]>([]);
+  const [tryoutSessions, setTryoutSessions] = useState<TryoutSession[]>([]);
+  const [tryoutAssignments, setTryoutAssignments] = useState<TryoutAssignment[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
 
   // Client-side auth guard
@@ -178,6 +204,24 @@ export default function PortalPage() {
 
         setDocuments((docsResult.data ?? []) as PlayerDocument[]);
         setContracts((contractsResult.data ?? []) as PlayerContract[]);
+
+        // Fetch tryout assignments for this parent's players
+        const { data: assignments } = await supabase!
+          .from("tryout_assignments")
+          .select("id, session_id, registration_id")
+          .in("registration_id", regIds);
+
+        setTryoutAssignments((assignments ?? []) as TryoutAssignment[]);
+
+        // Fetch the session details for assigned sessions
+        if (assignments && assignments.length > 0) {
+          const sessionIds = [...new Set(assignments.map((a: any) => a.session_id))];
+          const { data: sessions } = await supabase!
+            .from("tryout_sessions")
+            .select("id, division, session_date, start_time, end_time, location, field")
+            .in("id", sessionIds);
+          setTryoutSessions((sessions ?? []) as TryoutSession[]);
+        }
       }
 
       // Determine divisions for filtering announcements
@@ -383,6 +427,47 @@ export default function PortalPage() {
                         </p>
                       </div>
                     )}
+                    {(() => {
+                      const assignment = tryoutAssignments.find(a => a.registration_id === reg.id);
+                      const session = assignment ? tryoutSessions.find(s => s.id === assignment.session_id) : null;
+                      return (
+                        <>
+                          {session && (
+                            <div className="mt-4 bg-flag-blue/5 border border-flag-blue/15 rounded-lg p-4">
+                              <p className="font-display text-xs font-semibold text-flag-blue uppercase tracking-widest mb-2">
+                                &#9733; Your Tryout Time
+                              </p>
+                              <div className="flex flex-wrap gap-x-6 gap-y-2 text-sm">
+                                <span>
+                                  <span className="font-semibold text-charcoal">Date:</span>{" "}
+                                  {new Date(session.session_date + "T00:00:00").toLocaleDateString("en-US", {
+                                    weekday: "long",
+                                    month: "long",
+                                    day: "numeric",
+                                    year: "numeric",
+                                  })}
+                                </span>
+                                <span>
+                                  <span className="font-semibold text-charcoal">Time:</span>{" "}
+                                  {formatTime(session.start_time)}
+                                  {session.end_time ? ` – ${formatTime(session.end_time)}` : ""}
+                                </span>
+                                <span>
+                                  <span className="font-semibold text-charcoal">Location:</span>{" "}
+                                  {session.location}
+                                  {session.field ? `, ${session.field}` : ""}
+                                </span>
+                              </div>
+                            </div>
+                          )}
+                          {!session && !isIncomplete && (
+                            <p className="mt-3 text-gray-400 text-xs italic">
+                              Tryout time not yet assigned. Check back soon.
+                            </p>
+                          )}
+                        </>
+                      );
+                    })()}
                   </div>
                 );
               })}

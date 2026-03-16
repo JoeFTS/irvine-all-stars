@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { ChevronDown, ChevronUp } from "lucide-react";
 
-type Status = "registered" | "confirmed" | "waitlisted" | "withdrawn";
+type Status = "registered" | "confirmed" | "tryout_complete" | "selected" | "not_selected" | "alternate" | "waitlisted" | "withdrawn";
 
 interface Registration {
   id: string;
@@ -47,6 +47,10 @@ const DIVISIONS = [
 const STATUS_OPTIONS: { value: Status; label: string; color: string }[] = [
   { value: "registered", label: "Registered", color: "bg-gray-100 text-gray-600" },
   { value: "confirmed", label: "Confirmed", color: "bg-green-100 text-green-700" },
+  { value: "tryout_complete", label: "Tryout Complete", color: "bg-blue-100 text-blue-700" },
+  { value: "selected", label: "Selected", color: "bg-green-100 text-green-800 font-bold" },
+  { value: "not_selected", label: "Not Selected", color: "bg-gray-100 text-gray-500" },
+  { value: "alternate", label: "Alternate", color: "bg-orange-100 text-orange-700" },
   { value: "waitlisted", label: "Waitlisted", color: "bg-star-gold/15 text-star-gold" },
   { value: "withdrawn", label: "Withdrawn", color: "bg-flag-red/10 text-flag-red" },
 ];
@@ -104,6 +108,29 @@ export default function RegistrationsPage() {
       setRegistrations((prev) =>
         prev.map((r) => (r.id === id ? { ...r, status: newStatus } : r))
       );
+
+      // Send selection notification emails
+      if (newStatus === "selected" || newStatus === "not_selected" || newStatus === "alternate") {
+        const reg = registrations.find((r) => r.id === id);
+        if (reg) {
+          try {
+            await fetch("/api/send-selection", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                registration_id: id,
+                status: newStatus,
+                division: reg.division,
+                player_name: `${reg.player_first_name} ${reg.player_last_name}`,
+                parent_name: reg.parent_name,
+                parent_email: reg.parent_email,
+              }),
+            });
+          } catch {
+            // Email failure shouldn't block status update
+          }
+        }
+      }
     }
     setUpdatingId(null);
   }
