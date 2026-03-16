@@ -71,7 +71,17 @@ export function Navbar() {
           ))}
           {user ? (
             <>
-              {role === "coach" && (
+              {(role === "coach" || role === "admin") && (
+                <li>
+                  <Link
+                    href="/coach"
+                    className="text-white/65 hover:text-white text-sm font-semibold uppercase tracking-wide transition-colors"
+                  >
+                    Coach Portal
+                  </Link>
+                </li>
+              )}
+              {(role === "coach" || role === "parent") && (
                 <li>
                   <Link
                     href="/portal"
@@ -81,18 +91,20 @@ export function Navbar() {
                   </Link>
                 </li>
               )}
-              <li>
-                <Link
-                  href={portalLink.href}
-                  className="bg-flag-red hover:bg-flag-red-dark text-white px-4 py-2 rounded text-sm font-bold uppercase tracking-wide transition-colors"
-                >
-                  {portalLink.label}
-                </Link>
-              </li>
+              {role === "admin" && (
+                <li>
+                  <Link
+                    href="/admin"
+                    className="text-white/65 hover:text-white text-sm font-semibold uppercase tracking-wide transition-colors"
+                  >
+                    Admin
+                  </Link>
+                </li>
+              )}
               <li>
                 <button
                   onClick={handleSignOut}
-                  className="text-white/50 hover:text-white text-xs font-semibold uppercase tracking-wide transition-colors"
+                  className="bg-flag-red hover:bg-flag-red-dark text-white px-4 py-2 rounded text-sm font-bold uppercase tracking-wide transition-colors"
                 >
                   Sign Out
                 </button>
@@ -137,8 +149,19 @@ export function Navbar() {
             ))}
             {user ? (
               <>
-                {role === "coach" && (
+                {(role === "coach" || role === "admin") && (
                   <li className="mt-4">
+                    <Link
+                      href="/coach"
+                      onClick={() => setMobileOpen(false)}
+                      className="block text-white/80 hover:text-white font-display text-lg uppercase tracking-wider py-3 border-b border-white/10"
+                    >
+                      Coach Portal
+                    </Link>
+                  </li>
+                )}
+                {(role === "coach" || role === "parent") && (
+                  <li>
                     <Link
                       href="/portal"
                       onClick={() => setMobileOpen(false)}
@@ -148,19 +171,21 @@ export function Navbar() {
                     </Link>
                   </li>
                 )}
-                <li className={role === "coach" ? "" : "mt-4"}>
-                  <Link
-                    href={portalLink.href}
-                    onClick={() => setMobileOpen(false)}
-                    className="block bg-flag-red text-white text-center py-3 rounded font-display text-lg uppercase tracking-wider font-bold"
-                  >
-                    {portalLink.label}
-                  </Link>
-                </li>
-                <li className="mt-2">
+                {role === "admin" && (
+                  <li>
+                    <Link
+                      href="/admin"
+                      onClick={() => setMobileOpen(false)}
+                      className="block text-white/80 hover:text-white font-display text-lg uppercase tracking-wider py-3 border-b border-white/10"
+                    >
+                      Admin
+                    </Link>
+                  </li>
+                )}
+                <li className="mt-4">
                   <button
                     onClick={() => { setMobileOpen(false); handleSignOut(); }}
-                    className="block w-full text-white/50 hover:text-white text-center py-3 font-display text-sm uppercase tracking-wider"
+                    className="block w-full bg-flag-red text-white text-center py-3 rounded font-display text-lg uppercase tracking-wider font-bold"
                   >
                     Sign Out
                   </button>

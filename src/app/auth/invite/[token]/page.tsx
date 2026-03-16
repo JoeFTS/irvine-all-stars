@@ -116,7 +116,12 @@ export default function InviteSignupPage({
       // 2. Create profile with the invite role
       const { error: profileError } = await supabase
         .from("profiles")
-        .insert({ id: userId, role: inviteState.invite.role });
+        .insert({
+          id: userId,
+          email: inviteState.invite.email,
+          full_name: name,
+          role: inviteState.invite.role,
+        });
 
       if (profileError) {
         console.error("Profile insert error:", profileError);
