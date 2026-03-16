@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useState } from "react";
+import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { supabase } from "@/lib/supabase";
@@ -17,12 +18,22 @@ const navLinks = [
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, role } = useAuth();
+  const pathname = usePathname();
 
-  const portalLink = role === "admin"
-    ? { href: "/admin", label: "Admin Panel" }
-    : role === "coach"
-    ? { href: "/coach", label: "Coach Dashboard" }
-    : { href: "/portal", label: "Parent Portal" };
+  function isActive(href: string) {
+    if (href === "/") return pathname === "/";
+    return pathname.startsWith(href);
+  }
+
+  const linkClass = (href: string) =>
+    isActive(href)
+      ? "text-white text-sm font-semibold uppercase tracking-wide bg-white/15 px-3 py-1.5 rounded transition-colors"
+      : "text-white/65 hover:text-white text-sm font-semibold uppercase tracking-wide px-3 py-1.5 rounded transition-colors";
+
+  const mobileLinkClass = (href: string) =>
+    isActive(href)
+      ? "block text-white font-display text-lg uppercase tracking-wider py-3 border-b border-white/10 bg-white/10 px-3 rounded"
+      : "block text-white/80 hover:text-white font-display text-lg uppercase tracking-wider py-3 border-b border-white/10";
 
   async function handleSignOut() {
     if (supabase) {
@@ -58,13 +69,10 @@ export function Navbar() {
         </Link>
 
         {/* Desktop Links */}
-        <ul className="hidden lg:flex items-center gap-6">
+        <ul className="hidden lg:flex items-center gap-1">
           {navLinks.map((link) => (
             <li key={link.href}>
-              <Link
-                href={link.href}
-                className="text-white/65 hover:text-white text-sm font-semibold uppercase tracking-wide transition-colors"
-              >
+              <Link href={link.href} className={linkClass(link.href)}>
                 {link.label}
               </Link>
             </li>
@@ -73,48 +81,39 @@ export function Navbar() {
             <>
               {(role === "coach" || role === "admin") && (
                 <li>
-                  <Link
-                    href="/coach"
-                    className="text-white/65 hover:text-white text-sm font-semibold uppercase tracking-wide transition-colors"
-                  >
+                  <Link href="/coach" className={linkClass("/coach")}>
                     Coach Portal
                   </Link>
                 </li>
               )}
               {(role === "coach" || role === "parent") && (
                 <li>
-                  <Link
-                    href="/portal"
-                    className="text-white/65 hover:text-white text-sm font-semibold uppercase tracking-wide transition-colors"
-                  >
+                  <Link href="/portal" className={linkClass("/portal")}>
                     Parent Portal
                   </Link>
                 </li>
               )}
               {role === "admin" && (
                 <li>
-                  <Link
-                    href="/admin"
-                    className="text-white/65 hover:text-white text-sm font-semibold uppercase tracking-wide transition-colors"
-                  >
+                  <Link href="/admin" className={linkClass("/admin")}>
                     Admin
                   </Link>
                 </li>
               )}
-              <li>
+              <li className="ml-2">
                 <button
                   onClick={handleSignOut}
-                  className="bg-flag-red hover:bg-flag-red-dark text-white px-4 py-2 rounded text-sm font-bold uppercase tracking-wide transition-colors"
+                  className="bg-flag-red hover:bg-flag-red-dark text-white px-4 py-1.5 rounded text-sm font-bold uppercase tracking-wide transition-colors"
                 >
                   Sign Out
                 </button>
               </li>
             </>
           ) : (
-            <li>
+            <li className="ml-2">
               <Link
                 href="/auth/login"
-                className="bg-flag-red hover:bg-flag-red-dark text-white px-4 py-2 rounded text-sm font-bold uppercase tracking-wide transition-colors"
+                className="bg-flag-red hover:bg-flag-red-dark text-white px-4 py-1.5 rounded text-sm font-bold uppercase tracking-wide transition-colors"
               >
                 Sign In
               </Link>
@@ -141,7 +140,7 @@ export function Navbar() {
                 <Link
                   href={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className="block text-white/80 hover:text-white font-display text-lg uppercase tracking-wider py-3 border-b border-white/10"
+                  className={mobileLinkClass(link.href)}
                 >
                   {link.label}
                 </Link>
@@ -154,7 +153,7 @@ export function Navbar() {
                     <Link
                       href="/coach"
                       onClick={() => setMobileOpen(false)}
-                      className="block text-white/80 hover:text-white font-display text-lg uppercase tracking-wider py-3 border-b border-white/10"
+                      className={mobileLinkClass("/coach")}
                     >
                       Coach Portal
                     </Link>
@@ -165,7 +164,7 @@ export function Navbar() {
                     <Link
                       href="/portal"
                       onClick={() => setMobileOpen(false)}
-                      className="block text-white/80 hover:text-white font-display text-lg uppercase tracking-wider py-3 border-b border-white/10"
+                      className={mobileLinkClass("/portal")}
                     >
                       Parent Portal
                     </Link>
@@ -176,7 +175,7 @@ export function Navbar() {
                     <Link
                       href="/admin"
                       onClick={() => setMobileOpen(false)}
-                      className="block text-white/80 hover:text-white font-display text-lg uppercase tracking-wider py-3 border-b border-white/10"
+                      className={mobileLinkClass("/admin")}
                     >
                       Admin
                     </Link>
