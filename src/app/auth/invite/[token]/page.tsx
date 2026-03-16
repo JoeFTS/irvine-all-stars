@@ -173,11 +173,8 @@ export default function InviteSignupPage({
         }
       }
 
-      // 5. Success
+      // 5. Success — show email confirmation message
       setSuccess(true);
-      setTimeout(() => {
-        window.location.href = "/portal";
-      }, 2000);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unexpected error occurred.");
       setSubmitting(false);
@@ -327,9 +324,24 @@ export default function InviteSignupPage({
               <h2 className="font-display text-xl font-bold text-flag-blue uppercase tracking-wider mb-3">
                 Account Created!
               </h2>
-              <p className="text-gray-600 text-sm leading-relaxed">
-                Redirecting you to sign in...
+              <div className="bg-flag-blue/5 border border-flag-blue/20 rounded-lg p-5 mb-4">
+                <p className="text-flag-blue font-semibold text-sm mb-2">
+                  Check Your Email
+                </p>
+                <p className="text-gray-600 text-sm leading-relaxed">
+                  We&apos;ve sent a confirmation email to <strong>{inviteState.invite.email}</strong>.
+                  Please click the link in that email to verify your account before signing in.
+                </p>
+              </div>
+              <p className="text-gray-400 text-xs mb-4">
+                Didn&apos;t receive it? Check your spam folder, or contact AllStars@irvineallstars.com for help.
               </p>
+              <Link
+                href="/auth/login"
+                className="inline-block bg-flag-blue hover:bg-flag-blue-mid text-white font-display font-bold uppercase tracking-wider py-3 px-6 rounded transition-colors text-sm"
+              >
+                Go to Sign In
+              </Link>
             </div>
           ) : (
             /* Form Card */
