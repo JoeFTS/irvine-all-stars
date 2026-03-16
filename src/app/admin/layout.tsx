@@ -5,7 +5,6 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   ClipboardList,
-  Users,
   Users2,
   BarChart3,
   Megaphone,
@@ -17,7 +16,6 @@ import { useAuth } from "@/contexts/auth-context";
 const navItems = [
   { href: "/admin", label: "Dashboard", icon: LayoutDashboard },
   { href: "/admin/applications", label: "Applications", icon: ClipboardList },
-  { href: "/admin/registrations", label: "Registrations", icon: Users },
   { href: "/admin/scores", label: "Scores", icon: BarChart3 },
   { href: "/admin/announcements", label: "Announcements", icon: Megaphone },
   { href: "/admin/teams", label: "Teams", icon: Users2 },

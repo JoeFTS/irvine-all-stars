@@ -17,6 +17,43 @@ import {
 
 /* ---------- Types ---------- */
 
+type Status =
+  | "registered"
+  | "confirmed"
+  | "tryout_complete"
+  | "selected"
+  | "not_selected"
+  | "alternate"
+  | "waitlisted"
+  | "withdrawn";
+
+type Tab = "players" | "sessions";
+
+interface Registration {
+  id: string;
+  parent_name: string;
+  parent_email: string;
+  parent_phone: string;
+  player_first_name: string;
+  player_last_name: string;
+  player_date_of_birth: string;
+  division: string;
+  primary_position: string;
+  secondary_position: string | null;
+  bats: string;
+  throws: string;
+  current_team: string | null;
+  jersey_number: string | null;
+  medical_conditions: string | null;
+  emergency_contact_name: string;
+  emergency_contact_phone: string;
+  photo_release_consent: boolean;
+  liability_waiver_consent: boolean;
+  parent_code_of_conduct: boolean;
+  status: Status;
+  submitted_at: string;
+}
+
 interface TryoutSession {
   id: string;
   division: string;
@@ -37,15 +74,6 @@ interface TryoutAssignment {
   checked_in: boolean;
   checked_in_at: string | null;
   created_at: string;
-}
-
-interface Registration {
-  id: string;
-  player_first_name: string;
-  player_last_name: string;
-  division: string;
-  parent_name: string;
-  parent_email: string;
 }
 
 /* ---------- Constants ---------- */
@@ -76,6 +104,17 @@ const DIVISION_COLORS: Record<string, string> = {
   "12U-Bronco": "bg-orange-400",
 };
 
+const STATUS_OPTIONS: { value: Status; label: string; color: string }[] = [
+  { value: "registered", label: "Registered", color: "bg-gray-100 text-gray-600" },
+  { value: "confirmed", label: "Confirmed", color: "bg-green-100 text-green-700" },
+  { value: "tryout_complete", label: "Tryout Complete", color: "bg-blue-100 text-blue-700" },
+  { value: "selected", label: "Selected", color: "bg-green-100 text-green-800 font-bold" },
+  { value: "not_selected", label: "Not Selected", color: "bg-gray-100 text-gray-500" },
+  { value: "alternate", label: "Alternate", color: "bg-orange-100 text-orange-700" },
+  { value: "waitlisted", label: "Waitlisted", color: "bg-star-gold/15 text-star-gold" },
+  { value: "withdrawn", label: "Withdrawn", color: "bg-flag-red/10 text-flag-red" },
+];
+
 /* ---------- Helpers ---------- */
 
 function formatDate(dateStr: string): string {
@@ -96,23 +135,43 @@ function formatTime(timeStr: string): string {
   return `${display}:${m} ${ampm}`;
 }
 
+function StatusBadge({ status }: { status: Status }) {
+  const opt = STATUS_OPTIONS.find((s) => s.value === status) ?? STATUS_OPTIONS[0];
+  return (
+    <span
+      className={`inline-block px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${opt.color}`}
+    >
+      {opt.label}
+    </span>
+  );
+}
+
 /* ---------- Component ---------- */
 
 export default function TryoutsPage() {
+  const [activeTab, setActiveTab] = useState<Tab>("players");
+
+  // Data
+  const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [sessions, setSessions] = useState<TryoutSession[]>([]);
   const [assignments, setAssignments] = useState<TryoutAssignment[]>([]);
-  const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [loading, setLoading] = useState(true);
-  const [divisionFilter, setDivisionFilter] = useState<string>("all");
 
-  // Expanded session
-  const [expandedId, setExpandedId] = useState<string | null>(null);
+  // Players tab state
+  const [divisionFilter, setDivisionFilter] = useState<string>("all");
+  const [statusFilter, setStatusFilter] = useState<Status | "all">("all");
+  const [expandedPlayerId, setExpandedPlayerId] = useState<string | null>(null);
+  const [updatingId, setUpdatingId] = useState<string | null>(null);
+
+  // Sessions tab state
+  const [sessionDivisionFilter, setSessionDivisionFilter] = useState<string>("all");
+  const [expandedSessionId, setExpandedSessionId] = useState<string | null>(null);
 
   // Assign modal
   const [assigningSessionId, setAssigningSessionId] = useState<string | null>(null);
   const [selectedPlayerIds, setSelectedPlayerIds] = useState<Set<string>>(new Set());
 
-  // Create form
+  // Create session form
   const [formDivision, setFormDivision] = useState(DIVISIONS[0]);
   const [formDate, setFormDate] = useState("");
   const [formStartTime, setFormStartTime] = useState("");
@@ -137,21 +196,22 @@ export default function TryoutsPage() {
     if (!supabase) return;
     setLoading(true);
 
-    const [sessionsRes, assignmentsRes, regsRes] = await Promise.all([
+    const [regsRes, sessionsRes, assignmentsRes] = await Promise.all([
+      supabase
+        .from("tryout_registrations")
+        .select("*")
+        .order("submitted_at", { ascending: false }),
       supabase
         .from("tryout_sessions")
         .select("*")
         .order("session_date")
         .order("start_time"),
       supabase.from("tryout_assignments").select("*"),
-      supabase
-        .from("tryout_registrations")
-        .select("id, player_first_name, player_last_name, division, parent_name, parent_email"),
     ]);
 
+    if (regsRes.data) setRegistrations(regsRes.data);
     if (sessionsRes.data) setSessions(sessionsRes.data);
     if (assignmentsRes.data) setAssignments(assignmentsRes.data);
-    if (regsRes.data) setRegistrations(regsRes.data);
 
     setLoading(false);
   }, []);
@@ -164,7 +224,54 @@ export default function TryoutsPage() {
     fetchAll();
   }, [fetchAll]);
 
-  /* ---------- Create Session ---------- */
+  /* ---------- Stats ---------- */
+
+  const totalRegistered = registrations.length;
+  const totalSessions = sessions.length;
+  const totalCheckedIn = assignments.filter((a) => a.checked_in).length;
+
+  /* ---------- Status Update (Players Tab) ---------- */
+
+  async function updateStatus(id: string, newStatus: Status) {
+    if (!supabase) return;
+    setUpdatingId(id);
+    const { error } = await supabase
+      .from("tryout_registrations")
+      .update({ status: newStatus })
+      .eq("id", id);
+
+    if (!error) {
+      setRegistrations((prev) =>
+        prev.map((r) => (r.id === id ? { ...r, status: newStatus } : r))
+      );
+
+      // Send selection notification emails
+      if (newStatus === "selected" || newStatus === "not_selected" || newStatus === "alternate") {
+        const reg = registrations.find((r) => r.id === id);
+        if (reg) {
+          try {
+            await fetch("/api/send-selection", {
+              method: "POST",
+              headers: { "Content-Type": "application/json" },
+              body: JSON.stringify({
+                registration_id: id,
+                status: newStatus,
+                division: reg.division,
+                player_name: `${reg.player_first_name} ${reg.player_last_name}`,
+                parent_name: reg.parent_name,
+                parent_email: reg.parent_email,
+              }),
+            });
+          } catch {
+            // Email failure shouldn't block status update
+          }
+        }
+      }
+    }
+    setUpdatingId(null);
+  }
+
+  /* ---------- Session CRUD ---------- */
 
   async function handleCreate(e: React.FormEvent) {
     e.preventDefault();
@@ -198,11 +305,8 @@ export default function TryoutsPage() {
     setCreating(false);
   }
 
-  /* ---------- Delete Session ---------- */
-
   async function handleDelete(id: string) {
     if (!supabase) return;
-    // Delete assignments first, then session
     await supabase.from("tryout_assignments").delete().eq("session_id", id);
     const { error } = await supabase.from("tryout_sessions").delete().eq("id", id);
     if (!error) {
@@ -212,7 +316,7 @@ export default function TryoutsPage() {
     setDeletingId(null);
   }
 
-  /* ---------- Assign Players ---------- */
+  /* ---------- Assignment Helpers ---------- */
 
   function getSessionAssignments(sessionId: string) {
     return assignments.filter((a) => a.session_id === sessionId);
@@ -225,6 +329,16 @@ export default function TryoutsPage() {
     return registrations.filter(
       (r) => r.division === session.division && !assignedRegIds.has(r.id)
     );
+  }
+
+  function getPlayerAssignment(registrationId: string) {
+    return assignments.find((a) => a.registration_id === registrationId) ?? null;
+  }
+
+  function getPlayerSession(registrationId: string) {
+    const assignment = getPlayerAssignment(registrationId);
+    if (!assignment) return null;
+    return sessions.find((s) => s.id === assignment.session_id) ?? null;
   }
 
   async function handleAssignSelected() {
@@ -323,10 +437,16 @@ export default function TryoutsPage() {
     setAutoAssigning(false);
   }
 
-  /* ---------- Filter ---------- */
+  /* ---------- Filtered Lists ---------- */
 
-  const filtered = sessions.filter((s) => {
-    if (divisionFilter !== "all" && s.division !== divisionFilter) return false;
+  const filteredPlayers = registrations.filter((r) => {
+    if (divisionFilter !== "all" && r.division !== divisionFilter) return false;
+    if (statusFilter !== "all" && r.status !== statusFilter) return false;
+    return true;
+  });
+
+  const filteredSessions = sessions.filter((s) => {
+    if (sessionDivisionFilter !== "all" && s.division !== sessionDivisionFilter) return false;
     return true;
   });
 
@@ -370,398 +490,751 @@ export default function TryoutsPage() {
           Admin
         </p>
         <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide">
-          Tryout Schedule
+          Tryouts
         </h1>
         <p className="text-gray-400 text-sm mt-1">
-          {sessions.length} session{sessions.length !== 1 ? "s" : ""} scheduled
+          {totalRegistered} registered &middot; {totalSessions} session{totalSessions !== 1 ? "s" : ""} &middot; {totalCheckedIn} checked in
         </p>
       </div>
 
-      {/* Auto-Assign Button */}
-      <div className="mb-6 flex flex-wrap items-center gap-3">
+      {/* Tab Switcher */}
+      <div className="flex gap-2 mb-6">
         <button
-          onClick={handleAutoAssign}
-          disabled={autoAssigning || sessions.length === 0}
-          className="inline-flex items-center gap-2 bg-star-gold text-white px-5 py-2.5 rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-star-gold/90 transition-colors disabled:opacity-50"
+          onClick={() => setActiveTab("players")}
+          className={`px-5 py-2.5 rounded-full text-sm font-semibold uppercase tracking-wide transition-colors ${
+            activeTab === "players"
+              ? "bg-flag-blue text-white"
+              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+          }`}
         >
-          <Zap size={16} />
-          {autoAssigning ? "Assigning..." : "Auto-Assign All Players by Division"}
+          Players
         </button>
-        {autoAssignResult && (
-          <span className="text-sm text-green-600 font-semibold">{autoAssignResult}</span>
-        )}
+        <button
+          onClick={() => setActiveTab("sessions")}
+          className={`px-5 py-2.5 rounded-full text-sm font-semibold uppercase tracking-wide transition-colors ${
+            activeTab === "sessions"
+              ? "bg-flag-blue text-white"
+              : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+          }`}
+        >
+          Sessions
+        </button>
       </div>
 
-      {/* Create Session Form */}
-      <div className="bg-white border border-gray-200 rounded-lg p-5 mb-6">
-        <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-gray-400 mb-4">
-          Create New Session
-        </h2>
-        <form onSubmit={handleCreate} className="space-y-4">
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-            {/* Division */}
+      {/* ========== PLAYERS TAB ========== */}
+      {activeTab === "players" && (
+        <>
+          {/* Filters */}
+          <div className="space-y-3 mb-6">
+            {/* Division Filter */}
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                Division *
-              </label>
-              <select
-                value={formDivision}
-                onChange={(e) => setFormDivision(e.target.value)}
-                required
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
-              >
-                {DIVISIONS.map((d) => (
-                  <option key={d} value={d}>
-                    {d}
-                  </option>
+              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider mr-2">
+                Division:
+              </span>
+              <div className="inline-flex flex-wrap gap-1.5">
+                <button
+                  onClick={() => setDivisionFilter("all")}
+                  className={`px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide transition-colors ${
+                    divisionFilter === "all"
+                      ? "bg-flag-blue text-white"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
+                >
+                  All
+                </button>
+                {DIVISIONS.map((div) => (
+                  <button
+                    key={div}
+                    onClick={() => setDivisionFilter(div)}
+                    className={`px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide transition-colors ${
+                      divisionFilter === div
+                        ? "bg-flag-blue text-white"
+                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    }`}
+                  >
+                    {div.split("-")[0]}
+                  </button>
                 ))}
-              </select>
+              </div>
             </div>
 
-            {/* Date */}
+            {/* Status Filter */}
             <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                Date *
-              </label>
-              <input
-                type="date"
-                value={formDate}
-                onChange={(e) => setFormDate(e.target.value)}
-                required
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
-              />
-            </div>
-
-            {/* Start Time */}
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                Start Time *
-              </label>
-              <input
-                type="time"
-                value={formStartTime}
-                onChange={(e) => setFormStartTime(e.target.value)}
-                required
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
-              />
-            </div>
-
-            {/* End Time */}
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                End Time
-              </label>
-              <input
-                type="time"
-                value={formEndTime}
-                onChange={(e) => setFormEndTime(e.target.value)}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
-              />
+              <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider mr-2">
+                Status:
+              </span>
+              <div className="inline-flex flex-wrap gap-1.5">
+                <button
+                  onClick={() => setStatusFilter("all")}
+                  className={`px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide transition-colors ${
+                    statusFilter === "all"
+                      ? "bg-flag-blue text-white"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
+                >
+                  All
+                </button>
+                {STATUS_OPTIONS.map((opt) => (
+                  <button
+                    key={opt.value}
+                    onClick={() => setStatusFilter(opt.value)}
+                    className={`px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide transition-colors ${
+                      statusFilter === opt.value
+                        ? "bg-flag-blue text-white"
+                        : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                    }`}
+                  >
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
             </div>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {/* Location */}
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                Location *
-              </label>
-              <input
-                type="text"
-                value={formLocation}
-                onChange={(e) => setFormLocation(e.target.value)}
-                placeholder="e.g. Deerfield Community Park"
-                required
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
-              />
+          {/* Results count */}
+          <p className="text-xs text-gray-400 mb-3">
+            Showing {filteredPlayers.length} of {registrations.length}
+          </p>
+
+          {/* Player List */}
+          {filteredPlayers.length === 0 ? (
+            <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+              <p className="text-gray-400 text-sm">No players found.</p>
             </div>
+          ) : (
+            <div className="space-y-3">
+              {filteredPlayers.map((reg) => {
+                const expanded = expandedPlayerId === reg.id;
+                const playerSession = getPlayerSession(reg.id);
+                const playerAssignment = getPlayerAssignment(reg.id);
 
-            {/* Field */}
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                Field
-              </label>
-              <input
-                type="text"
-                value={formField}
-                onChange={(e) => setFormField(e.target.value)}
-                placeholder="e.g. Field 3"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
-              />
+                return (
+                  <div
+                    key={reg.id}
+                    className="bg-white border border-gray-200 rounded-lg overflow-hidden"
+                  >
+                    {/* Summary Row */}
+                    <button
+                      onClick={() => setExpandedPlayerId(expanded ? null : reg.id)}
+                      className="w-full text-left p-4 md:p-5 flex items-center gap-4 hover:bg-gray-50 transition-colors"
+                    >
+                      <div className="flex-1 min-w-0">
+                        <div className="flex flex-wrap items-center gap-2 mb-1">
+                          <p className="text-sm font-semibold text-charcoal truncate">
+                            {reg.player_first_name} {reg.player_last_name}
+                          </p>
+                          <span className="inline-block px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide bg-flag-blue/10 text-flag-blue">
+                            {reg.division}
+                          </span>
+                          <StatusBadge status={reg.status ?? "registered"} />
+                        </div>
+                        <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-400">
+                          {playerSession ? (
+                            <span className="flex items-center gap-1">
+                              <Clock size={12} />
+                              {formatDate(playerSession.session_date)} {formatTime(playerSession.start_time)} &middot; {playerSession.location}
+                              {playerAssignment?.checked_in && (
+                                <span className="text-green-600 font-semibold ml-1">Checked In</span>
+                              )}
+                            </span>
+                          ) : (
+                            <span className="text-gray-300">Not scheduled</span>
+                          )}
+                          <span>Parent: {reg.parent_name}</span>
+                          <span>{reg.primary_position}</span>
+                          <span>
+                            {new Date(reg.submitted_at).toLocaleDateString()}
+                          </span>
+                        </div>
+                      </div>
+                      {expanded ? (
+                        <ChevronUp size={18} className="text-gray-400 shrink-0" />
+                      ) : (
+                        <ChevronDown size={18} className="text-gray-400 shrink-0" />
+                      )}
+                    </button>
+
+                    {/* Expanded Details */}
+                    {expanded && (
+                      <div className="border-t border-gray-200 p-4 md:p-5 space-y-5">
+                        {/* Status Update */}
+                        <div className="flex flex-wrap items-center gap-3">
+                          <span className="text-sm font-semibold text-charcoal">
+                            Update Status:
+                          </span>
+                          {STATUS_OPTIONS.map((opt) => (
+                            <button
+                              key={opt.value}
+                              onClick={() => updateStatus(reg.id, opt.value)}
+                              disabled={
+                                updatingId === reg.id ||
+                                (reg.status ?? "registered") === opt.value
+                              }
+                              className={`px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wide transition-colors disabled:opacity-40 ${
+                                (reg.status ?? "registered") === opt.value
+                                  ? "bg-flag-blue text-white"
+                                  : "border border-gray-200 text-gray-600 hover:bg-gray-100"
+                              }`}
+                            >
+                              {opt.label}
+                            </button>
+                          ))}
+                        </div>
+
+                        {/* Player Info */}
+                        <div>
+                          <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-gray-400 mb-2">
+                            Player Info
+                          </h3>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                            <div>
+                              <span className="text-gray-400">Name:</span>{" "}
+                              <span className="text-charcoal">
+                                {reg.player_first_name} {reg.player_last_name}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-gray-400">DOB:</span>{" "}
+                              <span className="text-charcoal">
+                                {new Date(reg.player_date_of_birth).toLocaleDateString()}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-gray-400">Division:</span>{" "}
+                              <span className="text-charcoal">{reg.division}</span>
+                            </div>
+                            <div>
+                              <span className="text-gray-400">Position:</span>{" "}
+                              <span className="text-charcoal">
+                                {reg.primary_position}
+                                {reg.secondary_position &&
+                                reg.secondary_position !== "None"
+                                  ? ` / ${reg.secondary_position}`
+                                  : ""}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-gray-400">Bats:</span>{" "}
+                              <span className="text-charcoal">{reg.bats}</span>
+                            </div>
+                            <div>
+                              <span className="text-gray-400">Throws:</span>{" "}
+                              <span className="text-charcoal">{reg.throws}</span>
+                            </div>
+                            {reg.current_team && (
+                              <div>
+                                <span className="text-gray-400">Team:</span>{" "}
+                                <span className="text-charcoal">
+                                  {reg.current_team}
+                                </span>
+                              </div>
+                            )}
+                            {reg.jersey_number && (
+                              <div>
+                                <span className="text-gray-400">Jersey #:</span>{" "}
+                                <span className="text-charcoal">
+                                  {reg.jersey_number}
+                                </span>
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        {/* Parent / Contact */}
+                        <div>
+                          <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-gray-400 mb-2">
+                            Parent / Contact
+                          </h3>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                            <div>
+                              <span className="text-gray-400">Parent:</span>{" "}
+                              <span className="text-charcoal">
+                                {reg.parent_name}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-gray-400">Email:</span>{" "}
+                              <span className="text-charcoal">
+                                {reg.parent_email}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-gray-400">Phone:</span>{" "}
+                              <span className="text-charcoal">
+                                {reg.parent_phone}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Emergency */}
+                        <div>
+                          <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-gray-400 mb-2">
+                            Emergency Contact
+                          </h3>
+                          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-sm">
+                            <div>
+                              <span className="text-gray-400">Name:</span>{" "}
+                              <span className="text-charcoal">
+                                {reg.emergency_contact_name}
+                              </span>
+                            </div>
+                            <div>
+                              <span className="text-gray-400">Phone:</span>{" "}
+                              <span className="text-charcoal">
+                                {reg.emergency_contact_phone}
+                              </span>
+                            </div>
+                          </div>
+                        </div>
+
+                        {/* Medical */}
+                        {reg.medical_conditions && (
+                          <div>
+                            <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-gray-400 mb-2">
+                              Medical Conditions
+                            </h3>
+                            <p className="text-charcoal text-sm whitespace-pre-wrap">
+                              {reg.medical_conditions}
+                            </p>
+                          </div>
+                        )}
+
+                        {/* Consent */}
+                        <div>
+                          <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-gray-400 mb-2">
+                            Consent
+                          </h3>
+                          <div className="flex flex-wrap gap-3 text-xs">
+                            <span
+                              className={`px-2 py-1 rounded ${
+                                reg.photo_release_consent
+                                  ? "bg-green-100 text-green-700"
+                                  : "bg-gray-100 text-gray-400"
+                              }`}
+                            >
+                              Photo Release: {reg.photo_release_consent ? "Yes" : "No"}
+                            </span>
+                            <span
+                              className={`px-2 py-1 rounded ${
+                                reg.liability_waiver_consent
+                                  ? "bg-green-100 text-green-700"
+                                  : "bg-gray-100 text-gray-400"
+                              }`}
+                            >
+                              Liability: {reg.liability_waiver_consent ? "Yes" : "No"}
+                            </span>
+                            <span
+                              className={`px-2 py-1 rounded ${
+                                reg.parent_code_of_conduct
+                                  ? "bg-green-100 text-green-700"
+                                  : "bg-gray-100 text-gray-400"
+                              }`}
+                            >
+                              Code of Conduct: {reg.parent_code_of_conduct ? "Yes" : "No"}
+                            </span>
+                          </div>
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
             </div>
+          )}
+        </>
+      )}
 
-            {/* Max Players */}
-            <div>
-              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-                Max Players
-              </label>
-              <input
-                type="number"
-                value={formMaxPlayers}
-                onChange={(e) => setFormMaxPlayers(parseInt(e.target.value, 10) || 30)}
-                min={1}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
-              />
-            </div>
-          </div>
-
-          {/* Notes */}
-          <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-              Notes
-            </label>
-            <textarea
-              value={formNotes}
-              onChange={(e) => setFormNotes(e.target.value)}
-              rows={2}
-              placeholder="Optional notes..."
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-flag-blue/30 resize-none"
-            />
-          </div>
-
-          <div className="flex items-center gap-3">
+      {/* ========== SESSIONS TAB ========== */}
+      {activeTab === "sessions" && (
+        <>
+          {/* Auto-Assign Button */}
+          <div className="mb-6 flex flex-wrap items-center gap-3">
             <button
-              type="submit"
-              disabled={creating || !formDate || !formStartTime || !formLocation.trim()}
-              className="inline-flex items-center gap-2 bg-flag-blue text-white px-5 py-2.5 rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors disabled:opacity-50"
+              onClick={handleAutoAssign}
+              disabled={autoAssigning || sessions.length === 0}
+              className="inline-flex items-center gap-2 bg-star-gold text-white px-5 py-2.5 rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-star-gold/90 transition-colors disabled:opacity-50"
             >
-              <Plus size={16} />
-              {creating ? "Creating..." : "Create Session"}
+              <Zap size={16} />
+              {autoAssigning ? "Assigning..." : "Auto-Assign All Players by Division"}
             </button>
-            {createError && (
-              <p className="text-flag-red text-xs font-semibold">{createError}</p>
+            {autoAssignResult && (
+              <span className="text-sm text-green-600 font-semibold">{autoAssignResult}</span>
             )}
           </div>
-        </form>
-      </div>
 
-      {/* Division Filter */}
-      <div className="mb-6">
-        <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider mr-2">
-          Division:
-        </span>
-        <div className="inline-flex flex-wrap gap-1.5">
-          <button
-            onClick={() => setDivisionFilter("all")}
-            className={`px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide transition-colors ${
-              divisionFilter === "all"
-                ? "bg-flag-blue text-white"
-                : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-            }`}
-          >
-            All
-          </button>
-          {DIVISIONS.map((div) => (
-            <button
-              key={div}
-              onClick={() => setDivisionFilter(div)}
-              className={`px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide transition-colors ${
-                divisionFilter === div
-                  ? "bg-flag-blue text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
-              }`}
-            >
-              {div.split("-")[0]}
-            </button>
-          ))}
-        </div>
-      </div>
+          {/* Create Session Form */}
+          <div className="bg-white border border-gray-200 rounded-lg p-5 mb-6">
+            <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-gray-400 mb-4">
+              Create New Session
+            </h2>
+            <form onSubmit={handleCreate} className="space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                {/* Division */}
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                    Division *
+                  </label>
+                  <select
+                    value={formDivision}
+                    onChange={(e) => setFormDivision(e.target.value)}
+                    required
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                  >
+                    {DIVISIONS.map((d) => (
+                      <option key={d} value={d}>
+                        {d}
+                      </option>
+                    ))}
+                  </select>
+                </div>
 
-      {/* Results count */}
-      <p className="text-xs text-gray-400 mb-3">
-        Showing {filtered.length} of {sessions.length}
-      </p>
+                {/* Date */}
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                    Date *
+                  </label>
+                  <input
+                    type="date"
+                    value={formDate}
+                    onChange={(e) => setFormDate(e.target.value)}
+                    required
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                  />
+                </div>
 
-      {/* Sessions List */}
-      {filtered.length === 0 ? (
-        <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
-          <p className="text-gray-400 text-sm">
-            No tryout sessions found. Create one above to get started.
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-4">
-          {filtered.map((session) => {
-            const sessionAssignments = getSessionAssignments(session.id);
-            const checkedInCount = sessionAssignments.filter((a) => a.checked_in).length;
-            const expanded = expandedId === session.id;
-            const barColor = DIVISION_COLORS[session.division] ?? "bg-flag-blue";
+                {/* Start Time */}
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                    Start Time *
+                  </label>
+                  <input
+                    type="time"
+                    value={formStartTime}
+                    onChange={(e) => setFormStartTime(e.target.value)}
+                    required
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                  />
+                </div>
 
-            return (
-              <div
-                key={session.id}
-                className="bg-white border border-gray-200 rounded-lg overflow-hidden"
-              >
-                {/* Division Color Bar */}
-                <div className={`h-1.5 ${barColor}`} />
+                {/* End Time */}
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                    End Time
+                  </label>
+                  <input
+                    type="time"
+                    value={formEndTime}
+                    onChange={(e) => setFormEndTime(e.target.value)}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                  />
+                </div>
+              </div>
 
-                {/* Session Summary */}
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                {/* Location */}
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                    Location *
+                  </label>
+                  <input
+                    type="text"
+                    value={formLocation}
+                    onChange={(e) => setFormLocation(e.target.value)}
+                    placeholder="e.g. Deerfield Community Park"
+                    required
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                  />
+                </div>
+
+                {/* Field */}
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                    Field
+                  </label>
+                  <input
+                    type="text"
+                    value={formField}
+                    onChange={(e) => setFormField(e.target.value)}
+                    placeholder="e.g. Field 3"
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                  />
+                </div>
+
+                {/* Max Players */}
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                    Max Players
+                  </label>
+                  <input
+                    type="number"
+                    value={formMaxPlayers}
+                    onChange={(e) => setFormMaxPlayers(parseInt(e.target.value, 10) || 30)}
+                    min={1}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                  />
+                </div>
+              </div>
+
+              {/* Notes */}
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                  Notes
+                </label>
+                <textarea
+                  value={formNotes}
+                  onChange={(e) => setFormNotes(e.target.value)}
+                  rows={2}
+                  placeholder="Optional notes..."
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-flag-blue/30 resize-none"
+                />
+              </div>
+
+              <div className="flex items-center gap-3">
                 <button
-                  onClick={() => setExpandedId(expanded ? null : session.id)}
-                  className="w-full text-left p-4 md:p-5 hover:bg-gray-50 transition-colors"
+                  type="submit"
+                  disabled={creating || !formDate || !formStartTime || !formLocation.trim()}
+                  className="inline-flex items-center gap-2 bg-flag-blue text-white px-5 py-2.5 rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors disabled:opacity-50"
                 >
-                  <div className="flex items-start justify-between gap-4">
-                    <div className="flex-1 min-w-0">
-                      <div className="flex flex-wrap items-center gap-2 mb-2">
-                        <span className="inline-block px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide bg-flag-blue/10 text-flag-blue">
-                          {session.division}
-                        </span>
-                        <span className="text-sm font-semibold text-charcoal">
-                          {formatDate(session.session_date)}
-                        </span>
-                        <span className="text-sm text-gray-400 flex items-center gap-1">
-                          <Clock size={13} />
-                          {formatTime(session.start_time)}
-                          {session.end_time && ` - ${formatTime(session.end_time)}`}
-                        </span>
-                      </div>
-                      <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-400">
-                        <span className="flex items-center gap-1">
-                          <MapPin size={12} />
-                          {session.location}
-                          {session.field && ` - ${session.field}`}
-                        </span>
-                        <span className="flex items-center gap-1">
-                          <Users size={12} />
-                          {sessionAssignments.length} / {session.max_players} assigned
-                          {sessionAssignments.length > 0 && (
-                            <span className="text-green-600 ml-1">
-                              ({checkedInCount} checked in)
-                            </span>
-                          )}
-                        </span>
-                      </div>
-                      {session.notes && (
-                        <p className="text-xs text-gray-400 mt-1 italic">{session.notes}</p>
-                      )}
-                    </div>
-                    <div className="shrink-0 flex items-center gap-2">
-                      {expanded ? (
-                        <ChevronUp size={18} className="text-gray-400" />
-                      ) : (
-                        <ChevronDown size={18} className="text-gray-400" />
-                      )}
-                    </div>
-                  </div>
+                  <Plus size={16} />
+                  {creating ? "Creating..." : "Create Session"}
                 </button>
-
-                {/* Expanded Details */}
-                {expanded && (
-                  <div className="border-t border-gray-200 p-4 md:p-5 space-y-4">
-                    {/* Actions Row */}
-                    <div className="flex flex-wrap items-center gap-3">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setAssigningSessionId(session.id);
-                          setSelectedPlayerIds(new Set());
-                        }}
-                        className="inline-flex items-center gap-2 bg-flag-blue text-white px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors"
-                      >
-                        <UserPlus size={14} />
-                        Assign Players
-                      </button>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleAssignAll(session);
-                        }}
-                        className="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wide hover:bg-green-700 transition-colors"
-                      >
-                        <Users size={14} />
-                        Assign All in Division
-                      </button>
-
-                      {/* Delete */}
-                      {deletingId === session.id ? (
-                        <div className="flex items-center gap-2 ml-auto">
-                          <span className="text-xs text-flag-red font-semibold">
-                            Delete session?
-                          </span>
-                          <button
-                            onClick={() => handleDelete(session.id)}
-                            className="px-2.5 py-1 rounded text-xs font-semibold uppercase bg-flag-red text-white hover:bg-flag-red/90 transition-colors"
-                          >
-                            Yes
-                          </button>
-                          <button
-                            onClick={() => setDeletingId(null)}
-                            className="px-2.5 py-1 rounded text-xs font-semibold uppercase bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
-                          >
-                            No
-                          </button>
-                        </div>
-                      ) : (
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            setDeletingId(session.id);
-                          }}
-                          className="p-2 rounded-lg text-gray-300 hover:text-flag-red hover:bg-flag-red/5 transition-colors ml-auto"
-                          title="Delete session"
-                        >
-                          <Trash2 size={16} />
-                        </button>
-                      )}
-                    </div>
-
-                    {/* Assigned Players */}
-                    <div>
-                      <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-gray-400 mb-3">
-                        Assigned Players ({sessionAssignments.length})
-                      </h3>
-                      {sessionAssignments.length === 0 ? (
-                        <p className="text-xs text-gray-300">
-                          No players assigned yet. Use the buttons above to assign players.
-                        </p>
-                      ) : (
-                        <div className="space-y-1.5">
-                          {sessionAssignments.map((assignment) => {
-                            const player = registrations.find(
-                              (r) => r.id === assignment.registration_id
-                            );
-                            if (!player) return null;
-
-                            return (
-                              <label
-                                key={assignment.id}
-                                className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
-                                  assignment.checked_in
-                                    ? "bg-green-50 border border-green-200"
-                                    : "bg-gray-50 border border-gray-100 hover:bg-gray-100"
-                                }`}
-                              >
-                                <input
-                                  type="checkbox"
-                                  checked={assignment.checked_in}
-                                  onChange={() => toggleCheckIn(assignment)}
-                                  className="w-6 h-6 min-w-[24px] rounded border-gray-300 text-green-600 focus:ring-green-500 cursor-pointer"
-                                />
-                                <div className="flex-1 min-w-0">
-                                  <span className="text-sm font-semibold text-charcoal">
-                                    {player.player_first_name} {player.player_last_name}
-                                  </span>
-                                  <span className="text-xs text-gray-400 ml-2">
-                                    ({player.parent_name})
-                                  </span>
-                                </div>
-                                {assignment.checked_in && (
-                                  <span className="text-xs font-semibold text-green-600 uppercase tracking-wide shrink-0">
-                                    Checked In
-                                  </span>
-                                )}
-                              </label>
-                            );
-                          })}
-                        </div>
-                      )}
-                    </div>
-                  </div>
+                {createError && (
+                  <p className="text-flag-red text-xs font-semibold">{createError}</p>
                 )}
               </div>
-            );
-          })}
-        </div>
+            </form>
+          </div>
+
+          {/* Division Filter */}
+          <div className="mb-6">
+            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider mr-2">
+              Division:
+            </span>
+            <div className="inline-flex flex-wrap gap-1.5">
+              <button
+                onClick={() => setSessionDivisionFilter("all")}
+                className={`px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide transition-colors ${
+                  sessionDivisionFilter === "all"
+                    ? "bg-flag-blue text-white"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
+              >
+                All
+              </button>
+              {DIVISIONS.map((div) => (
+                <button
+                  key={div}
+                  onClick={() => setSessionDivisionFilter(div)}
+                  className={`px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide transition-colors ${
+                    sessionDivisionFilter === div
+                      ? "bg-flag-blue text-white"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
+                >
+                  {div.split("-")[0]}
+                </button>
+              ))}
+            </div>
+          </div>
+
+          {/* Results count */}
+          <p className="text-xs text-gray-400 mb-3">
+            Showing {filteredSessions.length} of {sessions.length}
+          </p>
+
+          {/* Sessions List */}
+          {filteredSessions.length === 0 ? (
+            <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+              <p className="text-gray-400 text-sm">
+                No tryout sessions found. Create one above to get started.
+              </p>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {filteredSessions.map((session) => {
+                const sessionAssignments = getSessionAssignments(session.id);
+                const checkedInCount = sessionAssignments.filter((a) => a.checked_in).length;
+                const expanded = expandedSessionId === session.id;
+                const barColor = DIVISION_COLORS[session.division] ?? "bg-flag-blue";
+
+                return (
+                  <div
+                    key={session.id}
+                    className="bg-white border border-gray-200 rounded-lg overflow-hidden"
+                  >
+                    {/* Division Color Bar */}
+                    <div className={`h-1.5 ${barColor}`} />
+
+                    {/* Session Summary */}
+                    <button
+                      onClick={() => setExpandedSessionId(expanded ? null : session.id)}
+                      className="w-full text-left p-4 md:p-5 hover:bg-gray-50 transition-colors"
+                    >
+                      <div className="flex items-start justify-between gap-4">
+                        <div className="flex-1 min-w-0">
+                          <div className="flex flex-wrap items-center gap-2 mb-2">
+                            <span className="inline-block px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide bg-flag-blue/10 text-flag-blue">
+                              {session.division}
+                            </span>
+                            <span className="text-sm font-semibold text-charcoal">
+                              {formatDate(session.session_date)}
+                            </span>
+                            <span className="text-sm text-gray-400 flex items-center gap-1">
+                              <Clock size={13} />
+                              {formatTime(session.start_time)}
+                              {session.end_time && ` - ${formatTime(session.end_time)}`}
+                            </span>
+                          </div>
+                          <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-400">
+                            <span className="flex items-center gap-1">
+                              <MapPin size={12} />
+                              {session.location}
+                              {session.field && ` - ${session.field}`}
+                            </span>
+                            <span className="flex items-center gap-1">
+                              <Users size={12} />
+                              {sessionAssignments.length} / {session.max_players} assigned
+                              {sessionAssignments.length > 0 && (
+                                <span className="text-green-600 ml-1">
+                                  ({checkedInCount} checked in)
+                                </span>
+                              )}
+                            </span>
+                          </div>
+                          {session.notes && (
+                            <p className="text-xs text-gray-400 mt-1 italic">{session.notes}</p>
+                          )}
+                        </div>
+                        <div className="shrink-0 flex items-center gap-2">
+                          {expanded ? (
+                            <ChevronUp size={18} className="text-gray-400" />
+                          ) : (
+                            <ChevronDown size={18} className="text-gray-400" />
+                          )}
+                        </div>
+                      </div>
+                    </button>
+
+                    {/* Expanded Details */}
+                    {expanded && (
+                      <div className="border-t border-gray-200 p-4 md:p-5 space-y-4">
+                        {/* Actions Row */}
+                        <div className="flex flex-wrap items-center gap-3">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setAssigningSessionId(session.id);
+                              setSelectedPlayerIds(new Set());
+                            }}
+                            className="inline-flex items-center gap-2 bg-flag-blue text-white px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors"
+                          >
+                            <UserPlus size={14} />
+                            Assign Players
+                          </button>
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleAssignAll(session);
+                            }}
+                            className="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wide hover:bg-green-700 transition-colors"
+                          >
+                            <Users size={14} />
+                            Assign All in Division
+                          </button>
+
+                          {/* Delete */}
+                          {deletingId === session.id ? (
+                            <div className="flex items-center gap-2 ml-auto">
+                              <span className="text-xs text-flag-red font-semibold">
+                                Delete session?
+                              </span>
+                              <button
+                                onClick={() => handleDelete(session.id)}
+                                className="px-2.5 py-1 rounded text-xs font-semibold uppercase bg-flag-red text-white hover:bg-flag-red/90 transition-colors"
+                              >
+                                Yes
+                              </button>
+                              <button
+                                onClick={() => setDeletingId(null)}
+                                className="px-2.5 py-1 rounded text-xs font-semibold uppercase bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                              >
+                                No
+                              </button>
+                            </div>
+                          ) : (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                setDeletingId(session.id);
+                              }}
+                              className="p-2 rounded-lg text-gray-300 hover:text-flag-red hover:bg-flag-red/5 transition-colors ml-auto"
+                              title="Delete session"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          )}
+                        </div>
+
+                        {/* Assigned Players */}
+                        <div>
+                          <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-gray-400 mb-3">
+                            Assigned Players ({sessionAssignments.length})
+                          </h3>
+                          {sessionAssignments.length === 0 ? (
+                            <p className="text-xs text-gray-300">
+                              No players assigned yet. Use the buttons above to assign players.
+                            </p>
+                          ) : (
+                            <div className="space-y-1.5">
+                              {sessionAssignments.map((assignment) => {
+                                const player = registrations.find(
+                                  (r) => r.id === assignment.registration_id
+                                );
+                                if (!player) return null;
+
+                                return (
+                                  <label
+                                    key={assignment.id}
+                                    className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
+                                      assignment.checked_in
+                                        ? "bg-green-50 border border-green-200"
+                                        : "bg-gray-50 border border-gray-100 hover:bg-gray-100"
+                                    }`}
+                                  >
+                                    <input
+                                      type="checkbox"
+                                      checked={assignment.checked_in}
+                                      onChange={() => toggleCheckIn(assignment)}
+                                      className="w-6 h-6 min-w-[24px] rounded border-gray-300 text-green-600 focus:ring-green-500 cursor-pointer"
+                                    />
+                                    <div className="flex-1 min-w-0">
+                                      <span className="text-sm font-semibold text-charcoal">
+                                        {player.player_first_name} {player.player_last_name}
+                                      </span>
+                                      <span className="text-xs text-gray-400 ml-2">
+                                        ({player.parent_name})
+                                      </span>
+                                    </div>
+                                    {assignment.checked_in && (
+                                      <span className="text-xs font-semibold text-green-600 uppercase tracking-wide shrink-0">
+                                        Checked In
+                                      </span>
+                                    )}
+                                  </label>
+                                );
+                              })}
+                            </div>
+                          )}
+                        </div>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </>
       )}
 
       {/* Assign Players Modal */}
