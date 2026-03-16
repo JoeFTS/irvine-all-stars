@@ -300,16 +300,111 @@ export default function PortalPage() {
 
       <StripeDivider />
 
-      {/* ===== COMPLIANCE CHECKLIST ===== */}
+      {/* ===== MY PLAYER'S STATUS ===== */}
+      <section className="bg-off-white py-12 md:py-16 px-6 md:px-10">
+        <div className="max-w-4xl mx-auto">
+          <p className="font-display text-sm font-semibold text-flag-red uppercase tracking-[3px] mb-2">
+            &#9733; Registration
+          </p>
+          <h2 className="font-display text-2xl md:text-3xl font-bold uppercase tracking-wide mb-6">
+            My Player&apos;s Status
+          </h2>
+
+          {dataLoading ? (
+            <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
+              <p className="text-gray-400 text-sm">Loading registrations...</p>
+            </div>
+          ) : registrations.length === 0 ? (
+            <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
+              <p className="text-gray-500 mb-4">
+                No tryout registrations found for your account.
+              </p>
+              <Link
+                href={`/apply/player?parent_name=${encodeURIComponent(user?.user_metadata?.full_name || "")}&parent_email=${encodeURIComponent(user?.email || "")}`}
+                className="inline-block bg-flag-red hover:bg-flag-red-dark text-white px-6 py-3 rounded font-display text-sm font-semibold uppercase tracking-widest transition-colors"
+              >
+                Register for Tryouts
+              </Link>
+            </div>
+          ) : (
+            <div className="space-y-4">
+              {registrations.map((reg) => {
+                const isIncomplete = !reg.player_date_of_birth || !reg.primary_position;
+                const playerName = `${reg.player_first_name || ""} ${reg.player_last_name || ""}`.trim() || "Unknown Player";
+                const completeUrl = `/apply/player?edit=${reg.id}&parent_name=${encodeURIComponent(reg.parent_name || "")}&parent_email=${encodeURIComponent(reg.parent_email || "")}&player_first_name=${encodeURIComponent(reg.player_first_name || "")}&player_last_name=${encodeURIComponent(reg.player_last_name || "")}&division=${encodeURIComponent(reg.division || "")}`;
+
+                return (
+                  <div
+                    key={reg.id}
+                    className={`bg-white rounded-lg border p-5 md:p-6 ${isIncomplete ? "border-flag-red/30 border-l-4 border-l-flag-red" : "border-gray-200"}`}
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+                      <h3 className="font-display text-xl font-bold uppercase tracking-wide">
+                        {playerName}
+                      </h3>
+                      {isIncomplete ? (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide bg-flag-red/10 text-flag-red border border-flag-red/20">
+                          Action Needed
+                        </span>
+                      ) : (
+                        <StatusBadge status={reg.status} />
+                      )}
+                    </div>
+                    <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-600">
+                      <span>
+                        <span className="font-semibold text-charcoal">Division:</span>{" "}
+                        {reg.division}
+                      </span>
+                      {reg.primary_position && (
+                        <span>
+                          <span className="font-semibold text-charcoal">Position:</span>{" "}
+                          {reg.primary_position}
+                        </span>
+                      )}
+                      <span>
+                        <span className="font-semibold text-charcoal">Submitted:</span>{" "}
+                        {new Date(reg.submitted_at).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </span>
+                    </div>
+                    {isIncomplete && (
+                      <div className="mt-4">
+                        <Link
+                          href={completeUrl}
+                          className="inline-block bg-flag-red hover:bg-flag-red-dark text-white px-5 py-2.5 rounded font-display text-xs font-semibold uppercase tracking-widest transition-colors"
+                        >
+                          Complete Registration
+                        </Link>
+                        <p className="text-gray-400 text-xs mt-2">
+                          Additional player details are needed to finalize tryout registration.
+                        </p>
+                      </div>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ===== COMPLIANCE INFO ===== */}
       {!dataLoading && registrations.length > 0 && (
         <section className="bg-white py-12 md:py-16 px-6 md:px-10">
           <div className="max-w-4xl mx-auto">
             <p className="font-display text-sm font-semibold text-flag-red uppercase tracking-[3px] mb-2">
-              &#9733; Action Items
+              &#9733; Looking Ahead
             </p>
-            <h2 className="font-display text-2xl md:text-3xl font-bold uppercase tracking-wide mb-6">
-              What&apos;s Needed From You
+            <h2 className="font-display text-2xl md:text-3xl font-bold uppercase tracking-wide mb-3">
+              If Your Player Makes All-Stars
             </h2>
+            <p className="text-gray-600 text-sm leading-relaxed mb-6">
+              If your player is selected for an All-Stars team, the following items will be required.
+              You can get a head start now, or wait until teams are announced.
+            </p>
 
             <div className="space-y-4">
               {registrations.map((reg) => {
@@ -467,97 +562,6 @@ export default function PortalPage() {
           </div>
         </section>
       )}
-
-      {/* ===== MY PLAYER'S STATUS ===== */}
-      <section className="bg-off-white py-12 md:py-16 px-6 md:px-10">
-        <div className="max-w-4xl mx-auto">
-          <p className="font-display text-sm font-semibold text-flag-red uppercase tracking-[3px] mb-2">
-            &#9733; Registration
-          </p>
-          <h2 className="font-display text-2xl md:text-3xl font-bold uppercase tracking-wide mb-6">
-            My Player&apos;s Status
-          </h2>
-
-          {dataLoading ? (
-            <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
-              <p className="text-gray-400 text-sm">Loading registrations...</p>
-            </div>
-          ) : registrations.length === 0 ? (
-            <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
-              <p className="text-gray-500 mb-4">
-                No tryout registrations found for your account.
-              </p>
-              <Link
-                href={`/apply/player?parent_name=${encodeURIComponent(user?.user_metadata?.full_name || "")}&parent_email=${encodeURIComponent(user?.email || "")}`}
-                className="inline-block bg-flag-red hover:bg-flag-red-dark text-white px-6 py-3 rounded font-display text-sm font-semibold uppercase tracking-widest transition-colors"
-              >
-                Register for Tryouts
-              </Link>
-            </div>
-          ) : (
-            <div className="space-y-4">
-              {registrations.map((reg) => {
-                const isIncomplete = !reg.player_date_of_birth || !reg.primary_position;
-                const playerName = reg.player_name || `${reg.player_first_name || ""} ${reg.player_last_name || ""}`.trim();
-                const completeUrl = `/apply/player?edit=${reg.id}&parent_name=${encodeURIComponent(reg.parent_name || "")}&parent_email=${encodeURIComponent(reg.parent_email || "")}&player_first_name=${encodeURIComponent(reg.player_first_name || "")}&player_last_name=${encodeURIComponent(reg.player_last_name || "")}&division=${encodeURIComponent(reg.division || "")}`;
-
-                return (
-                  <div
-                    key={reg.id}
-                    className={`bg-white rounded-lg border p-5 md:p-6 ${isIncomplete ? "border-flag-red/30 border-l-4 border-l-flag-red" : "border-gray-200"}`}
-                  >
-                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
-                      <h3 className="font-display text-xl font-bold uppercase tracking-wide">
-                        {playerName}
-                      </h3>
-                      {isIncomplete ? (
-                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide bg-flag-red/10 text-flag-red border border-flag-red/20">
-                          Action Needed
-                        </span>
-                      ) : (
-                        <StatusBadge status={reg.status} />
-                      )}
-                    </div>
-                    <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-600">
-                      <span>
-                        <span className="font-semibold text-charcoal">Division:</span>{" "}
-                        {reg.division}
-                      </span>
-                      {reg.primary_position && (
-                        <span>
-                          <span className="font-semibold text-charcoal">Position:</span>{" "}
-                          {reg.primary_position}
-                        </span>
-                      )}
-                      <span>
-                        <span className="font-semibold text-charcoal">Submitted:</span>{" "}
-                        {new Date(reg.submitted_at).toLocaleDateString("en-US", {
-                          month: "short",
-                          day: "numeric",
-                          year: "numeric",
-                        })}
-                      </span>
-                    </div>
-                    {isIncomplete && (
-                      <div className="mt-4">
-                        <Link
-                          href={completeUrl}
-                          className="inline-block bg-flag-red hover:bg-flag-red-dark text-white px-5 py-2.5 rounded font-display text-xs font-semibold uppercase tracking-widest transition-colors"
-                        >
-                          Complete Registration
-                        </Link>
-                        <p className="text-gray-400 text-xs mt-2">
-                          Additional player details are needed to finalize tryout registration.
-                        </p>
-                      </div>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </div>
-      </section>
 
       {/* ===== ANNOUNCEMENTS ===== */}
       <section className="bg-white py-12 md:py-16 px-6 md:px-10">
