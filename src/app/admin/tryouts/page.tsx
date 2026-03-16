@@ -13,6 +13,9 @@ import {
   MapPin,
   Clock,
   Users,
+  Mail,
+  Send,
+  Check,
 } from "lucide-react";
 
 /* ---------- Types ---------- */
@@ -72,6 +75,7 @@ interface TryoutAssignment {
   registration_id: string;
   checked_in: boolean;
   checked_in_at: string | null;
+  invited_at: string | null;
   created_at: string;
 }
 
@@ -226,7 +230,7 @@ export default function TryoutsPage() {
 
   const totalRegistered = registrations.length;
   const totalSessions = sessions.length;
-  const totalCheckedIn = assignments.filter((a) => a.checked_in).length;
+  const totalInvited = assignments.filter((a) => a.invited_at).length;
 
   /* ---------- Status Update (Players Tab) ---------- */
 
@@ -373,32 +377,70 @@ export default function TryoutsPage() {
     }
   }
 
-  /* ---------- Check-In ---------- */
+  /* ---------- Invite Emails ---------- */
 
-  async function toggleCheckIn(assignment: TryoutAssignment) {
+  const [sendingInvites, setSendingInvites] = useState<Set<string>>(new Set());
+  const [sendingSessionInvites, setSendingSessionInvites] = useState<string | null>(null);
+
+  async function sendInvite(assignment: TryoutAssignment, session: TryoutSession) {
     if (!supabase) return;
-    const newCheckedIn = !assignment.checked_in;
-    const { error } = await supabase
-      .from("tryout_assignments")
-      .update({
-        checked_in: newCheckedIn,
-        checked_in_at: newCheckedIn ? new Date().toISOString() : null,
-      })
-      .eq("id", assignment.id);
+    const player = registrations.find((r) => r.id === assignment.registration_id);
+    if (!player) return;
 
-    if (!error) {
+    setSendingInvites((prev) => new Set(prev).add(assignment.id));
+
+    try {
+      await fetch("/api/send-tryout-invite", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          parent_name: player.parent_name,
+          parent_email: player.parent_email,
+          player_name: `${player.player_first_name} ${player.player_last_name}`,
+          division: session.division,
+          session_date: session.session_date,
+          start_time: session.start_time,
+          end_time: session.end_time,
+          location: session.location,
+          field: session.field,
+        }),
+      });
+
+      const now = new Date().toISOString();
+      await supabase
+        .from("tryout_assignments")
+        .update({ invited_at: now })
+        .eq("id", assignment.id);
+
       setAssignments((prev) =>
         prev.map((a) =>
-          a.id === assignment.id
-            ? {
-                ...a,
-                checked_in: newCheckedIn,
-                checked_in_at: newCheckedIn ? new Date().toISOString() : null,
-              }
-            : a
+          a.id === assignment.id ? { ...a, invited_at: now } : a
         )
       );
+    } catch {
+      // silently fail individual invite
     }
+
+    setSendingInvites((prev) => {
+      const next = new Set(prev);
+      next.delete(assignment.id);
+      return next;
+    });
+  }
+
+  async function sendAllInvites(session: TryoutSession) {
+    if (!supabase) return;
+    setSendingSessionInvites(session.id);
+
+    const sessionAssigns = assignments.filter(
+      (a) => a.session_id === session.id && !a.invited_at
+    );
+
+    for (const assignment of sessionAssigns) {
+      await sendInvite(assignment, session);
+    }
+
+    setSendingSessionInvites(null);
   }
 
   /* ---------- Auto-Assign All ---------- */
@@ -491,7 +533,7 @@ export default function TryoutsPage() {
           Tryouts
         </h1>
         <p className="text-gray-400 text-sm mt-1">
-          {totalRegistered} registered &middot; {totalSessions} session{totalSessions !== 1 ? "s" : ""} &middot; {totalCheckedIn} checked in
+          {totalRegistered} registered &middot; {totalSessions} session{totalSessions !== 1 ? "s" : ""} &middot; {totalInvited} invited
         </p>
       </div>
 
@@ -631,8 +673,8 @@ export default function TryoutsPage() {
                             <span className="flex items-center gap-1">
                               <Clock size={12} />
                               {formatDate(playerSession.session_date)} {formatTime(playerSession.start_time)} &middot; {playerSession.location}
-                              {playerAssignment?.checked_in && (
-                                <span className="text-green-600 font-semibold ml-1">Checked In</span>
+                              {playerAssignment?.invited_at && (
+                                <span className="text-green-600 font-semibold ml-1 flex items-center gap-0.5"><Check size={12} /> Invited</span>
                               )}
                             </span>
                           ) : (
@@ -1052,7 +1094,8 @@ export default function TryoutsPage() {
             <div className="space-y-4">
               {filteredSessions.map((session) => {
                 const sessionAssignments = getSessionAssignments(session.id);
-                const checkedInCount = sessionAssignments.filter((a) => a.checked_in).length;
+                const invitedCount = sessionAssignments.filter((a) => a.invited_at).length;
+                const uninvitedCount = sessionAssignments.length - invitedCount;
                 const expanded = expandedSessionId === session.id;
                 const barColor = DIVISION_COLORS[session.division] ?? "bg-flag-blue";
 
@@ -1094,8 +1137,8 @@ export default function TryoutsPage() {
                               <Users size={12} />
                               {sessionAssignments.length} / {session.max_players} assigned
                               {sessionAssignments.length > 0 && (
-                                <span className="text-green-600 ml-1">
-                                  ({checkedInCount} checked in)
+                                <span className={`ml-1 ${invitedCount === sessionAssignments.length ? "text-green-600" : "text-gray-400"}`}>
+                                  ({invitedCount} invited{uninvitedCount > 0 ? `, ${uninvitedCount} pending` : ""})
                                 </span>
                               )}
                             </span>
@@ -1140,6 +1183,24 @@ export default function TryoutsPage() {
                             <Users size={14} />
                             Assign All in Division
                           </button>
+
+                          {sessionAssignments.length > 0 && (
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                sendAllInvites(session);
+                              }}
+                              disabled={sendingSessionInvites === session.id || uninvitedCount === 0}
+                              className="inline-flex items-center gap-2 bg-star-gold text-white px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wide hover:bg-star-gold/90 transition-colors disabled:opacity-50"
+                            >
+                              <Mail size={14} />
+                              {sendingSessionInvites === session.id
+                                ? "Sending..."
+                                : uninvitedCount === 0
+                                ? "All Invited"
+                                : `Send All Invites (${uninvitedCount})`}
+                            </button>
+                          )}
 
                           {/* Delete */}
                           {deletingId === session.id ? (
@@ -1190,36 +1251,42 @@ export default function TryoutsPage() {
                                   (r) => r.id === assignment.registration_id
                                 );
                                 if (!player) return null;
+                                const isInvited = !!assignment.invited_at;
+                                const isSending = sendingInvites.has(assignment.id);
 
                                 return (
-                                  <label
+                                  <div
                                     key={assignment.id}
-                                    className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
-                                      assignment.checked_in
+                                    className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+                                      isInvited
                                         ? "bg-green-50 border border-green-200"
-                                        : "bg-gray-50 border border-gray-100 hover:bg-gray-100"
+                                        : "bg-gray-50 border border-gray-100"
                                     }`}
                                   >
-                                    <input
-                                      type="checkbox"
-                                      checked={assignment.checked_in}
-                                      onChange={() => toggleCheckIn(assignment)}
-                                      className="w-6 h-6 min-w-[24px] rounded border-gray-300 text-green-600 focus:ring-green-500 cursor-pointer"
-                                    />
                                     <div className="flex-1 min-w-0">
                                       <span className="text-sm font-semibold text-charcoal">
                                         {player.player_first_name} {player.player_last_name}
                                       </span>
                                       <span className="text-xs text-gray-400 ml-2">
-                                        ({player.parent_name})
+                                        ({player.parent_name} &middot; {player.parent_email})
                                       </span>
                                     </div>
-                                    {assignment.checked_in && (
-                                      <span className="text-xs font-semibold text-green-600 uppercase tracking-wide shrink-0">
-                                        Checked In
+                                    {isInvited ? (
+                                      <span className="inline-flex items-center gap-1 text-xs font-semibold text-green-600 uppercase tracking-wide shrink-0">
+                                        <Check size={14} />
+                                        Invited
                                       </span>
+                                    ) : (
+                                      <button
+                                        onClick={() => sendInvite(assignment, session)}
+                                        disabled={isSending}
+                                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wide bg-star-gold/10 text-star-gold hover:bg-star-gold/20 transition-colors disabled:opacity-50 shrink-0"
+                                      >
+                                        <Send size={12} />
+                                        {isSending ? "Sending..." : "Send Invite"}
+                                      </button>
                                     )}
-                                  </label>
+                                  </div>
                                 );
                               })}
                             </div>
