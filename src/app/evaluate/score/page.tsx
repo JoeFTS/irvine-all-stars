@@ -43,7 +43,6 @@ const CATEGORIES = [
   { key: "fielding", label: "Fielding" },
   { key: "throwing", label: "Throwing" },
   { key: "running", label: "Running" },
-  { key: "baseballIq", label: "Baseball IQ" },
   { key: "effort", label: "Effort & Attitude" },
 ] as const;
 
@@ -152,7 +151,6 @@ export default function ScoringPage() {
         fielding: p.fielding,
         throwing: p.throwing,
         running: p.running,
-        baseball_iq: p.baseballIq,
         effort: p.effort,
         notes: p.notes || null,
         standout_skills: p.standoutSkills || null,

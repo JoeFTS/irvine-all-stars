@@ -39,15 +39,8 @@ const rubricItems = [
     color: "bg-flag-red",
   },
   {
-    category: "Baseball IQ",
-    points: 15,
-    description:
-      "Understanding of game situations, positioning, and decision-making. How well a player reads the game in real time.",
-    color: "bg-flag-blue",
-  },
-  {
     category: "Effort & Attitude",
-    points: 15,
+    points: 30,
     description:
       "Hustle, coachability, sportsmanship, and enthusiasm. Players who give 100% and support their teammates stand out.",
     color: "bg-flag-red",
