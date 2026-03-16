@@ -71,6 +71,16 @@ export function Navbar() {
           ))}
           {user ? (
             <>
+              {role === "coach" && (
+                <li>
+                  <Link
+                    href="/portal"
+                    className="text-white/65 hover:text-white text-sm font-semibold uppercase tracking-wide transition-colors"
+                  >
+                    Parent Portal
+                  </Link>
+                </li>
+              )}
               <li>
                 <Link
                   href={portalLink.href}
@@ -127,7 +137,18 @@ export function Navbar() {
             ))}
             {user ? (
               <>
-                <li className="mt-4">
+                {role === "coach" && (
+                  <li className="mt-4">
+                    <Link
+                      href="/portal"
+                      onClick={() => setMobileOpen(false)}
+                      className="block text-white/80 hover:text-white font-display text-lg uppercase tracking-wider py-3 border-b border-white/10"
+                    >
+                      Parent Portal
+                    </Link>
+                  </li>
+                )}
+                <li className={role === "coach" ? "" : "mt-4"}>
                   <Link
                     href={portalLink.href}
                     onClick={() => setMobileOpen(false)}
