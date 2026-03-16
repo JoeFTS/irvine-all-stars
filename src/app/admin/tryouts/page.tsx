@@ -17,7 +17,6 @@ import {
   Send,
   Check,
   Pencil,
-  Download,
 } from "lucide-react";
 
 /* ---------- Types ---------- */
@@ -1301,18 +1300,6 @@ export default function TryoutsPage() {
                                 ? "All Invited"
                                 : `Send All Invites (${uninvitedCount})`}
                             </button>
-                          )}
-
-                          {/* Download Score Sheet */}
-                          {sessionAssignments.length > 0 && (
-                            <a
-                              href={`/api/score-sheet?session_id=${session.id}`}
-                              download
-                              className="inline-flex items-center gap-2 bg-flag-blue/10 text-flag-blue px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wide hover:bg-flag-blue/20 transition-colors"
-                            >
-                              <Download size={14} />
-                              Download Score Sheet
-                            </a>
                           )}
 
                           {/* Delete */}
