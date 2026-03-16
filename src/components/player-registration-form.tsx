@@ -402,6 +402,23 @@ export function PlayerRegistrationForm() {
       return;
     }
 
+    // Send confirmation email
+    try {
+      await fetch("/api/send-confirmation", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          type: "player",
+          name: form.parent_name,
+          email: form.parent_email,
+          playerName: `${form.player_first_name} ${form.player_last_name}`,
+          division: form.division,
+        }),
+      });
+    } catch {
+      // Email failure shouldn't block submission
+    }
+
     // Clear draft
     localStorage.removeItem(STORAGE_KEY);
     setSubmitted(true);

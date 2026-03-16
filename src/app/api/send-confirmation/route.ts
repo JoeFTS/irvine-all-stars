@@ -39,31 +39,54 @@ function getCoachEmailHtml(name: string, division: string) {
 </table></td></tr></table></body></html>`;
 }
 
-function getPlayerEmailHtml(name: string, playerName: string) {
+function getPlayerEmailHtml(name: string, playerName: string, division: string) {
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
-<body style="margin:0;padding:0;background-color:#FAFAF8;font-family:system-ui,-apple-system,sans-serif;">
-<table width="100%" cellpadding="0" cellspacing="0" style="background-color:#FAFAF8;padding:40px 20px;">
-<tr><td align="center">
-<table width="600" cellpadding="0" cellspacing="0" style="max-width:600px;width:100%;">
-<tr><td style="background-color:#002868;padding:30px 40px;text-align:center;">
-<p style="color:#F59E0B;font-size:14px;margin:0 0 8px 0;letter-spacing:3px;">&#9733;&#9733;&#9733;</p>
-<h1 style="color:#FFFFFF;font-size:24px;font-weight:700;margin:0;letter-spacing:2px;text-transform:uppercase;">Irvine All-Stars</h1>
-<p style="color:#F59E0B;font-size:14px;margin:8px 0 0 0;letter-spacing:3px;">&#9733;&#9733;&#9733;</p>
-</td></tr>
-<tr><td style="background-color:#B22234;height:4px;font-size:0;line-height:0;">&nbsp;</td></tr>
-<tr><td style="background-color:#FFFFFF;padding:40px;">
-<h2 style="color:#002868;font-size:20px;font-weight:700;margin:0 0 16px 0;text-transform:uppercase;letter-spacing:1px;">Tryout Registration Received</h2>
-<p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0 0 16px 0;">Hi ${name},</p>
-<p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0 0 24px 0;">Thank you for registering <strong style="color:#002868;">${playerName}</strong> for the 2026 All-Stars tryouts. We have received the registration and will send tryout details as the date approaches.</p>
-<p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0 0 24px 0;">Check <a href="https://irvineallstars.com/tryouts" style="color:#002868;text-decoration:underline;">irvineallstars.com/tryouts</a> for the latest tryout schedule, what to bring, and how players are evaluated.</p>
-<p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0 0 8px 0;">If you have any questions, please contact the All-Stars Coordinator.</p>
-<p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0;">Best regards,<br><strong style="color:#002868;">Irvine Pony Baseball All-Stars</strong><br><a href="mailto:AllStars@irvinepony.com" style="color:#002868;text-decoration:underline;">AllStars@irvinepony.com</a></p>
-</td></tr>
-<tr><td style="background-color:#002868;padding:20px 40px;text-align:center;">
-<p style="color:rgba(255,255,255,0.5);font-size:12px;margin:0;line-height:1.5;">Irvine Pony Baseball &bull; 2026 All-Stars Season<br><a href="https://irvineallstars.com" style="color:rgba(255,255,255,0.7);text-decoration:underline;">irvineallstars.com</a></p>
-</td></tr>
-</table></td></tr></table></body></html>`;
+<body style="margin:0;padding:0;background-color:#F9FAFB;font-family:system-ui,-apple-system,sans-serif;">
+<div style="max-width:560px;margin:0 auto;font-family:Arial,Helvetica,sans-serif;">
+<div style="background:#0A2342;padding:24px;text-align:center;">
+<span style="color:#F4B400;font-size:18px;">&#9733; &#9733; &#9733;</span>
+<div style="color:#fff;font-size:22px;font-weight:bold;letter-spacing:2px;margin-top:8px;">IRVINE ALL-STARS</div>
+<span style="color:#F4B400;font-size:18px;">&#9733; &#9733; &#9733;</span>
+</div>
+<div style="background:#C1121F;height:4px;"></div>
+<div style="padding:32px 24px;background:#ffffff;">
+<h2 style="color:#0A2342;font-size:22px;margin:0 0 16px;letter-spacing:1px;">REGISTRATION COMPLETE</h2>
+<p style="color:#4B5563;font-size:15px;line-height:1.6;margin:0 0 8px;">Hi ${name},</p>
+<p style="color:#4B5563;font-size:15px;line-height:1.6;margin:0 0 24px;">Thank you for registering <strong style="color:#0A2342;">${playerName}</strong> for ${division} tryouts. We're excited to have your family as part of the All-Stars program.</p>
+<p style="color:#4B5563;font-size:15px;line-height:1.6;margin:0 0 24px;"><strong style="color:#0A2342;">We'll send you a separate email with your specific tryout time and location</strong> as the date gets closer. Keep an eye on your inbox and your Parent Portal for updates.</p>
+
+<div style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;padding:20px;margin:0 0 20px;">
+<h3 style="color:#0A2342;font-size:14px;font-weight:700;margin:0 0 12px;text-transform:uppercase;letter-spacing:1px;">What to Bring to Tryouts</h3>
+<table cellpadding="0" cellspacing="0" style="width:100%;">
+<tr><td style="padding:4px 10px 4px 0;vertical-align:top;color:#C1121F;font-size:13px;">&#9733;</td><td style="padding:4px 0;color:#4B5563;font-size:14px;line-height:1.5;">Glove, bat, helmet, and cleats</td></tr>
+<tr><td style="padding:4px 10px 4px 0;vertical-align:top;color:#C1121F;font-size:13px;">&#9733;</td><td style="padding:4px 0;color:#4B5563;font-size:14px;line-height:1.5;">Baseball pants and your regular-season jersey</td></tr>
+<tr><td style="padding:4px 10px 4px 0;vertical-align:top;color:#C1121F;font-size:13px;">&#9733;</td><td style="padding:4px 0;color:#4B5563;font-size:14px;line-height:1.5;">Water bottle (plenty of water!)</td></tr>
+<tr><td style="padding:4px 10px 4px 0;vertical-align:top;color:#C1121F;font-size:13px;">&#9733;</td><td style="padding:4px 0;color:#4B5563;font-size:14px;line-height:1.5;">Arrive 15 minutes early for check-in</td></tr>
+</table>
+</div>
+
+<div style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;padding:20px;margin:0 0 24px;">
+<h3 style="color:#0A2342;font-size:14px;font-weight:700;margin:0 0 12px;text-transform:uppercase;letter-spacing:1px;">Key Dates</h3>
+<table cellpadding="0" cellspacing="0" style="width:100%;">
+<tr><td style="padding:4px 0;color:#0A2342;font-size:14px;font-weight:700;width:80px;">May 10:</td><td style="padding:4px 0;color:#4B5563;font-size:14px;">5U, 6U Shetland &amp; 7U, 8U Pinto tryouts</td></tr>
+<tr><td style="padding:4px 0;color:#0A2342;font-size:14px;font-weight:700;">May 11:</td><td style="padding:4px 0;color:#4B5563;font-size:14px;">9U &amp; 10U Mustang tryouts</td></tr>
+<tr><td style="padding:4px 0;color:#0A2342;font-size:14px;font-weight:700;">May 12:</td><td style="padding:4px 0;color:#4B5563;font-size:14px;">11U &amp; 12U Bronco tryouts</td></tr>
+<tr><td style="padding:4px 0;color:#0A2342;font-size:14px;font-weight:700;">Mid-May:</td><td style="padding:4px 0;color:#4B5563;font-size:14px;">Roster announcements &amp; practices begin</td></tr>
+</table>
+</div>
+
+<div style="text-align:center;margin:24px 0;">
+<a href="https://irvineallstars.com/portal" style="background:#C1121F;color:#ffffff;padding:14px 32px;text-decoration:none;font-size:14px;font-weight:bold;letter-spacing:2px;border-radius:6px;display:inline-block;">VIEW PARENT PORTAL</a>
+</div>
+
+<p style="color:#9CA3AF;font-size:13px;line-height:1.5;">Questions? Contact us at <a href="mailto:AllStars@irvinepony.com" style="color:#0A2342;">AllStars@irvinepony.com</a></p>
+</div>
+<div style="background:#0A2342;padding:16px;text-align:center;">
+<p style="color:rgba(255,255,255,0.4);font-size:11px;margin:0;letter-spacing:1px;">IRVINE PONY ALL-STARS &bull; 2026</p>
+</div>
+</div>
+</body></html>`;
 }
 
 export async function POST(request: NextRequest) {
@@ -86,7 +109,7 @@ export async function POST(request: NextRequest) {
     const htmlContent =
       type === "coach"
         ? getCoachEmailHtml(name, division || "")
-        : getPlayerEmailHtml(name, playerName || "");
+        : getPlayerEmailHtml(name, playerName || "", division || "");
 
     if (resend) {
       const { error } = await resend.emails.send({
