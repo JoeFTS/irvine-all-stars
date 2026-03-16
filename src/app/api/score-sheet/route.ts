@@ -15,34 +15,42 @@ const CATEGORIES = [
 
 export async function GET(request: NextRequest) {
   const sessionId = request.nextUrl.searchParams.get("session_id");
+  const isBlank = request.nextUrl.searchParams.get("blank") === "true";
 
-  if (!sessionId || !supabaseUrl || !supabaseAnonKey) {
+  // Blank template doesn't need session_id or supabase
+  if (!isBlank && (!sessionId || !supabaseUrl || !supabaseAnonKey)) {
     return NextResponse.json({ error: "Missing parameters" }, { status: 400 });
   }
 
-  const supabase = createClient(supabaseUrl, supabaseAnonKey, {
-    db: { schema: "irvine_allstars" },
-  });
+  let session: {
+    division: string;
+    session_date: string;
+    start_time: string;
+    end_time: string | null;
+    location: string;
+    field: string | null;
+    max_players: number;
+  } | null = null;
 
-  // Fetch session
-  const { data: session } = await supabase
-    .from("tryout_sessions")
-    .select("*")
-    .eq("id", sessionId)
-    .single();
+  if (!isBlank) {
+    const supabase = createClient(supabaseUrl!, supabaseAnonKey!, {
+      db: { schema: "irvine_allstars" },
+    });
 
-  if (!session) {
-    return NextResponse.json({ error: "Session not found" }, { status: 404 });
+    const { data } = await supabase
+      .from("tryout_sessions")
+      .select("*")
+      .eq("id", sessionId)
+      .single();
+
+    session = data;
+
+    if (!session) {
+      return NextResponse.json({ error: "Session not found" }, { status: 404 });
+    }
   }
 
-  // Fetch assigned players
-  const { data: assignments } = await supabase
-    .from("tryout_assignments")
-    .select("registration_id")
-    .eq("session_id", sessionId);
-
-  const regIds = (assignments || []).map((a: { registration_id: string }) => a.registration_id);
-
+  // Fetch assigned players (skip for blank template)
   let players: {
     player_first_name: string;
     player_last_name: string;
@@ -55,27 +63,41 @@ export async function GET(request: NextRequest) {
     jersey_number: string | null;
   }[] = [];
 
-  if (regIds.length > 0) {
-    const { data } = await supabase
-      .from("tryout_registrations")
-      .select(
-        "player_first_name, player_last_name, division, primary_position, secondary_position, bats, throws, current_team, jersey_number"
-      )
-      .in("id", regIds)
-      .order("player_last_name")
-      .order("player_first_name");
+  if (!isBlank && sessionId) {
+    const supabase = createClient(supabaseUrl!, supabaseAnonKey!, {
+      db: { schema: "irvine_allstars" },
+    });
 
-    players = data || [];
+    const { data: assignments } = await supabase
+      .from("tryout_assignments")
+      .select("registration_id")
+      .eq("session_id", sessionId);
+
+    const regIds = (assignments || []).map((a: { registration_id: string }) => a.registration_id);
+
+    if (regIds.length > 0) {
+      const { data } = await supabase
+        .from("tryout_registrations")
+        .select(
+          "player_first_name, player_last_name, division, primary_position, secondary_position, bats, throws, current_team, jersey_number"
+        )
+        .in("id", regIds)
+        .order("player_last_name")
+        .order("player_first_name");
+
+      players = data || [];
+    }
   }
 
   // Format date/time for header
-  const d = new Date(session.session_date + "T00:00:00");
-  const dateStr = d.toLocaleDateString("en-US", {
-    weekday: "long",
-    month: "long",
-    day: "numeric",
-    year: "numeric",
-  });
+  const dateStr = session
+    ? new Date(session.session_date + "T00:00:00").toLocaleDateString("en-US", {
+        weekday: "long",
+        month: "long",
+        day: "numeric",
+        year: "numeric",
+      })
+    : "";
   function fmtTime(t: string) {
     const [h, m] = t.split(":");
     const hour = parseInt(h, 10);
@@ -83,12 +105,16 @@ export async function GET(request: NextRequest) {
     const display = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
     return `${display}:${m} ${ampm}`;
   }
-  const timeStr = session.end_time
-    ? `${fmtTime(session.start_time)} – ${fmtTime(session.end_time)}`
-    : fmtTime(session.start_time);
-  const locationStr = session.field
-    ? `${session.location} — ${session.field}`
-    : session.location;
+  const timeStr = session
+    ? session.end_time
+      ? `${fmtTime(session.start_time)} – ${fmtTime(session.end_time)}`
+      : fmtTime(session.start_time)
+    : "";
+  const locationStr = session
+    ? session.field
+      ? `${session.location} — ${session.field}`
+      : session.location
+    : "";
 
   // Build Excel
   const wb = new ExcelJS.Workbook();
@@ -122,7 +148,9 @@ export async function GET(request: NextRequest) {
   // Row 1: Title
   ws.mergeCells("A1:N1");
   const titleCell = ws.getCell("A1");
-  titleCell.value = `IRVINE ALL-STARS — ${session.division} TRYOUT SCORE SHEET`;
+  titleCell.value = isBlank
+    ? "IRVINE ALL-STARS — TRYOUT SCORE SHEET"
+    : `IRVINE ALL-STARS — ${session!.division} TRYOUT SCORE SHEET`;
   titleCell.font = { bold: true, size: 14, color: { argb: white } };
   titleCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: navy } };
   titleCell.alignment = { horizontal: "center", vertical: "middle" };
@@ -131,7 +159,9 @@ export async function GET(request: NextRequest) {
   // Row 2: Session info
   ws.mergeCells("A2:N2");
   const infoCell = ws.getCell("A2");
-  infoCell.value = `${dateStr}  |  ${timeStr}  |  ${locationStr}`;
+  infoCell.value = isBlank
+    ? "Division: _______________    Date: _______________    Location: _______________"
+    : `${dateStr}  |  ${timeStr}  |  ${locationStr}`;
   infoCell.font = { size: 11, color: { argb: navy } };
   infoCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: lightGray } };
   infoCell.alignment = { horizontal: "center", vertical: "middle" };
@@ -278,8 +308,9 @@ export async function GET(request: NextRequest) {
     row.height = 22;
   });
 
-  // Add empty rows for walk-ins (5 extra blank rows)
-  for (let i = 0; i < 5; i++) {
+  // Add empty rows for walk-ins
+  const blankRowCount = isBlank ? 30 : 5;
+  for (let i = 0; i < blankRowCount; i++) {
     const rowNum = 6 + players.length + i;
     const row = ws.getRow(rowNum);
     row.getCell(1).value = players.length + i + 1;
@@ -313,7 +344,7 @@ export async function GET(request: NextRequest) {
   }
 
   // Footer row
-  const footerRowNum = 6 + players.length + 5 + 1;
+  const footerRowNum = 6 + players.length + blankRowCount + 1;
   ws.mergeCells(`A${footerRowNum}:N${footerRowNum}`);
   const footerCell = ws.getCell(`A${footerRowNum}`);
   footerCell.value = `Coach Name: ___________________________    Signature: ___________________________    Date: ______________`;
@@ -333,7 +364,9 @@ export async function GET(request: NextRequest) {
   // Generate buffer
   const buffer = await wb.xlsx.writeBuffer();
 
-  const filename = `${session.division.replace(/\s+/g, "-")}_Score_Sheet_${session.session_date}.xlsx`;
+  const filename = isBlank
+    ? "Irvine_All-Stars_Blank_Score_Sheet.xlsx"
+    : `${session!.division.replace(/\s+/g, "-")}_Score_Sheet_${session!.session_date}.xlsx`;
 
   return new NextResponse(buffer as ArrayBuffer, {
     headers: {

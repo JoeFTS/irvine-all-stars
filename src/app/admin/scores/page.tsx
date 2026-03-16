@@ -170,14 +170,26 @@ export default function ScoresPage() {
       </div>
 
       {/* Score Sheet Downloads */}
-      {sessions.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-lg p-5 mb-6">
-          <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-gray-400 mb-3">
-            Download Score Sheets
-          </h2>
-          <p className="text-xs text-gray-400 mb-4">
-            Pre-filled Excel sheets with player names and scoring columns. Print for coaches or fill in digitally.
-          </p>
+      <div className="bg-white border border-gray-200 rounded-lg p-5 mb-6">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
+          <div>
+            <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-gray-400">
+              Download Score Sheets
+            </h2>
+            <p className="text-xs text-gray-400 mt-1">
+              Pre-filled Excel sheets with player names and scoring columns. Print for coaches or fill in digitally.
+            </p>
+          </div>
+          <a
+            href="/api/score-sheet?blank=true"
+            download
+            className="inline-flex items-center gap-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wide hover:bg-gray-200 transition-colors shrink-0"
+          >
+            <Download size={14} />
+            Blank Template
+          </a>
+        </div>
+        {sessions.length > 0 && (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
             {sessions.map((session) => {
               const count = assignmentCounts[session.id] || 0;
@@ -205,8 +217,8 @@ export default function ScoresPage() {
               );
             })}
           </div>
-        </div>
-      )}
+        )}
+      </div>
 
       {/* Division Filter */}
       <div className="mb-6">
