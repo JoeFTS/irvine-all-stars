@@ -225,9 +225,27 @@ export function PlayerRegistrationForm() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [editId, setEditId] = useState<string | null>(null);
 
-  // Load draft from localStorage on mount
+  // Pre-populate from URL query params (from invite or portal link)
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const prefill: Partial<FormData> = {};
+    let hasPrefill = false;
+
+    if (params.get("parent_name")) { prefill.parent_name = params.get("parent_name")!; hasPrefill = true; }
+    if (params.get("parent_email")) { prefill.parent_email = params.get("parent_email")!; hasPrefill = true; }
+    if (params.get("player_first_name")) { prefill.player_first_name = params.get("player_first_name")!; hasPrefill = true; }
+    if (params.get("player_last_name")) { prefill.player_last_name = params.get("player_last_name")!; hasPrefill = true; }
+    if (params.get("division")) { prefill.division = params.get("division")!; hasPrefill = true; }
+    if (params.get("edit")) { setEditId(params.get("edit")); }
+
+    if (hasPrefill) {
+      setForm((prev) => ({ ...prev, ...prefill }));
+      return; // skip localStorage draft when pre-filling from URL
+    }
+
+    // Load draft from localStorage on mount (only if no URL prefill)
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
       if (saved) {
@@ -366,9 +384,14 @@ export function PlayerRegistrationForm() {
       return;
     }
 
-    const { error } = await supabase
-      .from("tryout_registrations")
-      .insert(payload);
+    const { error } = editId
+      ? await supabase
+          .from("tryout_registrations")
+          .update(payload)
+          .eq("id", editId)
+      : await supabase
+          .from("tryout_registrations")
+          .insert(payload);
 
     setSubmitting(false);
 

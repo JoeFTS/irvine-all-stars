@@ -13,7 +13,12 @@ import { StripeDivider } from "@/components/stripe-divider";
 
 interface Registration {
   id: string;
+  parent_name: string;
+  parent_email: string;
+  player_first_name: string;
+  player_last_name: string;
   player_name: string;
+  player_date_of_birth: string | null;
   division: string;
   primary_position: string;
   status: string;
@@ -148,7 +153,7 @@ export default function PortalPage() {
       const { data: regs } = await supabase!
         .from("tryout_registrations")
         .select(
-          "id, player_name, division, primary_position, status, created_at"
+          "id, parent_name, parent_email, player_first_name, player_last_name, player_date_of_birth, division, primary_position, status, created_at"
         )
         .or(`parent_email.eq.${user!.email},secondary_parent_email.eq.${user!.email}`)
         .order("created_at", { ascending: false });
@@ -483,7 +488,7 @@ export default function PortalPage() {
                 No tryout registrations found for your account.
               </p>
               <Link
-                href="/apply/player"
+                href={`/apply/player?parent_name=${encodeURIComponent(user?.user_metadata?.full_name || "")}&parent_email=${encodeURIComponent(user?.email || "")}`}
                 className="inline-block bg-flag-red hover:bg-flag-red-dark text-white px-6 py-3 rounded font-display text-sm font-semibold uppercase tracking-widest transition-colors"
               >
                 Register for Tryouts
@@ -491,43 +496,64 @@ export default function PortalPage() {
             </div>
           ) : (
             <div className="space-y-4">
-              {registrations.map((reg) => (
-                <div
-                  key={reg.id}
-                  className="bg-white rounded-lg border border-gray-200 p-5 md:p-6"
-                >
-                  <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
-                    <h3 className="font-display text-xl font-bold uppercase tracking-wide">
-                      {reg.player_name}
-                    </h3>
-                    <StatusBadge status={reg.status} />
+              {registrations.map((reg) => {
+                const isIncomplete = !reg.player_date_of_birth || !reg.primary_position;
+                const playerName = reg.player_name || `${reg.player_first_name || ""} ${reg.player_last_name || ""}`.trim();
+                const completeUrl = `/apply/player?edit=${reg.id}&parent_name=${encodeURIComponent(reg.parent_name || "")}&parent_email=${encodeURIComponent(reg.parent_email || "")}&player_first_name=${encodeURIComponent(reg.player_first_name || "")}&player_last_name=${encodeURIComponent(reg.player_last_name || "")}&division=${encodeURIComponent(reg.division || "")}`;
+
+                return (
+                  <div
+                    key={reg.id}
+                    className={`bg-white rounded-lg border p-5 md:p-6 ${isIncomplete ? "border-flag-red/30 border-l-4 border-l-flag-red" : "border-gray-200"}`}
+                  >
+                    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
+                      <h3 className="font-display text-xl font-bold uppercase tracking-wide">
+                        {playerName}
+                      </h3>
+                      {isIncomplete ? (
+                        <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-semibold uppercase tracking-wide bg-flag-red/10 text-flag-red border border-flag-red/20">
+                          Action Needed
+                        </span>
+                      ) : (
+                        <StatusBadge status={reg.status} />
+                      )}
+                    </div>
+                    <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-600">
+                      <span>
+                        <span className="font-semibold text-charcoal">Division:</span>{" "}
+                        {reg.division}
+                      </span>
+                      {reg.primary_position && (
+                        <span>
+                          <span className="font-semibold text-charcoal">Position:</span>{" "}
+                          {reg.primary_position}
+                        </span>
+                      )}
+                      <span>
+                        <span className="font-semibold text-charcoal">Submitted:</span>{" "}
+                        {new Date(reg.created_at).toLocaleDateString("en-US", {
+                          month: "short",
+                          day: "numeric",
+                          year: "numeric",
+                        })}
+                      </span>
+                    </div>
+                    {isIncomplete && (
+                      <div className="mt-4">
+                        <Link
+                          href={completeUrl}
+                          className="inline-block bg-flag-red hover:bg-flag-red-dark text-white px-5 py-2.5 rounded font-display text-xs font-semibold uppercase tracking-widest transition-colors"
+                        >
+                          Complete Registration
+                        </Link>
+                        <p className="text-gray-400 text-xs mt-2">
+                          Additional player details are needed to finalize tryout registration.
+                        </p>
+                      </div>
+                    )}
                   </div>
-                  <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-600">
-                    <span>
-                      <span className="font-semibold text-charcoal">
-                        Division:
-                      </span>{" "}
-                      {reg.division}
-                    </span>
-                    <span>
-                      <span className="font-semibold text-charcoal">
-                        Position:
-                      </span>{" "}
-                      {reg.primary_position}
-                    </span>
-                    <span>
-                      <span className="font-semibold text-charcoal">
-                        Submitted:
-                      </span>{" "}
-                      {new Date(reg.created_at).toLocaleDateString("en-US", {
-                        month: "short",
-                        day: "numeric",
-                        year: "numeric",
-                      })}
-                    </span>
-                  </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
