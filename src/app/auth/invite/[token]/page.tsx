@@ -9,6 +9,7 @@ interface Invite {
   id: string;
   email: string;
   role: string;
+  division: string | null;
   token: string;
   used: boolean;
   created_at: string;
@@ -121,6 +122,7 @@ export default function InviteSignupPage({
           email: inviteState.invite.email,
           full_name: name,
           role: inviteState.invite.role,
+          division: inviteState.invite.division || null,
         });
 
       if (profileError) {
@@ -269,6 +271,11 @@ export default function InviteSignupPage({
               Welcome to Irvine All-Stars! Complete the form below to create your{" "}
               <span className="font-semibold capitalize">{inviteState.invite.role}</span> account.
             </p>
+            {inviteState.invite.role === "coach" && inviteState.invite.division && (
+              <p className="text-flag-blue text-sm font-semibold mt-2">
+                You&apos;ve been invited to coach the {inviteState.invite.division} division
+              </p>
+            )}
           </div>
 
           {/* Success State */}

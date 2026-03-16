@@ -4,10 +4,24 @@ import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import { Mail, RefreshCw } from "lucide-react";
 
+const DIVISION_OPTIONS = [
+  "5U-Shetland",
+  "6U-Shetland",
+  "7U MP-Pinto",
+  "7U KP-Pinto",
+  "8U MP-Pinto",
+  "8U KP-Pinto",
+  "9U-Mustang",
+  "10U-Mustang",
+  "11U-Bronco",
+  "12U-Bronco",
+] as const;
+
 interface Invite {
   id: string;
   email: string;
   role: string;
+  division: string | null;
   token: string;
   used: boolean;
   created_at: string;
@@ -34,6 +48,7 @@ const roleStyles = {
 export default function AdminInvitesPage() {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<"coach" | "parent">("coach");
+  const [division, setDivision] = useState<string>("");
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [invites, setInvites] = useState<Invite[]>([]);
@@ -65,7 +80,7 @@ export default function AdminInvitesPage() {
       const res = await fetch("/api/send-invite", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, role }),
+        body: JSON.stringify({ email, role, ...(role === "coach" && division ? { division } : {}) }),
       });
 
       if (!res.ok) {
@@ -75,6 +90,7 @@ export default function AdminInvitesPage() {
 
       setMessage({ type: "success", text: `Invite sent to ${email}!` });
       setEmail("");
+      setDivision("");
       fetchInvites();
     } catch (err) {
       setMessage({
@@ -92,7 +108,7 @@ export default function AdminInvitesPage() {
       const res = await fetch("/api/send-invite", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email: invite.email, role: invite.role }),
+        body: JSON.stringify({ email: invite.email, role: invite.role, ...(invite.division ? { division: invite.division } : {}) }),
       });
 
       if (!res.ok) {
@@ -171,13 +187,39 @@ export default function AdminInvitesPage() {
             <select
               id="invite-role"
               value={role}
-              onChange={(e) => setRole(e.target.value as "coach" | "parent")}
+              onChange={(e) => {
+                const newRole = e.target.value as "coach" | "parent";
+                setRole(newRole);
+                if (newRole !== "coach") setDivision("");
+              }}
               className="w-full border border-gray-200 rounded px-4 py-2.5 text-charcoal bg-white focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
             >
               <option value="coach">Coach</option>
               <option value="parent">Parent</option>
             </select>
           </div>
+          {role === "coach" && (
+            <div className="w-full sm:w-48">
+              <label
+                htmlFor="invite-division"
+                className="block text-sm font-semibold text-charcoal uppercase tracking-wide mb-1.5 font-display"
+              >
+                Division
+              </label>
+              <select
+                id="invite-division"
+                required
+                value={division}
+                onChange={(e) => setDivision(e.target.value)}
+                className="w-full border border-gray-200 rounded px-4 py-2.5 text-charcoal bg-white focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+              >
+                <option value="">Select division...</option>
+                {DIVISION_OPTIONS.map((d) => (
+                  <option key={d} value={d}>{d}</option>
+                ))}
+              </select>
+            </div>
+          )}
           <button
             type="submit"
             disabled={sending}
@@ -238,6 +280,11 @@ export default function AdminInvitesPage() {
                         >
                           {invite.role}
                         </span>
+                        {invite.role === "coach" && invite.division && (
+                          <span className="inline-block ml-1.5 px-2.5 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-700">
+                            {invite.division}
+                          </span>
+                        )}
                       </td>
                       <td className="px-6 py-3">
                         <span
