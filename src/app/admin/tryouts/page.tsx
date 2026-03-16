@@ -16,6 +16,7 @@ import {
   Mail,
   Send,
   Check,
+  Pencil,
 } from "lucide-react";
 
 /* ---------- Types ---------- */
@@ -188,6 +189,18 @@ export default function TryoutsPage() {
   // Delete confirmation
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
+  // Edit session
+  const [editingSession, setEditingSession] = useState<TryoutSession | null>(null);
+  const [editDivision, setEditDivision] = useState("");
+  const [editDate, setEditDate] = useState("");
+  const [editStartTime, setEditStartTime] = useState("");
+  const [editEndTime, setEditEndTime] = useState("");
+  const [editLocation, setEditLocation] = useState("");
+  const [editField, setEditField] = useState("");
+  const [editNotes, setEditNotes] = useState("");
+  const [editMaxPlayers, setEditMaxPlayers] = useState(30);
+  const [saving, setSaving] = useState(false);
+
   // Auto-assign
   const [autoAssigning, setAutoAssigning] = useState(false);
   const [autoAssignResult, setAutoAssignResult] = useState<string | null>(null);
@@ -316,6 +329,76 @@ export default function TryoutsPage() {
       setAssignments((prev) => prev.filter((a) => a.session_id !== id));
     }
     setDeletingId(null);
+  }
+
+  /* ---------- Edit Session ---------- */
+
+  function startEditing(session: TryoutSession) {
+    setEditingSession(session);
+    setEditDivision(session.division);
+    setEditDate(session.session_date);
+    setEditStartTime(session.start_time);
+    setEditEndTime(session.end_time || "");
+    setEditLocation(session.location);
+    setEditField(session.field || "");
+    setEditNotes(session.notes || "");
+    setEditMaxPlayers(session.max_players);
+  }
+
+  async function handleSaveEdit() {
+    if (!supabase || !editingSession) return;
+    setSaving(true);
+
+    const { error } = await supabase
+      .from("tryout_sessions")
+      .update({
+        division: editDivision,
+        session_date: editDate,
+        start_time: editStartTime,
+        end_time: editEndTime || null,
+        location: editLocation.trim(),
+        field: editField.trim() || null,
+        notes: editNotes.trim() || null,
+        max_players: editMaxPlayers,
+      })
+      .eq("id", editingSession.id);
+
+    if (!error) {
+      // Send update emails to all previously invited players in this session
+      const invitedAssignments = assignments.filter(
+        (a) => a.session_id === editingSession.id && a.invited_at
+      );
+
+      for (const assignment of invitedAssignments) {
+        const player = registrations.find((r) => r.id === assignment.registration_id);
+        if (!player) continue;
+
+        try {
+          await fetch("/api/send-tryout-invite", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              parent_name: player.parent_name,
+              parent_email: player.parent_email,
+              player_name: `${player.player_first_name} ${player.player_last_name}`,
+              division: editDivision,
+              session_date: editDate,
+              start_time: editStartTime,
+              end_time: editEndTime || null,
+              location: editLocation.trim(),
+              field: editField.trim() || null,
+              updated: true,
+            }),
+          });
+        } catch {
+          // continue sending to others
+        }
+      }
+
+      await fetchAll();
+      setEditingSession(null);
+    }
+    setSaving(false);
   }
 
   /* ---------- Assignment Helpers ---------- */
@@ -1222,16 +1305,28 @@ export default function TryoutsPage() {
                               </button>
                             </div>
                           ) : (
-                            <button
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                setDeletingId(session.id);
-                              }}
-                              className="p-2 rounded-lg text-gray-300 hover:text-flag-red hover:bg-flag-red/5 transition-colors ml-auto"
-                              title="Delete session"
-                            >
-                              <Trash2 size={16} />
-                            </button>
+                            <div className="flex items-center gap-1 ml-auto">
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  startEditing(session);
+                                }}
+                                className="p-2 rounded-lg text-gray-300 hover:text-flag-blue hover:bg-flag-blue/5 transition-colors"
+                                title="Edit session"
+                              >
+                                <Pencil size={16} />
+                              </button>
+                              <button
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  setDeletingId(session.id);
+                                }}
+                                className="p-2 rounded-lg text-gray-300 hover:text-flag-red hover:bg-flag-red/5 transition-colors"
+                                title="Delete session"
+                              >
+                                <Trash2 size={16} />
+                              </button>
+                            </div>
                           )}
                         </div>
 
@@ -1426,6 +1521,151 @@ export default function TryoutsPage() {
               >
                 <UserPlus size={14} />
                 Assign Selected ({selectedPlayerIds.size})
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Edit Session Modal */}
+      {editingSession && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/40 p-4">
+          <div className="bg-white rounded-xl shadow-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto">
+            <div className="flex items-center justify-between p-5 border-b border-gray-200">
+              <h2 className="font-display text-lg font-bold uppercase tracking-wide text-charcoal">
+                Edit Session
+              </h2>
+              <button
+                onClick={() => setEditingSession(null)}
+                className="p-2 rounded-lg text-gray-400 hover:text-charcoal hover:bg-gray-100 transition-colors"
+              >
+                <X size={20} />
+              </button>
+            </div>
+            <div className="p-5 space-y-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                    Division *
+                  </label>
+                  <select
+                    value={editDivision}
+                    onChange={(e) => setEditDivision(e.target.value)}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                  >
+                    {DIVISIONS.map((d) => (
+                      <option key={d} value={d}>{d}</option>
+                    ))}
+                  </select>
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                    Date *
+                  </label>
+                  <input
+                    type="date"
+                    value={editDate}
+                    onChange={(e) => setEditDate(e.target.value)}
+                    required
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                    Start Time *
+                  </label>
+                  <input
+                    type="time"
+                    value={editStartTime}
+                    onChange={(e) => setEditStartTime(e.target.value)}
+                    required
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                    End Time
+                  </label>
+                  <input
+                    type="time"
+                    value={editEndTime}
+                    onChange={(e) => setEditEndTime(e.target.value)}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                  />
+                </div>
+              </div>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                    Location *
+                  </label>
+                  <input
+                    type="text"
+                    value={editLocation}
+                    onChange={(e) => setEditLocation(e.target.value)}
+                    required
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                    Field
+                  </label>
+                  <input
+                    type="text"
+                    value={editField}
+                    onChange={(e) => setEditField(e.target.value)}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                    Max Players
+                  </label>
+                  <input
+                    type="number"
+                    value={editMaxPlayers}
+                    onChange={(e) => setEditMaxPlayers(parseInt(e.target.value, 10) || 30)}
+                    min={1}
+                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                  />
+                </div>
+              </div>
+              <div>
+                <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                  Notes
+                </label>
+                <textarea
+                  value={editNotes}
+                  onChange={(e) => setEditNotes(e.target.value)}
+                  rows={2}
+                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 resize-none"
+                />
+              </div>
+
+              {/* Info about update emails */}
+              {assignments.filter((a) => a.session_id === editingSession.id && a.invited_at).length > 0 && (
+                <div className="bg-star-gold/10 border border-star-gold/20 rounded-lg p-3">
+                  <p className="text-xs text-star-gold font-semibold">
+                    <Mail size={12} className="inline mr-1" />
+                    {assignments.filter((a) => a.session_id === editingSession.id && a.invited_at).length} player(s) have already been invited. Saving will automatically send them an update email with the new details.
+                  </p>
+                </div>
+              )}
+            </div>
+            <div className="p-5 border-t border-gray-200 flex items-center justify-end gap-3">
+              <button
+                onClick={() => setEditingSession(null)}
+                className="px-4 py-2 rounded-lg text-sm font-semibold text-gray-600 hover:bg-gray-100 transition-colors"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleSaveEdit}
+                disabled={saving || !editDate || !editStartTime || !editLocation.trim()}
+                className="inline-flex items-center gap-2 bg-flag-blue text-white px-5 py-2 rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors disabled:opacity-50"
+              >
+                {saving ? "Saving & Notifying..." : "Save Changes"}
               </button>
             </div>
           </div>

@@ -12,7 +12,8 @@ function getTryoutInviteHtml(
   startTime: string,
   endTime: string | null,
   location: string,
-  field: string | null
+  field: string | null,
+  isUpdated: boolean = false
 ) {
   // Format date
   const d = new Date(sessionDate + "T00:00:00");
@@ -49,9 +50,12 @@ function getTryoutInviteHtml(
 </div>
 <div style="background:#C1121F;height:4px;"></div>
 <div style="padding:32px 24px;background:#ffffff;">
-<h2 style="color:#0A2342;font-size:22px;margin:0 0 16px;letter-spacing:1px;">YOUR TRYOUT TIME</h2>
+<h2 style="color:#0A2342;font-size:22px;margin:0 0 16px;letter-spacing:1px;">${isUpdated ? "UPDATED TRYOUT TIME" : "YOUR TRYOUT TIME"}</h2>
 <p style="color:#4B5563;font-size:15px;line-height:1.6;margin:0 0 8px;">Hi ${parentName},</p>
-<p style="color:#4B5563;font-size:15px;line-height:1.6;margin:0 0 24px;">We're excited to let you know that <strong style="color:#0A2342;">${playerName}</strong>'s tryout time has been scheduled for the ${division} division.</p>
+${isUpdated
+  ? `<p style="color:#C1121F;font-size:15px;line-height:1.6;margin:0 0 8px;font-weight:bold;">Please note: the tryout details for <strong style="color:#0A2342;">${playerName}</strong> have been updated. See the new information below.</p>`
+  : ""}
+<p style="color:#4B5563;font-size:15px;line-height:1.6;margin:0 0 24px;">${isUpdated ? `Here are the updated details for ${playerName}'s ${division} tryout:` : `We're excited to let you know that <strong style="color:#0A2342;">${playerName}</strong>'s tryout time has been scheduled for the ${division} division.`}</p>
 
 <div style="background:#F0F4FF;border:2px solid #0A2342;border-radius:8px;padding:24px;margin:0 0 24px;text-align:center;">
 <p style="color:#0A2342;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:2px;margin:0 0 12px;">Tryout Details</p>
@@ -96,7 +100,10 @@ export async function POST(request: NextRequest) {
       end_time,
       location,
       field,
+      updated,
     } = body;
+
+    const isUpdated = !!updated;
 
     if (!parent_email || !player_name || !session_date) {
       return NextResponse.json(
@@ -113,14 +120,17 @@ export async function POST(request: NextRequest) {
       start_time || "",
       end_time || null,
       location || "",
-      field || null
+      field || null,
+      isUpdated
     );
 
     if (resend) {
       const { error } = await resend.emails.send({
         from: "Irvine All-Stars <noreply@irvineallstars.com>",
         to: parent_email,
-        subject: `${player_name}'s Tryout Time — ${division}`,
+        subject: isUpdated
+          ? `Updated: ${player_name}'s Tryout Time — ${division}`
+          : `${player_name}'s Tryout Time — ${division}`,
         html: htmlContent,
       });
 
