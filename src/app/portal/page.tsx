@@ -22,7 +22,7 @@ interface Registration {
   division: string;
   primary_position: string;
   status: string;
-  created_at: string;
+  submitted_at: string;
 }
 
 interface PlayerDocument {
@@ -153,10 +153,10 @@ export default function PortalPage() {
       const { data: regs } = await supabase!
         .from("tryout_registrations")
         .select(
-          "id, parent_name, parent_email, player_first_name, player_last_name, player_date_of_birth, division, primary_position, status, created_at"
+          "id, parent_name, parent_email, player_first_name, player_last_name, player_date_of_birth, division, primary_position, status, submitted_at"
         )
         .or(`parent_email.eq.${user!.email},secondary_parent_email.eq.${user!.email}`)
-        .order("created_at", { ascending: false });
+        .order("submitted_at", { ascending: false });
 
       const regData = (regs ?? []) as Registration[];
       setRegistrations(regData);
@@ -531,7 +531,7 @@ export default function PortalPage() {
                       )}
                       <span>
                         <span className="font-semibold text-charcoal">Submitted:</span>{" "}
-                        {new Date(reg.created_at).toLocaleDateString("en-US", {
+                        {new Date(reg.submitted_at).toLocaleDateString("en-US", {
                           month: "short",
                           day: "numeric",
                           year: "numeric",
