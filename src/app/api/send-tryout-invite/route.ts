@@ -13,7 +13,8 @@ function getTryoutInviteHtml(
   endTime: string | null,
   location: string,
   field: string | null,
-  isUpdated: boolean = false
+  isUpdated: boolean = false,
+  registrationId: string = ""
 ) {
   // Format date
   const d = new Date(sessionDate + "T00:00:00");
@@ -75,8 +76,9 @@ ${isUpdated
 </div>
 
 <div style="text-align:center;margin:24px 0;">
-<a href="https://irvineallstars.com/portal" style="background:#C1121F;color:#ffffff;padding:14px 32px;text-decoration:none;font-size:14px;font-weight:bold;letter-spacing:2px;border-radius:6px;display:inline-block;">VIEW PARENT PORTAL</a>
+<a href="https://irvineallstars.com/portal/confirm?id=${registrationId}" style="background:#C1121F;color:#ffffff;padding:14px 32px;text-decoration:none;font-size:14px;font-weight:bold;letter-spacing:2px;border-radius:6px;display:inline-block;">CONFIRM ATTENDANCE</a>
 </div>
+<p style="color:#9CA3AF;font-size:13px;line-height:1.5;text-align:center;margin:0 0 16px;">Please confirm so we know to expect ${playerName} at tryouts.</p>
 
 <p style="color:#9CA3AF;font-size:13px;line-height:1.5;">Questions? Contact us at <a href="mailto:AllStars@irvinepony.com" style="color:#0A2342;">AllStars@irvinepony.com</a></p>
 </div>
@@ -101,6 +103,7 @@ export async function POST(request: NextRequest) {
       location,
       field,
       updated,
+      registration_id,
     } = body;
 
     const isUpdated = !!updated;
@@ -121,7 +124,8 @@ export async function POST(request: NextRequest) {
       end_time || null,
       location || "",
       field || null,
-      isUpdated
+      isUpdated,
+      registration_id || ""
     );
 
     if (resend) {

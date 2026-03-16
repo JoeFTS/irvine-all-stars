@@ -23,6 +23,7 @@ import {
 
 type Status =
   | "registered"
+  | "invited"
   | "confirmed"
   | "tryout_complete"
   | "selected"
@@ -110,6 +111,7 @@ const DIVISION_COLORS: Record<string, string> = {
 
 const STATUS_OPTIONS: { value: Status; label: string; color: string }[] = [
   { value: "registered", label: "Registered", color: "bg-gray-100 text-gray-600" },
+  { value: "invited", label: "Invited", color: "bg-blue-50 text-blue-600" },
   { value: "confirmed", label: "Confirmed", color: "bg-green-100 text-green-700" },
   { value: "tryout_complete", label: "Tryout Complete", color: "bg-blue-100 text-blue-700" },
   { value: "selected", label: "Selected", color: "bg-green-100 text-green-800 font-bold" },
@@ -477,6 +479,7 @@ export default function TryoutsPage() {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
+          registration_id: player.id,
           parent_name: player.parent_name,
           parent_email: player.parent_email,
           player_name: `${player.player_first_name} ${player.player_last_name}`,
@@ -500,6 +503,20 @@ export default function TryoutsPage() {
           a.id === assignment.id ? { ...a, invited_at: now } : a
         )
       );
+
+      // Auto-update player status to "invited" if still "registered"
+      if (player.status === "registered") {
+        await supabase
+          .from("tryout_registrations")
+          .update({ status: "invited" })
+          .eq("id", player.id);
+
+        setRegistrations((prev) =>
+          prev.map((r) =>
+            r.id === player.id ? { ...r, status: "invited" as Status } : r
+          )
+        );
+      }
     } catch {
       // silently fail individual invite
     }

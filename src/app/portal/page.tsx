@@ -458,6 +458,34 @@ export default function PortalPage() {
                                   {session.field ? `, ${session.field}` : ""}
                                 </span>
                               </div>
+                              {(reg.status === "registered" || reg.status === "invited") && (
+                                <button
+                                  onClick={async () => {
+                                    try {
+                                      await fetch("/api/confirm-tryout", {
+                                        method: "POST",
+                                        headers: { "Content-Type": "application/json" },
+                                        body: JSON.stringify({ registration_id: reg.id }),
+                                      });
+                                      setRegistrations((prev) =>
+                                        prev.map((r) =>
+                                          r.id === reg.id ? { ...r, status: "confirmed" } : r
+                                        )
+                                      );
+                                    } catch {
+                                      // silently fail
+                                    }
+                                  }}
+                                  className="mt-3 inline-block bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded font-display text-xs font-semibold uppercase tracking-widest transition-colors"
+                                >
+                                  Confirm Attendance
+                                </button>
+                              )}
+                              {reg.status === "confirmed" && (
+                                <p className="mt-3 text-green-600 text-xs font-semibold flex items-center gap-1">
+                                  &#10003; Attendance Confirmed
+                                </p>
+                              )}
                             </div>
                           )}
                           {!session && !isIncomplete && (
