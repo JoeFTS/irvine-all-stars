@@ -24,7 +24,6 @@ type Status =
   | "selected"
   | "not_selected"
   | "alternate"
-  | "waitlisted"
   | "withdrawn";
 
 type Tab = "players" | "sessions";
@@ -111,7 +110,6 @@ const STATUS_OPTIONS: { value: Status; label: string; color: string }[] = [
   { value: "selected", label: "Selected", color: "bg-green-100 text-green-800 font-bold" },
   { value: "not_selected", label: "Not Selected", color: "bg-gray-100 text-gray-500" },
   { value: "alternate", label: "Alternate", color: "bg-orange-100 text-orange-700" },
-  { value: "waitlisted", label: "Waitlisted", color: "bg-star-gold/15 text-star-gold" },
   { value: "withdrawn", label: "Withdrawn", color: "bg-flag-red/10 text-flag-red" },
 ];
 
