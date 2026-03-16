@@ -9,6 +9,7 @@ import {
   Users2,
   BarChart3,
   Megaphone,
+  Mail,
 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 
@@ -19,6 +20,7 @@ const navItems = [
   { href: "/admin/scores", label: "Scores", icon: BarChart3 },
   { href: "/admin/announcements", label: "Announcements", icon: Megaphone },
   { href: "/admin/teams", label: "Teams", icon: Users2 },
+  { href: "/admin/invites", label: "Invites", icon: Mail },
 ];
 
 export default function AdminLayout({
