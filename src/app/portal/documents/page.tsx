@@ -14,8 +14,13 @@ import FileUpload from "@/components/file-upload";
 
 interface Registration {
   id: string;
-  player_name: string;
+  player_first_name: string;
+  player_last_name: string;
   division: string;
+}
+
+function playerFullName(reg: Registration): string {
+  return `${reg.player_first_name || ""} ${reg.player_last_name || ""}`.trim() || "Unknown Player";
 }
 
 interface PlayerContract {
@@ -76,7 +81,7 @@ function DocumentsPage() {
 
       const { data: regs } = await supabase!
         .from("tryout_registrations")
-        .select("id, player_name, division")
+        .select("id, player_first_name, player_last_name, division")
         .or(`parent_email.eq.${user!.email},secondary_parent_email.eq.${user!.email}`)
         .order("created_at", { ascending: false });
 
@@ -245,7 +250,7 @@ function DocumentsPage() {
                     {/* Player header */}
                     <div className="flex items-center gap-3 mb-6">
                       <h2 className="font-display text-xl font-bold uppercase tracking-wide">
-                        {reg.player_name}
+                        {playerFullName(reg)}
                       </h2>
                       <span className="inline-block text-xs uppercase tracking-wider px-2.5 py-1 rounded border font-display font-semibold bg-flag-blue/10 text-flag-blue border-flag-blue/30">
                         {reg.division}
@@ -272,7 +277,7 @@ function DocumentsPage() {
                         onUploadComplete={(filePath, fileName) =>
                           handleUploadComplete(
                             reg.id,
-                            reg.player_name,
+                            playerFullName(reg),
                             reg.division,
                             "birth_certificate",
                             filePath,
@@ -300,7 +305,7 @@ function DocumentsPage() {
                         onUploadComplete={(filePath, fileName) =>
                           handleUploadComplete(
                             reg.id,
-                            reg.player_name,
+                            playerFullName(reg),
                             reg.division,
                             "player_photo",
                             filePath,

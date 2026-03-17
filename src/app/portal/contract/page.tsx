@@ -13,9 +13,14 @@ import { StripeDivider } from "@/components/stripe-divider";
 
 interface Registration {
   id: string;
-  player_name: string;
+  player_first_name: string;
+  player_last_name: string;
   division: string;
   status: string;
+}
+
+function playerFullName(reg: Registration): string {
+  return `${reg.player_first_name || ""} ${reg.player_last_name || ""}`.trim() || "Unknown Player";
 }
 
 interface ExistingContract {
@@ -135,7 +140,7 @@ function ContractPage() {
 
       const { data: regs } = await supabase!
         .from("tryout_registrations")
-        .select("id, player_name, division, status")
+        .select("id, player_first_name, player_last_name, division, status")
         .or(`parent_email.eq.${user!.email},secondary_parent_email.eq.${user!.email}`)
         .order("created_at", { ascending: false });
 
@@ -184,7 +189,7 @@ function ContractPage() {
       .from("player_contracts")
       .insert({
         registration_id: selectedRegId,
-        player_name: selectedReg.player_name,
+        player_name: playerFullName(selectedReg),
         division: selectedReg.division,
         parent_name: signature.trim(),
         parent_email: user.email,
@@ -308,7 +313,7 @@ function ContractPage() {
                   >
                     {registrations.map((reg) => (
                       <option key={reg.id} value={reg.id}>
-                        {reg.player_name} — {reg.division}
+                        {playerFullName(reg)} — {reg.division}
                       </option>
                     ))}
                   </select>
@@ -339,7 +344,7 @@ function ContractPage() {
                   <p className="text-gray-600 text-sm mb-1">
                     The player contract for{" "}
                     <span className="font-semibold">
-                      {selectedReg?.player_name}
+                      {selectedReg ? playerFullName(selectedReg) : ""}
                     </span>{" "}
                     has already been signed.
                   </p>
@@ -371,7 +376,7 @@ function ContractPage() {
                   <p className="text-gray-600 text-sm mb-1">
                     Thank you for signing the player contract for{" "}
                     <span className="font-semibold">
-                      {selectedReg?.player_name}
+                      {selectedReg ? playerFullName(selectedReg) : ""}
                     </span>
                     .
                   </p>
@@ -386,7 +391,7 @@ function ContractPage() {
                   <div className="bg-white rounded-lg border border-gray-200 p-6 md:p-8 mb-6">
                     <div className="flex items-center gap-3 mb-4">
                       <h2 className="font-display text-xl font-bold uppercase tracking-wide">
-                        {selectedReg?.player_name}
+                        {selectedReg ? playerFullName(selectedReg) : ""}
                       </h2>
                       <span className="inline-block text-xs uppercase tracking-wider px-2.5 py-1 rounded border font-display font-semibold bg-flag-blue/10 text-flag-blue border-flag-blue/30">
                         {selectedReg?.division}
@@ -395,7 +400,7 @@ function ContractPage() {
                     <p className="text-gray-700 text-sm leading-relaxed">
                       Congratulations on{" "}
                       <span className="font-semibold">
-                        {selectedReg?.player_name}
+                        {selectedReg ? playerFullName(selectedReg) : ""}
                       </span>
                       &apos;s selection to the Irvine PONY{" "}
                       <span className="font-semibold">
