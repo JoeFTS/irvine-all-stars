@@ -188,9 +188,15 @@ function ContractPage() {
         division: selectedReg.division,
         parent_name: signature.trim(),
         parent_email: user.email,
-        parent_user_id: user.id,
+        parent_signature: signature.trim(),
         planned_vacations: vacations.trim() || null,
-        acknowledged_items: acknowledgments,
+        acknowledge_eligibility: checks[0],
+        acknowledge_no_travel_ball: checks[1],
+        acknowledge_tournament_schedule: checks[2],
+        acknowledge_fees: checks[3],
+        acknowledge_practices: checks[4],
+        acknowledge_conduct: checks[5],
+        acknowledge_no_playing_guarantee: checks[6],
         signed_at: new Date().toISOString(),
       });
 
