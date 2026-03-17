@@ -30,7 +30,7 @@
 - [x] Resend email integration
 - [x] Division names corrected (9U-Mustang, 12U-Bronco)
 - [x] /portal placeholder page
-- [ ] Add RESEND_API_KEY to VPS .env.local (Joe needs to create Resend account)
+- [x] Add RESEND_API_KEY to VPS .env.local
 - [ ] Test full e2e form submission on production
 
 ## Phase 3: Auth + Evaluator Scoring ✅
@@ -70,9 +70,9 @@
 - [ ] Tournament Hub
 - [ ] Photo Gallery
 - [ ] Post-Season Survey
-- [ ] Set up Joe's admin account in Supabase
+- [x] Admin account set up (allstars@irvinepony.com)
 
 ---
 **Status:** Phases 0-5 COMPLETE. 22 routes live at irvineallstars.com.
-**Remaining:** Phase 6 polish items + Resend API key setup + admin account creation
-**Last Updated:** 2026-03-14
+**Remaining:** Phase 6 polish items
+**Last Updated:** 2026-03-16

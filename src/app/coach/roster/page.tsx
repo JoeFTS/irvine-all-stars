@@ -342,6 +342,7 @@ export default function CoachRosterPage() {
         .select(
           "id, player_first_name, player_last_name, division, jersey_number, primary_position, secondary_position, bats, throws, parent_name, parent_email, parent_phone, emergency_contact_name, emergency_contact_phone"
         )
+        .in("status", ["selected", "alternate"])
         .order("division")
         .order("player_last_name"),
       supabase
@@ -350,7 +351,14 @@ export default function CoachRosterPage() {
       supabase.from("player_contracts").select("registration_id"),
     ]);
 
-    if (regsRes.data) setRegistrations(regsRes.data);
+    // Only show players who have signed their contracts
+    const signedRegIds = new Set(
+      (contractsRes.data ?? []).map((c: any) => c.registration_id)
+    );
+    const allRegs = regsRes.data ?? [];
+    const signedRegs = allRegs.filter((r: any) => signedRegIds.has(r.id));
+
+    setRegistrations(signedRegs);
     if (docsRes.data) setDocuments(docsRes.data);
     if (contractsRes.data) setContracts(contractsRes.data);
 

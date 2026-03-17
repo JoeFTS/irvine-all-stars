@@ -509,14 +509,14 @@ export default function PortalPage() {
         <section className="bg-white py-12 md:py-16 px-6 md:px-10">
           <div className="max-w-4xl mx-auto">
             <p className="font-display text-sm font-semibold text-flag-red uppercase tracking-[3px] mb-2">
-              &#9733; Looking Ahead
+              &#9733; Compliance
             </p>
             <h2 className="font-display text-2xl md:text-3xl font-bold uppercase tracking-wide mb-3">
-              If Your Player Makes All-Stars
+              Tournament Readiness
             </h2>
             <p className="text-gray-600 text-sm leading-relaxed mb-6">
-              If your player is selected for an All-Stars team, the following items will be required.
-              You can get a head start now, or wait until teams are announced.
+              Complete each step in order. Once your player is selected for a team,
+              the next steps will unlock.
             </p>
 
             <div className="space-y-4">
@@ -535,22 +535,28 @@ export default function PortalPage() {
                   (c) => c.registration_id === reg.id
                 );
 
+                const isSelected = reg.status === "selected";
+                const isOnTeam = isSelected || reg.status === "alternate";
+
                 const items = [
-                  { label: "Register for tryouts", done: true, href: "#" },
+                  { label: "Register for tryouts", done: true, href: "#", locked: false },
                   {
-                    label: "Upload birth certificate",
-                    done: hasBirthCert,
-                    href: "/portal/documents",
+                    label: "Sign player contract",
+                    done: hasContract,
+                    href: `/portal/contract?player=${reg.id}`,
+                    locked: !isOnTeam,
                   },
                   {
                     label: "Upload player photo",
                     done: hasPhoto,
-                    href: "/portal/documents",
+                    href: `/portal/documents?player=${reg.id}`,
+                    locked: !hasContract,
                   },
                   {
-                    label: "Sign player contract",
-                    done: hasContract,
-                    href: "/portal/contract",
+                    label: "Upload birth certificate",
+                    done: hasBirthCert,
+                    href: `/portal/documents?player=${reg.id}`,
+                    locked: !hasContract,
                   },
                 ];
 
@@ -570,7 +576,7 @@ export default function PortalPage() {
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
                       <div className="flex items-center gap-3">
                         <h3 className="font-display text-xl font-bold uppercase tracking-wide">
-                          {reg.player_name}
+                          {`${reg.player_first_name || ""} ${reg.player_last_name || ""}`.trim() || "Unknown Player"}
                         </h3>
                         <span className="inline-block text-xs uppercase tracking-wider px-2.5 py-1 rounded border font-display font-semibold bg-flag-blue/10 text-flag-blue border-flag-blue/30">
                           {reg.division}
@@ -641,6 +647,23 @@ export default function PortalPage() {
                                 {item.label}
                               </span>
                             </div>
+                          ) : item.locked ? (
+                            <div className="flex items-center gap-3 text-sm text-gray-400 cursor-not-allowed">
+                              <svg
+                                className="h-5 w-5 shrink-0 text-gray-300"
+                                fill="none"
+                                viewBox="0 0 24 24"
+                                stroke="currentColor"
+                                strokeWidth={2}
+                              >
+                                <path
+                                  strokeLinecap="round"
+                                  strokeLinejoin="round"
+                                  d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z"
+                                />
+                              </svg>
+                              <span>{item.label}</span>
+                            </div>
                           ) : (
                             <Link
                               href={item.href}
@@ -668,6 +691,18 @@ export default function PortalPage() {
                         </li>
                       ))}
                     </ul>
+
+                    {/* Hint messages for locked items */}
+                    {!isOnTeam && (
+                      <p className="mt-3 text-xs text-gray-400 italic">
+                        Steps 2-4 will unlock once your player is selected for a team.
+                      </p>
+                    )}
+                    {isOnTeam && !hasContract && (
+                      <p className="mt-3 text-xs text-gray-400 italic">
+                        Sign the player contract to unlock document uploads.
+                      </p>
+                    )}
                   </div>
                 );
               })}

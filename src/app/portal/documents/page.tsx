@@ -1,8 +1,8 @@
 "use client";
 
-import { useEffect, useState, useCallback } from "react";
+import { Suspense, useEffect, useState, useCallback } from "react";
 import Link from "next/link";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { supabase } from "@/lib/supabase";
 import { StripeDivider } from "@/components/stripe-divider";
@@ -18,6 +18,11 @@ interface Registration {
   division: string;
 }
 
+interface PlayerContract {
+  id: string;
+  registration_id: string;
+}
+
 interface PlayerDocument {
   id: string;
   registration_id: string;
@@ -30,10 +35,25 @@ interface PlayerDocument {
 /*  Page Component                                                     */
 /* ------------------------------------------------------------------ */
 
-export default function DocumentsPage() {
+export default function DocumentsPageWrapper() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-off-white pt-[98px] flex items-center justify-center">
+        <p className="text-gray-400 font-display uppercase tracking-wider text-sm">Loading...</p>
+      </div>
+    }>
+      <DocumentsPage />
+    </Suspense>
+  );
+}
+
+function DocumentsPage() {
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const playerParam = searchParams.get("player");
   const { user, loading: authLoading } = useAuth();
   const [registrations, setRegistrations] = useState<Registration[]>([]);
+  const [contracts, setContracts] = useState<PlayerContract[]>([]);
   const [documents, setDocuments] = useState<PlayerDocument[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
 
@@ -60,17 +80,33 @@ export default function DocumentsPage() {
         .or(`parent_email.eq.${user!.email},secondary_parent_email.eq.${user!.email}`)
         .order("created_at", { ascending: false });
 
-      const regData = (regs ?? []) as Registration[];
-      setRegistrations(regData);
+      const allRegs = (regs ?? []) as Registration[];
 
-      if (regData.length > 0) {
-        const regIds = regData.map((r) => r.id);
-        const { data: docs } = await supabase!
-          .from("player_documents")
-          .select("id, registration_id, document_type, file_path, file_name")
-          .in("registration_id", regIds);
+      if (allRegs.length > 0) {
+        const regIds = allRegs.map((r) => r.id);
 
-        setDocuments((docs ?? []) as PlayerDocument[]);
+        // Fetch contracts and documents in parallel
+        const [contractsResult, docsResult] = await Promise.all([
+          supabase!
+            .from("player_contracts")
+            .select("id, registration_id")
+            .in("registration_id", regIds),
+          supabase!
+            .from("player_documents")
+            .select("id, registration_id, document_type, file_path, file_name")
+            .in("registration_id", regIds),
+        ]);
+
+        const contractData = (contractsResult.data ?? []) as PlayerContract[];
+        setContracts(contractData);
+        setDocuments((docsResult.data ?? []) as PlayerDocument[]);
+
+        // Only show players who have signed contracts
+        const signedRegIds = new Set(contractData.map((c) => c.registration_id));
+        const eligibleRegs = allRegs.filter((r) => signedRegIds.has(r.id));
+        setRegistrations(eligibleRegs);
+      } else {
+        setRegistrations([]);
       }
 
       setDataLoading(false);
@@ -176,15 +212,23 @@ export default function DocumentsPage() {
             </div>
           ) : registrations.length === 0 ? (
             <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
-              <p className="text-gray-500 mb-4">
-                No registered players found. You must register for tryouts
-                first.
+              <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
+                <svg className="h-7 w-7 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
+                </svg>
+              </div>
+              <h2 className="font-display text-xl font-bold uppercase tracking-wide mb-2">
+                Not Yet Available
+              </h2>
+              <p className="text-gray-500 text-sm mb-4">
+                Document uploads unlock after you sign the player contract.
+                Please complete the contract signing step first.
               </p>
               <Link
-                href="/apply/player"
-                className="inline-block bg-flag-red hover:bg-flag-red-dark text-white px-6 py-3 rounded font-display text-sm font-semibold uppercase tracking-widest transition-colors"
+                href="/portal"
+                className="inline-block bg-flag-blue hover:bg-flag-blue-mid text-white px-6 py-3 rounded font-display text-sm font-semibold uppercase tracking-widest transition-colors"
               >
-                Register for Tryouts
+                Back to Portal
               </Link>
             </div>
           ) : (
