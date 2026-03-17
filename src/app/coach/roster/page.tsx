@@ -435,7 +435,7 @@ export default function CoachRosterPage() {
           Team Roster
         </h1>
         <p className="text-gray-500 text-sm mt-1">
-          {totalPlayers} player{totalPlayers !== 1 ? "s" : ""} registered
+          {totalPlayers} player{totalPlayers !== 1 ? "s" : ""} on roster
         </p>
       </div>
 
@@ -478,8 +478,8 @@ export default function CoachRosterPage() {
           <Shield size={32} className="text-gray-300 mx-auto mb-3" />
           <p className="text-gray-500 text-sm max-w-md mx-auto">
             {registrations.length === 0
-              ? "No players registered yet. Players will appear here after parents register through the tryout registration form."
-              : `No players registered in the ${divisionShortName(selectedDivision)} division.`}
+              ? "No players on your roster yet. Players appear here after they are selected for a team and their parent signs the player contract."
+              : `No players on roster in the ${divisionShortName(selectedDivision)} division.`}
           </p>
         </div>
       ) : (
