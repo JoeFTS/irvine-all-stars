@@ -353,6 +353,26 @@ export function PlayerRegistrationForm() {
     }
     setSubmitting(true);
 
+    // Check for duplicate registration (same player name + division + parent email)
+    if (!editId && supabase) {
+      const { data: existing } = await supabase
+        .from("tryout_registrations")
+        .select("id")
+        .ilike("player_first_name", form.player_first_name.trim())
+        .ilike("player_last_name", form.player_last_name.trim())
+        .eq("division", form.division)
+        .or(`parent_email.eq.${form.parent_email.trim().toLowerCase()},secondary_parent_email.eq.${form.parent_email.trim().toLowerCase()}`)
+        .limit(1);
+
+      if (existing && existing.length > 0) {
+        setSubmitting(false);
+        setErrors({
+          submit: `${form.player_first_name} ${form.player_last_name} is already registered for ${form.division}. If you need to make changes, please visit the Parent Portal or contact the coordinator.`,
+        });
+        return;
+      }
+    }
+
     const payload = {
       parent_name: form.parent_name.trim(),
       parent_email: form.parent_email.trim().toLowerCase(),
@@ -486,6 +506,29 @@ export function PlayerRegistrationForm() {
             </p>
           </div>
         </div>
+
+        {/* Register another child */}
+        <button
+          type="button"
+          onClick={() => {
+            setForm({
+              ...INITIAL_DATA,
+              parent_name: form.parent_name,
+              parent_email: form.parent_email,
+              parent_phone: form.parent_phone,
+              emergency_contact_name: form.emergency_contact_name,
+              emergency_contact_phone: form.emergency_contact_phone,
+            });
+            setStep(0);
+            setSubmitted(false);
+            setErrors({});
+            setEditId(null);
+            window.scrollTo({ top: 0, behavior: "smooth" });
+          }}
+          className="mt-6 inline-block bg-flag-blue hover:bg-flag-blue-mid text-white px-6 py-3 rounded-lg font-display text-sm font-semibold uppercase tracking-widest transition-colors"
+        >
+          Register Another Child
+        </button>
       </div>
     );
   }
