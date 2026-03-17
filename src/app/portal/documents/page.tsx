@@ -83,7 +83,7 @@ function DocumentsPage() {
         .from("tryout_registrations")
         .select("id, player_first_name, player_last_name, division")
         .or(`parent_email.eq.${user!.email},secondary_parent_email.eq.${user!.email}`)
-        .order("created_at", { ascending: false });
+        .order("submitted_at", { ascending: false });
 
       const allRegs = (regs ?? []) as Registration[];
 

@@ -142,7 +142,7 @@ function ContractPage() {
         .from("tryout_registrations")
         .select("id, player_first_name, player_last_name, division, status")
         .or(`parent_email.eq.${user!.email},secondary_parent_email.eq.${user!.email}`)
-        .order("created_at", { ascending: false });
+        .order("submitted_at", { ascending: false });
 
       // Only show players who have been selected for a team
       const regData = ((regs ?? []) as Registration[]).filter(
