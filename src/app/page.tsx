@@ -156,10 +156,10 @@ export default function Home() {
               &#9733; 2026 Divisions
             </p>
             <h2 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide text-[#0A2342] mb-3">
-              Ten Divisions of All-Stars
+              Twelve Divisions of All-Stars
             </h2>
             <p className="text-gray-600 text-lg max-w-xl mb-10 leading-relaxed">
-              From Shetland to Bronco, every division gets its own tryout
+              From Shetland to Pony, every division gets its own tryout
               schedule, coaching staff, and summer of competition.
             </p>
           </RevealOnScroll>
@@ -197,8 +197,8 @@ export default function Home() {
       <section className="bg-[#0A2342] py-10 px-6 md:px-10">
         <StaggerReveal className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {[
-            { number: "10", label: "Divisions" },
-            { number: "120", label: "Roster Spots" },
+            { number: "12", label: "Divisions" },
+            { number: "144", label: "Roster Spots" },
             { number: "100", label: "Point Rubric" },
             { number: "Fair", label: "& Transparent" },
           ].map((stat) => (

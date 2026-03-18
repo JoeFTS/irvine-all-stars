@@ -54,31 +54,31 @@ const rubricItems = [
 const timelineSteps = [
   {
     step: "1",
-    title: "Submit Application",
-    date: "April 1 - April 21",
+    title: "Declare Candidacy",
+    date: "By March 22",
     description:
-      "Complete the online coach application form. Include your coaching history, proposed staff, and division preference.",
+      "Email PonyBroncoVP@irvinepony.com with a paragraph or two about your qualifications, coaching philosophy, and goals for being an All-Star coach.",
   },
   {
     step: "2",
-    title: "Committee Review",
-    date: "April 22 - April 28",
+    title: "Candidate Statements Distributed",
+    date: "March 23",
     description:
-      "The All-Stars Committee reviews all applications, checks references, and scores each candidate on the 100-point rubric.",
+      "Your candidate statement is distributed to all coaches in your division. This is the deadline to formally declare candidacy.",
   },
   {
     step: "3",
-    title: "Interview",
-    date: "April 29 - May 3",
+    title: "Peer Coach Voting & Nominations",
+    date: "March 24 - 26",
     description:
-      "Top candidates are invited for a brief interview with the committee. Share your coaching philosophy and vision for the team.",
+      "All coaches in your division vote on All-Star coach candidates. Player nominations are also collected during this period.",
   },
   {
     step: "4",
-    title: "Selection & Notification",
-    date: "May 5",
+    title: "Coaches Named",
+    date: "March 27",
     description:
-      "Head coaches are selected and notified. Coaching staffs are finalized and announced to the league.",
+      "All-Star head coaches are announced. Coaches with the highest vote are designated as the A team coach if multiple teams are formed.",
   },
 ];
 
@@ -228,8 +228,8 @@ export default function CoachesPage() {
             Application Process
           </h2>
           <p className="text-gray-600 text-lg max-w-xl mb-10 leading-relaxed">
-            From application to selection in about five weeks. Here&apos;s what
-            to expect.
+            From candidacy to selection in about one week. Here&apos;s the
+            process.
           </p>
 
           <div className="space-y-0">

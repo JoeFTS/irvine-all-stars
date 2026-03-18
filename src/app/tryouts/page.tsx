@@ -6,11 +6,11 @@ import { StripeDivider } from "@/components/stripe-divider";
 export const metadata: Metadata = {
   title: "All-Stars Tryouts",
   description:
-    "Everything you need to know about Irvine Pony Baseball All-Stars tryouts. Schedule, scoring rubric, what to bring, and what to expect for all ten divisions.",
+    "Everything you need to know about Irvine Pony Baseball All-Stars tryouts. Schedule, scoring rubric, what to bring, and what to expect for all twelve divisions.",
   openGraph: {
     title: "All-Stars Tryouts",
     description:
-      "Tryout schedule, scoring rubric, and what to expect for all ten Irvine All-Stars divisions.",
+      "Tryout schedule, scoring rubric, and what to expect for all twelve Irvine All-Stars divisions.",
   },
 };
 
@@ -137,7 +137,7 @@ export default function TryoutsPage() {
             Tryout Schedule
           </h2>
           <p className="text-gray-600 text-lg max-w-xl mb-8 leading-relaxed">
-            All ten divisions have dedicated tryout dates. Find your
+            All twelve divisions have scheduled tryout dates. Find your
             player&apos;s division below.
           </p>
 

@@ -22,6 +22,8 @@ const DIVISIONS = [
   { value: "10U-Mustang", label: "10U - Mustang", minAge: 9, maxAge: 10 },
   { value: "11U-Bronco", label: "11U - Bronco", minAge: 10, maxAge: 11 },
   { value: "12U-Bronco", label: "12U - Bronco", minAge: 11, maxAge: 12 },
+  { value: "13U-Pony", label: "13U - Pony", minAge: 12, maxAge: 13 },
+  { value: "14U-Pony", label: "14U - Pony", minAge: 13, maxAge: 14 },
 ] as const;
 
 const POSITIONS = [
@@ -492,17 +494,16 @@ export function PlayerRegistrationForm() {
           </h3>
           <div className="space-y-2 text-gray-600 text-sm">
             <p>
-              <strong>May 10:</strong> 7U Shetland &amp; 8U Pinto tryouts
+              <strong>March 23:</strong> Coach candidacy deadline
             </p>
             <p>
-              <strong>May 11:</strong> 9U Mustang &amp; 10U Mustang tryouts
+              <strong>March 27:</strong> All-Star coaches named
             </p>
             <p>
-              <strong>May 12:</strong> 11U Bronco &amp; 12U Bronco tryouts
+              <strong>April 12:</strong> All-Star tryouts (all Bronco &amp; Pony divisions)
             </p>
             <p>
-              <strong>Mid-May:</strong> Roster announcements &amp; practices
-              begin
+              <strong>April 14:</strong> All-Star players notified
             </p>
           </div>
         </div>

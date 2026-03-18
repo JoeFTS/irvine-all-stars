@@ -78,7 +78,7 @@ export const divisions: Division[] = [
     ageGroup: "Ages 10-11",
     ponyName: "Bronco",
     rosterSize: 12,
-    tryoutDate: "May 12",
+    tryoutDate: "April 12",
   },
   {
     id: "12u",
@@ -86,6 +86,22 @@ export const divisions: Division[] = [
     ageGroup: "Ages 11-12",
     ponyName: "Bronco",
     rosterSize: 12,
-    tryoutDate: "May 12",
+    tryoutDate: "April 12",
+  },
+  {
+    id: "13u",
+    name: "13U",
+    ageGroup: "Ages 12-13",
+    ponyName: "Pony",
+    rosterSize: 12,
+    tryoutDate: "April 12",
+  },
+  {
+    id: "14u",
+    name: "14U",
+    ageGroup: "Ages 13-14",
+    ponyName: "Pony",
+    rosterSize: 12,
+    tryoutDate: "April 12",
   },
 ];

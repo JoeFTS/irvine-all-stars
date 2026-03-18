@@ -47,7 +47,7 @@ const faqSections: FaqSection[] = [
         answer: (
           <>
             All-Stars is a significant commitment. Expect practices 2&ndash;4
-            times per week plus games and tournaments from late May through July.
+            times per week plus games and tournaments from late May through early August.
             Weeknight practices are typically 1.5&ndash;2 hours, and tournament
             weekends may involve multiple games per day. Families should be
             prepared for a busy summer schedule.
@@ -172,11 +172,11 @@ const faqSections: FaqSection[] = [
         question: "What divisions are there?",
         answer: (
           <>
-            Irvine All-Stars fields ten divisions: 5U Shetland, 6U
+            Irvine All-Stars fields twelve divisions: 5U Shetland, 6U
             Shetland, 7U Pinto Machine Pitch, 7U Pinto Kid Pitch, 8U Pinto
             Machine Pitch, 8U Pinto Kid Pitch, 9U Mustang, 10U Mustang, 11U
-            Bronco, and 12U Bronco. Each division has its own tryout schedule,
-            coaching staff, and tournament calendar.
+            Bronco, 12U Bronco, 13U Pony, and 14U Pony. Each division has its
+            own tryout schedule, coaching staff, and tournament calendar.
           </>
         ),
       },

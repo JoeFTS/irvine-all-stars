@@ -13,6 +13,7 @@ import {
   AlertCircle,
   Calendar,
   ChevronRight,
+  ExternalLink,
 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { supabase } from "@/lib/supabase";
@@ -68,9 +69,14 @@ const quickLinks = [
 ];
 
 const upcomingDates = [
-  { event: "Memorial Day Tournament", date: "May 21 - 25" },
-  { event: "Pre-Tournament Manager Meeting", date: "June 1 - 12 (dates TBA)" },
-  { event: "District Tournament", date: "June (dates TBA)" },
+  { event: "Coach Candidacy Deadline", date: "March 22" },
+  { event: "Peer Coach Voting", date: "March 24 - 26" },
+  { event: "All-Star Coaches Named", date: "March 27" },
+  { event: "Scouting Period", date: "March 28 - April 11" },
+  { event: "All-Star Tryouts", date: "April 12" },
+  { event: "Players Notified", date: "April 14" },
+  { event: "Memorial Day Tournament", date: "Late May (league-funded)" },
+  { event: "District Tournaments Begin", date: "June 11" },
   { event: "Binder Sign-Off Deadline", date: "Before your first tournament game" },
 ];
 
@@ -392,6 +398,15 @@ export default function CoachDashboardPage() {
             </li>
           ))}
         </ul>
+        <a
+          href="https://docs.google.com/spreadsheets/d/1Drx76VHKBQrb-dcL8nCfBUfxZio9pVXBVf01HHbcuh0/edit?gid=1045930144#gid=1045930144"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-flag-blue hover:text-flag-red transition-colors"
+        >
+          <ExternalLink size={14} />
+          View Full Sanction Play Schedule
+        </a>
       </div>
 
       {/* 5. Announcements (if any) */}
