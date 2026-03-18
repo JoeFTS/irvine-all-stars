@@ -153,14 +153,12 @@ export default function CoachScoresPage() {
         return;
       }
 
-      // If existing scores, replace them
-      if (existingScores.length > 0) {
-        const existingIds = existingScores.map((s) => s.id);
-        await supabase
-          .from("evaluator_scores")
-          .delete()
-          .in("id", existingIds);
-      }
+      // Always delete all previous scores by this coach in this division
+      await supabase
+        .from("evaluator_scores")
+        .delete()
+        .eq("evaluator_name", coachName)
+        .eq("division", division);
 
       // Insert new scores
       const dbRows = valid.map((score) => ({
