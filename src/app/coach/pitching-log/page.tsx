@@ -18,10 +18,10 @@ const PITCHING_DIVISIONS = [
 const BLANK_ROWS = 12;
 
 /**
- * On beforeprint: hide everything except #pitching-log-print-area
- * by walking up from the print area and hiding siblings.
+ * On beforeprint: walk up from #pitching-log-print-area to body,
+ * hiding all sibling elements at each level and collapsing wrapper spacing.
  * On afterprint: restore everything.
- * Also injects @page { size: landscape } via a style tag.
+ * Also injects @page { size: landscape }.
  */
 function usePrintStyles() {
   useEffect(() => {
@@ -30,57 +30,53 @@ function usePrintStyles() {
     style.textContent = `@page { size: landscape; margin: 0.25in; }`;
     document.head.appendChild(style);
 
-    const hidden: HTMLElement[] = [];
+    const hiddenSiblings: HTMLElement[] = [];
+    const collapsedParents: HTMLElement[] = [];
 
     function beforePrint() {
       const printArea = document.getElementById("pitching-log-print-area");
       if (!printArea) return;
 
-      // Walk up from printArea to body, hiding all siblings at each level
-      let el: HTMLElement | null = printArea;
-      while (el && el !== document.body) {
-        const parent = el.parentElement;
-        if (parent) {
-          Array.from(parent.children).forEach((sibling) => {
-            if (sibling !== el && sibling instanceof HTMLElement && sibling.style.display !== "none") {
-              sibling.dataset.printHidden = sibling.style.display;
+      let current: HTMLElement | null = printArea;
+      while (current && current !== document.body) {
+        const par: HTMLElement | null = current.parentElement;
+        if (par) {
+          const cur = current;
+          Array.from(par.children).forEach((sibling) => {
+            if (sibling !== cur && sibling instanceof HTMLElement) {
+              sibling.dataset.printWas = sibling.style.display;
               sibling.style.display = "none";
-              hidden.push(sibling);
+              hiddenSiblings.push(sibling);
             }
           });
-          // Collapse wrapper padding/margins
-          parent.dataset.printPad = parent.style.padding;
-          parent.dataset.printMar = parent.style.margin;
-          parent.dataset.printMinH = parent.style.minHeight;
-          parent.style.padding = "0";
-          parent.style.margin = "0";
-          parent.style.minHeight = "0";
-          hidden.push(parent);
+          par.dataset.printPad = par.style.padding;
+          par.dataset.printMar = par.style.margin;
+          par.dataset.printMinH = par.style.minHeight;
+          par.style.padding = "0";
+          par.style.margin = "0";
+          par.style.minHeight = "0";
+          collapsedParents.push(par);
         }
-        el = parent;
+        current = par;
       }
     }
 
     function afterPrint() {
-      hidden.forEach((el) => {
-        if (el.dataset.printHidden !== undefined) {
-          el.style.display = el.dataset.printHidden;
-          delete el.dataset.printHidden;
-        }
-        if (el.dataset.printPad !== undefined) {
-          el.style.padding = el.dataset.printPad;
-          delete el.dataset.printPad;
-        }
-        if (el.dataset.printMar !== undefined) {
-          el.style.margin = el.dataset.printMar;
-          delete el.dataset.printMar;
-        }
-        if (el.dataset.printMinH !== undefined) {
-          el.style.minHeight = el.dataset.printMinH;
-          delete el.dataset.printMinH;
-        }
+      hiddenSiblings.forEach((el) => {
+        el.style.display = el.dataset.printWas ?? "";
+        delete el.dataset.printWas;
       });
-      hidden.length = 0;
+      hiddenSiblings.length = 0;
+
+      collapsedParents.forEach((el) => {
+        el.style.padding = el.dataset.printPad ?? "";
+        el.style.margin = el.dataset.printMar ?? "";
+        el.style.minHeight = el.dataset.printMinH ?? "";
+        delete el.dataset.printPad;
+        delete el.dataset.printMar;
+        delete el.dataset.printMinH;
+      });
+      collapsedParents.length = 0;
     }
 
     window.addEventListener("beforeprint", beforePrint);
