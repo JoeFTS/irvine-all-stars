@@ -1,26 +1,19 @@
 "use client";
 
-import { useEffect, useState, useCallback, useMemo } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/auth-context";
 import {
-  parseTSV,
   parseCSV,
   parseXLSX,
   validateScores,
-  VALID_SCORES,
-  MAX_TOTAL,
-  type ParsedScore,
 } from "@/lib/score-parser";
 import {
   Upload,
-  ClipboardPaste,
   Download,
-  Trash2,
   CheckCircle2,
-  AlertTriangle,
   XCircle,
-  Save,
+  FileSpreadsheet,
 } from "lucide-react";
 
 /* ---------- Types ---------- */
@@ -30,23 +23,10 @@ interface Profile {
   full_name: string | null;
 }
 
-interface Registration {
-  id: string;
-  player_first_name: string;
-  player_last_name: string;
-  primary_position: string;
-  bats: string;
-  throws: string;
-  current_team: string | null;
-  jersey_number: string | null;
-}
-
 interface ExistingScore {
   id: string;
   player_name: string;
 }
-
-type Tab = "paste" | "upload";
 
 /* ---------- Component ---------- */
 
@@ -55,19 +35,15 @@ export default function CoachScoresPage() {
 
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<Profile | null>(null);
-  const [registrations, setRegistrations] = useState<Registration[]>([]);
+  const [playerCount, setPlayerCount] = useState(0);
   const [existingScores, setExistingScores] = useState<ExistingScore[]>([]);
 
-  const [tab, setTab] = useState<Tab>("paste");
-  const [pasteText, setPasteText] = useState("");
-  const [parsedScores, setParsedScores] = useState<ParsedScore[] | null>(null);
-  const [submitting, setSubmitting] = useState(false);
-  const [submitResult, setSubmitResult] = useState<{
+  const [uploading, setUploading] = useState(false);
+  const [fileName, setFileName] = useState<string | null>(null);
+  const [result, setResult] = useState<{
     success: boolean;
-    count: number;
     message: string;
   } | null>(null);
-  const [showDuplicateDialog, setShowDuplicateDialog] = useState(false);
 
   /* ---- Data fetching ---- */
 
@@ -100,11 +76,8 @@ export default function CoachScoresPage() {
       const [regsResult, scoresResult] = await Promise.all([
         supabase
           .from("tryout_registrations")
-          .select(
-            "id, player_first_name, player_last_name, primary_position, bats, throws, current_team, jersey_number"
-          )
-          .eq("division", division)
-          .order("player_last_name"),
+          .select("id", { count: "exact", head: true })
+          .eq("division", division),
         supabase
           .from("evaluator_scores")
           .select("id, player_name")
@@ -113,7 +86,7 @@ export default function CoachScoresPage() {
       ]);
 
       if (cancelled) return;
-      setRegistrations((regsResult.data ?? []) as Registration[]);
+      setPlayerCount(regsResult.count ?? 0);
       setExistingScores((scoresResult.data ?? []) as ExistingScore[]);
       setLoading(false);
     }
@@ -127,120 +100,46 @@ export default function CoachScoresPage() {
   const division = profile?.division ?? null;
   const coachName = profile?.full_name ?? "Coach";
 
-  const registrationNames = useMemo(
-    () =>
-      registrations.map(
-        (r) => `${r.player_first_name} ${r.player_last_name}`
-      ),
-    [registrations]
-  );
-
-  /* ---- Parsing handlers ---- */
-
-  const handleParse = useCallback(() => {
-    if (!pasteText.trim()) return;
-    const raw = parseTSV(pasteText);
-    const validated = validateScores(raw, registrationNames);
-    setParsedScores(validated);
-    setSubmitResult(null);
-  }, [pasteText, registrationNames]);
+  /* ---- Upload handler ---- */
 
   const handleFileUpload = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
-      if (!file) return;
+      if (!file || !supabase || !division) return;
 
-      setSubmitResult(null);
+      setResult(null);
+      setUploading(true);
+      setFileName(file.name);
 
       try {
-        let raw: ParsedScore[];
-
-        if (
-          file.name.endsWith(".xlsx") ||
-          file.name.endsWith(".xls")
-        ) {
+        // Parse the file
+        let parsed;
+        if (file.name.endsWith(".xlsx") || file.name.endsWith(".xls")) {
           const buffer = await file.arrayBuffer();
-          raw = await parseXLSX(buffer);
+          parsed = await parseXLSX(buffer);
         } else {
           const text = await file.text();
-          raw = parseCSV(text);
+          parsed = parseCSV(text);
         }
 
-        const validated = validateScores(raw, registrationNames);
-        setParsedScores(validated);
-      } catch {
-        setParsedScores([]);
-      }
+        const validated = validateScores(parsed);
+        const valid = validated.filter(
+          (s) => s.status === "valid" || s.status === "warning"
+        );
 
-      // Reset input
-      e.target.value = "";
-    },
-    [registrationNames]
-  );
+        if (valid.length === 0) {
+          setResult({
+            success: false,
+            message:
+              "No valid scores found in the file. Make sure you filled in scores using the template.",
+          });
+          setUploading(false);
+          e.target.value = "";
+          return;
+        }
 
-
-  /* ---- Preview table handlers ---- */
-
-  const updateScore = useCallback(
-    (
-      idx: number,
-      field: keyof ParsedScore,
-      value: number | null | string
-    ) => {
-      setParsedScores((prev) => {
-        if (!prev) return prev;
-        const next = [...prev];
-        const row = { ...next[idx], [field]: value };
-        // Recalculate total
-        const vals = [
-          row.hitting,
-          row.fielding,
-          row.throwing,
-          row.running,
-          row.effort,
-          row.attitude,
-        ];
-        const filled = (vals.filter((v) => v !== null) as number[]);
-        row.total = filled.length > 0 ? filled.reduce((a, b) => a + b, 0) : null;
-        next[idx] = row;
-        return validateScores(next, registrationNames);
-      });
-    },
-    [registrationNames]
-  );
-
-  const removeRow = useCallback((idx: number) => {
-    setParsedScores((prev) => {
-      if (!prev) return prev;
-      return prev.filter((_, i) => i !== idx);
-    });
-  }, []);
-
-  /* ---- Submit ---- */
-
-  const validRows = useMemo(
-    () =>
-      parsedScores?.filter(
-        (s) => s.status === "valid" || s.status === "warning"
-      ) ?? [],
-    [parsedScores]
-  );
-
-  const errorCount = useMemo(
-    () => parsedScores?.filter((s) => s.status === "error").length ?? 0,
-    [parsedScores]
-  );
-
-  const handleSubmit = useCallback(
-    async (mode: "update" | "add") => {
-      if (!supabase || !division || validRows.length === 0) return;
-
-      setSubmitting(true);
-      setShowDuplicateDialog(false);
-
-      try {
-        if (mode === "update" && existingScores.length > 0) {
-          // Delete existing scores by this coach in this division
+        // If existing scores, replace them
+        if (existingScores.length > 0) {
           const existingIds = existingScores.map((s) => s.id);
           await supabase
             .from("evaluator_scores")
@@ -248,7 +147,8 @@ export default function CoachScoresPage() {
             .in("id", existingIds);
         }
 
-        const dbRows = validRows.map((score) => ({
+        // Insert new scores
+        const dbRows = valid.map((score) => ({
           player_number: score.playerNumber || null,
           player_name:
             `${score.firstName} ${score.lastName}`.trim() || "Unknown",
@@ -269,21 +169,14 @@ export default function CoachScoresPage() {
           .insert(dbRows);
 
         if (error) {
-          setSubmitResult({
-            success: false,
-            count: 0,
-            message: `Error: ${error.message}`,
-          });
+          setResult({ success: false, message: `Error: ${error.message}` });
         } else {
-          setSubmitResult({
+          setResult({
             success: true,
-            count: dbRows.length,
-            message: `${dbRows.length} score${dbRows.length !== 1 ? "s" : ""} submitted successfully!`,
+            message: `${dbRows.length} score${dbRows.length !== 1 ? "s" : ""} saved successfully!`,
           });
-          setParsedScores(null);
-          setPasteText("");
 
-          // Refresh existing scores
+          // Refresh existing scores count
           const { data } = await supabase
             .from("evaluator_scores")
             .select("id, player_name")
@@ -292,25 +185,17 @@ export default function CoachScoresPage() {
           setExistingScores((data ?? []) as ExistingScore[]);
         }
       } catch {
-        setSubmitResult({
+        setResult({
           success: false,
-          count: 0,
-          message: "An unexpected error occurred.",
+          message: "Could not read the file. Make sure it is a valid .xlsx or .csv file.",
         });
       }
 
-      setSubmitting(false);
+      setUploading(false);
+      e.target.value = "";
     },
-    [supabase, division, validRows, coachName, existingScores]
+    [supabase, division, coachName, existingScores]
   );
-
-  const handleSubmitClick = useCallback(() => {
-    if (existingScores.length > 0) {
-      setShowDuplicateDialog(true);
-    } else {
-      handleSubmit("add");
-    }
-  }, [existingScores, handleSubmit]);
 
   /* ---- Loading / guards ---- */
 
@@ -339,27 +224,10 @@ export default function CoachScoresPage() {
     );
   }
 
-  const TABS: { id: Tab; label: string; icon: typeof Upload }[] = [
-    { id: "paste", label: "Paste from Spreadsheet", icon: ClipboardPaste },
-    { id: "upload", label: "Upload File", icon: Upload },
-  ];
-
-  const scoreFields: {
-    key: "hitting" | "fielding" | "throwing" | "running" | "effort" | "attitude";
-    label: string;
-  }[] = [
-    { key: "hitting", label: "Hit" },
-    { key: "fielding", label: "Fld" },
-    { key: "throwing", label: "Thr" },
-    { key: "running", label: "Run" },
-    { key: "effort", label: "Eff" },
-    { key: "attitude", label: "Att" },
-  ];
-
   return (
     <div className="p-6 md:p-10">
       {/* Header */}
-      <div className="mb-6">
+      <div className="mb-8">
         <p className="font-display text-sm font-semibold text-flag-red uppercase tracking-[3px] mb-1">
           Coach
         </p>
@@ -367,451 +235,194 @@ export default function CoachScoresPage() {
           Enter Scores
         </h1>
         <p className="text-gray-400 text-sm mt-1">
-          {division} &middot; {registrations.length} registered player
-          {registrations.length !== 1 ? "s" : ""}
+          {division} &middot; {playerCount} registered player
+          {playerCount !== 1 ? "s" : ""}
           {existingScores.length > 0 && (
-            <span className="text-star-gold">
+            <span className="text-green-600">
               {" "}
-              &middot; {existingScores.length} existing score
+              &middot; {existingScores.length} score
               {existingScores.length !== 1 ? "s" : ""} submitted
             </span>
           )}
         </p>
       </div>
 
-      {/* Success/Error Result */}
-      {submitResult && (
+      {/* Result message */}
+      {result && (
         <div
-          className={`mb-6 p-4 rounded-lg border ${
-            submitResult.success
+          className={`mb-6 p-4 rounded-lg border flex items-center gap-2 ${
+            result.success
               ? "bg-green-50 border-green-200 text-green-800"
               : "bg-red-50 border-red-200 text-flag-red"
           }`}
         >
-          <div className="flex items-center gap-2">
-            {submitResult.success ? (
-              <CheckCircle2 size={18} />
-            ) : (
-              <XCircle size={18} />
-            )}
-            <span className="font-semibold text-sm">
-              {submitResult.message}
-            </span>
-          </div>
+          {result.success ? (
+            <CheckCircle2 size={18} className="shrink-0" />
+          ) : (
+            <XCircle size={18} className="shrink-0" />
+          )}
+          <span className="font-semibold text-sm">{result.message}</span>
         </div>
       )}
 
-      {/* Tab Bar */}
-      <div className="flex flex-wrap gap-2 mb-6">
-        {TABS.map(({ id, label, icon: Icon }) => (
-          <button
-            key={id}
-            onClick={() => {
-              setTab(id);
-              setParsedScores(null);
-              setPasteText("");
-              setSubmitResult(null);
-            }}
-            className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
-              tab === id
-                ? "bg-flag-blue text-white"
-                : "bg-white border border-gray-200 text-gray-600 hover:bg-gray-50"
-            }`}
-          >
-            <Icon size={16} />
-            {label}
-          </button>
-        ))}
+      {/* Step 1: Download Template */}
+      <div className="bg-white border border-gray-200 rounded-lg p-6 mb-4">
+        <div className="flex items-start gap-4">
+          <div className="w-10 h-10 rounded-full bg-flag-blue text-white font-display text-lg font-bold flex items-center justify-center shrink-0">
+            1
+          </div>
+          <div className="flex-1">
+            <h2 className="font-display text-lg font-bold uppercase tracking-wide mb-2">
+              Download the Score Sheet
+            </h2>
+            <p className="text-gray-500 text-sm mb-4">
+              This template already has your players&apos; names filled in.
+              Just enter the scores.
+            </p>
+            <a
+              href={`/api/score-sheet?division=${encodeURIComponent(division)}`}
+              download
+              className="inline-flex items-center gap-2 bg-flag-blue text-white px-5 py-2.5 rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors"
+            >
+              <Download size={16} />
+              Download Score Sheet
+            </a>
+          </div>
+        </div>
       </div>
 
-      {/* Tab Content */}
-      {!parsedScores && (
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
-          {tab === "paste" && (
-            <div>
-              <h2 className="font-display text-lg font-bold uppercase tracking-wide mb-3">
-                Paste from Google Sheets or Excel
-              </h2>
+      {/* Step 2: Fill in scores */}
+      <div className="bg-white border border-gray-200 rounded-lg p-6 mb-4">
+        <div className="flex items-start gap-4">
+          <div className="w-10 h-10 rounded-full bg-flag-blue text-white font-display text-lg font-bold flex items-center justify-center shrink-0">
+            2
+          </div>
+          <div className="flex-1">
+            <h2 className="font-display text-lg font-bold uppercase tracking-wide mb-2">
+              Fill In Scores
+            </h2>
+            <p className="text-gray-500 text-sm mb-3">
+              Open the file and enter a score for each player. Use{" "}
+              <strong>1, 3, 5, 7, or 9</strong> for each category (9 is
+              highest).
+            </p>
 
-              {/* Step-by-step instructions */}
-              <div className="bg-flag-blue/5 border border-flag-blue/10 rounded-lg p-4 mb-5">
-                <p className="font-display text-sm font-semibold uppercase tracking-wide text-flag-blue mb-2">
-                  How to use Google Sheets
-                </p>
-                <ol className="text-sm text-gray-600 space-y-1.5 list-decimal list-inside">
-                  <li>
-                    <strong>Download the template</strong> below &mdash; it
-                    already has your players&apos; names filled in.
-                  </li>
-                  <li>
-                    Open the .xlsx file in Google Sheets (File &rarr;
-                    Import &rarr; Upload).
-                  </li>
-                  <li>
-                    Fill in scores for each player (1, 3, 5, 7, or 9
-                    per category).
-                  </li>
-                  <li>
-                    Select all the <strong>player rows</strong> with
-                    scores (not the header rows).
-                  </li>
-                  <li>
-                    Copy (<strong>Ctrl+C</strong> on Windows or{" "}
-                    <strong>Cmd+C</strong> on Mac).
-                  </li>
-                  <li>
-                    Click in the box below and paste (
-                    <strong>Ctrl+V</strong> / <strong>Cmd+V</strong>).
-                  </li>
-                  <li>
-                    Click <strong>&ldquo;Parse Scores&rdquo;</strong>{" "}
-                    to review, then submit.
-                  </li>
-                </ol>
-              </div>
-
-              {/* Download pre-filled template */}
-              <div className="flex flex-wrap items-center gap-3 mb-5">
-                <a
-                  href={`/api/score-sheet?division=${encodeURIComponent(division)}`}
-                  download
-                  className="inline-flex items-center gap-2 bg-flag-blue text-white px-5 py-2.5 rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors"
-                >
-                  <Download size={16} />
-                  Download Template with Players
-                </a>
-                <a
-                  href="/api/score-sheet?blank=true"
-                  download
-                  className="inline-flex items-center gap-2 bg-gray-100 text-gray-600 px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-200 transition-colors"
-                >
-                  <Download size={16} />
-                  Blank Template
-                </a>
-              </div>
-
-              {/* Paste area */}
-              <textarea
-                value={pasteText}
-                onChange={(e) => setPasteText(e.target.value)}
-                placeholder="Paste your score data here..."
-                rows={10}
-                className="w-full border border-gray-200 rounded-lg px-4 py-3 text-sm font-mono text-charcoal placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-flag-blue/30 resize-y"
-              />
-              <div className="flex items-center gap-3 mt-4">
-                <button
-                  onClick={handleParse}
-                  disabled={!pasteText.trim()}
-                  className="inline-flex items-center gap-2 bg-flag-blue text-white px-5 py-2.5 rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors disabled:opacity-50"
-                >
-                  <ClipboardPaste size={16} />
-                  Parse Scores
-                </button>
-              </div>
-            </div>
-          )}
-
-          {tab === "upload" && (
-            <div>
-              <h2 className="font-display text-lg font-bold uppercase tracking-wide mb-2">
-                Upload Score File
-              </h2>
-              <p className="text-gray-500 text-sm mb-4">
-                Download the template with your players pre-filled, enter scores
-                in Google Sheets or Excel, then upload the completed file.
+            <div className="bg-flag-blue/5 border border-flag-blue/10 rounded-lg p-4">
+              <p className="font-display text-xs font-semibold uppercase tracking-wider text-flag-blue mb-2">
+                Option A &mdash; Use Excel or Numbers
               </p>
-              <div className="flex flex-col sm:flex-row items-start gap-3 mb-4">
-                <a
-                  href={`/api/score-sheet?division=${encodeURIComponent(division)}`}
-                  download
-                  className="inline-flex items-center gap-2 bg-flag-blue text-white px-5 py-2.5 rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors"
-                >
-                  <Download size={16} />
-                  Download Template with Players
-                </a>
-                <a
-                  href="/api/score-sheet?blank=true"
-                  download
-                  className="inline-flex items-center gap-2 bg-gray-100 text-gray-600 px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-200 transition-colors"
-                >
-                  <Download size={16} />
-                  Blank Template
-                </a>
-              </div>
-              <label className="inline-flex items-center gap-2 bg-white border-2 border-dashed border-gray-300 hover:border-flag-blue text-gray-600 px-6 py-4 rounded-lg text-sm font-semibold uppercase tracking-wide transition-colors cursor-pointer">
-                <Upload size={16} />
-                Choose File to Upload
-                <input
-                  type="file"
-                  accept=".csv,.xlsx,.xls"
-                  onChange={handleFileUpload}
-                  className="hidden"
-                />
-              </label>
-              <p className="text-xs text-gray-400 mt-3">
-                Accepts .csv and .xlsx files
+              <p className="text-gray-600 text-sm mb-3">
+                Double-click the downloaded .xlsx file. It opens directly in
+                Excel or Numbers. Fill in the yellow score columns, then save.
               </p>
-            </div>
-          )}
 
+              <p className="font-display text-xs font-semibold uppercase tracking-wider text-flag-blue mb-2">
+                Option B &mdash; Use Google Sheets
+              </p>
+              <ol className="text-gray-600 text-sm space-y-1 list-decimal list-inside">
+                <li>
+                  Go to{" "}
+                  <strong>sheets.google.com</strong> and create a new
+                  spreadsheet.
+                </li>
+                <li>
+                  Click <strong>File &rarr; Import &rarr; Upload</strong>,
+                  then select the downloaded .xlsx file.
+                </li>
+                <li>Fill in the yellow score columns for each player.</li>
+                <li>
+                  Click <strong>File &rarr; Download &rarr; Microsoft
+                  Excel (.xlsx)</strong> to save it back to your computer.
+                </li>
+              </ol>
+            </div>
+          </div>
         </div>
-      )}
+      </div>
 
-      {/* Preview Table */}
-      {parsedScores && (
-        <div>
-          {/* Summary bar */}
-          <div className="bg-white border border-gray-200 rounded-lg p-4 mb-4 flex flex-wrap items-center justify-between gap-3">
-            <div className="flex flex-wrap items-center gap-4 text-sm">
-              <span className="font-semibold text-charcoal">
-                {parsedScores.length} row
-                {parsedScores.length !== 1 ? "s" : ""}
-              </span>
-              <span className="flex items-center gap-1 text-green-600">
-                <CheckCircle2 size={14} />
-                {validRows.length} valid
-              </span>
-              {errorCount > 0 && (
-                <span className="flex items-center gap-1 text-flag-red">
-                  <XCircle size={14} />
-                  {errorCount} error{errorCount !== 1 ? "s" : ""}
+      {/* Step 3: Upload */}
+      <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="flex items-start gap-4">
+          <div className="w-10 h-10 rounded-full bg-flag-blue text-white font-display text-lg font-bold flex items-center justify-center shrink-0">
+            3
+          </div>
+          <div className="flex-1">
+            <h2 className="font-display text-lg font-bold uppercase tracking-wide mb-2">
+              Upload Your Completed File
+            </h2>
+            <p className="text-gray-500 text-sm mb-4">
+              Upload the score sheet with your scores filled in. We&apos;ll
+              save everything automatically.
+              {existingScores.length > 0 && (
+                <span className="text-amber-600">
+                  {" "}
+                  This will replace your {existingScores.length} previously
+                  submitted score{existingScores.length !== 1 ? "s" : ""}.
                 </span>
               )}
-            </div>
-            <div className="flex flex-wrap items-center gap-2">
-              <button
-                onClick={() => {
-                  setParsedScores(null);
-                  setPasteText("");
-                }}
-                className="text-xs text-gray-400 hover:text-gray-600 transition-colors px-2 py-1"
-              >
-                Clear All
-              </button>
-              <button
-                onClick={handleSubmitClick}
-                disabled={validRows.length === 0 || submitting}
-                className="inline-flex items-center gap-2 bg-flag-blue text-white px-5 py-2 rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors disabled:opacity-50"
-              >
-                <Save size={14} />
-                {submitting
-                  ? "Saving..."
-                  : `Save ${validRows.length} Score${validRows.length !== 1 ? "s" : ""}`}
-              </button>
-            </div>
-          </div>
-
-          {/* Table */}
-          <div className="bg-white border border-gray-200 rounded-lg overflow-x-auto">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="border-b border-gray-200 bg-gray-50">
-                  <th className="px-3 py-2.5 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-wider w-8">
-                    #
-                  </th>
-                  <th className="px-3 py-2.5 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-wider min-w-[140px]">
-                    Player
-                  </th>
-                  {scoreFields.map((f) => (
-                    <th
-                      key={f.key}
-                      className="px-2 py-2.5 text-center text-[10px] font-semibold text-gray-400 uppercase tracking-wider w-16"
-                    >
-                      {f.label}
-                    </th>
-                  ))}
-                  <th className="px-2 py-2.5 text-center text-[10px] font-semibold text-flag-blue uppercase tracking-wider w-14">
-                    Total
-                  </th>
-                  <th className="px-3 py-2.5 text-left text-[10px] font-semibold text-gray-400 uppercase tracking-wider min-w-[120px]">
-                    Notes
-                  </th>
-                  <th className="px-2 py-2.5 w-10" />
-                </tr>
-              </thead>
-              <tbody>
-                {parsedScores.map((score, idx) => (
-                  <tr
-                    key={idx}
-                    className={`border-b border-gray-100 last:border-0 ${
-                      score.status === "error"
-                        ? "bg-red-50/50"
-                        : score.status === "warning"
-                        ? "bg-amber-50/50"
-                        : ""
-                    }`}
-                  >
-                    {/* Row number + status */}
-                    <td className="px-3 py-2">
-                      <div className="flex items-center gap-1.5">
-                        {score.status === "valid" && (
-                          <CheckCircle2
-                            size={12}
-                            className="text-green-500 shrink-0"
-                          />
-                        )}
-                        {score.status === "warning" && (
-                          <AlertTriangle
-                            size={12}
-                            className="text-amber-500 shrink-0"
-                          />
-                        )}
-                        {score.status === "error" && (
-                          <XCircle
-                            size={12}
-                            className="text-flag-red shrink-0"
-                          />
-                        )}
-                        <span className="text-xs text-gray-400">
-                          {idx + 1}
-                        </span>
-                      </div>
-                    </td>
-
-                    {/* Player name */}
-                    <td className="px-3 py-2">
-                      <div>
-                        <span className="font-semibold text-charcoal">
-                          {score.firstName} {score.lastName}
-                        </span>
-                        {score.position && (
-                          <span className="text-xs text-gray-400 ml-1">
-                            ({score.position})
-                          </span>
-                        )}
-                      </div>
-                      {score.errors.length > 0 && (
-                        <p className="text-[10px] text-flag-red mt-0.5">
-                          {score.errors.join("; ")}
-                        </p>
-                      )}
-                    </td>
-
-                    {/* Score cells */}
-                    {scoreFields.map((f) => (
-                      <td key={f.key} className="px-1 py-2 text-center">
-                        <select
-                          value={
-                            (score[f.key] as number | null) ?? ""
-                          }
-                          onChange={(e) =>
-                            updateScore(
-                              idx,
-                              f.key,
-                              e.target.value ? parseInt(e.target.value) : null
-                            )
-                          }
-                          className="w-14 border border-gray-200 rounded px-1 py-1.5 text-xs text-center font-semibold text-charcoal focus:outline-none focus:ring-1 focus:ring-flag-blue/30 bg-white"
-                        >
-                          <option value="">—</option>
-                          {VALID_SCORES.map((v) => (
-                            <option key={v} value={v}>
-                              {v}
-                            </option>
-                          ))}
-                        </select>
-                      </td>
-                    ))}
-
-                    {/* Total */}
-                    <td className="px-2 py-2 text-center">
-                      <span className="font-display text-sm font-bold text-flag-blue">
-                        {score.total ?? "—"}
-                      </span>
-                      <span className="text-[10px] text-gray-400">
-                        /{MAX_TOTAL}
-                      </span>
-                    </td>
-
-                    {/* Notes */}
-                    <td className="px-3 py-2">
-                      <input
-                        type="text"
-                        value={score.notes}
-                        onChange={(e) =>
-                          updateScore(idx, "notes", e.target.value)
-                        }
-                        placeholder="Notes..."
-                        className="w-full border border-gray-200 rounded px-2 py-1 text-xs text-charcoal placeholder:text-gray-300 focus:outline-none focus:ring-1 focus:ring-flag-blue/30"
-                      />
-                    </td>
-
-                    {/* Remove */}
-                    <td className="px-2 py-2">
-                      <button
-                        onClick={() => removeRow(idx)}
-                        className="p-1 rounded text-gray-300 hover:text-flag-red hover:bg-red-50 transition-colors"
-                        title="Remove row"
-                      >
-                        <Trash2 size={14} />
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-
-          {/* Score scale legend */}
-          <div className="mt-3 flex flex-wrap items-center gap-3 text-xs text-gray-400">
-            <span className="font-semibold uppercase tracking-wider">
-              Scale:
-            </span>
-            {VALID_SCORES.map((v) => (
-              <span key={v} className="bg-gray-100 px-2 py-0.5 rounded">
-                {v} ={" "}
-                {v === 1
-                  ? "Needs Work"
-                  : v === 3
-                  ? "Below Avg"
-                  : v === 5
-                  ? "Average"
-                  : v === 7
-                  ? "Above Avg"
-                  : "Excellent"}
-              </span>
-            ))}
-          </div>
-        </div>
-      )}
-
-      {/* Duplicate Dialog */}
-      {showDuplicateDialog && (
-        <div className="fixed inset-0 z-50 bg-black/50 flex items-center justify-center p-4">
-          <div className="bg-white rounded-lg p-6 max-w-md w-full">
-            <h3 className="font-display text-lg font-bold uppercase tracking-wide mb-2">
-              Existing Scores Found
-            </h3>
-            <p className="text-gray-600 text-sm mb-4">
-              You have {existingScores.length} existing score
-              {existingScores.length !== 1 ? "s" : ""} in {division}. What
-              would you like to do?
             </p>
-            <div className="flex flex-col gap-2">
-              <button
-                onClick={() => handleSubmit("update")}
-                disabled={submitting}
-                className="w-full bg-flag-blue text-white px-4 py-2.5 rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors disabled:opacity-50"
-              >
-                {submitting ? "Submitting..." : "Replace Existing Scores"}
-              </button>
-              <button
-                onClick={() => handleSubmit("add")}
-                disabled={submitting}
-                className="w-full bg-gray-100 text-gray-700 px-4 py-2.5 rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-gray-200 transition-colors disabled:opacity-50"
-              >
-                Add as Additional Scores
-              </button>
-              <button
-                onClick={() => setShowDuplicateDialog(false)}
-                className="w-full text-gray-400 text-sm py-2 hover:text-gray-600 transition-colors"
-              >
-                Cancel
-              </button>
-            </div>
+
+            <label
+              className={`inline-flex items-center gap-3 border-2 border-dashed rounded-lg px-8 py-5 transition-colors cursor-pointer ${
+                uploading
+                  ? "border-gray-200 bg-gray-50 cursor-wait"
+                  : "border-gray-300 hover:border-flag-blue hover:bg-flag-blue/5"
+              }`}
+            >
+              {uploading ? (
+                <>
+                  <FileSpreadsheet size={20} className="text-flag-blue animate-pulse" />
+                  <span className="text-sm font-semibold text-gray-600">
+                    Processing {fileName}...
+                  </span>
+                </>
+              ) : (
+                <>
+                  <Upload size={20} className="text-gray-400" />
+                  <span className="text-sm font-semibold text-gray-600">
+                    Choose .xlsx or .csv file
+                  </span>
+                </>
+              )}
+              <input
+                type="file"
+                accept=".csv,.xlsx,.xls"
+                onChange={handleFileUpload}
+                disabled={uploading}
+                className="hidden"
+              />
+            </label>
           </div>
         </div>
-      )}
+      </div>
+
+      {/* Score scale reference */}
+      <div className="mt-6 bg-gray-50 border border-gray-200 rounded-lg p-4">
+        <p className="font-display text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
+          Scoring Scale
+        </p>
+        <div className="flex flex-wrap gap-3 text-xs text-gray-500">
+          <span className="bg-white px-2.5 py-1 rounded border border-gray-200">
+            <strong>1</strong> = Needs Work
+          </span>
+          <span className="bg-white px-2.5 py-1 rounded border border-gray-200">
+            <strong>3</strong> = Below Avg
+          </span>
+          <span className="bg-white px-2.5 py-1 rounded border border-gray-200">
+            <strong>5</strong> = Average
+          </span>
+          <span className="bg-white px-2.5 py-1 rounded border border-gray-200">
+            <strong>7</strong> = Above Avg
+          </span>
+          <span className="bg-white px-2.5 py-1 rounded border border-gray-200">
+            <strong>9</strong> = Excellent
+          </span>
+        </div>
+        <p className="text-xs text-gray-400 mt-2">
+          6 categories: Hitting, Fielding, Throwing, Running / Speed, Effort,
+          Attitude. Max total: 54 points.
+        </p>
+      </div>
     </div>
   );
 }
