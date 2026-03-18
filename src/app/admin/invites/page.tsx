@@ -15,6 +15,8 @@ const DIVISION_OPTIONS = [
   "10U-Mustang",
   "11U-Bronco",
   "12U-Bronco",
+  "13U-Pony",
+  "14U-Pony",
 ] as const;
 
 interface Invite {

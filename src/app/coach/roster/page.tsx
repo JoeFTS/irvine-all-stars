@@ -58,6 +58,8 @@ const DIVISIONS = [
   "10U-Mustang",
   "11U-Bronco",
   "12U-Bronco",
+  "13U-Pony",
+  "14U-Pony",
 ] as const;
 
 const DIVISION_LABELS: Record<string, string> = {
@@ -72,6 +74,8 @@ const DIVISION_LABELS: Record<string, string> = {
   "10U-Mustang": "10U",
   "11U-Bronco": "11U",
   "12U-Bronco": "12U",
+  "13U-Pony": "13U",
+  "14U-Pony": "14U",
 };
 
 /* ------------------------------------------------------------------ */

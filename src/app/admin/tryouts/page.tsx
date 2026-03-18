@@ -106,6 +106,8 @@ const DIVISIONS = [
   "10U-Mustang",
   "11U-Bronco",
   "12U-Bronco",
+  "13U-Pony",
+  "14U-Pony",
 ];
 
 const DIVISION_COLORS: Record<string, string> = {
@@ -119,6 +121,8 @@ const DIVISION_COLORS: Record<string, string> = {
   "10U-Mustang": "bg-green-400",
   "11U-Bronco": "bg-orange-500",
   "12U-Bronco": "bg-orange-400",
+  "13U-Pony": "bg-red-500",
+  "14U-Pony": "bg-red-400",
 };
 
 const STATUS_OPTIONS: { value: Status; label: string; color: string }[] = [

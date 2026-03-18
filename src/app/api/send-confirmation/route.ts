@@ -69,10 +69,10 @@ function getPlayerEmailHtml(name: string, playerName: string, division: string) 
 <div style="background:#F9FAFB;border:1px solid #E5E7EB;border-radius:8px;padding:20px;margin:0 0 24px;">
 <h3 style="color:#0A2342;font-size:14px;font-weight:700;margin:0 0 12px;text-transform:uppercase;letter-spacing:1px;">Key Dates</h3>
 <table cellpadding="0" cellspacing="0" style="width:100%;">
-<tr><td style="padding:4px 0;color:#0A2342;font-size:14px;font-weight:700;width:80px;">May 10:</td><td style="padding:4px 0;color:#4B5563;font-size:14px;">5U, 6U Shetland &amp; 7U, 8U Pinto tryouts</td></tr>
-<tr><td style="padding:4px 0;color:#0A2342;font-size:14px;font-weight:700;">May 11:</td><td style="padding:4px 0;color:#4B5563;font-size:14px;">9U &amp; 10U Mustang tryouts</td></tr>
-<tr><td style="padding:4px 0;color:#0A2342;font-size:14px;font-weight:700;">May 12:</td><td style="padding:4px 0;color:#4B5563;font-size:14px;">11U &amp; 12U Bronco tryouts</td></tr>
-<tr><td style="padding:4px 0;color:#0A2342;font-size:14px;font-weight:700;">Mid-May:</td><td style="padding:4px 0;color:#4B5563;font-size:14px;">Roster announcements &amp; practices begin</td></tr>
+<tr><td style="padding:4px 0;color:#0A2342;font-size:14px;font-weight:700;width:80px;">March 27:</td><td style="padding:4px 0;color:#4B5563;font-size:14px;">All-Star coaches named</td></tr>
+<tr><td style="padding:4px 0;color:#0A2342;font-size:14px;font-weight:700;">April 12:</td><td style="padding:4px 0;color:#4B5563;font-size:14px;">All-Star tryouts (all Bronco &amp; Pony divisions)</td></tr>
+<tr><td style="padding:4px 0;color:#0A2342;font-size:14px;font-weight:700;">April 14:</td><td style="padding:4px 0;color:#4B5563;font-size:14px;">All-Star players notified</td></tr>
+<tr><td style="padding:4px 0;color:#0A2342;font-size:14px;font-weight:700;">Late May:</td><td style="padding:4px 0;color:#4B5563;font-size:14px;">Tournament season begins</td></tr>
 </table>
 </div>
 

@@ -55,6 +55,8 @@ const DIVISIONS = [
   "10U-Mustang",
   "11U-Bronco",
   "12U-Bronco",
+  "13U-Pony",
+  "14U-Pony",
 ];
 
 function docTypeLabel(type: string): string {
