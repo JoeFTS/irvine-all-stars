@@ -161,6 +161,15 @@ export async function POST(request: NextRequest) {
 
     const token = invite.token;
 
+    // Auto-accept coach application when invite is sent
+    if (role === "coach") {
+      await supabase
+        .from("coach_applications")
+        .update({ status: "accepted" })
+        .eq("email", email)
+        .in("status", ["submitted", "under_review"]);
+    }
+
     // Send branded invite email
     const subject =
       role === "coach"
