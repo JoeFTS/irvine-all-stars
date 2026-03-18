@@ -23,6 +23,9 @@ export async function GET(request: NextRequest) {
   if (!isBlank && !divisionParam && (!sessionId || !supabaseUrl || !supabaseAnonKey)) {
     return NextResponse.json({ error: "Missing parameters" }, { status: 400 });
   }
+  if (divisionParam && (!supabaseUrl || !supabaseAnonKey)) {
+    return NextResponse.json({ error: "Supabase not configured" }, { status: 500 });
+  }
 
   let session: {
     division: string;
@@ -34,7 +37,7 @@ export async function GET(request: NextRequest) {
     max_players: number;
   } | null = null;
 
-  if (!isBlank) {
+  if (!isBlank && !divisionParam && sessionId) {
     const supabase = createClient(supabaseUrl!, supabaseAnonKey!, {
       db: { schema: "irvine_allstars" },
     });
