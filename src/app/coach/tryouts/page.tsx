@@ -12,6 +12,7 @@ import {
   AlertTriangle,
   User,
   Mail,
+  X,
 } from "lucide-react";
 
 /* ---------- Types ---------- */
@@ -257,6 +258,27 @@ export default function CoachTryoutsPage() {
     setSubmitMsg(null);
   }
 
+  async function removeRecommendation(regId: string) {
+    if (!supabase) return;
+    const sel = selections.find((s) => s.registration_id === regId);
+    if (!sel) return;
+
+    const { error } = await supabase
+      .from("coach_selections")
+      .delete()
+      .eq("id", sel.id);
+
+    if (!error) {
+      setLocalSelected((prev) => {
+        const next = new Set(prev);
+        next.delete(regId);
+        return next;
+      });
+      setSelections((prev) => prev.filter((s) => s.id !== sel.id));
+      setSubmitMsg("Recommendation removed.");
+    }
+  }
+
   async function submitRecommendations() {
     if (!supabase || !user || !division) return;
     setSubmitting(true);
@@ -274,8 +296,6 @@ export default function CoachTryoutsPage() {
           registration_id,
           coach_id: user.id,
           division,
-          notes: null,
-          selected_at: new Date().toISOString(),
         }));
         const { error } = await supabase.from("coach_selections").insert(rows);
         if (error) throw error;
@@ -443,6 +463,23 @@ export default function CoachTryoutsPage() {
 
                   {/* Status */}
                   <StatusBadge status={r.status} />
+
+                  {/* Recommended badge with remove */}
+                  {selections.some((s) => s.registration_id === r.id) && (
+                    <span className="hidden sm:inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-star-gold/20 text-star-gold">
+                      Recommended
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          removeRecommendation(r.id);
+                        }}
+                        className="hover:text-flag-red transition-colors"
+                        title="Remove recommendation"
+                      >
+                        <X size={10} />
+                      </button>
+                    </span>
+                  )}
 
                   {/* Score */}
                   <div className="shrink-0 text-right w-16">
