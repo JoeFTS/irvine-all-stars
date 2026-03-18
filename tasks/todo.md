@@ -63,11 +63,16 @@
 - [x] Player status cards with color-coded badges
 - [x] Division-filtered announcements feed
 - [x] Quick links grid + key dates section
-- [x] Step-by-step compliance gating (Register → Contract → Photo → Birth Cert)
-- [x] Contract page gated behind team selection
+- [x] Step-by-step compliance gating (Register → Accept → Contract → Photo → Birth Cert → Medical Release)
+- [x] Parent acceptance flow — Accept/Decline selection before compliance unlocks
+- [x] Contract page gated behind acceptance
 - [x] Documents page gated behind signed contract
+- [x] Medical release form (/portal/medical-release) — allergies, meds, insurance, physician, authorization
 - [x] Coach portal (/coach) with dashboard, roster, checklist, certifications, tournament rules, updates
-- [x] Coach roster only shows players with signed contracts
+- [x] Coach roster only shows selected/alternate players with signed contracts
+- [x] Coach checklist only shows selected/alternate players (not unselected)
+- [x] Coach checklist shows full player journey (acceptance → contract → docs → medical release)
+- [x] Coach can view uploaded documents (birth cert, photo) via signed URLs
 - [x] Admin account set up (allstars@irvinepony.com)
 - [x] Coach tryouts page (/coach/tryouts) — view division players + scores + submit recommendations
 - [x] Coach score entry (/coach/scores) — download template, fill in, upload (3-step flow)
@@ -85,6 +90,12 @@
 - [x] Replaced broken emoji HTML entities with SVG icons ✅
 - [x] Coach application error visibility improved ✅
 - [x] Teams table: added coach_email column ✅
+- [x] Coach application retry + error codes for diagnosis ✅
+- [x] 13U-Pony and 14U-Pony divisions added (now 12 divisions) ✅
+- [x] All dates updated from Scott's email (coach voting 3/22-27, tryouts 4/12, notified 4/14) ✅
+- [x] Sanction play schedule link on coach dashboard ✅
+- [x] Admin tryouts shows acceptance status (Awaiting/Accepted badges) ✅
+- [x] Selection email updated — tells parent to accept their spot ✅
 - [ ] Homepage: replace placeholder content with real images (deferred — no photos yet)
 
 ## Phase 7: Nice to Have
@@ -93,7 +104,10 @@
 - [ ] Tournament Hub
 - [ ] Photo Gallery
 - [ ] Clean up test data (joe@fivetoolsolutions.com coach application)
+- [ ] Persist "email sent" status to DB so admin Awaiting/Accepted badges survive page refresh
+- [ ] Automate decline flow (currently directs parent to email coordinator)
+- [ ] Pitching log upload on parent portal
 
 ---
-**Status:** Phases 0-6 COMPLETE. 26+ routes live at irvineallstars.com.
-**Last Updated:** 2026-03-17
+**Status:** Phases 0-6 COMPLETE. 28+ routes live at irvineallstars.com. 12 divisions.
+**Last Updated:** 2026-03-18
