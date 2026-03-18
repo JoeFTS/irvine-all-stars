@@ -609,7 +609,7 @@ export default function BinderChecklistPage() {
                     {birthCert?.file_path && (
                       <button
                         onClick={() => handleViewDocument(birthCert.file_path!)}
-                        className="flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold text-flag-blue hover:bg-flag-blue/10 transition-colors"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
                         title="View birth certificate"
                       >
                         <Eye size={14} />
@@ -619,7 +619,7 @@ export default function BinderChecklistPage() {
                     {photo?.file_path && (
                       <button
                         onClick={() => handleViewDocument(photo.file_path!)}
-                        className="flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold text-purple-600 hover:bg-purple-50 transition-colors"
+                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-purple-600 text-white hover:bg-purple-700 transition-colors"
                         title="View player photo"
                       >
                         <Camera size={14} />
