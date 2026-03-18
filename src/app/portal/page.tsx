@@ -704,24 +704,42 @@ export default function PortalPage() {
                               </span>
                             </div>
                           ) : item.acceptAction ? (
-                            <button
-                              onClick={() => {
-                                if (confirm("Are you sure you want to accept the All-Stars selection? This confirms your family's commitment to the full All-Stars season.")) {
-                                  acceptSelection(item.acceptAction!);
-                                }
-                              }}
-                              disabled={acceptingId === item.acceptAction}
-                              className="flex items-center gap-3 text-sm w-full text-left group"
-                            >
-                              <div className="h-5 w-5 shrink-0 rounded-full border-2 border-green-500 bg-green-50 group-hover:bg-green-100 transition-colors flex items-center justify-center">
-                                <svg className="h-3 w-3 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
-                                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
-                                </svg>
+                            <div className="bg-flag-blue/5 border-2 border-flag-blue/20 rounded-lg p-4 space-y-3">
+                              <div className="flex items-start gap-3">
+                                <div className="w-8 h-8 rounded-full bg-star-gold-bright/20 flex items-center justify-center shrink-0 mt-0.5">
+                                  <svg className="w-4 h-4 text-star-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                                    <path strokeLinecap="round" strokeLinejoin="round" d="M11.48 3.499a.562.562 0 011.04 0l2.125 5.111a.563.563 0 00.475.345l5.518.442c.499.04.701.663.321.988l-4.204 3.602a.563.563 0 00-.182.557l1.285 5.385a.562.562 0 01-.84.61l-4.725-2.885a.563.563 0 00-.586 0L6.982 20.54a.562.562 0 01-.84-.61l1.285-5.386a.562.562 0 00-.182-.557l-4.204-3.602a.563.563 0 01.321-.988l5.518-.442a.563.563 0 00.475-.345L11.48 3.5z" />
+                                  </svg>
+                                </div>
+                                <div>
+                                  <p className="font-display text-sm font-bold uppercase tracking-wide text-flag-blue">
+                                    Your player has been selected!
+                                  </p>
+                                  <p className="text-xs text-gray-500 mt-1">
+                                    Please accept or decline the All-Stars spot. Accepting confirms your family&apos;s commitment to the full season including practices, games, and tournaments.
+                                  </p>
+                                </div>
                               </div>
-                              <span className="font-semibold text-green-700 group-hover:text-green-800">
-                                {acceptingId === item.acceptAction ? "Accepting..." : "Accept All-Stars Selection"}
-                              </span>
-                            </button>
+                              <div className="flex gap-3 pl-11">
+                                <button
+                                  onClick={() => acceptSelection(item.acceptAction!)}
+                                  disabled={acceptingId === item.acceptAction}
+                                  className="bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white px-5 py-2.5 rounded font-display text-xs font-semibold uppercase tracking-widest transition-colors"
+                                >
+                                  {acceptingId === item.acceptAction ? "Accepting..." : "Accept Spot"}
+                                </button>
+                                <button
+                                  onClick={() => {
+                                    if (confirm("Are you sure you want to decline? This will release the spot to another player. This action cannot be undone.")) {
+                                      alert("Please contact AllStars@irvinepony.com to formally decline the selection.");
+                                    }
+                                  }}
+                                  className="border border-gray-300 hover:border-gray-400 text-gray-600 px-5 py-2.5 rounded font-display text-xs font-semibold uppercase tracking-widest transition-colors"
+                                >
+                                  Decline
+                                </button>
+                              </div>
+                            </div>
                           ) : item.locked ? (
                             <div className="flex items-center gap-3 text-sm text-gray-400 cursor-not-allowed">
                               <svg
