@@ -39,7 +39,7 @@ export default function CoachScoresPage() {
   const [existingScores, setExistingScores] = useState<ExistingScore[]>([]);
 
   const [uploading, setUploading] = useState(false);
-  const [fileName, setFileName] = useState<string | null>(null);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
   const [result, setResult] = useState<{
     success: boolean;
     message: string;
@@ -100,102 +100,116 @@ export default function CoachScoresPage() {
   const division = profile?.division ?? null;
   const coachName = profile?.full_name ?? "Coach";
 
-  /* ---- Upload handler ---- */
+  /* ---- File selection (separate from upload) ---- */
 
-  const handleFileUpload = useCallback(
-    async (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleFileSelect = useCallback(
+    (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
-      if (!file || !supabase || !division) return;
-
+      if (!file) return;
+      setSelectedFile(file);
       setResult(null);
-      setUploading(true);
-      setFileName(file.name);
-
-      try {
-        // Parse the file
-        let parsed;
-        if (file.name.endsWith(".xlsx") || file.name.endsWith(".xls")) {
-          const buffer = await file.arrayBuffer();
-          parsed = await parseXLSX(buffer);
-        } else {
-          const text = await file.text();
-          parsed = parseCSV(text);
-        }
-
-        const validated = validateScores(parsed);
-        const valid = validated.filter(
-          (s) => s.status === "valid" || s.status === "warning"
-        );
-
-        if (valid.length === 0) {
-          setResult({
-            success: false,
-            message:
-              "No valid scores found in the file. Make sure you filled in scores using the template.",
-          });
-          setUploading(false);
-          e.target.value = "";
-          return;
-        }
-
-        // If existing scores, replace them
-        if (existingScores.length > 0) {
-          const existingIds = existingScores.map((s) => s.id);
-          await supabase
-            .from("evaluator_scores")
-            .delete()
-            .in("id", existingIds);
-        }
-
-        // Insert new scores
-        const dbRows = valid.map((score) => ({
-          player_number: score.playerNumber || null,
-          player_name:
-            `${score.firstName} ${score.lastName}`.trim() || "Unknown",
-          division,
-          evaluator_name: coachName,
-          hitting: score.hitting,
-          fielding: score.fielding,
-          throwing: score.throwing,
-          running: score.running,
-          effort: score.effort,
-          attitude: score.attitude,
-          notes: score.notes || null,
-          updated_at: new Date().toISOString(),
-        }));
-
-        const { error } = await supabase
-          .from("evaluator_scores")
-          .insert(dbRows);
-
-        if (error) {
-          setResult({ success: false, message: `Error: ${error.message}` });
-        } else {
-          setResult({
-            success: true,
-            message: `${dbRows.length} score${dbRows.length !== 1 ? "s" : ""} saved successfully!`,
-          });
-
-          // Refresh existing scores count
-          const { data } = await supabase
-            .from("evaluator_scores")
-            .select("id, player_name")
-            .eq("evaluator_name", coachName)
-            .eq("division", division);
-          setExistingScores((data ?? []) as ExistingScore[]);
-        }
-      } catch {
-        setResult({
-          success: false,
-          message: "Could not read the file. Make sure it is a valid .xlsx or .csv file.",
-        });
-      }
-
-      setUploading(false);
       e.target.value = "";
     },
-    [supabase, division, coachName, existingScores]
+    []
   );
+
+  const handleClearFile = useCallback(() => {
+    setSelectedFile(null);
+  }, []);
+
+  /* ---- Upload handler ---- */
+
+  const handleUpload = useCallback(async () => {
+    if (!selectedFile || !supabase || !division) return;
+
+    setUploading(true);
+
+    try {
+      // Parse the file
+      let parsed;
+      if (
+        selectedFile.name.endsWith(".xlsx") ||
+        selectedFile.name.endsWith(".xls")
+      ) {
+        const buffer = await selectedFile.arrayBuffer();
+        parsed = await parseXLSX(buffer);
+      } else {
+        const text = await selectedFile.text();
+        parsed = parseCSV(text);
+      }
+
+      const validated = validateScores(parsed);
+      const valid = validated.filter(
+        (s) => s.status === "valid" || s.status === "warning"
+      );
+
+      if (valid.length === 0) {
+        setResult({
+          success: false,
+          message:
+            "No valid scores found in the file. Make sure you filled in scores using the template.",
+        });
+        setUploading(false);
+        return;
+      }
+
+      // If existing scores, replace them
+      if (existingScores.length > 0) {
+        const existingIds = existingScores.map((s) => s.id);
+        await supabase
+          .from("evaluator_scores")
+          .delete()
+          .in("id", existingIds);
+      }
+
+      // Insert new scores
+      const dbRows = valid.map((score) => ({
+        player_number: score.playerNumber || null,
+        player_name:
+          `${score.firstName} ${score.lastName}`.trim() || "Unknown",
+        division,
+        evaluator_name: coachName,
+        hitting: score.hitting,
+        fielding: score.fielding,
+        throwing: score.throwing,
+        running: score.running,
+        effort: score.effort,
+        attitude: score.attitude,
+        notes: score.notes || null,
+        updated_at: new Date().toISOString(),
+      }));
+
+      const { error } = await supabase
+        .from("evaluator_scores")
+        .insert(dbRows);
+
+      if (error) {
+        setResult({ success: false, message: `Error: ${error.message}` });
+      } else {
+        setResult({
+          success: true,
+          message: `${dbRows.length} score${dbRows.length !== 1 ? "s" : ""} saved successfully!`,
+        });
+        setSelectedFile(null);
+
+        // Refresh existing scores count
+        const { data } = await supabase
+          .from("evaluator_scores")
+          .select("id, player_name")
+          .eq("evaluator_name", coachName)
+          .eq("division", division);
+        setExistingScores((data ?? []) as ExistingScore[]);
+      }
+    } catch {
+      setResult({
+        success: false,
+        message:
+          "Could not read the file. Make sure it is a valid .xlsx or .csv file.",
+      });
+    }
+
+    setUploading(false);
+  }, [selectedFile, supabase, division, coachName, existingScores]);
 
   /* ---- Loading / guards ---- */
 
@@ -362,36 +376,48 @@ export default function CoachScoresPage() {
               )}
             </p>
 
-            <label
-              className={`inline-flex items-center gap-3 border-2 border-dashed rounded-lg px-8 py-5 transition-colors cursor-pointer ${
-                uploading
-                  ? "border-gray-200 bg-gray-50 cursor-wait"
-                  : "border-gray-300 hover:border-flag-blue hover:bg-flag-blue/5"
-              }`}
-            >
-              {uploading ? (
-                <>
-                  <FileSpreadsheet size={20} className="text-flag-blue animate-pulse" />
-                  <span className="text-sm font-semibold text-gray-600">
-                    Processing {fileName}...
+            {selectedFile ? (
+              /* File selected — show name with Upload and Replace buttons */
+              <div className="border-2 border-flag-blue/30 bg-flag-blue/5 rounded-lg px-5 py-4 inline-flex flex-col sm:flex-row items-start sm:items-center gap-3">
+                <div className="flex items-center gap-2 min-w-0">
+                  <FileSpreadsheet size={20} className="text-flag-blue shrink-0" />
+                  <span className="text-sm font-semibold text-charcoal truncate">
+                    {selectedFile.name}
                   </span>
-                </>
-              ) : (
-                <>
-                  <Upload size={20} className="text-gray-400" />
-                  <span className="text-sm font-semibold text-gray-600">
-                    Choose .xlsx or .csv file
-                  </span>
-                </>
-              )}
-              <input
-                type="file"
-                accept=".csv,.xlsx,.xls"
-                onChange={handleFileUpload}
-                disabled={uploading}
-                className="hidden"
-              />
-            </label>
+                </div>
+                <div className="flex items-center gap-2">
+                  <button
+                    onClick={handleUpload}
+                    disabled={uploading}
+                    className="inline-flex items-center gap-2 bg-flag-blue text-white px-5 py-2 rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors disabled:opacity-50"
+                  >
+                    <Upload size={14} />
+                    {uploading ? "Uploading..." : "Upload Scores"}
+                  </button>
+                  <button
+                    onClick={handleClearFile}
+                    disabled={uploading}
+                    className="inline-flex items-center gap-2 bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-gray-200 transition-colors disabled:opacity-50"
+                  >
+                    Replace File
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* No file selected — show file picker */
+              <label className="inline-flex items-center gap-3 border-2 border-dashed border-gray-300 hover:border-flag-blue hover:bg-flag-blue/5 rounded-lg px-8 py-5 transition-colors cursor-pointer">
+                <Upload size={20} className="text-gray-400" />
+                <span className="text-sm font-semibold text-gray-600">
+                  Choose .xlsx or .csv file
+                </span>
+                <input
+                  type="file"
+                  accept=".csv,.xlsx,.xls"
+                  onChange={handleFileSelect}
+                  className="hidden"
+                />
+              </label>
+            )}
           </div>
         </div>
       </div>
