@@ -105,7 +105,7 @@ export default function SummaryPage() {
       : "0";
 
   return (
-    <div className="pt-[98px] min-h-screen bg-off-white pb-8">
+    <div className="pt-16 min-h-screen bg-off-white pb-8">
       <div className="max-w-lg mx-auto px-4 py-6">
         {/* Back button */}
         <button

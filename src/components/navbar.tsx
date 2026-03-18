@@ -7,7 +7,7 @@ import { Menu, X } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { supabase } from "@/lib/supabase";
 
-const navLinks = [
+const publicNavLinks = [
   { href: "/coaches", label: "Coaches" },
   { href: "/tryouts", label: "Tryouts" },
   { href: "/timeline", label: "Timeline" },
@@ -15,10 +15,16 @@ const navLinks = [
   { href: "/faq", label: "FAQ" },
 ];
 
+// When logged in, only show FAQ
+const loggedInNavLinks = [
+  { href: "/faq", label: "FAQ" },
+];
+
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const { user, role } = useAuth();
   const pathname = usePathname();
+  const navLinks = user ? loggedInNavLinks : publicNavLinks;
 
   function isActive(href: string) {
     if (href === "/") return pathname === "/";
@@ -45,17 +51,19 @@ export function Navbar() {
 
   return (
     <>
-      {/* Announcement Bar */}
-      <div className="fixed top-0 w-full z-[101] bg-cream border-b border-sand text-center py-1.5 px-4 overflow-hidden">
-        <p className="text-flag-blue text-xs font-bold tracking-wider uppercase font-display whitespace-nowrap text-ellipsis overflow-hidden">
-          <span className="text-star-gold">&#9733;</span> 2026 All-Stars
-          Season — Applications Now Open{" "}
-          <span className="text-star-gold">&#9733;</span>
-        </p>
-      </div>
+      {/* Announcement Bar — only for public visitors */}
+      {!user && (
+        <div className="fixed top-0 w-full z-[101] bg-cream border-b border-sand text-center py-1.5 px-4 overflow-hidden">
+          <p className="text-flag-blue text-xs font-bold tracking-wider uppercase font-display whitespace-nowrap text-ellipsis overflow-hidden">
+            <span className="text-star-gold">&#9733;</span> 2026 All-Stars
+            Season — Applications Now Open{" "}
+            <span className="text-star-gold">&#9733;</span>
+          </p>
+        </div>
+      )}
 
       {/* Main Nav */}
-      <nav className="fixed top-[34px] w-full z-100 bg-flag-blue px-4 md:px-8 h-16 flex items-center justify-between">
+      <nav className={`fixed w-full z-100 bg-flag-blue px-4 md:px-8 h-16 flex items-center justify-between ${user ? "top-0" : "top-[34px]"}`}>
         <Link href="/" className="flex items-center gap-2">
           <span className="text-star-gold-bright text-sm tracking-widest">
             &#9733;&#9733;&#9733;
@@ -133,7 +141,7 @@ export function Navbar() {
 
       {/* Mobile Menu */}
       {mobileOpen && (
-        <div className="fixed inset-0 top-[98px] z-[99] bg-flag-blue lg:hidden">
+        <div className={`fixed inset-0 z-[99] bg-flag-blue lg:hidden ${user ? "top-16" : "top-[98px]"}`}>
           <ul className="flex flex-col p-6 gap-1">
             {navLinks.map((link) => (
               <li key={link.href}>

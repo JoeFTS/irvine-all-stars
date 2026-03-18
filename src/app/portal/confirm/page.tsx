@@ -39,7 +39,7 @@ function ConfirmContent() {
   }, [registrationId]);
 
   return (
-    <div className="min-h-screen bg-off-white pt-[98px] flex items-center justify-center px-6">
+    <div className="min-h-screen bg-off-white pt-16 flex items-center justify-center px-6">
       <div className="max-w-md w-full text-center">
         {status === "loading" && (
           <div>
@@ -113,7 +113,7 @@ export default function ConfirmPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-off-white pt-[98px] flex items-center justify-center">
+        <div className="min-h-screen bg-off-white pt-16 flex items-center justify-center">
           <p className="text-gray-400 font-display uppercase tracking-wider text-sm">Loading...</p>
         </div>
       }

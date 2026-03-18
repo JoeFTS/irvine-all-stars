@@ -297,9 +297,9 @@ export default function ScoringPage() {
   const scored = scoredCount(player);
 
   return (
-    <div className="pt-[98px] min-h-screen bg-off-white pb-24">
+    <div className="pt-16 min-h-screen bg-off-white pb-24">
       {/* ───── Sticky Header ───── */}
-      <div className="sticky top-[98px] z-40 bg-flag-blue text-white px-4 py-3 shadow-md">
+      <div className="sticky top-16 z-40 bg-flag-blue text-white px-4 py-3 shadow-md">
         <div className="max-w-lg mx-auto">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2 min-w-0">

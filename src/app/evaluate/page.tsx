@@ -57,7 +57,7 @@ export default function EvaluateSetupPage() {
   }
 
   return (
-    <div className="pt-[98px] min-h-screen bg-off-white">
+    <div className="pt-16 min-h-screen bg-off-white">
       <div className="max-w-md mx-auto px-4 py-8">
         {/* Header */}
         <div className="text-center mb-8">

@@ -171,7 +171,7 @@ export default function MedicalReleasePage() {
 
   if (authLoading || loading) {
     return (
-      <div className="min-h-screen bg-off-white pt-[98px] flex items-center justify-center">
+      <div className="min-h-screen bg-off-white pt-16 flex items-center justify-center">
         <p className="text-gray-400 font-display uppercase tracking-wider text-sm">
           Loading...
         </p>

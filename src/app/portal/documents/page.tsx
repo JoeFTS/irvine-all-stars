@@ -43,7 +43,7 @@ interface PlayerDocument {
 export default function DocumentsPageWrapper() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-off-white pt-[98px] flex items-center justify-center">
+      <div className="min-h-screen bg-off-white pt-16 flex items-center justify-center">
         <p className="text-gray-400 font-display uppercase tracking-wider text-sm">Loading...</p>
       </div>
     }>
@@ -175,7 +175,7 @@ function DocumentsPage() {
   /* ---- Loading state ---- */
   if (authLoading) {
     return (
-      <div className="min-h-screen bg-off-white pt-[98px] flex items-center justify-center">
+      <div className="min-h-screen bg-off-white pt-16 flex items-center justify-center">
         <p className="text-gray-400 font-display uppercase tracking-wider text-sm">
           Loading...
         </p>
@@ -188,7 +188,7 @@ function DocumentsPage() {
   return (
     <>
       {/* ===== HERO ===== */}
-      <section className="relative bg-flag-blue pt-[98px] pb-14 md:pb-20 px-6 md:px-10 overflow-hidden">
+      <section className="relative bg-flag-blue pt-16 pb-14 md:pb-20 px-6 md:px-10 overflow-hidden">
         <div className="absolute inset-0 text-white/[0.04] text-xl leading-[2.8rem] tracking-widest overflow-hidden pointer-events-none p-4">
           {"★ ".repeat(200)}
         </div>

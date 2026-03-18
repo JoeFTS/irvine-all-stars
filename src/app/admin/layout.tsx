@@ -39,7 +39,7 @@ export default function AdminLayout({
 
   if (loading) {
     return (
-      <div className="pt-[98px] min-h-screen bg-off-white flex items-center justify-center">
+      <div className="pt-16 min-h-screen bg-off-white flex items-center justify-center">
         <p className="text-gray-500">Loading...</p>
       </div>
     );
@@ -52,7 +52,7 @@ export default function AdminLayout({
 
   if (role !== "admin") {
     return (
-      <div className="pt-[98px] min-h-screen bg-off-white flex items-center justify-center">
+      <div className="pt-16 min-h-screen bg-off-white flex items-center justify-center">
         <p className="text-flag-red font-semibold">Access denied. Admin role required.</p>
       </div>
     );
@@ -64,10 +64,10 @@ export default function AdminLayout({
   }
 
   return (
-    <div className="pt-[98px] min-h-screen bg-off-white">
+    <div className="pt-16 min-h-screen bg-off-white">
       <div className="flex">
         {/* Desktop Sidebar */}
-        <aside className="hidden md:flex flex-col w-56 min-h-[calc(100vh-98px)] bg-white border-r border-gray-200 shrink-0">
+        <aside className="hidden md:flex flex-col w-56 min-h-[calc(100vh-64px)] bg-white border-r border-gray-200 shrink-0">
           <div className="p-5 border-b border-gray-200">
             <h2 className="font-display text-lg font-bold uppercase tracking-wider text-flag-blue">
               Admin Panel
