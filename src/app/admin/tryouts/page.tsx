@@ -17,6 +17,9 @@ import {
   Send,
   Check,
   Pencil,
+  CheckSquare,
+  Square,
+  AlertTriangle,
 } from "lucide-react";
 
 /* ---------- Types ---------- */
@@ -168,6 +171,11 @@ export default function TryoutsPage() {
   const [expandedPlayerId, setExpandedPlayerId] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
 
+  // Bulk select state
+  const [bulkSelectedIds, setBulkSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkUpdating, setBulkUpdating] = useState(false);
+  const [bulkProgress, setBulkProgress] = useState({ done: 0, total: 0, emailsSent: 0, emailsFailed: 0 });
+
   // Sessions tab state
   const [sessionDivisionFilter, setSessionDivisionFilter] = useState<string>("all");
   const [expandedSessionId, setExpandedSessionId] = useState<string | null>(null);
@@ -286,6 +294,90 @@ export default function TryoutsPage() {
       }
     }
     setUpdatingId(null);
+  }
+
+  /* ---------- Bulk Status Update ---------- */
+
+  function toggleBulkSelect(id: string) {
+    setBulkSelectedIds((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleSelectAllFiltered() {
+    const allFilteredIds = filteredPlayers.map((r) => r.id);
+    const allSelected = allFilteredIds.every((id) => bulkSelectedIds.has(id));
+    if (allSelected) {
+      setBulkSelectedIds((prev) => {
+        const next = new Set(prev);
+        allFilteredIds.forEach((id) => next.delete(id));
+        return next;
+      });
+    } else {
+      setBulkSelectedIds((prev) => {
+        const next = new Set(prev);
+        allFilteredIds.forEach((id) => next.add(id));
+        return next;
+      });
+    }
+  }
+
+  async function bulkUpdateStatus(newStatus: Status) {
+    if (!supabase || bulkSelectedIds.size === 0) return;
+    const ids = Array.from(bulkSelectedIds);
+    const sendEmail = newStatus === "selected" || newStatus === "not_selected" || newStatus === "alternate";
+
+    setBulkUpdating(true);
+    setBulkProgress({ done: 0, total: ids.length, emailsSent: 0, emailsFailed: 0 });
+
+    let emailsSent = 0;
+    let emailsFailed = 0;
+
+    for (let i = 0; i < ids.length; i++) {
+      const id = ids[i];
+      const { error } = await supabase
+        .from("tryout_registrations")
+        .update({ status: newStatus })
+        .eq("id", id);
+
+      if (!error) {
+        setRegistrations((prev) =>
+          prev.map((r) => (r.id === id ? { ...r, status: newStatus } : r))
+        );
+
+        if (sendEmail) {
+          const reg = registrations.find((r) => r.id === id);
+          if (reg) {
+            try {
+              const res = await fetch("/api/send-selection", {
+                method: "POST",
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({
+                  registration_id: id,
+                  status: newStatus,
+                  division: reg.division,
+                  player_name: `${reg.player_first_name} ${reg.player_last_name}`,
+                  parent_name: reg.parent_name,
+                  parent_email: reg.parent_email,
+                }),
+              });
+              if (res.ok) emailsSent++;
+              else emailsFailed++;
+            } catch {
+              emailsFailed++;
+            }
+          }
+        }
+      }
+
+      setBulkProgress({ done: i + 1, total: ids.length, emailsSent, emailsFailed });
+    }
+
+    setBulkSelectedIds(new Set());
+    setBulkUpdating(false);
   }
 
   /* ---------- Session CRUD ---------- */
@@ -731,10 +823,73 @@ export default function TryoutsPage() {
             </div>
           </div>
 
-          {/* Results count */}
-          <p className="text-xs text-gray-400 mb-3">
-            Showing {filteredPlayers.length} of {registrations.length}
-          </p>
+          {/* Bulk Action Bar */}
+          <div className="flex flex-wrap items-center gap-3 mb-3">
+            <button
+              onClick={toggleSelectAllFiltered}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wide border border-gray-200 text-gray-600 hover:bg-gray-100 transition-colors"
+            >
+              {filteredPlayers.length > 0 && filteredPlayers.every((r) => bulkSelectedIds.has(r.id))
+                ? <><CheckSquare size={14} /> Deselect All</>
+                : <><Square size={14} /> Select All</>
+              }
+            </button>
+
+            <span className="text-xs text-gray-400">
+              {bulkSelectedIds.size > 0
+                ? `${bulkSelectedIds.size} selected`
+                : `Showing ${filteredPlayers.length} of ${registrations.length}`}
+            </span>
+
+            {bulkSelectedIds.size > 0 && !bulkUpdating && (
+              <>
+                <span className="text-xs text-gray-300">|</span>
+                <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                  Bulk Set:
+                </span>
+                {(["selected", "alternate", "not_selected"] as Status[]).map((s) => {
+                  const opt = STATUS_OPTIONS.find((o) => o.value === s)!;
+                  return (
+                    <button
+                      key={s}
+                      onClick={() => {
+                        if (confirm(`Set ${bulkSelectedIds.size} player(s) to "${opt.label}"?\n\n${s === "selected" || s === "not_selected" || s === "alternate" ? "This will also send notification emails to parents." : ""}`)) {
+                          bulkUpdateStatus(s);
+                        }
+                      }}
+                      className={`px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wide transition-colors border border-gray-200 hover:bg-gray-100 ${opt.color}`}
+                    >
+                      {opt.label}
+                    </button>
+                  );
+                })}
+                <button
+                  onClick={() => setBulkSelectedIds(new Set())}
+                  className="px-2 py-1.5 rounded text-xs text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <X size={14} />
+                </button>
+              </>
+            )}
+
+            {bulkUpdating && (
+              <div className="flex items-center gap-2 text-xs">
+                <div className="w-32 h-2 bg-gray-200 rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-flag-blue rounded-full transition-all"
+                    style={{ width: `${bulkProgress.total > 0 ? (bulkProgress.done / bulkProgress.total) * 100 : 0}%` }}
+                  />
+                </div>
+                <span className="text-gray-500">
+                  {bulkProgress.done}/{bulkProgress.total}
+                  {bulkProgress.emailsSent > 0 && ` · ${bulkProgress.emailsSent} emails sent`}
+                  {bulkProgress.emailsFailed > 0 && (
+                    <span className="text-flag-red"> · {bulkProgress.emailsFailed} failed</span>
+                  )}
+                </span>
+              </div>
+            )}
+          </div>
 
           {/* Player List */}
           {filteredPlayers.length === 0 ? (
@@ -751,12 +906,23 @@ export default function TryoutsPage() {
                 return (
                   <div
                     key={reg.id}
-                    className="bg-white border border-gray-200 rounded-lg overflow-hidden"
+                    className={`bg-white border rounded-lg overflow-hidden ${bulkSelectedIds.has(reg.id) ? "border-flag-blue ring-1 ring-flag-blue/30" : "border-gray-200"}`}
                   >
                     {/* Summary Row */}
+                    <div className="flex items-center">
+                      <button
+                        onClick={(e) => { e.stopPropagation(); toggleBulkSelect(reg.id); }}
+                        className="pl-4 pr-1 py-4 shrink-0"
+                        aria-label={bulkSelectedIds.has(reg.id) ? "Deselect player" : "Select player"}
+                      >
+                        {bulkSelectedIds.has(reg.id)
+                          ? <CheckSquare size={18} className="text-flag-blue" />
+                          : <Square size={18} className="text-gray-300 hover:text-gray-500" />
+                        }
+                      </button>
                     <button
                       onClick={() => setExpandedPlayerId(expanded ? null : reg.id)}
-                      className="w-full text-left p-4 md:p-5 flex items-center gap-4 hover:bg-gray-50 transition-colors"
+                      className="flex-1 text-left p-4 md:p-5 flex items-center gap-4 hover:bg-gray-50 transition-colors"
                     >
                       <div className="flex-1 min-w-0">
                         <div className="flex flex-wrap items-center gap-2 mb-1">
@@ -793,6 +959,7 @@ export default function TryoutsPage() {
                         <ChevronDown size={18} className="text-gray-400 shrink-0" />
                       )}
                     </button>
+                    </div>
 
                     {/* Expanded Details */}
                     {expanded && (
