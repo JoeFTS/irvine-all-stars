@@ -16,10 +16,11 @@ const CATEGORIES = [
 
 export async function GET(request: NextRequest) {
   const sessionId = request.nextUrl.searchParams.get("session_id");
+  const divisionParam = request.nextUrl.searchParams.get("division");
   const isBlank = request.nextUrl.searchParams.get("blank") === "true";
 
   // Blank template doesn't need session_id or supabase
-  if (!isBlank && (!sessionId || !supabaseUrl || !supabaseAnonKey)) {
+  if (!isBlank && !divisionParam && (!sessionId || !supabaseUrl || !supabaseAnonKey)) {
     return NextResponse.json({ error: "Missing parameters" }, { status: 400 });
   }
 
@@ -64,29 +65,44 @@ export async function GET(request: NextRequest) {
     jersey_number: string | null;
   }[] = [];
 
-  if (!isBlank && sessionId) {
+  if (!isBlank && (sessionId || divisionParam)) {
     const supabase = createClient(supabaseUrl!, supabaseAnonKey!, {
       db: { schema: "irvine_allstars" },
     });
 
-    const { data: assignments } = await supabase
-      .from("tryout_assignments")
-      .select("registration_id")
-      .eq("session_id", sessionId);
-
-    const regIds = (assignments || []).map((a: { registration_id: string }) => a.registration_id);
-
-    if (regIds.length > 0) {
+    if (divisionParam) {
+      // Fetch all players in the division directly
       const { data } = await supabase
         .from("tryout_registrations")
         .select(
           "player_first_name, player_last_name, division, primary_position, secondary_position, bats, throws, current_team, jersey_number"
         )
-        .in("id", regIds)
+        .eq("division", divisionParam)
         .order("player_last_name")
         .order("player_first_name");
 
       players = data || [];
+    } else if (sessionId) {
+      // Fetch players assigned to a specific tryout session
+      const { data: assignments } = await supabase
+        .from("tryout_assignments")
+        .select("registration_id")
+        .eq("session_id", sessionId);
+
+      const regIds = (assignments || []).map((a: { registration_id: string }) => a.registration_id);
+
+      if (regIds.length > 0) {
+        const { data } = await supabase
+          .from("tryout_registrations")
+          .select(
+            "player_first_name, player_last_name, division, primary_position, secondary_position, bats, throws, current_team, jersey_number"
+          )
+          .in("id", regIds)
+          .order("player_last_name")
+          .order("player_first_name");
+
+        players = data || [];
+      }
     }
   }
 
@@ -150,9 +166,10 @@ export async function GET(request: NextRequest) {
   // Row 1: Title
   ws.mergeCells("A1:O1");
   const titleCell = ws.getCell("A1");
+  const sheetDivision = session?.division || divisionParam || "";
   titleCell.value = isBlank
     ? "IRVINE ALL-STARS — TRYOUT SCORE SHEET"
-    : `IRVINE ALL-STARS — ${session!.division} TRYOUT SCORE SHEET`;
+    : `IRVINE ALL-STARS — ${sheetDivision} TRYOUT SCORE SHEET`;
   titleCell.font = { bold: true, size: 14, color: { argb: white } };
   titleCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: navy } };
   titleCell.alignment = { horizontal: "center", vertical: "middle" };
@@ -163,6 +180,8 @@ export async function GET(request: NextRequest) {
   const infoCell = ws.getCell("A2");
   infoCell.value = isBlank
     ? "Division: _______________    Date: _______________    Location: _______________"
+    : divisionParam && !session
+    ? `Division: ${divisionParam}    Date: _______________    Coach: _______________`
     : `${dateStr}  |  ${timeStr}  |  ${locationStr}`;
   infoCell.font = { size: 11, color: { argb: navy } };
   infoCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: lightGray } };
@@ -368,6 +387,8 @@ export async function GET(request: NextRequest) {
 
   const filename = isBlank
     ? "Irvine_All-Stars_Blank_Score_Sheet.xlsx"
+    : divisionParam
+    ? `${divisionParam.replace(/\s+/g, "-")}_Score_Sheet.xlsx`
     : `${session!.division.replace(/\s+/g, "-")}_Score_Sheet_${session!.session_date}.xlsx`;
 
   return new NextResponse(buffer as ArrayBuffer, {

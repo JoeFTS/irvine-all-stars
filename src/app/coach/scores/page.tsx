@@ -23,6 +23,8 @@ import {
   XCircle,
   Send,
   Plus,
+  RotateCcw,
+  Save,
 } from "lucide-react";
 
 /* ---------- Types ---------- */
@@ -204,6 +206,25 @@ export default function CoachScoresPage() {
     setParsedScores(rows);
     setSubmitResult(null);
   }, [registrations]);
+
+  const handleResetScores = useCallback(() => {
+    setParsedScores((prev) => {
+      if (!prev) return prev;
+      return prev.map((row) => ({
+        ...row,
+        hitting: null,
+        fielding: null,
+        throwing: null,
+        running: null,
+        effort: null,
+        attitude: null,
+        total: null,
+        notes: "",
+        errors: [],
+        status: "valid" as const,
+      }));
+    });
+  }, []);
 
   const handleAddManualRow = useCallback(() => {
     setParsedScores((prev) => {
@@ -464,7 +485,10 @@ export default function CoachScoresPage() {
             key={id}
             onClick={() => {
               setTab(id);
-              if (id === "manual" && !parsedScores) handleManualInit();
+              setParsedScores(null);
+              setPasteText("");
+              setSubmitResult(null);
+              if (id === "manual") handleManualInit();
             }}
             className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
               tab === id
@@ -483,14 +507,68 @@ export default function CoachScoresPage() {
         <div className="bg-white border border-gray-200 rounded-lg p-6">
           {tab === "paste" && (
             <div>
-              <h2 className="font-display text-lg font-bold uppercase tracking-wide mb-2">
+              <h2 className="font-display text-lg font-bold uppercase tracking-wide mb-3">
                 Paste from Google Sheets or Excel
               </h2>
-              <p className="text-gray-500 text-sm mb-4">
-                Select your score data in Google Sheets (including player names
-                and scores), copy it (Ctrl+C / Cmd+C), then paste below.
-                The data should match the score sheet template format.
-              </p>
+
+              {/* Step-by-step instructions */}
+              <div className="bg-flag-blue/5 border border-flag-blue/10 rounded-lg p-4 mb-5">
+                <p className="font-display text-sm font-semibold uppercase tracking-wide text-flag-blue mb-2">
+                  How to use Google Sheets
+                </p>
+                <ol className="text-sm text-gray-600 space-y-1.5 list-decimal list-inside">
+                  <li>
+                    <strong>Download the template</strong> below &mdash; it
+                    already has your players&apos; names filled in.
+                  </li>
+                  <li>
+                    Open the .xlsx file in Google Sheets (File &rarr;
+                    Import &rarr; Upload).
+                  </li>
+                  <li>
+                    Fill in scores for each player (1, 3, 5, 7, or 9
+                    per category).
+                  </li>
+                  <li>
+                    Select all the <strong>player rows</strong> with
+                    scores (not the header rows).
+                  </li>
+                  <li>
+                    Copy (<strong>Ctrl+C</strong> on Windows or{" "}
+                    <strong>Cmd+C</strong> on Mac).
+                  </li>
+                  <li>
+                    Click in the box below and paste (
+                    <strong>Ctrl+V</strong> / <strong>Cmd+V</strong>).
+                  </li>
+                  <li>
+                    Click <strong>&ldquo;Parse Scores&rdquo;</strong>{" "}
+                    to review, then submit.
+                  </li>
+                </ol>
+              </div>
+
+              {/* Download pre-filled template */}
+              <div className="flex flex-wrap items-center gap-3 mb-5">
+                <a
+                  href={`/api/score-sheet?division=${encodeURIComponent(division)}`}
+                  download
+                  className="inline-flex items-center gap-2 bg-flag-blue text-white px-5 py-2.5 rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors"
+                >
+                  <Download size={16} />
+                  Download Template with Players
+                </a>
+                <a
+                  href="/api/score-sheet?blank=true"
+                  download
+                  className="inline-flex items-center gap-2 bg-gray-100 text-gray-600 px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-200 transition-colors"
+                >
+                  <Download size={16} />
+                  Blank Template
+                </a>
+              </div>
+
+              {/* Paste area */}
               <textarea
                 value={pasteText}
                 onChange={(e) => setPasteText(e.target.value)}
@@ -507,14 +585,6 @@ export default function CoachScoresPage() {
                   <ClipboardPaste size={16} />
                   Parse Scores
                 </button>
-                <a
-                  href="/api/score-sheet?blank=true"
-                  download
-                  className="inline-flex items-center gap-2 bg-gray-100 text-gray-600 px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-200 transition-colors"
-                >
-                  <Download size={16} />
-                  Download Template
-                </a>
               </div>
             </div>
           )}
@@ -525,49 +595,48 @@ export default function CoachScoresPage() {
                 Upload Score File
               </h2>
               <p className="text-gray-500 text-sm mb-4">
-                Upload a CSV or Excel (.xlsx) file with your scores. Use the
-                template for the correct format.
+                Download the template with your players pre-filled, enter scores
+                in Google Sheets or Excel, then upload the completed file.
               </p>
-              <div className="flex flex-col sm:flex-row items-start gap-3">
-                <label className="inline-flex items-center gap-2 bg-flag-blue text-white px-5 py-2.5 rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors cursor-pointer">
-                  <Upload size={16} />
-                  Choose File
-                  <input
-                    type="file"
-                    accept=".csv,.xlsx,.xls"
-                    onChange={handleFileUpload}
-                    className="hidden"
-                  />
-                </label>
+              <div className="flex flex-col sm:flex-row items-start gap-3 mb-4">
+                <a
+                  href={`/api/score-sheet?division=${encodeURIComponent(division)}`}
+                  download
+                  className="inline-flex items-center gap-2 bg-flag-blue text-white px-5 py-2.5 rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors"
+                >
+                  <Download size={16} />
+                  Download Template with Players
+                </a>
                 <a
                   href="/api/score-sheet?blank=true"
                   download
                   className="inline-flex items-center gap-2 bg-gray-100 text-gray-600 px-4 py-2.5 rounded-lg text-sm font-semibold hover:bg-gray-200 transition-colors"
                 >
                   <Download size={16} />
-                  Download Template
+                  Blank Template
                 </a>
               </div>
+              <label className="inline-flex items-center gap-2 bg-white border-2 border-dashed border-gray-300 hover:border-flag-blue text-gray-600 px-6 py-4 rounded-lg text-sm font-semibold uppercase tracking-wide transition-colors cursor-pointer">
+                <Upload size={16} />
+                Choose File to Upload
+                <input
+                  type="file"
+                  accept=".csv,.xlsx,.xls"
+                  onChange={handleFileUpload}
+                  className="hidden"
+                />
+              </label>
               <p className="text-xs text-gray-400 mt-3">
                 Accepts .csv and .xlsx files
               </p>
             </div>
           )}
 
-          {tab === "manual" && (
+          {tab === "manual" && registrations.length === 0 && (
             <div className="text-center py-4">
-              <p className="text-gray-500 text-sm mb-4">
-                Enter scores manually for {registrations.length} registered
-                players in {division}.
+              <p className="text-gray-500 text-sm">
+                No registered players found in {division}.
               </p>
-              <button
-                onClick={handleManualInit}
-                disabled={registrations.length === 0}
-                className="inline-flex items-center gap-2 bg-flag-blue text-white px-5 py-2.5 rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors disabled:opacity-50"
-              >
-                <PenLine size={16} />
-                Start Entering Scores
-              </button>
             </div>
           )}
         </div>
@@ -594,15 +663,24 @@ export default function CoachScoresPage() {
                 </span>
               )}
             </div>
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               {tab === "manual" && (
-                <button
-                  onClick={handleAddManualRow}
-                  className="inline-flex items-center gap-1.5 bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wide hover:bg-gray-200 transition-colors"
-                >
-                  <Plus size={14} />
-                  Add Row
-                </button>
+                <>
+                  <button
+                    onClick={handleAddManualRow}
+                    className="inline-flex items-center gap-1.5 bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wide hover:bg-gray-200 transition-colors"
+                  >
+                    <Plus size={14} />
+                    Add Row
+                  </button>
+                  <button
+                    onClick={handleResetScores}
+                    className="inline-flex items-center gap-1.5 bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wide hover:bg-gray-200 transition-colors"
+                  >
+                    <RotateCcw size={14} />
+                    Reset Scores
+                  </button>
+                </>
               )}
               <button
                 onClick={() => {
@@ -618,10 +696,10 @@ export default function CoachScoresPage() {
                 disabled={validRows.length === 0 || submitting}
                 className="inline-flex items-center gap-2 bg-flag-blue text-white px-5 py-2 rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors disabled:opacity-50"
               >
-                <Send size={14} />
+                <Save size={14} />
                 {submitting
-                  ? "Submitting..."
-                  : `Submit ${validRows.length} Score${validRows.length !== 1 ? "s" : ""}`}
+                  ? "Saving..."
+                  : `Save ${validRows.length} Score${validRows.length !== 1 ? "s" : ""}`}
               </button>
             </div>
           </div>
