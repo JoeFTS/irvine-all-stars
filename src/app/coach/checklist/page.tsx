@@ -15,6 +15,7 @@ import {
   ShieldCheck,
   Info,
   AlertTriangle,
+  Camera,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
@@ -561,17 +562,17 @@ export default function BinderChecklistPage() {
       </div>
 
       {/* ================================================================ */}
-      {/*  SECTION 5: Birth Certificates (per player)                      */}
+      {/*  SECTION 5: Birth Certificates & Player Photos (per player)      */}
       {/* ================================================================ */}
       <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
         <div className="p-5 flex items-center gap-3 border-b border-gray-100">
           <SectionNumber n={5} />
           <div className="flex-1">
             <h2 className="font-display text-lg font-bold uppercase tracking-wider">
-              Birth Certificates
+              Birth Certificates &amp; Player Photos
             </h2>
             <p className="text-xs text-gray-400 mt-0.5">
-              {s5Complete} of {s5Total} players complete
+              {s5Complete} of {s5Total} birth certs uploaded
             </p>
           </div>
           {s5Complete === s5Total && s5Total > 0 ? (
@@ -589,8 +590,9 @@ export default function BinderChecklistPage() {
             </div>
           ) : (
             registrations.map((reg) => {
-              const doc = playerHasDoc(reg.id, "birth_certificate");
-              const status: SectionItemStatus = doc ? "complete" : "pending";
+              const birthCert = playerHasDoc(reg.id, "birth_certificate");
+              const photo = playerHasDoc(reg.id, "player_photo");
+              const status: SectionItemStatus = birthCert ? "complete" : "pending";
               return (
                 <div
                   key={reg.id}
@@ -604,19 +606,30 @@ export default function BinderChecklistPage() {
                     <span className="text-xs text-gray-400">
                       {divisionShortName(reg.division)}
                     </span>
-                    {doc?.file_path && (
+                    {birthCert?.file_path && (
                       <button
-                        onClick={() => handleViewDocument(doc.file_path!)}
+                        onClick={() => handleViewDocument(birthCert.file_path!)}
                         className="flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold text-flag-blue hover:bg-flag-blue/10 transition-colors"
+                        title="View birth certificate"
                       >
                         <Eye size={14} />
-                        View
+                        Birth Cert
+                      </button>
+                    )}
+                    {photo?.file_path && (
+                      <button
+                        onClick={() => handleViewDocument(photo.file_path!)}
+                        className="flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold text-purple-600 hover:bg-purple-50 transition-colors"
+                        title="View player photo"
+                      >
+                        <Camera size={14} />
+                        Photo
                       </button>
                     )}
                     <span
                       className={`px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${statusBadgeClasses(status)}`}
                     >
-                      {doc ? "Uploaded" : "Pending"}
+                      {birthCert ? "Uploaded" : "Pending"}
                     </span>
                   </div>
                 </div>
