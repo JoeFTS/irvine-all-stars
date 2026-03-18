@@ -63,3 +63,12 @@ body {
     margin: 0 !important;
   }
 }
+
+/* Landscape print — forces landscape + fits to one page */
+@page pitching-log {
+  size: landscape;
+  margin: 0.3in;
+}
+.print-landscape {
+  page: pitching-log;
+}
