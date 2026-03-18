@@ -244,16 +244,35 @@ export function CoachApplicationForm() {
       return;
     }
 
-    const { error } = await supabase
-      .from("coach_applications")
-      .insert(payload);
+    // Try up to 2 times for transient network issues
+    let lastError: { message: string; code?: string; details?: string } | null = null;
+    for (let attempt = 0; attempt < 2; attempt++) {
+      const { error } = await supabase
+        .from("coach_applications")
+        .insert(payload);
+      if (!error) {
+        lastError = null;
+        break;
+      }
+      lastError = error;
+      console.error(`Submit error (attempt ${attempt + 1}):`, error.message, error.code, error.details);
+      // Don't retry on constraint violations
+      if (error.code === "23505" || error.code === "23514") break;
+      // Brief pause before retry
+      if (attempt === 0) await new Promise((r) => setTimeout(r, 1000));
+    }
 
-    if (error) {
-      console.error("Submit error:", error);
+    if (lastError) {
       setSubmitting(false);
-      setSubmitError(
-        "Something went wrong submitting your application. Please try again. If the problem persists, contact AllStars@irvinepony.com."
-      );
+      if (lastError.code === "23505") {
+        setSubmitError(
+          "An application with this email already exists. If you need to update your application, contact AllStars@irvinepony.com."
+        );
+      } else {
+        setSubmitError(
+          `Something went wrong submitting your application (${lastError.code || "network"}). Please try again. If the problem persists, contact AllStars@irvinepony.com.`
+        );
+      }
       return;
     }
 
