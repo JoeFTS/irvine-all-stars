@@ -28,15 +28,24 @@ function usePrintStyles() {
     style.textContent = `
       @page { size: landscape; margin: 0.25in; }
       @media print {
-        /* Hide everything except the pitching log */
-        body > * { visibility: hidden !important; }
-        #pitching-log-print-area,
+        html, body { height: auto !important; overflow: visible !important; margin: 0 !important; padding: 0 !important; }
+        body > * { display: none !important; }
+        body > *:has(#pitching-log-print-area) { display: block !important; }
+        #pitching-log-print-area { display: block !important; }
         #pitching-log-print-area * { visibility: visible !important; }
-        #pitching-log-print-area {
-          position: absolute;
-          left: 0;
-          top: 0;
-          width: 100%;
+        /* Collapse all wrappers between body and the print area */
+        body > *:has(#pitching-log-print-area),
+        body > *:has(#pitching-log-print-area) > *,
+        body > *:has(#pitching-log-print-area) > * > *,
+        body > *:has(#pitching-log-print-area) > * > * > *,
+        body > *:has(#pitching-log-print-area) > * > * > * > *,
+        body > *:has(#pitching-log-print-area) > * > * > * > * > * {
+          display: block !important;
+          padding: 0 !important;
+          margin: 0 !important;
+          min-height: 0 !important;
+          height: auto !important;
+          overflow: visible !important;
         }
       }
     `;
