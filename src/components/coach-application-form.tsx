@@ -203,6 +203,7 @@ export function CoachApplicationForm() {
 
   async function handleSubmit() {
     if (!validateStep(3)) {
+      setSubmitError("Please check all required consent boxes before submitting.");
       window.scrollTo({ top: 0, behavior: "smooth" });
       return;
     }
@@ -765,6 +766,12 @@ export function CoachApplicationForm() {
   return (
     <div>
       {progressBar}
+
+      {submitError && (
+        <div className="bg-flag-red/10 border border-flag-red/30 rounded-lg p-4 mb-4">
+          <p className="text-flag-red text-sm font-semibold">{submitError}</p>
+        </div>
+      )}
 
       <div className="bg-white rounded-lg border border-gray-200 p-5 md:p-8">
         {step === 0 && renderStep0()}
