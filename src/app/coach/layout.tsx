@@ -11,6 +11,7 @@ import {
   Award,
   BookOpen,
   Megaphone,
+  UserCircle,
 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 
@@ -90,6 +91,17 @@ export default function CoachLayout({
               );
             })}
           </nav>
+          <div className="mt-auto p-4 border-t border-gray-200">
+            <div className="flex items-center gap-2.5">
+              <UserCircle size={20} className="text-flag-blue shrink-0" />
+              <div className="min-w-0">
+                <p className="text-xs font-bold uppercase tracking-wide text-flag-blue">
+                  {role === "admin" ? "Admin" : "Coach"}
+                </p>
+                <p className="text-[11px] text-gray-500 truncate">{user?.email}</p>
+              </div>
+            </div>
+          </div>
         </aside>
 
         {/* Main Content */}
