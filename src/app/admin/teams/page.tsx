@@ -69,7 +69,7 @@ function computeCompliance(
     (d) => regIds.has(d.registration_id) && d.document_type === "birth_certificate"
   ).length;
   const photoUploaded = docs.filter(
-    (d) => regIds.has(d.registration_id) && d.document_type === "photo"
+    (d) => regIds.has(d.registration_id) && d.document_type === "player_photo"
   ).length;
   const contractSigned = contracts.filter((c) => regIds.has(c.registration_id)).length;
 
@@ -86,7 +86,7 @@ function computeCompliance(
   for (const reg of divRegs) {
     const docSet = regDocsMap.get(reg.id);
     const hasBirth = docSet?.has("birth_certificate") ?? false;
-    const hasPhoto = docSet?.has("photo") ?? false;
+    const hasPhoto = docSet?.has("player_photo") ?? false;
     const hasContract = contractSet.has(reg.id);
     if (hasBirth && hasPhoto && hasContract) readyCount++;
   }

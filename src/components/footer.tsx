@@ -16,26 +16,26 @@ export function Footer() {
           </span>
         </div>
 
-        <div className="flex flex-wrap justify-center gap-6 text-sm">
-          <Link href="/coaches" className="hover:text-white transition-colors">
+        <div className="flex flex-wrap justify-center gap-x-6 gap-y-2 text-sm">
+          <Link href="/coaches" className="hover:text-white transition-colors py-1">
             Coaches
           </Link>
-          <Link href="/tryouts" className="hover:text-white transition-colors">
+          <Link href="/tryouts" className="hover:text-white transition-colors py-1">
             Tryouts
           </Link>
           <Link
             href="/timeline"
-            className="hover:text-white transition-colors"
+            className="hover:text-white transition-colors py-1"
           >
             Timeline
           </Link>
           <Link
             href="/documents"
-            className="hover:text-white transition-colors"
+            className="hover:text-white transition-colors py-1"
           >
             Documents
           </Link>
-          <Link href="/faq" className="hover:text-white transition-colors">
+          <Link href="/faq" className="hover:text-white transition-colors py-1">
             FAQ
           </Link>
         </div>

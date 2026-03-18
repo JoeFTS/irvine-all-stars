@@ -97,7 +97,7 @@ function Label({
 }
 
 const inputClasses =
-  "w-full rounded border border-gray-200 bg-white px-4 py-3 text-base text-charcoal placeholder:text-gray-400 focus:border-flag-blue focus:ring-2 focus:ring-flag-blue/20 focus:outline-none transition-colors";
+  "w-full min-h-[44px] rounded border border-gray-200 bg-white px-4 py-3 text-base text-charcoal placeholder:text-gray-400 focus:border-flag-blue focus:ring-2 focus:ring-flag-blue/20 focus:outline-none transition-colors";
 
 const selectClasses = `${inputClasses} appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%234B5563%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M5.23%207.21a.75.75%200%20011.06.02L10%2011.168l3.71-3.938a.75.75%200%20111.08%201.04l-4.25%204.5a.75.75%200%2001-1.08%200l-4.25-4.5a.75.75%200%2001.02-1.06z%22%20clip-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E')] bg-[length:20px] bg-[right_12px_center] bg-no-repeat pr-10`;
 
@@ -413,7 +413,7 @@ export function CoachApplicationForm() {
         <button
           type="button"
           onClick={handleBack}
-          className="px-6 py-3.5 rounded border-2 border-gray-200 font-display text-sm font-semibold uppercase tracking-widest text-gray-600 hover:border-gray-400 hover:text-charcoal transition-colors min-w-[120px]"
+          className="px-4 sm:px-6 py-3.5 rounded border-2 border-gray-200 font-display text-sm font-semibold uppercase tracking-widest text-gray-600 hover:border-gray-400 hover:text-charcoal transition-colors min-h-[44px]"
         >
           &larr; Back
         </button>
@@ -425,7 +425,7 @@ export function CoachApplicationForm() {
         <button
           type="button"
           onClick={handleNext}
-          className="px-6 py-3.5 rounded bg-flag-blue text-white font-display text-sm font-semibold uppercase tracking-widest hover:bg-flag-blue-mid transition-colors min-w-[120px]"
+          className="px-4 sm:px-6 py-3.5 rounded bg-flag-blue text-white font-display text-sm font-semibold uppercase tracking-widest hover:bg-flag-blue-mid transition-colors min-h-[44px]"
         >
           Next &rarr;
         </button>
@@ -434,7 +434,7 @@ export function CoachApplicationForm() {
           type="button"
           onClick={handleSubmit}
           disabled={submitting}
-          className="px-8 py-3.5 rounded bg-flag-red text-white font-display text-sm font-semibold uppercase tracking-widest hover:bg-flag-red-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-w-[160px]"
+          className="px-6 sm:px-8 py-3.5 rounded bg-flag-red text-white font-display text-sm font-semibold uppercase tracking-widest hover:bg-flag-red-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
         >
           {submitting ? "Submitting..." : "Submit Application \u2605"}
         </button>

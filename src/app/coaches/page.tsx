@@ -6,6 +6,11 @@ export const metadata: Metadata = {
   title: "Coach Selection",
   description:
     "Learn about the Irvine All-Stars coach selection process. Fair, transparent, and based on a 100-point rubric covering player development, sportsmanship, and commitment.",
+  openGraph: {
+    title: "Coach Selection",
+    description:
+      "Apply to coach an Irvine All-Stars division. Fair, transparent selection based on a 100-point rubric.",
+  },
 };
 
 const rubricItems = [

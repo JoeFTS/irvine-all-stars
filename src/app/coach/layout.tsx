@@ -4,6 +4,7 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
+  UserCheck,
   ClipboardCheck,
   Users,
   Award,
@@ -14,6 +15,7 @@ import { useAuth } from "@/contexts/auth-context";
 
 const navItems = [
   { href: "/coach", label: "Dashboard", icon: LayoutDashboard },
+  { href: "/coach/tryouts", label: "Tryouts", icon: UserCheck },
   { href: "/coach/checklist", label: "Binder Checklist", icon: ClipboardCheck },
   { href: "/coach/roster", label: "Roster", icon: Users },
   { href: "/coach/certifications", label: "Certifications", icon: Award },

@@ -31,7 +31,8 @@
 - [x] Division names corrected (9U-Mustang, 12U-Bronco)
 - [x] /portal placeholder page
 - [x] Add RESEND_API_KEY to VPS .env.local
-- [ ] Test full e2e form submission on production
+- [x] Duplicate registration prevention
+- [x] Multi-child registration flow ("Register Another Child")
 
 ## Phase 3: Auth + Evaluator Scoring ✅
 - [x] Auth context with role-based access (admin/coach/evaluator/parent)
@@ -53,26 +54,46 @@
 - [x] Evaluator scores — grouped by division, sorted by total, expandable
 - [x] Announcements CRUD — create, edit, delete, division targeting
 
-## Phase 5: Parent Portal ✅
+## Phase 5: Parent + Coach Portals ✅
 - [x] Auth-gated parent portal (/portal)
 - [x] Player status cards with color-coded badges
 - [x] Division-filtered announcements feed
-- [x] Quick links grid (tryouts, scoring, FAQ, documents, contact)
-- [x] Key dates section
-
-## Phase 6: Polish + Future
-- [ ] Generate real images with imagegen skill (hero, division graphics)
-- [ ] SEO optimization (meta tags, OG images)
-- [ ] Analytics (GA4 or Plausible)
-- [ ] Practice Schedule Board
-- [ ] Volunteer Sign-Up
-- [ ] Equipment/Uniform Tracker
-- [ ] Tournament Hub
-- [ ] Photo Gallery
-- [ ] Post-Season Survey
+- [x] Quick links grid + key dates section
+- [x] Step-by-step compliance gating (Register → Contract → Photo → Birth Cert)
+- [x] Contract page gated behind team selection
+- [x] Documents page gated behind signed contract
+- [x] Coach portal (/coach) with dashboard, roster, checklist, certifications, tournament rules, updates
+- [x] Coach roster only shows players with signed contracts
 - [x] Admin account set up (allstars@irvinepony.com)
 
+## Phase 6: Final Polish (MUST FINISH BY 2026-03-17)
+
+### Priority 1 — Must Have
+- [x] Full e2e production test: register player → admin selects → parent signs contract → uploads docs → coach sees on roster — ALL PASS, emails sent to bloodkin@me.com ✅
+- [x] Verify confirmation emails actually send in production (Resend) — API returns success, Resend domain verified, RESEND_API_KEY on VPS ✅
+- [x] Admin: ability to bulk-select players for teams (set status to "selected") — checkboxes, select-all, bulk action bar with progress ✅
+- [x] Admin: send "You've been selected" notification email to parents when status changes — already existed in single-update; now also fires in bulk flow ✅
+- [x] Verify all Supabase tables exist (teams, player_documents, player_contracts, coach_certifications, etc.) — all 13 tables verified with row counts ✅
+- [x] Verify Supabase Storage bucket "player-documents" exists and RLS policies allow parent uploads — bucket created + 3 RLS policies added ✅
+
+### Priority 2 — Should Have
+- [x] Admin: view uploaded documents per player (birth certs, photos) — `/admin/documents` with view/download/approve/reject ✅
+- [x] Admin: team compliance overview (which teams are tournament-ready) — `/admin/compliance` with per-division/per-player drill-down ✅
+- [x] Bug fix: `document_type` mismatch — teams page checked "photo" but portal uploads "player_photo" ✅
+- [ ] Homepage: replace placeholder content with real images (deferred — no real team photos available yet)
+- [x] SEO: meta tags + OG images for all pages ✅
+- [x] Mobile polish pass on all pages ✅
+- [x] Coach tryouts page — coaches see division players, scores, and submit recommendations ✅
+- [x] Admin tryouts — coach picks integration (gold badge + filter) ✅
+- [x] Database: coach_selections table + RLS policies ✅
+
+### Priority 3 — Nice to Have
+- [ ] Analytics (GA4 or Plausible)
+- [ ] Practice Schedule Board
+- [ ] Tournament Hub
+- [ ] Photo Gallery
+
 ---
-**Status:** Phases 0-5 COMPLETE. 22 routes live at irvineallstars.com.
-**Remaining:** Phase 6 polish items
+**Status:** Phases 0-5 COMPLETE. 22+ routes live at irvineallstars.com. 43/43 e2e tests passing.
+**Deadline:** March 17, 2026
 **Last Updated:** 2026-03-16

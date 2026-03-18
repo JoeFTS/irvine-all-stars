@@ -6,6 +6,11 @@ export const metadata: Metadata = {
   title: "Frequently Asked Questions",
   description:
     "Everything you need to know about Irvine Pony Baseball All-Stars — tryouts, selection, costs, coaching, and more.",
+  openGraph: {
+    title: "Frequently Asked Questions",
+    description:
+      "Everything parents and coaches need to know about Irvine All-Stars tryouts, selection, costs, and more.",
+  },
 };
 
 const faqSections: FaqSection[] = [

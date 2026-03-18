@@ -5,6 +5,11 @@ export const metadata: Metadata = {
   title: "2026 Season Timeline",
   description:
     "The complete Irvine Pony Baseball All-Stars timeline — from pre-season planning through post-season celebration.",
+  openGraph: {
+    title: "2026 Season Timeline",
+    description:
+      "Key dates from coach applications through tournaments for the Irvine All-Stars season.",
+  },
 };
 
 const phases = [

@@ -46,8 +46,8 @@ export function Navbar() {
   return (
     <>
       {/* Announcement Bar */}
-      <div className="fixed top-0 w-full z-[101] bg-cream border-b border-sand text-center py-1.5 px-4">
-        <p className="text-flag-blue text-xs font-bold tracking-wider uppercase font-display">
+      <div className="fixed top-0 w-full z-[101] bg-cream border-b border-sand text-center py-1.5 px-4 overflow-hidden">
+        <p className="text-flag-blue text-xs font-bold tracking-wider uppercase font-display whitespace-nowrap text-ellipsis overflow-hidden">
           <span className="text-star-gold">&#9733;</span> 2026 All-Stars
           Season — Applications Now Open{" "}
           <span className="text-star-gold">&#9733;</span>
@@ -124,7 +124,7 @@ export function Navbar() {
         {/* Mobile Toggle */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="lg:hidden text-white p-2"
+          className="lg:hidden text-white p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
           aria-label="Toggle menu"
         >
           {mobileOpen ? <X size={24} /> : <Menu size={24} />}

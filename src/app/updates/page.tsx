@@ -5,6 +5,11 @@ export const metadata: Metadata = {
   title: "Updates & Announcements",
   description:
     "Latest news and announcements for Irvine Pony Baseball All-Stars. Stay informed on tryout dates, coach applications, and important deadlines.",
+  openGraph: {
+    title: "Updates & Announcements",
+    description:
+      "Latest news and announcements from Irvine All-Stars — tryout dates, coach applications, and deadlines.",
+  },
 };
 
 const announcements = [

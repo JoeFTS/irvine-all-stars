@@ -20,6 +20,7 @@ import {
   CheckSquare,
   Square,
   AlertTriangle,
+  Star,
 } from "lucide-react";
 
 /* ---------- Types ---------- */
@@ -82,6 +83,14 @@ interface TryoutAssignment {
   checked_in_at: string | null;
   invited_at: string | null;
   created_at: string;
+}
+
+interface CoachSelection {
+  registration_id: string;
+  coach_id: string;
+  division: string;
+  notes: string | null;
+  selected_at: string;
 }
 
 /* ---------- Constants ---------- */
@@ -163,10 +172,12 @@ export default function TryoutsPage() {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [sessions, setSessions] = useState<TryoutSession[]>([]);
   const [assignments, setAssignments] = useState<TryoutAssignment[]>([]);
+  const [coachSelections, setCoachSelections] = useState<CoachSelection[]>([]);
   const [loading, setLoading] = useState(true);
 
   // Players tab state
   const [divisionFilter, setDivisionFilter] = useState<string>("all");
+  const [showCoachPicks, setShowCoachPicks] = useState(false);
   const [statusFilter, setStatusFilter] = useState<Status | "all">("all");
   const [expandedPlayerId, setExpandedPlayerId] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -221,7 +232,7 @@ export default function TryoutsPage() {
     if (!supabase) return;
     setLoading(true);
 
-    const [regsRes, sessionsRes, assignmentsRes] = await Promise.all([
+    const [regsRes, sessionsRes, assignmentsRes, coachSelectionsRes] = await Promise.all([
       supabase
         .from("tryout_registrations")
         .select("*")
@@ -232,11 +243,13 @@ export default function TryoutsPage() {
         .order("session_date")
         .order("start_time"),
       supabase.from("tryout_assignments").select("*"),
+      supabase.from("coach_selections").select("registration_id, coach_id, division, notes, selected_at"),
     ]);
 
     if (regsRes.data) setRegistrations(regsRes.data);
     if (sessionsRes.data) setSessions(sessionsRes.data);
     if (assignmentsRes.data) setAssignments(assignmentsRes.data);
+    if (coachSelectionsRes.data) setCoachSelections(coachSelectionsRes.data);
 
     setLoading(false);
   }, []);
@@ -671,9 +684,12 @@ export default function TryoutsPage() {
 
   /* ---------- Filtered Lists ---------- */
 
+  const coachPickRegIds = new Set(coachSelections.map((cs) => cs.registration_id));
+
   const filteredPlayers = registrations.filter((r) => {
     if (divisionFilter !== "all" && r.division !== divisionFilter) return false;
     if (statusFilter !== "all" && r.status !== statusFilter) return false;
+    if (showCoachPicks && !coachPickRegIds.has(r.id)) return false;
     return true;
   });
 
@@ -821,6 +837,21 @@ export default function TryoutsPage() {
                 ))}
               </div>
             </div>
+
+            {/* Coach Picks Filter */}
+            <div>
+              <button
+                onClick={() => setShowCoachPicks(!showCoachPicks)}
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide transition-colors ${
+                  showCoachPicks
+                    ? "bg-star-gold text-white"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
+              >
+                <Star size={10} className="inline -mt-0.5 mr-1" />
+                Coach Picks{coachSelections.length > 0 ? ` (${coachSelections.length})` : ""}
+              </button>
+            </div>
           </div>
 
           {/* Bulk Action Bar */}
@@ -933,6 +964,12 @@ export default function TryoutsPage() {
                             {reg.division}
                           </span>
                           <StatusBadge status={reg.status ?? "registered"} />
+                          {coachPickRegIds.has(reg.id) && (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-star-gold/20 text-star-gold border border-star-gold/30">
+                              <Star size={10} />
+                              Coach Pick
+                            </span>
+                          )}
                         </div>
                         <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-400">
                           {playerSession ? (
@@ -1142,6 +1179,43 @@ export default function TryoutsPage() {
                             </span>
                           </div>
                         </div>
+
+                        {/* Coach Recommendation */}
+                        {(() => {
+                          const selection = coachSelections.find((cs) => cs.registration_id === reg.id);
+                          if (!selection) return null;
+                          return (
+                            <div className="bg-star-gold/10 border border-star-gold/20 rounded-lg p-4">
+                              <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-star-gold mb-2 flex items-center gap-1.5">
+                                <Star size={14} />
+                                Coach Recommendation
+                              </h3>
+                              <div className="text-sm text-charcoal space-y-1">
+                                <p>
+                                  <span className="text-gray-400">Recommended by:</span>{" "}
+                                  Coach {selection.coach_id}
+                                </p>
+                                <p>
+                                  <span className="text-gray-400">Date:</span>{" "}
+                                  {new Date(selection.selected_at).toLocaleDateString("en-US", {
+                                    weekday: "short",
+                                    month: "short",
+                                    day: "numeric",
+                                    year: "numeric",
+                                    hour: "numeric",
+                                    minute: "2-digit",
+                                  })}
+                                </p>
+                                {selection.notes && (
+                                  <p>
+                                    <span className="text-gray-400">Notes:</span>{" "}
+                                    <span className="italic">{selection.notes}</span>
+                                  </p>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </div>
                     )}
                   </div>

@@ -199,7 +199,7 @@ export default function Home() {
             { number: "Fair", label: "& Transparent" },
           ].map((stat) => (
             <StaggerItem key={stat.label}>
-              <p className="font-display text-5xl font-bold text-[#F4B400]">
+              <p className="font-display text-3xl md:text-5xl font-bold text-[#F4B400]">
                 {stat.number}
               </p>
               <p className="text-white/60 text-sm uppercase tracking-wider mt-1">

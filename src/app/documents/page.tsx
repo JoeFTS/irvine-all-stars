@@ -6,6 +6,11 @@ export const metadata: Metadata = {
   title: "Documents & Downloads",
   description:
     "Download All-Stars policies, forms, and rubrics. Coach selection, player tryout evaluation, and general documents for Irvine Pony Baseball All-Stars.",
+  openGraph: {
+    title: "Documents & Downloads",
+    description:
+      "Downloadable forms, policies, and rubrics for Irvine Pony Baseball All-Stars.",
+  },
 };
 
 const coachDocuments = [

@@ -818,7 +818,7 @@ export default function PortalPage() {
                     i % 2 === 0 ? "bg-flag-blue" : "bg-flag-red"
                   }`}
                 />
-                <span className="font-display text-sm font-bold uppercase tracking-wide text-flag-blue w-24 shrink-0">
+                <span className="font-display text-sm font-bold uppercase tracking-wide text-flag-blue w-20 sm:w-24 shrink-0">
                   {item.date}
                 </span>
                 <span className="text-sm text-gray-600">{item.label}</span>

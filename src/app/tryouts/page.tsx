@@ -7,6 +7,11 @@ export const metadata: Metadata = {
   title: "All-Stars Tryouts",
   description:
     "Everything you need to know about Irvine Pony Baseball All-Stars tryouts. Schedule, scoring rubric, what to bring, and what to expect for all ten divisions.",
+  openGraph: {
+    title: "All-Stars Tryouts",
+    description:
+      "Tryout schedule, scoring rubric, and what to expect for all ten Irvine All-Stars divisions.",
+  },
 };
 
 const rubricItems = [
@@ -263,11 +268,11 @@ export default function TryoutsPage() {
             Make sure your player shows up ready to compete.
           </p>
 
-          <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
+          <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
             {whatToBring.map((item) => (
               <div
                 key={item.item}
-                className="bg-white rounded-lg p-5 border border-gray-200 text-center"
+                className="bg-white rounded-lg p-4 sm:p-5 border border-gray-200 text-center"
               >
                 <div
                   className="text-3xl mb-2"
