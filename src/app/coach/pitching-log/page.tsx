@@ -15,7 +15,7 @@ const PITCHING_DIVISIONS = [
   { key: "Pony", label: "Pony" },
 ] as const;
 
-const BLANK_ROWS = 15;
+const BLANK_ROWS = 12;
 
 export default function PitchingLogPage() {
   const [selectedDivision, setSelectedDivision] = useState<string>(
