@@ -76,12 +76,30 @@ const whatToExpect = [
 ];
 
 const whatToBring = [
-  { item: "Baseball glove", icon: "&#129354;" },
-  { item: "Cleats (no metal)", icon: "&#128094;" },
-  { item: "Bat (optional — bats provided)", icon: "&#127951;" },
-  { item: "Water bottle", icon: "&#128167;" },
-  { item: "Athletic clothes & cup", icon: "&#128085;" },
-  { item: "A positive attitude", icon: "&#9733;" },
+  {
+    item: "Baseball glove",
+    iconPath: "M18 11V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2M14 11V4a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7M10 11V6a2 2 0 0 0-2-2 2 2 0 0 0-2 2v5M6 11V9a2 2 0 0 0-2-2 2 2 0 0 0-2 2v7a8 8 0 0 0 16 0v-1M18 11a2 2 0 1 0-4 0v1",
+  },
+  {
+    item: "Cleats (no metal)",
+    iconPath: "M4 16v-2.38C4 11.5 2.97 10.5 3 8c.03-2.72 1.49-5 4.5-5 2.4 0 3.9 1.55 4.5 3.03C12.6 4.55 14.1 3 16.5 3 19.51 3 20.97 5.28 21 8c.03 2.5-1 3.5-1 5.62V16M3 18h18M7 20h10",
+  },
+  {
+    item: "Bat (optional -- bats provided)",
+    iconPath: "M5 19L19 5M5 19l-2 2M19 5l1.5-1.5a1.5 1.5 0 0 0-2.12-2.12L17 2.88",
+  },
+  {
+    item: "Water bottle",
+    iconPath: "M12 2.69l5.66 5.66a8 8 0 1 1-11.31 0z",
+  },
+  {
+    item: "Athletic clothes & cup",
+    iconPath: "M20.38 3.46L16 2 12 5.5 8 2 3.62 3.46a2 2 0 0 0-1.34 2.23l.58 3.47a1 1 0 0 0 .99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 0 0 2-2V10h2.15a1 1 0 0 0 .99-.84l.58-3.47a2 2 0 0 0-1.34-2.23z",
+  },
+  {
+    item: "A positive attitude",
+    iconPath: "M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z",
+  },
 ];
 
 export default function TryoutsPage() {
@@ -272,12 +290,13 @@ export default function TryoutsPage() {
             {whatToBring.map((item) => (
               <div
                 key={item.item}
-                className="bg-white rounded-lg p-4 sm:p-5 border border-gray-200 text-center"
+                className="bg-white rounded-lg p-4 sm:p-5 border border-gray-200 text-center flex flex-col items-center"
               >
-                <div
-                  className="text-3xl mb-2"
-                  dangerouslySetInnerHTML={{ __html: item.icon }}
-                />
+                <div className="w-8 h-8 rounded-full bg-flag-blue/10 flex items-center justify-center shrink-0 mb-2">
+                  <svg className="w-4 h-4 text-flag-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                    <path d={item.iconPath} />
+                  </svg>
+                </div>
                 <p className="font-display text-sm font-semibold uppercase tracking-wide">
                   {item.item}
                 </p>
@@ -303,8 +322,10 @@ export default function TryoutsPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
             <div className="bg-off-white rounded-lg p-6 md:p-7 border border-gray-200">
-              <div className="w-10 h-10 rounded-full bg-flag-blue text-white font-display font-bold flex items-center justify-center mb-4 text-lg">
-                &#128337;
+              <div className="w-10 h-10 rounded-full bg-flag-blue/10 flex items-center justify-center mb-4">
+                <svg className="w-5 h-5 text-flag-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                  <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
+                </svg>
               </div>
               <h3 className="font-display text-lg font-semibold uppercase tracking-wide mb-2">
                 Time Commitment
@@ -318,8 +339,10 @@ export default function TryoutsPage() {
             </div>
 
             <div className="bg-off-white rounded-lg p-6 md:p-7 border border-gray-200">
-              <div className="w-10 h-10 rounded-full bg-flag-red text-white font-display font-bold flex items-center justify-center mb-4 text-lg">
-                &#128176;
+              <div className="w-10 h-10 rounded-full bg-flag-red/10 flex items-center justify-center mb-4">
+                <svg className="w-5 h-5 text-flag-red" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                  <line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
+                </svg>
               </div>
               <h3 className="font-display text-lg font-semibold uppercase tracking-wide mb-2">
                 Estimated Costs
@@ -333,8 +356,10 @@ export default function TryoutsPage() {
             </div>
 
             <div className="bg-off-white rounded-lg p-6 md:p-7 border border-gray-200">
-              <div className="w-10 h-10 rounded-full bg-flag-blue text-white font-display font-bold flex items-center justify-center mb-4 text-lg">
-                &#128172;
+              <div className="w-10 h-10 rounded-full bg-flag-blue/10 flex items-center justify-center mb-4">
+                <svg className="w-5 h-5 text-flag-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
+                </svg>
               </div>
               <h3 className="font-display text-lg font-semibold uppercase tracking-wide mb-2">
                 Communication
@@ -347,8 +372,10 @@ export default function TryoutsPage() {
             </div>
 
             <div className="bg-off-white rounded-lg p-6 md:p-7 border border-gray-200">
-              <div className="w-10 h-10 rounded-full bg-flag-red text-white font-display font-bold flex items-center justify-center mb-4 text-lg">
-                &#129309;
+              <div className="w-10 h-10 rounded-full bg-flag-red/10 flex items-center justify-center mb-4">
+                <svg className="w-5 h-5 text-flag-red" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                  <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
+                </svg>
               </div>
               <h3 className="font-display text-lg font-semibold uppercase tracking-wide mb-2">
                 Parent Conduct

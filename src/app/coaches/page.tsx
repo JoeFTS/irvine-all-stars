@@ -288,29 +288,33 @@ export default function CoachesPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
             {[
               {
-                icon: "&#128170;",
                 title: "Development Focus",
                 description:
                   "The best All-Stars coaches prioritize player growth over wins. Teach fundamentals, build confidence, and make every kid better than when the season started.",
+                iconPath: "M13 10V3L4 14h7v7l9-11h-7z",
               },
               {
-                icon: "&#128172;",
                 title: "Clear Communication",
                 description:
                   "Parents need to know the plan. Players need to know expectations. Coaches who communicate proactively create the best team culture.",
+                iconPath: "M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z",
               },
               {
-                icon: "&#129309;",
                 title: "Coaching Philosophy",
                 description:
                   "We look for coaches who believe in fair playing time, positive reinforcement, and competitive excellence — not at the expense of the kids' experience.",
+                iconPath: "M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z",
               },
             ].map((item) => (
               <div
                 key={item.title}
                 className="bg-off-white rounded-lg p-6 md:p-7 border border-gray-200 text-center"
               >
-                <div className="text-4xl mb-4">{item.icon}</div>
+                <div className="w-12 h-12 rounded-full bg-flag-blue/10 flex items-center justify-center mx-auto mb-4">
+                  <svg className="w-6 h-6 text-flag-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d={item.iconPath} />
+                  </svg>
+                </div>
                 <h3 className="font-display text-lg font-semibold uppercase tracking-wide mb-2">
                   {item.title}
                 </h3>
