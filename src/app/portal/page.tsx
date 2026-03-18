@@ -118,14 +118,13 @@ function StatusBadge({ status }: { status: string }) {
 /* ------------------------------------------------------------------ */
 
 const keyDates = [
-  { date: "Mar 15", label: "Coach applications open" },
-  { date: "Apr 1", label: "Player registration opens" },
-  { date: "May 10", label: "5U, 6U, 7U & 8U tryouts" },
-  { date: "May 11", label: "9U & 10U tryouts" },
-  { date: "May 12", label: "11U & 12U tryouts" },
-  { date: "Mid-May", label: "Rosters finalized & families notified" },
-  { date: "May 21-25", label: "Memorial Day Tournament" },
-  { date: "Jun-Jul", label: "District tournaments" },
+  { date: "Mar 22", label: "Coach candidacy deadline" },
+  { date: "Mar 27", label: "All-Star coaches named" },
+  { date: "Apr 12", label: "All-Star tryouts (Bronco & Pony)" },
+  { date: "Apr 14", label: "All-Star players notified" },
+  { date: "Late May", label: "Memorial Day Tournament" },
+  { date: "Jun 11", label: "District tournaments begin" },
+  { date: "Jun-Aug", label: "Sanction play through early August" },
 ];
 
 /* ------------------------------------------------------------------ */
@@ -535,6 +534,12 @@ export default function PortalPage() {
                   (c) => c.registration_id === reg.id
                 );
 
+                const hasMedicalRelease = documents.some(
+                  (d) =>
+                    d.registration_id === reg.id &&
+                    d.document_type === "medical_release"
+                );
+
                 const isSelected = reg.status === "selected";
                 const isOnTeam = isSelected || reg.status === "alternate";
 
@@ -556,6 +561,12 @@ export default function PortalPage() {
                     label: "Upload birth certificate",
                     done: hasBirthCert,
                     href: `/portal/documents?player=${reg.id}`,
+                    locked: !hasContract,
+                  },
+                  {
+                    label: "Complete medical release",
+                    done: hasMedicalRelease,
+                    href: `/portal/medical-release?player=${reg.id}`,
                     locked: !hasContract,
                   },
                 ];

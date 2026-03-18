@@ -12,6 +12,7 @@ import {
   ShieldCheck,
   FileText,
   Info,
+  Eye,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
@@ -23,17 +24,21 @@ interface Registration {
   player_first_name: string;
   player_last_name: string;
   division: string;
+  status: string;
 }
 
 interface PlayerDocument {
   id: string;
   registration_id: string;
   document_type: string;
+  file_path: string | null;
 }
 
 interface PlayerContract {
   id: string;
   registration_id: string;
+  parent_signature: string | null;
+  signed_at: string | null;
 }
 
 type ItemStatus = "complete" | "pending" | "not_required";
@@ -42,6 +47,7 @@ interface ChecklistItem {
   label: string;
   status: ItemStatus;
   note?: string;
+  viewUrl?: string | null;
 }
 
 /* ------------------------------------------------------------------ */
@@ -58,7 +64,6 @@ function isPitchingLogRequired(division: string): boolean {
 }
 
 function divisionShortName(division: string): string {
-  // "8U MP-Pinto" -> "8U MP"
   return division.split("-")[0];
 }
 
@@ -68,28 +73,25 @@ function buildPlayerChecklist(
   contracts: PlayerContract[]
 ): ChecklistItem[] {
   const regDocs = docs.filter((d) => d.registration_id === reg.id);
-  const hasBirthCert = regDocs.some(
+  const birthCertDoc = regDocs.find(
     (d) => d.document_type === "birth_certificate"
   );
-  const hasPhoto = regDocs.some((d) => d.document_type === "player_photo");
-  const hasContract = contracts.some((c) => c.registration_id === reg.id);
+  const photoDoc = regDocs.find((d) => d.document_type === "player_photo");
+  const medicalDoc = regDocs.find((d) => d.document_type === "medical_release");
+  const contract = contracts.find((c) => c.registration_id === reg.id);
   const pitchingRequired = isPitchingLogRequired(reg.division);
 
   return [
     {
       label: "Birth Certificate",
-      status: hasBirthCert ? "complete" : "pending",
-      note: hasBirthCert ? "Uploaded" : "Pending",
+      status: birthCertDoc ? "complete" : "pending",
+      note: birthCertDoc ? "Uploaded" : "Pending",
+      viewUrl: birthCertDoc?.file_path ?? null,
     },
     {
-      label: "Affidavit",
-      status: "pending",
-      note: "Completed online",
-    },
-    {
-      label: "Medical Release (Parent Signature)",
-      status: "pending",
-      note: "Part of Affidavit Page 2",
+      label: "Medical Release",
+      status: medicalDoc ? "complete" : "pending",
+      note: medicalDoc ? "Completed" : "Pending — parent completes in portal",
     },
     {
       label: "Pitching Log",
@@ -98,13 +100,16 @@ function buildPlayerChecklist(
     },
     {
       label: "Player Photo",
-      status: hasPhoto ? "complete" : "pending",
-      note: hasPhoto ? "Uploaded" : "Pending",
+      status: photoDoc ? "complete" : "pending",
+      note: photoDoc ? "Uploaded" : "Pending",
+      viewUrl: photoDoc?.file_path ?? null,
     },
     {
       label: "Player Contract",
-      status: hasContract ? "complete" : "pending",
-      note: hasContract ? "Signed" : "Pending",
+      status: contract ? "complete" : "pending",
+      note: contract
+        ? `Signed${contract.signed_at ? ` ${new Date(contract.signed_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}` : ""}`
+        : "Pending",
     },
   ];
 }
@@ -183,15 +188,16 @@ export default function BinderChecklistPage() {
     const [regsRes, docsRes, contractsRes] = await Promise.all([
       supabase
         .from("tryout_registrations")
-        .select("id, player_first_name, player_last_name, division")
+        .select("id, player_first_name, player_last_name, division, status")
+        .in("status", ["selected", "alternate"])
         .order("division")
         .order("player_last_name"),
       supabase
         .from("player_documents")
-        .select("id, registration_id, document_type"),
+        .select("id, registration_id, document_type, file_path"),
       supabase
         .from("player_contracts")
-        .select("id, registration_id"),
+        .select("id, registration_id, parent_signature, signed_at"),
     ]);
 
     if (regsRes.data) setRegistrations(regsRes.data);
@@ -199,6 +205,16 @@ export default function BinderChecklistPage() {
     if (contractsRes.data) setContracts(contractsRes.data);
 
     setLoading(false);
+  }
+
+  async function handleViewDocument(filePath: string) {
+    if (!supabase || !filePath) return;
+    const { data } = await supabase.storage
+      .from("player-documents")
+      .createSignedUrl(filePath, 300);
+    if (data?.signedUrl) {
+      window.open(data.signedUrl, "_blank");
+    }
   }
 
   /* ---------------------------------------------------------------- */
@@ -265,7 +281,7 @@ export default function BinderChecklistPage() {
         </h1>
         <p className="text-gray-500 text-sm mt-1 max-w-xl">
           Everything needed for your tournament binder. Green means ready, red
-          means action needed.
+          means action needed. Only selected and alternate players are shown.
         </p>
       </div>
 
@@ -381,8 +397,9 @@ export default function BinderChecklistPage() {
               Do NOT leave out any middle names, Jr, III, etc.
             </p>
             <p>
-              <span className="font-semibold">Page 2</span> &mdash; All Parents
-              MUST sign (it&apos;s a medical release).
+              <span className="font-semibold">Medical Release</span> &mdash; All
+              Parents MUST complete the medical release form in their Parent
+              Portal.
             </p>
             <p>
               You will receive an email with how to complete your Affidavit
@@ -408,8 +425,8 @@ export default function BinderChecklistPage() {
         {registrations.length === 0 ? (
           <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
             <p className="text-gray-400 text-sm">
-              No registrations found. Players appear here after registering for
-              tryouts.
+              No selected or alternate players found. Players appear here after
+              being selected for the team.
             </p>
           </div>
         ) : (
@@ -470,13 +487,24 @@ export default function BinderChecklistPage() {
                         <span className="flex-1 text-sm text-charcoal">
                           {item.label}
                         </span>
-                        <span
-                          className={`px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${statusBadgeClasses(
-                            item.status
-                          )}`}
-                        >
-                          {item.note}
-                        </span>
+                        <div className="flex items-center gap-2">
+                          {item.viewUrl && item.status === "complete" && (
+                            <button
+                              onClick={() => handleViewDocument(item.viewUrl!)}
+                              className="flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold text-flag-blue hover:bg-flag-blue/10 transition-colors"
+                            >
+                              <Eye size={14} />
+                              View
+                            </button>
+                          )}
+                          <span
+                            className={`px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${statusBadgeClasses(
+                              item.status
+                            )}`}
+                          >
+                            {item.note}
+                          </span>
+                        </div>
                       </div>
                     ))}
                   </div>

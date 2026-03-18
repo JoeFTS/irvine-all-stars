@@ -122,12 +122,13 @@ export default function CoachDashboardPage() {
       // Parallel fetches
       const [regsResult, certsResult, agreementsResult, announcementsResult] =
         await Promise.all([
-          // 2. Registrations in division
+          // 2. Registrations in division (only selected/alternate players)
           division
             ? supabase
                 .from("tryout_registrations")
                 .select("id")
                 .eq("division", division)
+                .in("status", ["selected", "alternate"])
             : Promise.resolve({ data: [] as Registration[] }),
 
           // 5. Coach certifications
