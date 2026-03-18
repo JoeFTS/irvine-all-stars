@@ -334,7 +334,7 @@ export default function InviteSignupPage({
                 </p>
               </div>
               <p className="text-gray-400 text-xs mb-4">
-                Didn&apos;t receive it? Check your spam folder, or contact AllStars@irvineallstars.com for help.
+                Didn&apos;t receive it? Check your spam folder, or contact AllStars@irvinepony.com for help.
               </p>
               <Link
                 href="/auth/login"

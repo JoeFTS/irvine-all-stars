@@ -131,6 +131,7 @@ export async function POST(request: NextRequest) {
     if (resend) {
       const { error } = await resend.emails.send({
         from: "Irvine All-Stars <noreply@irvineallstars.com>",
+        replyTo: "AllStars@irvinepony.com",
         to: parent_email,
         subject: isUpdated
           ? `Updated: ${player_name}'s Tryout Time — ${division}`

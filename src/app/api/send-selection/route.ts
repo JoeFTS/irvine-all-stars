@@ -70,7 +70,7 @@ ${teamLine}
 <a href="${portalUrl}" style="display:inline-block;background-color:#C1121F;color:#FFFFFF;font-size:16px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:6px;text-transform:uppercase;letter-spacing:1px;">Log In to Parent Portal</a>
 </td></tr></table>
 <p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0 0 4px 0;">See you on the diamond.</p>
-<p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0;"><strong style="color:#0A2342;">Irvine PONY All-Stars Coordinator</strong><br><a href="mailto:AllStars@irvineallstars.com" style="color:#0A2342;text-decoration:underline;">AllStars@irvineallstars.com</a></p>
+<p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0;"><strong style="color:#0A2342;">Irvine PONY All-Stars Coordinator</strong><br><a href="mailto:AllStars@irvinepony.com" style="color:#0A2342;text-decoration:underline;">AllStars@irvinepony.com</a></p>
 </td></tr>
 ${getEmailFooter()}`;
 }
@@ -91,7 +91,7 @@ function getNotSelectedHtml(data: SelectionRequest) {
 <p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0 0 16px 0;">The best thing ${player_name} can do right now is keep working, keep competing, and keep loving the game. The regular season is where real growth happens, and next year's tryouts will be here before you know it.</p>
 <p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0 0 16px 0;">We genuinely hope to see ${player_name} back out there.</p>
 <p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0 0 4px 0;">Thank you for being part of the All-Stars program.</p>
-<p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0;"><strong style="color:#0A2342;">Irvine PONY All-Stars Coordinator</strong><br><a href="mailto:AllStars@irvineallstars.com" style="color:#0A2342;text-decoration:underline;">AllStars@irvineallstars.com</a></p>
+<p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0;"><strong style="color:#0A2342;">Irvine PONY All-Stars Coordinator</strong><br><a href="mailto:AllStars@irvinepony.com" style="color:#0A2342;text-decoration:underline;">AllStars@irvinepony.com</a></p>
 </td></tr>
 ${getEmailFooter()}`;
 }
@@ -114,7 +114,7 @@ function getAlternateHtml(data: SelectionRequest) {
 </table></td></tr></table>
 <p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0 0 16px 0;">In the meantime, the best thing ${player_name} can do is keep practicing and stay sharp. Opportunities come up more often than you might think, and we want ${player_name} ready to step in.</p>
 <p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0 0 4px 0;">Thank you for being part of the All-Stars program. We'll be in touch.</p>
-<p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0;"><strong style="color:#0A2342;">Irvine PONY All-Stars Coordinator</strong><br><a href="mailto:AllStars@irvineallstars.com" style="color:#0A2342;text-decoration:underline;">AllStars@irvineallstars.com</a></p>
+<p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0;"><strong style="color:#0A2342;">Irvine PONY All-Stars Coordinator</strong><br><a href="mailto:AllStars@irvinepony.com" style="color:#0A2342;text-decoration:underline;">AllStars@irvinepony.com</a></p>
 </td></tr>
 ${getEmailFooter()}`;
 }
@@ -178,6 +178,7 @@ export async function POST(request: NextRequest) {
     if (resend) {
       const { error: emailError } = await resend.emails.send({
         from: "Irvine All-Stars <AllStars@irvineallstars.com>",
+        replyTo: "AllStars@irvinepony.com",
         to: [parent_email],
         subject,
         html: htmlContent,

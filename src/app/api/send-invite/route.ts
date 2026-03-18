@@ -46,7 +46,7 @@ function getCoachInviteHtml(token: string, division?: string) {
 <a href="${ctaUrl}" style="display:inline-block;background-color:#C1121F;color:#FFFFFF;font-size:16px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:6px;text-transform:uppercase;letter-spacing:1px;">Set Up Your Account</a>
 </td></tr></table>
 <p style="color:#9CA3AF;font-size:13px;line-height:1.5;margin:0 0 24px 0;text-align:center;">This link expires in 7 days and can only be used once.</p>
-<p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0;">Best regards,<br><strong style="color:#0A2342;">Irvine Pony Baseball All-Stars</strong><br><a href="mailto:AllStars@irvineallstars.com" style="color:#0A2342;text-decoration:underline;">AllStars@irvineallstars.com</a></p>
+<p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0;">Best regards,<br><strong style="color:#0A2342;">Irvine Pony Baseball All-Stars</strong><br><a href="mailto:AllStars@irvinepony.com" style="color:#0A2342;text-decoration:underline;">AllStars@irvinepony.com</a></p>
 </td></tr>
 <tr><td style="background-color:#0A2342;padding:20px 40px;text-align:center;">
 <p style="color:rgba(255,255,255,0.5);font-size:12px;margin:0;line-height:1.5;">Irvine Pony Baseball &bull; 2026 All-Stars Season<br><a href="https://irvineallstars.com" style="color:rgba(255,255,255,0.7);text-decoration:underline;">irvineallstars.com</a></p>
@@ -93,7 +93,7 @@ ${childLine}<p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0 0 24
 <a href="${ctaUrl}" style="display:inline-block;background-color:#C1121F;color:#FFFFFF;font-size:16px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:6px;text-transform:uppercase;letter-spacing:1px;">Set Up Your Account</a>
 </td></tr></table>
 <p style="color:#9CA3AF;font-size:13px;line-height:1.5;margin:0 0 24px 0;text-align:center;">This link expires in 7 days and can only be used once.</p>
-<p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0;">Best regards,<br><strong style="color:#0A2342;">Irvine Pony Baseball All-Stars</strong><br><a href="mailto:AllStars@irvineallstars.com" style="color:#0A2342;text-decoration:underline;">AllStars@irvineallstars.com</a></p>
+<p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0;">Best regards,<br><strong style="color:#0A2342;">Irvine Pony Baseball All-Stars</strong><br><a href="mailto:AllStars@irvinepony.com" style="color:#0A2342;text-decoration:underline;">AllStars@irvinepony.com</a></p>
 </td></tr>
 <tr><td style="background-color:#0A2342;padding:20px 40px;text-align:center;">
 <p style="color:rgba(255,255,255,0.5);font-size:12px;margin:0;line-height:1.5;">Irvine Pony Baseball &bull; 2026 All-Stars Season<br><a href="https://irvineallstars.com" style="color:rgba(255,255,255,0.7);text-decoration:underline;">irvineallstars.com</a></p>
@@ -175,6 +175,7 @@ export async function POST(request: NextRequest) {
     if (resend) {
       const { error: emailError } = await resend.emails.send({
         from: "Irvine All-Stars <AllStars@irvineallstars.com>",
+        replyTo: "AllStars@irvinepony.com",
         to: [email],
         subject,
         html: htmlContent,
