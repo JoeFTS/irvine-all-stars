@@ -3,16 +3,18 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/contexts/auth-context";
+import { getPitchingRuleForDivision } from "@/content/pitching-rules";
 import {
   CheckCircle2,
   XCircle,
   Clock,
-  Minus,
-  AlertTriangle,
-  ShieldCheck,
-  FileText,
-  Info,
   Eye,
+  Printer,
+  FileText,
+  ShieldCheck,
+  Info,
+  AlertTriangle,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
@@ -34,137 +36,97 @@ interface PlayerDocument {
   file_path: string | null;
 }
 
-interface PlayerContract {
+interface TeamDocument {
   id: string;
-  registration_id: string;
-  parent_signature: string | null;
-  signed_at: string | null;
+  document_type: string;
+  file_path: string | null;
 }
 
-type ItemStatus = "complete" | "pending" | "not_required";
-
-interface ChecklistItem {
-  label: string;
-  status: ItemStatus;
-  note?: string;
-  viewUrl?: string | null;
+interface CoachCertification {
+  id: string;
+  cert_type: string;
+  file_path: string | null;
 }
+
+type SectionItemStatus = "complete" | "pending" | "not_required";
 
 /* ------------------------------------------------------------------ */
 /*  Helpers                                                            */
 /* ------------------------------------------------------------------ */
 
-/** Shetland & Pinto MP divisions don't require pitching logs */
-function isPitchingLogRequired(division: string): boolean {
+/** Map division strings like "11U-Bronco" → "Bronco", "7U KP-Pinto" → "Pinto Kid Pitch", etc. */
+function divisionToPonyName(division: string): string {
   const lower = division.toLowerCase();
-  return !(
-    lower.includes("shetland") ||
-    (lower.includes("pinto") && lower.includes("mp"))
-  );
+
+  if (lower.includes("shetland")) return "Shetland";
+  if (lower.includes("mp") && lower.includes("pinto")) return "Pinto Machine Pitch";
+  if (lower.includes("kp") && lower.includes("pinto")) return "Pinto Kid Pitch";
+  if (lower.includes("pinto")) return "Pinto Kid Pitch"; // fallback for generic pinto
+
+  // For "11U-Bronco", "9U-Mustang", "12U-Pony" — extract after hyphen
+  const parts = division.split("-");
+  if (parts.length >= 2) {
+    const name = parts[parts.length - 1].trim();
+    // Capitalize first letter
+    return name.charAt(0).toUpperCase() + name.slice(1);
+  }
+
+  return division;
 }
 
 function divisionShortName(division: string): string {
   return division.split("-")[0];
 }
 
-function buildPlayerChecklist(
-  reg: Registration,
-  docs: PlayerDocument[],
-  contracts: PlayerContract[]
-): ChecklistItem[] {
-  const regDocs = docs.filter((d) => d.registration_id === reg.id);
-  const hasAccepted = regDocs.some((d) => d.document_type === "selection_acceptance");
-  const birthCertDoc = regDocs.find(
-    (d) => d.document_type === "birth_certificate"
-  );
-  const photoDoc = regDocs.find((d) => d.document_type === "player_photo");
-  const medicalDoc = regDocs.find((d) => d.document_type === "medical_release");
-  const contract = contracts.find((c) => c.registration_id === reg.id);
-  const pitchingRequired = isPitchingLogRequired(reg.division);
-
-  return [
-    {
-      label: "Selection Accepted",
-      status: hasAccepted ? "complete" : "pending",
-      note: hasAccepted ? "Accepted" : "Awaiting parent acceptance",
-    },
-    {
-      label: "Player Contract",
-      status: contract ? "complete" : "pending",
-      note: contract
-        ? `Signed${contract.signed_at ? ` ${new Date(contract.signed_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}` : ""}`
-        : "Pending",
-    },
-    {
-      label: "Birth Certificate",
-      status: birthCertDoc ? "complete" : "pending",
-      note: birthCertDoc ? "Uploaded" : "Pending",
-      viewUrl: birthCertDoc?.file_path ?? null,
-    },
-    {
-      label: "Player Photo",
-      status: photoDoc ? "complete" : "pending",
-      note: photoDoc ? "Uploaded" : "Pending",
-      viewUrl: photoDoc?.file_path ?? null,
-    },
-    {
-      label: "Medical Release",
-      status: medicalDoc ? "complete" : "pending",
-      note: medicalDoc ? "Completed" : "Pending — parent completes in portal",
-    },
-    {
-      label: "Pitching Log",
-      status: pitchingRequired ? "pending" : "not_required",
-      note: pitchingRequired ? "Pending" : "Not Required",
-    },
-  ];
-}
-
 /* ------------------------------------------------------------------ */
-/*  Status Icon                                                        */
+/*  Status helpers & icons                                             */
 /* ------------------------------------------------------------------ */
 
-function StatusIcon({ status }: { status: ItemStatus }) {
+function StatusIcon({ status }: { status: SectionItemStatus }) {
   switch (status) {
     case "complete":
       return <CheckCircle2 size={18} className="text-green-600 shrink-0" />;
     case "pending":
       return <XCircle size={18} className="text-flag-red shrink-0" />;
     case "not_required":
-      return <Minus size={18} className="text-gray-400 shrink-0" />;
+      return <CheckCircle2 size={18} className="text-green-600 shrink-0" />;
   }
 }
 
-function statusBg(status: ItemStatus): string {
+function statusBg(status: SectionItemStatus): string {
   switch (status) {
     case "complete":
       return "bg-green-50";
     case "pending":
       return "bg-red-50";
     case "not_required":
-      return "bg-gray-50";
+      return "bg-green-50";
   }
 }
 
-function statusBadgeClasses(status: ItemStatus): string {
+function statusBadgeClasses(status: SectionItemStatus): string {
   switch (status) {
     case "complete":
       return "bg-green-100 text-green-700";
     case "pending":
       return "bg-red-100 text-flag-red";
     case "not_required":
-      return "bg-gray-100 text-gray-500";
+      return "bg-green-100 text-green-700";
   }
 }
 
+function amberBadge() {
+  return "bg-amber-100 text-amber-700";
+}
+
 /* ------------------------------------------------------------------ */
-/*  Division Badge                                                     */
+/*  Section Number Badge                                               */
 /* ------------------------------------------------------------------ */
 
-function DivisionBadge({ division }: { division: string }) {
+function SectionNumber({ n }: { n: number }) {
   return (
-    <span className="inline-block px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide bg-flag-blue/10 text-flag-blue">
-      {divisionShortName(division)}
+    <span className="flex items-center justify-center w-8 h-8 rounded-full bg-flag-blue text-white text-sm font-bold shrink-0">
+      {n}
     </span>
   );
 }
@@ -174,9 +136,12 @@ function DivisionBadge({ division }: { division: string }) {
 /* ------------------------------------------------------------------ */
 
 export default function BinderChecklistPage() {
+  const { user } = useAuth();
+
   const [registrations, setRegistrations] = useState<Registration[]>([]);
-  const [documents, setDocuments] = useState<PlayerDocument[]>([]);
-  const [contracts, setContracts] = useState<PlayerContract[]>([]);
+  const [playerDocs, setPlayerDocs] = useState<PlayerDocument[]>([]);
+  const [teamDocs, setTeamDocs] = useState<TeamDocument[]>([]);
+  const [coachCerts, setCoachCerts] = useState<CoachCertification[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -185,13 +150,14 @@ export default function BinderChecklistPage() {
       return;
     }
     fetchAll();
-  }, []);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [user]);
 
   async function fetchAll() {
     if (!supabase) return;
     setLoading(true);
 
-    const [regsRes, docsRes, contractsRes] = await Promise.all([
+    const [regsRes, docsRes, teamDocsRes, certsRes] = await Promise.all([
       supabase
         .from("tryout_registrations")
         .select("id, player_first_name, player_last_name, division, status")
@@ -202,21 +168,34 @@ export default function BinderChecklistPage() {
         .from("player_documents")
         .select("id, registration_id, document_type, file_path"),
       supabase
-        .from("player_contracts")
-        .select("id, registration_id, parent_signature, signed_at"),
+        .from("team_documents")
+        .select("id, document_type, file_path")
+        .in("document_type", ["tournament_rules", "insurance_certificate"]),
+      user
+        ? supabase
+            .from("coach_certifications")
+            .select("id, cert_type, file_path")
+            .eq("coach_id", user.id)
+            .in("cert_type", ["concussion", "cardiac_arrest"])
+        : Promise.resolve({ data: [] }),
     ]);
 
     if (regsRes.data) setRegistrations(regsRes.data);
-    if (docsRes.data) setDocuments(docsRes.data);
-    if (contractsRes.data) setContracts(contractsRes.data);
+    if (docsRes.data) setPlayerDocs(docsRes.data);
+    if (teamDocsRes.data) setTeamDocs(teamDocsRes.data);
+    if (certsRes.data) setCoachCerts(certsRes.data as CoachCertification[]);
 
     setLoading(false);
   }
 
-  async function handleViewDocument(filePath: string) {
+  /* ---------------------------------------------------------------- */
+  /*  Document viewing                                                 */
+  /* ---------------------------------------------------------------- */
+
+  async function handleViewDocument(filePath: string, bucket = "player-documents") {
     if (!supabase || !filePath) return;
     const { data } = await supabase.storage
-      .from("player-documents")
+      .from(bucket)
       .createSignedUrl(filePath, 300);
     if (data?.signedUrl) {
       window.open(data.signedUrl, "_blank");
@@ -224,20 +203,67 @@ export default function BinderChecklistPage() {
   }
 
   /* ---------------------------------------------------------------- */
-  /*  Compute overall progress                                         */
+  /*  Derived data                                                     */
   /* ---------------------------------------------------------------- */
 
-  const allChecklists = registrations.map((reg) =>
-    buildPlayerChecklist(reg, documents, contracts)
-  );
-  const totalItems = allChecklists.reduce(
-    (sum, items) => sum + items.filter((i) => i.status !== "not_required").length,
-    0
-  );
-  const completedItems = allChecklists.reduce(
-    (sum, items) => sum + items.filter((i) => i.status === "complete").length,
-    0
-  );
+  // Determine division for pitching rules
+  const divisions = [...new Set(registrations.map((r) => r.division))];
+  const primaryDivision = divisions.length === 1 ? divisions[0] : divisions[0] ?? "";
+  const ponyName = primaryDivision ? divisionToPonyName(primaryDivision) : "";
+  const pitchingRule = ponyName ? getPitchingRuleForDivision(ponyName) : null;
+  const noPitchingRequired = pitchingRule ? !pitchingRule.hasPitching : false;
+
+  // Team documents
+  const tournamentRulesDoc = teamDocs.find((d) => d.document_type === "tournament_rules");
+  const insuranceDoc = teamDocs.find((d) => d.document_type === "insurance_certificate");
+
+  // Coach certifications
+  const concussionCert = coachCerts.find((c) => c.cert_type === "concussion");
+  const cardiacCert = coachCerts.find((c) => c.cert_type === "cardiac_arrest");
+
+  // Per-player document status
+  function playerHasDoc(regId: string, docType: string): PlayerDocument | undefined {
+    return playerDocs.find(
+      (d) => d.registration_id === regId && d.document_type === docType
+    );
+  }
+
+  /* ---------------------------------------------------------------- */
+  /*  Progress calculation                                             */
+  /* ---------------------------------------------------------------- */
+
+  const playerCount = registrations.length;
+
+  // Section 1: always 1 ready item (printable pitching log)
+  const s1Complete = 1;
+  const s1Total = 1;
+
+  // Section 2: tournament rules uploaded?
+  const s2Complete = tournamentRulesDoc ? 1 : 0;
+  const s2Total = 1;
+
+  // Section 3: insurance certificate uploaded?
+  const s3Complete = insuranceDoc ? 1 : 0;
+  const s3Total = 1;
+
+  // Section 4: medical release per player
+  const s4Complete = registrations.filter((r) => playerHasDoc(r.id, "medical_release")).length;
+  const s4Total = playerCount;
+
+  // Section 5: birth certificate per player
+  const s5Complete = registrations.filter((r) => playerHasDoc(r.id, "birth_certificate")).length;
+  const s5Total = playerCount;
+
+  // Section 6: concussion cert
+  const s6Complete = concussionCert ? 1 : 0;
+  const s6Total = 1;
+
+  // Section 7: cardiac arrest cert
+  const s7Complete = cardiacCert ? 1 : 0;
+  const s7Total = 1;
+
+  const totalItems = s1Total + s2Total + s3Total + s4Total + s5Total + s6Total + s7Total;
+  const completedItems = s1Complete + s2Complete + s3Complete + s4Complete + s5Complete + s6Complete + s7Complete;
   const progressPct = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
 
   /* ---------------------------------------------------------------- */
@@ -267,8 +293,8 @@ export default function BinderChecklistPage() {
           <div className="h-8 bg-gray-200 rounded w-56" />
           <div className="h-6 bg-gray-200 rounded w-80" />
           <div className="h-4 bg-gray-200 rounded w-full max-w-md" />
-          {[1, 2, 3].map((i) => (
-            <div key={i} className="h-40 bg-gray-200 rounded-lg" />
+          {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+            <div key={i} className="h-28 bg-gray-200 rounded-lg" />
           ))}
         </div>
       </div>
@@ -286,8 +312,8 @@ export default function BinderChecklistPage() {
           Binder Checklist
         </h1>
         <p className="text-gray-500 text-sm mt-1 max-w-xl">
-          Everything needed for your tournament binder. Green means ready, red
-          means action needed. Only selected and alternate players are shown.
+          7 sections matching your physical tournament binder. Green means ready,
+          red means action needed.
         </p>
       </div>
 
@@ -320,212 +346,398 @@ export default function BinderChecklistPage() {
         </div>
       )}
 
-      {/* ---- Team-Level Requirements ---- */}
-      <div className="bg-white border border-gray-200 rounded-lg p-5 space-y-4">
-        <div className="flex items-center gap-2 mb-1">
-          <ShieldCheck size={20} className="text-flag-blue" />
-          <h2 className="font-display text-lg font-bold uppercase tracking-wider">
-            Team Requirements
-          </h2>
+      {/* ================================================================ */}
+      {/*  SECTION 1: Tournament Pitching Log                              */}
+      {/* ================================================================ */}
+      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <div className="p-5 flex items-center gap-3 border-b border-gray-100">
+          <SectionNumber n={1} />
+          <div className="flex-1">
+            <h2 className="font-display text-lg font-bold uppercase tracking-wider">
+              Tournament Pitching Log
+            </h2>
+          </div>
+          <CheckCircle2 size={20} className="text-green-600" />
         </div>
+        <div className="p-5 space-y-3">
+          {noPitchingRequired ? (
+            <div className="flex items-center gap-3 p-3 rounded-lg bg-green-50">
+              <CheckCircle2 size={18} className="text-green-600 shrink-0" />
+              <div className="flex-1">
+                <p className="text-sm font-semibold text-charcoal">
+                  No pitching log required
+                </p>
+                <p className="text-xs text-gray-400">
+                  {ponyName} division does not have live pitching
+                </p>
+              </div>
+              <span className="px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide bg-green-100 text-green-700">
+                N/A
+              </span>
+            </div>
+          ) : (
+            <>
+              <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50">
+                <FileText size={18} className="text-flag-blue shrink-0" />
+                <div className="flex-1">
+                  <p className="text-sm font-semibold text-charcoal">
+                    Pitching Log
+                  </p>
+                  {pitchingRule && (
+                    <p className="text-xs text-gray-400">
+                      Max pitch count: <span className="font-semibold text-charcoal">{pitchingRule.maxPitches}</span> ({ponyName})
+                    </p>
+                  )}
+                </div>
+                <Link
+                  href="/coach/pitching-log"
+                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
+                >
+                  <Printer size={14} />
+                  View &amp; Print Pitching Log
+                </Link>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
 
-        <div className="space-y-3">
-          <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50">
-            <Clock size={18} className="text-amber-500 shrink-0" />
+      {/* ================================================================ */}
+      {/*  SECTION 2: Pre-Tournament Rules / Coach's Agreement             */}
+      {/* ================================================================ */}
+      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <div className="p-5 flex items-center gap-3 border-b border-gray-100">
+          <SectionNumber n={2} />
+          <div className="flex-1">
+            <h2 className="font-display text-lg font-bold uppercase tracking-wider">
+              Pre-Tournament Rules / Coach&apos;s Agreement
+            </h2>
+          </div>
+          {tournamentRulesDoc ? (
+            <CheckCircle2 size={20} className="text-green-600" />
+          ) : (
+            <Clock size={20} className="text-amber-500" />
+          )}
+        </div>
+        <div className="p-5">
+          <div className={`flex items-center gap-3 p-3 rounded-lg ${tournamentRulesDoc ? "bg-green-50" : "bg-amber-50"}`}>
+            {tournamentRulesDoc ? (
+              <CheckCircle2 size={18} className="text-green-600 shrink-0" />
+            ) : (
+              <Clock size={18} className="text-amber-500 shrink-0" />
+            )}
             <div className="flex-1">
               <p className="text-sm font-semibold text-charcoal">
-                League Insurance Certificate
+                Tournament Rules Document
               </p>
               <p className="text-xs text-gray-400">
-                Provided by the league — informational
+                {tournamentRulesDoc ? "Uploaded by admin" : "Admin will upload when available"}
               </p>
             </div>
-            <span className="px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide bg-amber-100 text-amber-700">
-              Pending
-            </span>
+            {tournamentRulesDoc ? (
+              <button
+                onClick={() => handleViewDocument(tournamentRulesDoc.file_path!, "team-documents")}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
+              >
+                <Eye size={14} />
+                View / Print
+              </button>
+            ) : (
+              <span className={`px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${amberBadge()}`}>
+                Pending
+              </span>
+            )}
           </div>
+        </div>
+      </div>
 
-          <Link
-            href="/coach/certifications"
-            className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
-          >
-            <Clock size={18} className="text-amber-500 shrink-0" />
+      {/* ================================================================ */}
+      {/*  SECTION 3: Certificate of Liability Insurance                   */}
+      {/* ================================================================ */}
+      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <div className="p-5 flex items-center gap-3 border-b border-gray-100">
+          <SectionNumber n={3} />
+          <div className="flex-1">
+            <h2 className="font-display text-lg font-bold uppercase tracking-wider">
+              Certificate of Liability Insurance
+            </h2>
+          </div>
+          {insuranceDoc ? (
+            <CheckCircle2 size={20} className="text-green-600" />
+          ) : (
+            <Clock size={20} className="text-amber-500" />
+          )}
+        </div>
+        <div className="p-5">
+          <div className={`flex items-center gap-3 p-3 rounded-lg ${insuranceDoc ? "bg-green-50" : "bg-amber-50"}`}>
+            {insuranceDoc ? (
+              <CheckCircle2 size={18} className="text-green-600 shrink-0" />
+            ) : (
+              <Clock size={18} className="text-amber-500 shrink-0" />
+            )}
+            <div className="flex-1">
+              <p className="text-sm font-semibold text-charcoal">
+                Insurance Certificate
+              </p>
+              <p className="text-xs text-gray-400">
+                {insuranceDoc ? "Uploaded by admin" : "Admin will upload when available"}
+              </p>
+            </div>
+            {insuranceDoc ? (
+              <button
+                onClick={() => handleViewDocument(insuranceDoc.file_path!, "team-documents")}
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
+              >
+                <Eye size={14} />
+                View / Print
+              </button>
+            ) : (
+              <span className={`px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${amberBadge()}`}>
+                Pending
+              </span>
+            )}
+          </div>
+        </div>
+      </div>
+
+      {/* ================================================================ */}
+      {/*  SECTION 4: Medical Releases (per player)                        */}
+      {/* ================================================================ */}
+      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <div className="p-5 flex items-center gap-3 border-b border-gray-100">
+          <SectionNumber n={4} />
+          <div className="flex-1">
+            <h2 className="font-display text-lg font-bold uppercase tracking-wider">
+              Medical Releases
+            </h2>
+            <p className="text-xs text-gray-400 mt-0.5">
+              {s4Complete} of {s4Total} players complete
+            </p>
+          </div>
+          {s4Complete === s4Total && s4Total > 0 ? (
+            <CheckCircle2 size={20} className="text-green-600" />
+          ) : (
+            <XCircle size={20} className="text-flag-red" />
+          )}
+        </div>
+        <div className="divide-y divide-gray-100">
+          {registrations.length === 0 ? (
+            <div className="p-5 text-center">
+              <p className="text-gray-400 text-sm">
+                No selected or alternate players found.
+              </p>
+            </div>
+          ) : (
+            registrations.map((reg) => {
+              const doc = playerHasDoc(reg.id, "medical_release");
+              const status: SectionItemStatus = doc ? "complete" : "pending";
+              return (
+                <div
+                  key={reg.id}
+                  className={`flex items-center gap-3 px-5 py-3 ${statusBg(status)}`}
+                >
+                  <StatusIcon status={status} />
+                  <span className="flex-1 text-sm text-charcoal">
+                    {reg.player_first_name} {reg.player_last_name}
+                  </span>
+                  <span className="text-xs text-gray-400 mr-2">
+                    {divisionShortName(reg.division)}
+                  </span>
+                  <span
+                    className={`px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${statusBadgeClasses(status)}`}
+                  >
+                    {doc ? "Complete" : "Pending"}
+                  </span>
+                </div>
+              );
+            })
+          )}
+        </div>
+        <div className="px-5 py-3 bg-gray-50 border-t border-gray-100">
+          <p className="text-xs text-gray-400 italic">
+            Parent completes in portal
+          </p>
+        </div>
+      </div>
+
+      {/* ================================================================ */}
+      {/*  SECTION 5: Birth Certificates (per player)                      */}
+      {/* ================================================================ */}
+      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <div className="p-5 flex items-center gap-3 border-b border-gray-100">
+          <SectionNumber n={5} />
+          <div className="flex-1">
+            <h2 className="font-display text-lg font-bold uppercase tracking-wider">
+              Birth Certificates
+            </h2>
+            <p className="text-xs text-gray-400 mt-0.5">
+              {s5Complete} of {s5Total} players complete
+            </p>
+          </div>
+          {s5Complete === s5Total && s5Total > 0 ? (
+            <CheckCircle2 size={20} className="text-green-600" />
+          ) : (
+            <XCircle size={20} className="text-flag-red" />
+          )}
+        </div>
+        <div className="divide-y divide-gray-100">
+          {registrations.length === 0 ? (
+            <div className="p-5 text-center">
+              <p className="text-gray-400 text-sm">
+                No selected or alternate players found.
+              </p>
+            </div>
+          ) : (
+            registrations.map((reg) => {
+              const doc = playerHasDoc(reg.id, "birth_certificate");
+              const status: SectionItemStatus = doc ? "complete" : "pending";
+              return (
+                <div
+                  key={reg.id}
+                  className={`flex items-center gap-3 px-5 py-3 ${statusBg(status)}`}
+                >
+                  <StatusIcon status={status} />
+                  <span className="flex-1 text-sm text-charcoal">
+                    {reg.player_first_name} {reg.player_last_name}
+                  </span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xs text-gray-400">
+                      {divisionShortName(reg.division)}
+                    </span>
+                    {doc?.file_path && (
+                      <button
+                        onClick={() => handleViewDocument(doc.file_path!)}
+                        className="flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold text-flag-blue hover:bg-flag-blue/10 transition-colors"
+                      >
+                        <Eye size={14} />
+                        View
+                      </button>
+                    )}
+                    <span
+                      className={`px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${statusBadgeClasses(status)}`}
+                    >
+                      {doc ? "Uploaded" : "Pending"}
+                    </span>
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+        <div className="px-5 py-3 bg-gray-50 border-t border-gray-100">
+          <div className="flex items-start gap-2">
+            <AlertTriangle size={14} className="text-flag-red shrink-0 mt-0.5" />
+            <p className="text-xs text-flag-red font-semibold">
+              Name on birth certificate MUST match the affidavit exactly. Do NOT
+              leave out middle names, Jr, III, etc.
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* ================================================================ */}
+      {/*  SECTION 6: Concussion Training Certificate                      */}
+      {/* ================================================================ */}
+      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <div className="p-5 flex items-center gap-3 border-b border-gray-100">
+          <SectionNumber n={6} />
+          <div className="flex-1">
+            <h2 className="font-display text-lg font-bold uppercase tracking-wider">
+              Concussion Training Certificate
+            </h2>
+          </div>
+          {concussionCert ? (
+            <CheckCircle2 size={20} className="text-green-600" />
+          ) : (
+            <XCircle size={20} className="text-flag-red" />
+          )}
+        </div>
+        <div className="p-5">
+          <div className={`flex items-center gap-3 p-3 rounded-lg ${concussionCert ? "bg-green-50" : "bg-red-50"}`}>
+            {concussionCert ? (
+              <CheckCircle2 size={18} className="text-green-600 shrink-0" />
+            ) : (
+              <XCircle size={18} className="text-flag-red shrink-0" />
+            )}
             <div className="flex-1">
               <p className="text-sm font-semibold text-charcoal">
                 Concussion Protocol Certificate
               </p>
               <p className="text-xs text-gray-400">
-                View in Certifications &rarr;
+                {concussionCert ? "Uploaded" : "Required — upload in Certifications"}
               </p>
             </div>
-            <span className="px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide bg-amber-100 text-amber-700">
-              Check
-            </span>
-          </Link>
+            {concussionCert ? (
+              <span className="px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide bg-green-100 text-green-700">
+                Complete
+              </span>
+            ) : (
+              <Link
+                href="/coach/certifications"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-flag-red text-white hover:bg-flag-red/90 transition-colors"
+              >
+                <ShieldCheck size={14} />
+                Upload
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
 
-          <Link
-            href="/coach/certifications"
-            className="flex items-center gap-3 p-3 rounded-lg bg-gray-50 hover:bg-gray-100 transition-colors"
-          >
-            <Clock size={18} className="text-amber-500 shrink-0" />
+      {/* ================================================================ */}
+      {/*  SECTION 7: Sudden Cardiac Arrest Certificate                    */}
+      {/* ================================================================ */}
+      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <div className="p-5 flex items-center gap-3 border-b border-gray-100">
+          <SectionNumber n={7} />
+          <div className="flex-1">
+            <h2 className="font-display text-lg font-bold uppercase tracking-wider">
+              Sudden Cardiac Arrest Certificate
+            </h2>
+          </div>
+          {cardiacCert ? (
+            <CheckCircle2 size={20} className="text-green-600" />
+          ) : (
+            <XCircle size={20} className="text-flag-red" />
+          )}
+        </div>
+        <div className="p-5">
+          <div className={`flex items-center gap-3 p-3 rounded-lg ${cardiacCert ? "bg-green-50" : "bg-red-50"}`}>
+            {cardiacCert ? (
+              <CheckCircle2 size={18} className="text-green-600 shrink-0" />
+            ) : (
+              <XCircle size={18} className="text-flag-red shrink-0" />
+            )}
             <div className="flex-1">
               <p className="text-sm font-semibold text-charcoal">
                 Sudden Cardiac Arrest Prevention Certificate
               </p>
               <p className="text-xs text-gray-400">
-                View in Certifications &rarr;
+                {cardiacCert ? "Uploaded" : "Required — upload in Certifications"}
               </p>
             </div>
-            <span className="px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide bg-amber-100 text-amber-700">
-              Check
-            </span>
-          </Link>
-        </div>
-
-        <p className="text-xs text-gray-400 italic">
-          At least ONE coaching staff member must have BOTH certificates before
-          the binder can be signed off.
-        </p>
-      </div>
-
-      {/* ---- Affidavit Instructions ---- */}
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
-        <div className="border-l-4 border-flag-blue p-5 space-y-3">
-          <div className="flex items-center gap-2">
-            <AlertTriangle size={18} className="text-flag-blue shrink-0" />
-            <h2 className="font-display text-lg font-bold uppercase tracking-wider">
-              Affidavit Instructions
-            </h2>
-          </div>
-          <div className="space-y-2 text-sm text-charcoal">
-            <p className="font-semibold text-flag-red">
-              COMPLETE NAME ON BIRTH CERTIFICATE MUST BE THE SAME AS AFFIDAVIT.
-              Do NOT leave out any middle names, Jr, III, etc.
-            </p>
-            <p>
-              <span className="font-semibold">Medical Release</span> &mdash; All
-              Parents MUST complete the medical release form in their Parent
-              Portal.
-            </p>
-            <p>
-              You will receive an email with how to complete your Affidavit
-              online.
-            </p>
+            {cardiacCert ? (
+              <span className="px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide bg-green-100 text-green-700">
+                Complete
+              </span>
+            ) : (
+              <Link
+                href="/coach/certifications"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-flag-red text-white hover:bg-flag-red/90 transition-colors"
+              >
+                <ShieldCheck size={14} />
+                Upload
+              </Link>
+            )}
           </div>
         </div>
-      </div>
-
-      {/* ---- Per-Player Checklists ---- */}
-      <div>
-        <div className="flex items-center gap-2 mb-4">
-          <FileText size={20} className="text-flag-blue" />
-          <h2 className="font-display text-lg font-bold uppercase tracking-wider">
-            Player Documents
-          </h2>
-          <span className="text-xs text-gray-400 ml-1">
-            ({registrations.length} player
-            {registrations.length !== 1 ? "s" : ""})
-          </span>
-        </div>
-
-        {registrations.length === 0 ? (
-          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
-            <p className="text-gray-400 text-sm">
-              No selected or alternate players found. Players appear here after
-              being selected for the team.
-            </p>
-          </div>
-        ) : (
-          <div className="space-y-4">
-            {registrations.map((reg) => {
-              const items = buildPlayerChecklist(reg, documents, contracts);
-              const playerComplete = items.filter(
-                (i) => i.status === "complete"
-              ).length;
-              const playerRequired = items.filter(
-                (i) => i.status !== "not_required"
-              ).length;
-              const allDone = playerComplete === playerRequired;
-
-              return (
-                <div
-                  key={reg.id}
-                  className="bg-white border border-gray-200 rounded-lg overflow-hidden"
-                >
-                  {/* Player header */}
-                  <div className="p-4 md:p-5 flex items-center justify-between gap-3 border-b border-gray-100">
-                    <div className="flex items-center gap-3 min-w-0">
-                      <div
-                        className={`w-8 h-8 rounded-full flex items-center justify-center shrink-0 ${
-                          allDone
-                            ? "bg-green-100 text-green-600"
-                            : "bg-red-100 text-flag-red"
-                        }`}
-                      >
-                        {allDone ? (
-                          <CheckCircle2 size={18} />
-                        ) : (
-                          <XCircle size={18} />
-                        )}
-                      </div>
-                      <div className="min-w-0">
-                        <p className="text-sm font-semibold text-charcoal truncate">
-                          {reg.player_first_name} {reg.player_last_name}
-                        </p>
-                        <p className="text-xs text-gray-400">
-                          {playerComplete} of {playerRequired} complete
-                        </p>
-                      </div>
-                    </div>
-                    <DivisionBadge division={reg.division} />
-                  </div>
-
-                  {/* Checklist items */}
-                  <div className="divide-y divide-gray-100">
-                    {items.map((item) => (
-                      <div
-                        key={item.label}
-                        className={`flex items-center gap-3 px-4 py-3 md:px-5 ${statusBg(
-                          item.status
-                        )}`}
-                      >
-                        <StatusIcon status={item.status} />
-                        <span className="flex-1 text-sm text-charcoal">
-                          {item.label}
-                        </span>
-                        <div className="flex items-center gap-2">
-                          {item.viewUrl && item.status === "complete" && (
-                            <button
-                              onClick={() => handleViewDocument(item.viewUrl!)}
-                              className="flex items-center gap-1 px-2 py-1 rounded text-xs font-semibold text-flag-blue hover:bg-flag-blue/10 transition-colors"
-                            >
-                              <Eye size={14} />
-                              View
-                            </button>
-                          )}
-                          <span
-                            className={`px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${statusBadgeClasses(
-                              item.status
-                            )}`}
-                          >
-                            {item.note}
-                          </span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              );
-            })}
-          </div>
-        )}
       </div>
 
       {/* ---- Footer Note ---- */}
       <div className="flex items-start gap-3 p-4 rounded-lg bg-gray-50 border border-gray-200">
         <Info size={18} className="text-gray-400 shrink-0 mt-0.5" />
         <p className="text-xs text-gray-500">
-          Parents upload documents through their{" "}
+          Parents upload medical releases and birth certificates through their{" "}
           <Link href="/portal" className="text-flag-blue underline">
             Parent Portal
           </Link>

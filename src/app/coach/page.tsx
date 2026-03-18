@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import {
   ClipboardCheck,
+  ClipboardList,
   Users,
   Award,
   BookOpen,
@@ -61,6 +62,7 @@ interface Announcement {
 
 const quickLinks = [
   { href: "/coach/checklist", label: "Binder Checklist", icon: ClipboardCheck },
+  { href: "/coach/pitching-log", label: "Pitching Log", icon: ClipboardList },
   { href: "/coach/roster", label: "Team Roster", icon: Users },
   { href: "/coach/certifications", label: "Certifications", icon: Award },
   { href: "/coach/tournament-rules", label: "Tournament Rules", icon: BookOpen },

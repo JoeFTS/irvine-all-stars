@@ -12,6 +12,7 @@ import {
   BookOpen,
   Megaphone,
   UserCircle,
+  ClipboardList,
 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 
@@ -20,6 +21,7 @@ const navItems = [
   { href: "/coach/tryouts", label: "Tryouts", icon: UserCheck },
   { href: "/coach/scores", label: "Enter Scores", icon: FileSpreadsheet },
   { href: "/coach/checklist", label: "Binder Checklist", icon: ClipboardCheck },
+  { href: "/coach/pitching-log", label: "Pitching Log", icon: ClipboardList },
   { href: "/coach/roster", label: "Roster", icon: Users },
   { href: "/coach/certifications", label: "Certifications", icon: Award },
   { href: "/coach/tournament-rules", label: "Tournament Rules", icon: BookOpen },
