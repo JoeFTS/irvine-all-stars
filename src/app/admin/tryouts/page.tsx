@@ -186,6 +186,7 @@ export default function TryoutsPage() {
   const [bulkSelectedIds, setBulkSelectedIds] = useState<Set<string>>(new Set());
   const [bulkUpdating, setBulkUpdating] = useState(false);
   const [bulkProgress, setBulkProgress] = useState({ done: 0, total: 0, emailsSent: 0, emailsFailed: 0 });
+  const [emailSentIds, setEmailSentIds] = useState<Set<string>>(new Set());
 
   // Sessions tab state
   const [sessionDivisionFilter, setSessionDivisionFilter] = useState<string>("all");
@@ -282,29 +283,33 @@ export default function TryoutsPage() {
       setRegistrations((prev) =>
         prev.map((r) => (r.id === id ? { ...r, status: newStatus } : r))
       );
+    }
+    setUpdatingId(null);
+  }
 
-      // Send selection notification emails
-      if (newStatus === "selected" || newStatus === "not_selected" || newStatus === "alternate") {
-        const reg = registrations.find((r) => r.id === id);
-        if (reg) {
-          try {
-            await fetch("/api/send-selection", {
-              method: "POST",
-              headers: { "Content-Type": "application/json" },
-              body: JSON.stringify({
-                registration_id: id,
-                status: newStatus,
-                division: reg.division,
-                player_name: `${reg.player_first_name} ${reg.player_last_name}`,
-                parent_name: reg.parent_name,
-                parent_email: reg.parent_email,
-              }),
-            });
-          } catch {
-            // Email failure shouldn't block status update
-          }
-        }
+  async function sendSelectionEmail(id: string) {
+    const reg = registrations.find((r) => r.id === id);
+    if (!reg) return;
+
+    setUpdatingId(id);
+    try {
+      const res = await fetch("/api/send-selection", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          registration_id: id,
+          status: reg.status,
+          division: reg.division,
+          player_name: `${reg.player_first_name} ${reg.player_last_name}`,
+          parent_name: reg.parent_name,
+          parent_email: reg.parent_email,
+        }),
+      });
+      if (res.ok) {
+        setEmailSentIds((prev) => new Set([...prev, id]));
       }
+    } catch {
+      // silent
     }
     setUpdatingId(null);
   }
@@ -341,13 +346,9 @@ export default function TryoutsPage() {
   async function bulkUpdateStatus(newStatus: Status) {
     if (!supabase || bulkSelectedIds.size === 0) return;
     const ids = Array.from(bulkSelectedIds);
-    const sendEmail = newStatus === "selected" || newStatus === "not_selected" || newStatus === "alternate";
 
     setBulkUpdating(true);
     setBulkProgress({ done: 0, total: ids.length, emailsSent: 0, emailsFailed: 0 });
-
-    let emailsSent = 0;
-    let emailsFailed = 0;
 
     for (let i = 0; i < ids.length; i++) {
       const id = ids[i];
@@ -360,29 +361,48 @@ export default function TryoutsPage() {
         setRegistrations((prev) =>
           prev.map((r) => (r.id === id ? { ...r, status: newStatus } : r))
         );
+      }
 
-        if (sendEmail) {
-          const reg = registrations.find((r) => r.id === id);
-          if (reg) {
-            try {
-              const res = await fetch("/api/send-selection", {
-                method: "POST",
-                headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({
-                  registration_id: id,
-                  status: newStatus,
-                  division: reg.division,
-                  player_name: `${reg.player_first_name} ${reg.player_last_name}`,
-                  parent_name: reg.parent_name,
-                  parent_email: reg.parent_email,
-                }),
-              });
-              if (res.ok) emailsSent++;
-              else emailsFailed++;
-            } catch {
-              emailsFailed++;
-            }
-          }
+      setBulkProgress({ done: i + 1, total: ids.length, emailsSent: 0, emailsFailed: 0 });
+    }
+
+    setBulkSelectedIds(new Set());
+    setBulkUpdating(false);
+  }
+
+  async function bulkSendEmails() {
+    if (!supabase || bulkSelectedIds.size === 0) return;
+    const ids = Array.from(bulkSelectedIds);
+
+    setBulkUpdating(true);
+    setBulkProgress({ done: 0, total: ids.length, emailsSent: 0, emailsFailed: 0 });
+
+    let emailsSent = 0;
+    let emailsFailed = 0;
+
+    for (let i = 0; i < ids.length; i++) {
+      const id = ids[i];
+      const reg = registrations.find((r) => r.id === id);
+      if (reg && (reg.status === "selected" || reg.status === "not_selected" || reg.status === "alternate")) {
+        try {
+          const res = await fetch("/api/send-selection", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              registration_id: id,
+              status: reg.status,
+              division: reg.division,
+              player_name: `${reg.player_first_name} ${reg.player_last_name}`,
+              parent_name: reg.parent_name,
+              parent_email: reg.parent_email,
+            }),
+          });
+          if (res.ok) {
+            emailsSent++;
+            setEmailSentIds((prev) => new Set([...prev, id]));
+          } else emailsFailed++;
+        } catch {
+          emailsFailed++;
         }
       }
 
@@ -884,7 +904,7 @@ export default function TryoutsPage() {
                     <button
                       key={s}
                       onClick={() => {
-                        if (confirm(`Set ${bulkSelectedIds.size} player(s) to "${opt.label}"?\n\n${s === "selected" || s === "not_selected" || s === "alternate" ? "This will also send notification emails to parents." : ""}`)) {
+                        if (confirm(`Set ${bulkSelectedIds.size} player(s) to "${opt.label}"?\n\nNo emails will be sent. Use "Send Emails" separately.`)) {
                           bulkUpdateStatus(s);
                         }
                       }}
@@ -894,6 +914,27 @@ export default function TryoutsPage() {
                     </button>
                   );
                 })}
+                <span className="text-xs text-gray-300">|</span>
+                <button
+                  onClick={() => {
+                    const selectedRegs = registrations.filter(
+                      (r) => bulkSelectedIds.has(r.id) && (r.status === "selected" || r.status === "not_selected" || r.status === "alternate")
+                    );
+                    if (selectedRegs.length === 0) {
+                      alert("No checked players have a status of Selected, Alternate, or Not Selected. Set their status first, then send emails.");
+                      return;
+                    }
+                    if (confirm(`Send notification emails to ${selectedRegs.length} parent(s)?\n\nEach parent will be notified of their player's current status.`)) {
+                      bulkSendEmails();
+                    }
+                  }}
+                  className="px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wide transition-colors border border-flag-blue bg-flag-blue text-white hover:bg-flag-blue/90"
+                >
+                  <span className="flex items-center gap-1.5">
+                    <Mail size={12} />
+                    Send Emails
+                  </span>
+                </button>
                 <button
                   onClick={() => setBulkSelectedIds(new Set())}
                   className="px-2 py-1.5 rounded text-xs text-gray-400 hover:text-gray-600 transition-colors"
@@ -1024,6 +1065,36 @@ export default function TryoutsPage() {
                             </button>
                           ))}
                         </div>
+
+                        {/* Send Email — only for selected/alternate/not_selected */}
+                        {(reg.status === "selected" || reg.status === "not_selected" || reg.status === "alternate") && (
+                          <div className="flex items-center gap-3 bg-flag-blue/5 border border-flag-blue/10 rounded-lg p-3">
+                            <div className="flex-1">
+                              <p className="text-sm font-semibold text-charcoal">
+                                Notify Parent
+                              </p>
+                              <p className="text-xs text-gray-500">
+                                Send an email to {reg.parent_name} ({reg.parent_email}) notifying them that {reg.player_first_name} has been{" "}
+                                {reg.status === "selected" ? "selected" : reg.status === "alternate" ? "placed as alternate" : "not selected"}.
+                                {emailSentIds.has(reg.id) && (
+                                  <span className="text-green-600 font-semibold"> Email sent!</span>
+                                )}
+                              </p>
+                            </div>
+                            <button
+                              onClick={() => {
+                                if (confirm(`Send notification email to ${reg.parent_name} (${reg.parent_email})?`)) {
+                                  sendSelectionEmail(reg.id);
+                                }
+                              }}
+                              disabled={updatingId === reg.id}
+                              className="inline-flex items-center gap-1.5 bg-flag-blue text-white px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors disabled:opacity-50 shrink-0"
+                            >
+                              <Mail size={14} />
+                              {emailSentIds.has(reg.id) ? "Resend Email" : "Send Email"}
+                            </button>
+                          </div>
+                        )}
 
                         {/* Player Info */}
                         <div>
