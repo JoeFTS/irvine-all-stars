@@ -42,17 +42,21 @@
 - [x] Auth callback for email confirmation
 - [x] Middleware protecting /admin, /portal, /evaluate routes
 - [x] Evaluator setup page (/evaluate) — name, division, session ID
-- [x] Evaluator scoring sheet (/evaluate/score) — mobile-first, 56px touch targets
+- [x] Evaluator scoring sheet (/evaluate/score) — mobile-first, 1-9 scale, 6 categories
 - [x] Auto-save with 500ms debounce + localStorage offline buffer
 - [x] Session summary (/evaluate/summary) — rankings, score breakdowns, edit links
 
 ## Phase 4: Admin Dashboard ✅
-- [x] Admin layout with sidebar (desktop) / bottom tabs (mobile)
+- [x] Admin layout with sidebar (desktop) / scrollable bottom tabs (mobile)
 - [x] Dashboard overview with stat cards + recent submissions
 - [x] Coach applications — filter by status, expand details, update status
 - [x] Player registrations — filter by division/status, expand, update
-- [x] Evaluator scores — grouped by division, sorted by total, expandable
+- [x] Evaluator scores — grouped by division, sorted by total, expandable (/9 scale, /54 total)
 - [x] Announcements CRUD — create, edit, delete, division targeting
+- [x] Admin documents viewer (/admin/documents) — view/download/approve/reject
+- [x] Admin compliance page (/admin/compliance) — tournament readiness per division
+- [x] Admin tryouts — coach picks integration (gold badge + filter)
+- [x] Status updates separated from email sending (no accidental emails)
 
 ## Phase 5: Parent + Coach Portals ✅
 - [x] Auth-gated parent portal (/portal)
@@ -65,35 +69,31 @@
 - [x] Coach portal (/coach) with dashboard, roster, checklist, certifications, tournament rules, updates
 - [x] Coach roster only shows players with signed contracts
 - [x] Admin account set up (allstars@irvinepony.com)
+- [x] Coach tryouts page (/coach/tryouts) — view division players + scores + submit recommendations
+- [x] Coach score entry (/coach/scores) — download template, fill in, upload (3-step flow)
+- [x] Coach recommendations with remove button
+- [x] Coach application auto-accepted when invite is sent
 
-## Phase 6: Final Polish (MUST FINISH BY 2026-03-17)
+## Phase 6: Final Polish ✅
+- [x] Full e2e production test — ALL PASS ✅
+- [x] Verify confirmation emails (Resend) ✅
+- [x] Admin bulk-select with progress bar ✅
+- [x] Supabase Storage bucket + RLS ✅
+- [x] SEO: OpenGraph metadata on all pages ✅
+- [x] Mobile polish pass (touch targets, overflow, responsive) ✅
+- [x] Scoring system overhaul: 6 categories, 1-9 scale, max 54 ✅
+- [x] Replaced broken emoji HTML entities with SVG icons ✅
+- [x] Coach application error visibility improved ✅
+- [x] Teams table: added coach_email column ✅
+- [ ] Homepage: replace placeholder content with real images (deferred — no photos yet)
 
-### Priority 1 — Must Have
-- [x] Full e2e production test: register player → admin selects → parent signs contract → uploads docs → coach sees on roster — ALL PASS, emails sent to bloodkin@me.com ✅
-- [x] Verify confirmation emails actually send in production (Resend) — API returns success, Resend domain verified, RESEND_API_KEY on VPS ✅
-- [x] Admin: ability to bulk-select players for teams (set status to "selected") — checkboxes, select-all, bulk action bar with progress ✅
-- [x] Admin: send "You've been selected" notification email to parents when status changes — already existed in single-update; now also fires in bulk flow ✅
-- [x] Verify all Supabase tables exist (teams, player_documents, player_contracts, coach_certifications, etc.) — all 13 tables verified with row counts ✅
-- [x] Verify Supabase Storage bucket "player-documents" exists and RLS policies allow parent uploads — bucket created + 3 RLS policies added ✅
-
-### Priority 2 — Should Have
-- [x] Admin: view uploaded documents per player (birth certs, photos) — `/admin/documents` with view/download/approve/reject ✅
-- [x] Admin: team compliance overview (which teams are tournament-ready) — `/admin/compliance` with per-division/per-player drill-down ✅
-- [x] Bug fix: `document_type` mismatch — teams page checked "photo" but portal uploads "player_photo" ✅
-- [ ] Homepage: replace placeholder content with real images (deferred — no real team photos available yet)
-- [x] SEO: meta tags + OG images for all pages ✅
-- [x] Mobile polish pass on all pages ✅
-- [x] Coach tryouts page — coaches see division players, scores, and submit recommendations ✅
-- [x] Admin tryouts — coach picks integration (gold badge + filter) ✅
-- [x] Database: coach_selections table + RLS policies ✅
-
-### Priority 3 — Nice to Have
+## Phase 7: Nice to Have
 - [ ] Analytics (GA4 or Plausible)
 - [ ] Practice Schedule Board
 - [ ] Tournament Hub
 - [ ] Photo Gallery
+- [ ] Clean up test data (joe@fivetoolsolutions.com coach application)
 
 ---
-**Status:** Phases 0-5 COMPLETE. 22+ routes live at irvineallstars.com. 43/43 e2e tests passing.
-**Deadline:** March 17, 2026
-**Last Updated:** 2026-03-16
+**Status:** Phases 0-6 COMPLETE. 26+ routes live at irvineallstars.com.
+**Last Updated:** 2026-03-17
