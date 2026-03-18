@@ -15,15 +15,11 @@ import {
 import {
   Upload,
   ClipboardPaste,
-  PenLine,
   Download,
   Trash2,
   CheckCircle2,
   AlertTriangle,
   XCircle,
-  Send,
-  Plus,
-  RotateCcw,
   Save,
 } from "lucide-react";
 
@@ -50,7 +46,7 @@ interface ExistingScore {
   player_name: string;
 }
 
-type Tab = "paste" | "upload" | "manual";
+type Tab = "paste" | "upload";
 
 /* ---------- Component ---------- */
 
@@ -182,78 +178,6 @@ export default function CoachScoresPage() {
     [registrationNames]
   );
 
-  const handleManualInit = useCallback(() => {
-    const rows: ParsedScore[] = registrations.map((r, i) => ({
-      rowIndex: i + 1,
-      playerNumber: r.jersey_number || String(i + 1),
-      lastName: r.player_last_name,
-      firstName: r.player_first_name,
-      position: r.primary_position,
-      bats: r.bats,
-      throws: r.throws,
-      team: r.current_team || "",
-      hitting: null,
-      fielding: null,
-      throwing: null,
-      running: null,
-      effort: null,
-      attitude: null,
-      total: null,
-      notes: "",
-      errors: [],
-      status: "valid" as const,
-    }));
-    setParsedScores(rows);
-    setSubmitResult(null);
-  }, [registrations]);
-
-  const handleResetScores = useCallback(() => {
-    setParsedScores((prev) => {
-      if (!prev) return prev;
-      return prev.map((row) => ({
-        ...row,
-        hitting: null,
-        fielding: null,
-        throwing: null,
-        running: null,
-        effort: null,
-        attitude: null,
-        total: null,
-        notes: "",
-        errors: [],
-        status: "valid" as const,
-      }));
-    });
-  }, []);
-
-  const handleAddManualRow = useCallback(() => {
-    setParsedScores((prev) => {
-      if (!prev) return prev;
-      return [
-        ...prev,
-        {
-          rowIndex: prev.length + 1,
-          playerNumber: "",
-          lastName: "",
-          firstName: "",
-          position: "",
-          bats: "",
-          throws: "",
-          team: "",
-          hitting: null,
-          fielding: null,
-          throwing: null,
-          running: null,
-          effort: null,
-          attitude: null,
-          total: null,
-          notes: "",
-          errors: [],
-          status: "valid" as const,
-        },
-      ];
-    });
-  }, []);
 
   /* ---- Preview table handlers ---- */
 
@@ -418,7 +342,6 @@ export default function CoachScoresPage() {
   const TABS: { id: Tab; label: string; icon: typeof Upload }[] = [
     { id: "paste", label: "Paste from Spreadsheet", icon: ClipboardPaste },
     { id: "upload", label: "Upload File", icon: Upload },
-    { id: "manual", label: "Manual Entry", icon: PenLine },
   ];
 
   const scoreFields: {
@@ -488,7 +411,6 @@ export default function CoachScoresPage() {
               setParsedScores(null);
               setPasteText("");
               setSubmitResult(null);
-              if (id === "manual") handleManualInit();
             }}
             className={`inline-flex items-center gap-2 px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors ${
               tab === id
@@ -632,13 +554,6 @@ export default function CoachScoresPage() {
             </div>
           )}
 
-          {tab === "manual" && registrations.length === 0 && (
-            <div className="text-center py-4">
-              <p className="text-gray-500 text-sm">
-                No registered players found in {division}.
-              </p>
-            </div>
-          )}
         </div>
       )}
 
@@ -664,24 +579,6 @@ export default function CoachScoresPage() {
               )}
             </div>
             <div className="flex flex-wrap items-center gap-2">
-              {tab === "manual" && (
-                <>
-                  <button
-                    onClick={handleAddManualRow}
-                    className="inline-flex items-center gap-1.5 bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wide hover:bg-gray-200 transition-colors"
-                  >
-                    <Plus size={14} />
-                    Add Row
-                  </button>
-                  <button
-                    onClick={handleResetScores}
-                    className="inline-flex items-center gap-1.5 bg-gray-100 text-gray-600 px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wide hover:bg-gray-200 transition-colors"
-                  >
-                    <RotateCcw size={14} />
-                    Reset Scores
-                  </button>
-                </>
-              )}
               <button
                 onClick={() => {
                   setParsedScores(null);
@@ -773,39 +670,16 @@ export default function CoachScoresPage() {
 
                     {/* Player name */}
                     <td className="px-3 py-2">
-                      {tab === "manual" ? (
-                        <div className="flex gap-1">
-                          <input
-                            type="text"
-                            value={score.firstName}
-                            onChange={(e) =>
-                              updateScore(idx, "firstName", e.target.value)
-                            }
-                            placeholder="First"
-                            className="w-20 border border-gray-200 rounded px-1.5 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-flag-blue/30"
-                          />
-                          <input
-                            type="text"
-                            value={score.lastName}
-                            onChange={(e) =>
-                              updateScore(idx, "lastName", e.target.value)
-                            }
-                            placeholder="Last"
-                            className="w-20 border border-gray-200 rounded px-1.5 py-1 text-xs focus:outline-none focus:ring-1 focus:ring-flag-blue/30"
-                          />
-                        </div>
-                      ) : (
-                        <div>
-                          <span className="font-semibold text-charcoal">
-                            {score.firstName} {score.lastName}
+                      <div>
+                        <span className="font-semibold text-charcoal">
+                          {score.firstName} {score.lastName}
+                        </span>
+                        {score.position && (
+                          <span className="text-xs text-gray-400 ml-1">
+                            ({score.position})
                           </span>
-                          {score.position && (
-                            <span className="text-xs text-gray-400 ml-1">
-                              ({score.position})
-                            </span>
-                          )}
-                        </div>
-                      )}
+                        )}
+                      </div>
                       {score.errors.length > 0 && (
                         <p className="text-[10px] text-flag-red mt-0.5">
                           {score.errors.join("; ")}
