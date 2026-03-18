@@ -64,23 +64,3 @@ body {
   }
 }
 
-/* Landscape print — forces landscape + fits to one page */
-@page pitching-log {
-  size: landscape;
-  margin: 0.25in;
-}
-.print-landscape {
-  page: pitching-log;
-}
-@media print {
-  .print-landscape {
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    overflow: hidden;
-    z-index: 9999;
-    background: white;
-  }
-}
