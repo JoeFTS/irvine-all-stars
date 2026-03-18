@@ -5,6 +5,7 @@ import { usePathname, useRouter } from "next/navigation";
 import {
   LayoutDashboard,
   UserCheck,
+  FileSpreadsheet,
   ClipboardCheck,
   Users,
   Award,
@@ -16,6 +17,7 @@ import { useAuth } from "@/contexts/auth-context";
 const navItems = [
   { href: "/coach", label: "Dashboard", icon: LayoutDashboard },
   { href: "/coach/tryouts", label: "Tryouts", icon: UserCheck },
+  { href: "/coach/scores", label: "Enter Scores", icon: FileSpreadsheet },
   { href: "/coach/checklist", label: "Binder Checklist", icon: ClipboardCheck },
   { href: "/coach/roster", label: "Roster", icon: Users },
   { href: "/coach/certifications", label: "Certifications", icon: Award },
@@ -96,24 +98,26 @@ export default function CoachLayout({
         </div>
       </div>
 
-      {/* Mobile Bottom Tabs */}
-      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 flex">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const active = isActive(item.href);
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={`flex-1 flex flex-col items-center gap-0.5 py-2.5 text-[10px] font-semibold uppercase tracking-wide transition-colors ${
-                active ? "text-flag-blue" : "text-gray-400"
-              }`}
-            >
-              <Icon size={20} />
-              <span>{item.label.length > 8 ? item.label.slice(0, 7) + "." : item.label}</span>
-            </Link>
-          );
-        })}
+      {/* Mobile Bottom Tabs — horizontally scrollable */}
+      <nav className="md:hidden fixed bottom-0 left-0 right-0 z-50 bg-white border-t border-gray-200 overflow-x-auto">
+        <div className="flex min-w-max">
+          {navItems.map((item) => {
+            const Icon = item.icon;
+            const active = isActive(item.href);
+            return (
+              <Link
+                key={item.href}
+                href={item.href}
+                className={`flex flex-col items-center gap-0.5 py-2.5 px-3 text-[10px] font-semibold uppercase tracking-wide transition-colors whitespace-nowrap ${
+                  active ? "text-flag-blue" : "text-gray-400"
+                }`}
+              >
+                <Icon size={20} />
+                <span>{item.label.length > 8 ? item.label.slice(0, 7) + "." : item.label}</span>
+              </Link>
+            );
+          })}
+        </div>
       </nav>
     </div>
   );

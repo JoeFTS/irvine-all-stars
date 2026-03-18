@@ -51,9 +51,9 @@ interface EvaluatorScore {
   hitting: number;
   fielding: number;
   throwing: number;
-  baserunning: number;
+  running: number;
+  effort: number;
   attitude: number;
-  total_score: number;
   notes: string | null;
 }
 
@@ -83,7 +83,8 @@ const SCORE_CATEGORIES = [
   { key: "hitting", label: "Hitting" },
   { key: "fielding", label: "Fielding" },
   { key: "throwing", label: "Throwing" },
-  { key: "baserunning", label: "Baserunning" },
+  { key: "running", label: "Running / Speed" },
+  { key: "effort", label: "Effort" },
   { key: "attitude", label: "Attitude" },
 ] as const;
 
@@ -106,7 +107,7 @@ function StatusBadge({ status }: { status: Status }) {
   );
 }
 
-function ScoreBar({ value, max = 20 }: { value: number; max?: number }) {
+function ScoreBar({ value, max = 9 }: { value: number; max?: number }) {
   const pct = Math.min((value / max) * 100, 100);
   const color =
     pct >= 80 ? "bg-green-500" : pct >= 60 ? "bg-star-gold" : pct >= 40 ? "bg-orange-400" : "bg-red-400";
@@ -118,6 +119,10 @@ function ScoreBar({ value, max = 20 }: { value: number; max?: number }) {
       <span className="text-xs font-semibold text-charcoal w-6 text-right">{value}</span>
     </div>
   );
+}
+
+function computeTotal(s: EvaluatorScore): number {
+  return (s.hitting || 0) + (s.fielding || 0) + (s.throwing || 0) + (s.running || 0) + (s.effort || 0) + (s.attitude || 0);
 }
 
 /* ---------- Main averages for a player ---------- */
@@ -149,7 +154,7 @@ function computePlayerData(
 
     if (playerScores.length > 0) {
       avgTotal =
-        playerScores.reduce((sum, s) => sum + s.total_score, 0) / playerScores.length;
+        playerScores.reduce((sum, s) => sum + computeTotal(s), 0) / playerScores.length;
       for (const cat of SCORE_CATEGORIES) {
         avgCategories[cat.key] =
           playerScores.reduce((sum, s) => sum + s[cat.key], 0) / playerScores.length;
@@ -207,7 +212,7 @@ export default function CoachTryoutsPage() {
       supabase
         .from("evaluator_scores")
         .select(
-          "id, player_name, division, evaluator_name, hitting, fielding, throwing, baserunning, attitude, total_score, notes"
+          "id, player_name, division, evaluator_name, hitting, fielding, throwing, running, effort, attitude, notes"
         )
         .eq("division", division),
       supabase
@@ -551,7 +556,7 @@ export default function CoachTryoutsPage() {
                                 <span className="font-display text-lg font-bold text-flag-blue">
                                   {p.avgTotal.toFixed(1)}
                                 </span>
-                                <span className="text-xs text-gray-400">/ 100</span>
+                                <span className="text-xs text-gray-400">/ 54</span>
                               </div>
                             </div>
                           </div>
@@ -580,9 +585,9 @@ export default function CoachTryoutsPage() {
                               <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
                                 <span className="w-24 text-xs font-bold text-charcoal">Total</span>
                                 <span className="font-display text-lg font-bold text-flag-blue">
-                                  {s.total_score}
+                                  {computeTotal(s)}
                                 </span>
-                                <span className="text-xs text-gray-400">/ 100</span>
+                                <span className="text-xs text-gray-400">/ 54</span>
                               </div>
                             </div>
                             {s.notes && (

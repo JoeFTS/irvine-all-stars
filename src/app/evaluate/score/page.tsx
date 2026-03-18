@@ -26,6 +26,7 @@ interface PlayerScore {
   running: number | null;
   baseballIq: number | null;
   effort: number | null;
+  attitude: number | null;
   notes: string;
   standoutSkills: string;
   concerns: string;
@@ -43,7 +44,8 @@ const CATEGORIES = [
   { key: "fielding", label: "Fielding" },
   { key: "throwing", label: "Throwing" },
   { key: "running", label: "Running" },
-  { key: "effort", label: "Effort & Attitude" },
+  { key: "effort", label: "Effort" },
+  { key: "attitude", label: "Attitude" },
 ] as const;
 
 type CategoryKey = (typeof CATEGORIES)[number]["key"];
@@ -58,6 +60,7 @@ function emptyPlayer(num: number): PlayerScore {
     running: null,
     baseballIq: null,
     effort: null,
+    attitude: null,
     notes: "",
     standoutSkills: "",
     concerns: "",
@@ -152,6 +155,7 @@ export default function ScoringPage() {
         throwing: p.throwing,
         running: p.running,
         effort: p.effort,
+        attitude: p.attitude,
         notes: p.notes || null,
         standout_skills: p.standoutSkills || null,
         concerns: p.concerns || null,
@@ -346,7 +350,7 @@ export default function ScoringPage() {
                 {total}
               </div>
               <div className="text-[10px] opacity-60 uppercase tracking-wide">
-                / 30
+                / 54
               </div>
             </div>
           </div>
@@ -380,12 +384,12 @@ export default function ScoringPage() {
                 </span>
                 {val != null && (
                   <span className="text-xs text-gray-400 font-medium">
-                    {val}/5
+                    {val}/9
                   </span>
                 )}
               </div>
               <div className="flex gap-2 mt-2">
-                {[1, 2, 3, 4, 5].map((n) => {
+                {[1, 3, 5, 7, 9].map((n) => {
                   const selected = val === n;
                   return (
                     <button

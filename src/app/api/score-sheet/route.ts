@@ -6,11 +6,12 @@ const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
 
 const CATEGORIES = [
-  { name: "Hitting", max: 20 },
-  { name: "Fielding", max: 20 },
-  { name: "Throwing", max: 15 },
-  { name: "Running / Speed", max: 15 },
-  { name: "Effort & Attitude", max: 30 },
+  { name: "Hitting", max: 9 },
+  { name: "Fielding", max: 9 },
+  { name: "Throwing", max: 9 },
+  { name: "Running / Speed", max: 9 },
+  { name: "Effort", max: 9 },
+  { name: "Attitude", max: 9 },
 ];
 
 export async function GET(request: NextRequest) {
@@ -136,17 +137,18 @@ export async function GET(request: NextRequest) {
     { width: 8 },   // E: Bats
     { width: 8 },   // F: Throws
     { width: 14 },  // G: Team
-    { width: 12 },  // H: Hitting (20)
-    { width: 12 },  // I: Fielding (20)
-    { width: 12 },  // J: Throwing (15)
-    { width: 15 },  // K: Running/Speed (15)
-    { width: 18 },  // L: Effort & Attitude (30)
-    { width: 10 },  // M: TOTAL
-    { width: 20 },  // N: Notes
+    { width: 10 },  // H: Hitting (9)
+    { width: 10 },  // I: Fielding (9)
+    { width: 10 },  // J: Throwing (9)
+    { width: 10 },  // K: Running/Speed (9)
+    { width: 10 },  // L: Effort (9)
+    { width: 10 },  // M: Attitude (9)
+    { width: 10 },  // N: TOTAL
+    { width: 20 },  // O: Notes
   ];
 
   // Row 1: Title
-  ws.mergeCells("A1:N1");
+  ws.mergeCells("A1:O1");
   const titleCell = ws.getCell("A1");
   titleCell.value = isBlank
     ? "IRVINE ALL-STARS — TRYOUT SCORE SHEET"
@@ -157,7 +159,7 @@ export async function GET(request: NextRequest) {
   ws.getRow(1).height = 36;
 
   // Row 2: Session info
-  ws.mergeCells("A2:N2");
+  ws.mergeCells("A2:O2");
   const infoCell = ws.getCell("A2");
   infoCell.value = isBlank
     ? "Division: _______________    Date: _______________    Location: _______________"
@@ -168,9 +170,9 @@ export async function GET(request: NextRequest) {
   ws.getRow(2).height = 24;
 
   // Row 3: Scoring guide
-  ws.mergeCells("A3:N3");
+  ws.mergeCells("A3:O3");
   const guideCell = ws.getCell("A3");
-  guideCell.value = "SCORING:  Score each category up to its max points.  Total = 100 points possible.";
+  guideCell.value = "SCORING:  Score each category 1, 3, 5, 7, or 9 (9 = highest).  Total = 54 points possible.";
   guideCell.font = { size: 10, italic: true, color: { argb: red } };
   guideCell.alignment = { horizontal: "center", vertical: "middle" };
   ws.getRow(3).height = 22;
@@ -183,18 +185,18 @@ export async function GET(request: NextRequest) {
   playerHeaderCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: navy } };
   playerHeaderCell.alignment = { horizontal: "center", vertical: "middle" };
 
-  ws.mergeCells("H4:L4");
+  ws.mergeCells("H4:M4");
   const evalHeaderCell = ws.getCell("H4");
   evalHeaderCell.value = "EVALUATION (fill in scores)";
   evalHeaderCell.font = { bold: true, size: 10, color: { argb: white } };
   evalHeaderCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: red } };
   evalHeaderCell.alignment = { horizontal: "center", vertical: "middle" };
 
-  const totalHeaderCell = ws.getCell("M4");
+  const totalHeaderCell = ws.getCell("N4");
   totalHeaderCell.value = "";
   totalHeaderCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: navy } };
 
-  const notesHeaderCell = ws.getCell("N4");
+  const notesHeaderCell = ws.getCell("O4");
   notesHeaderCell.value = "";
   notesHeaderCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: navy } };
 
@@ -221,7 +223,7 @@ export async function GET(request: NextRequest) {
     cell.fill = {
       type: "pattern",
       pattern: "solid",
-      fgColor: { argb: i >= 7 && i <= 11 ? red : navy },
+      fgColor: { argb: i >= 7 && i <= 12 ? red : navy },
     };
     cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
     cell.border = {
@@ -267,8 +269,8 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    // Score columns (H-L) — yellow background, empty for coaches to fill
-    for (let i = 7; i <= 11; i++) {
+    // Score columns (H-M) — yellow background, empty for coaches to fill
+    for (let i = 7; i <= 12; i++) {
       const cell = row.getCell(i + 1);
       cell.value = null;
       cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFDE7" } };
@@ -281,10 +283,10 @@ export async function GET(request: NextRequest) {
       };
     }
 
-    // Total column (M) — SUM formula
-    const totalCell = row.getCell(13);
+    // Total column (N) — SUM formula
+    const totalCell = row.getCell(14);
     totalCell.value = {
-      formula: `SUM(H${rowNum}:L${rowNum})`,
+      formula: `SUM(H${rowNum}:M${rowNum})`,
       result: 0,
     };
     totalCell.font = { size: 12, bold: true, color: { argb: navy } };
@@ -295,8 +297,8 @@ export async function GET(request: NextRequest) {
       right: { style: "thin", color: { argb: navy } },
     };
 
-    // Notes column (N) — empty
-    const notesCell = row.getCell(14);
+    // Notes column (O) — empty
+    const notesCell = row.getCell(15);
     notesCell.value = null;
     notesCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFDE7" } };
     notesCell.border = {
@@ -324,7 +326,7 @@ export async function GET(request: NextRequest) {
       };
     }
 
-    for (let c = 8; c <= 12; c++) {
+    for (let c = 8; c <= 13; c++) {
       const cell = row.getCell(c);
       cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFDE7" } };
       cell.border = {
@@ -334,18 +336,18 @@ export async function GET(request: NextRequest) {
       };
     }
 
-    const totalCell = row.getCell(13);
-    totalCell.value = { formula: `SUM(H${rowNum}:L${rowNum})`, result: 0 };
+    const totalCell = row.getCell(14);
+    totalCell.value = { formula: `SUM(H${rowNum}:M${rowNum})`, result: 0 };
     totalCell.font = { size: 12, bold: true, color: { argb: navy } };
     totalCell.alignment = { horizontal: "center", vertical: "middle" };
 
-    row.getCell(14).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFDE7" } };
+    row.getCell(15).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFDE7" } };
     row.height = 22;
   }
 
   // Footer row
   const footerRowNum = 6 + players.length + blankRowCount + 1;
-  ws.mergeCells(`A${footerRowNum}:N${footerRowNum}`);
+  ws.mergeCells(`A${footerRowNum}:O${footerRowNum}`);
   const footerCell = ws.getCell(`A${footerRowNum}`);
   footerCell.value = `Coach Name: ___________________________    Signature: ___________________________    Date: ______________`;
   footerCell.font = { size: 10, color: { argb: "666666" } };

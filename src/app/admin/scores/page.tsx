@@ -24,9 +24,9 @@ interface Score {
   hitting: number;
   fielding: number;
   throwing: number;
-  baserunning: number;
+  running: number;
+  effort: number;
   attitude: number;
-  total_score: number;
   notes: string | null;
   created_at: string;
 }
@@ -48,9 +48,14 @@ const SCORE_CATEGORIES = [
   { key: "hitting", label: "Hitting" },
   { key: "fielding", label: "Fielding" },
   { key: "throwing", label: "Throwing" },
-  { key: "baserunning", label: "Baserunning" },
+  { key: "running", label: "Running / Speed" },
+  { key: "effort", label: "Effort" },
   { key: "attitude", label: "Attitude" },
 ] as const;
+
+function computeTotal(score: Score): number {
+  return (score.hitting || 0) + (score.fielding || 0) + (score.throwing || 0) + (score.running || 0) + (score.effort || 0) + (score.attitude || 0);
+}
 
 function formatDate(dateStr: string): string {
   const d = new Date(dateStr + "T00:00:00");
@@ -78,7 +83,7 @@ export default function ScoresPage() {
     setLoading(true);
 
     const [scoresRes, sessionsRes, assignmentsRes] = await Promise.all([
-      supabase.from("evaluator_scores").select("*").order("total_score", { ascending: false }),
+      supabase.from("evaluator_scores").select("*"),
       supabase.from("tryout_sessions").select("*").order("session_date").order("start_time"),
       supabase.from("tryout_assignments").select("session_id"),
     ]);
@@ -119,9 +124,9 @@ export default function ScoresPage() {
     return acc;
   }, {});
 
-  // Sort each group by total_score descending
+  // Sort each group by computed total descending
   for (const div of Object.keys(grouped)) {
-    grouped[div].sort((a, b) => (b.total_score ?? 0) - (a.total_score ?? 0));
+    grouped[div].sort((a, b) => computeTotal(b) - computeTotal(a));
   }
 
   if (!supabase) {
@@ -313,10 +318,10 @@ export default function ScoresPage() {
                             {/* Total Score */}
                             <div className="text-right shrink-0">
                               <p className="font-display text-2xl font-bold text-flag-blue">
-                                {score.total_score}
+                                {computeTotal(score)}
                               </p>
                               <p className="text-[10px] text-gray-400 uppercase tracking-wider">
-                                / 100
+                                / 54
                               </p>
                             </div>
 
@@ -350,14 +355,14 @@ export default function ScoresPage() {
                                           {cat.label}
                                         </span>
                                         <span className="text-sm font-semibold text-flag-blue">
-                                          {val} / 20
+                                          {val} / 9
                                         </span>
                                       </div>
                                       <div className="w-full bg-gray-100 rounded-full h-2">
                                         <div
                                           className="bg-flag-blue h-2 rounded-full transition-all"
                                           style={{
-                                            width: `${(val / 20) * 100}%`,
+                                            width: `${(val / 9) * 100}%`,
                                           }}
                                         />
                                       </div>
@@ -372,7 +377,7 @@ export default function ScoresPage() {
                                   Total
                                 </span>
                                 <span className="font-display text-2xl font-bold text-flag-blue">
-                                  {score.total_score} / 100
+                                  {computeTotal(score)} / 54
                                 </span>
                               </div>
 
