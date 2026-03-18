@@ -18,39 +18,79 @@ const PITCHING_DIVISIONS = [
 const BLANK_ROWS = 12;
 
 /**
- * Inject a <style> tag for print-specific @page rules.
- * This is the most reliable cross-browser way to force landscape.
+ * On beforeprint: hide everything except #pitching-log-print-area
+ * by walking up from the print area and hiding siblings.
+ * On afterprint: restore everything.
+ * Also injects @page { size: landscape } via a style tag.
  */
 function usePrintStyles() {
   useEffect(() => {
     const style = document.createElement("style");
-    style.id = "pitching-log-print";
-    style.textContent = `
-      @page { size: landscape; margin: 0.25in; }
-      @media print {
-        html, body { height: auto !important; overflow: visible !important; margin: 0 !important; padding: 0 !important; }
-        body > * { display: none !important; }
-        body > *:has(#pitching-log-print-area) { display: block !important; }
-        #pitching-log-print-area { display: block !important; }
-        #pitching-log-print-area * { visibility: visible !important; }
-        /* Collapse all wrappers between body and the print area */
-        body > *:has(#pitching-log-print-area),
-        body > *:has(#pitching-log-print-area) > *,
-        body > *:has(#pitching-log-print-area) > * > *,
-        body > *:has(#pitching-log-print-area) > * > * > *,
-        body > *:has(#pitching-log-print-area) > * > * > * > *,
-        body > *:has(#pitching-log-print-area) > * > * > * > * > * {
-          display: block !important;
-          padding: 0 !important;
-          margin: 0 !important;
-          min-height: 0 !important;
-          height: auto !important;
-          overflow: visible !important;
-        }
-      }
-    `;
+    style.id = "pitching-log-print-style";
+    style.textContent = `@page { size: landscape; margin: 0.25in; }`;
     document.head.appendChild(style);
-    return () => { style.remove(); };
+
+    const hidden: HTMLElement[] = [];
+
+    function beforePrint() {
+      const printArea = document.getElementById("pitching-log-print-area");
+      if (!printArea) return;
+
+      // Walk up from printArea to body, hiding all siblings at each level
+      let el: HTMLElement | null = printArea;
+      while (el && el !== document.body) {
+        const parent = el.parentElement;
+        if (parent) {
+          Array.from(parent.children).forEach((sibling) => {
+            if (sibling !== el && sibling instanceof HTMLElement && sibling.style.display !== "none") {
+              sibling.dataset.printHidden = sibling.style.display;
+              sibling.style.display = "none";
+              hidden.push(sibling);
+            }
+          });
+          // Collapse wrapper padding/margins
+          parent.dataset.printPad = parent.style.padding;
+          parent.dataset.printMar = parent.style.margin;
+          parent.dataset.printMinH = parent.style.minHeight;
+          parent.style.padding = "0";
+          parent.style.margin = "0";
+          parent.style.minHeight = "0";
+          hidden.push(parent);
+        }
+        el = parent;
+      }
+    }
+
+    function afterPrint() {
+      hidden.forEach((el) => {
+        if (el.dataset.printHidden !== undefined) {
+          el.style.display = el.dataset.printHidden;
+          delete el.dataset.printHidden;
+        }
+        if (el.dataset.printPad !== undefined) {
+          el.style.padding = el.dataset.printPad;
+          delete el.dataset.printPad;
+        }
+        if (el.dataset.printMar !== undefined) {
+          el.style.margin = el.dataset.printMar;
+          delete el.dataset.printMar;
+        }
+        if (el.dataset.printMinH !== undefined) {
+          el.style.minHeight = el.dataset.printMinH;
+          delete el.dataset.printMinH;
+        }
+      });
+      hidden.length = 0;
+    }
+
+    window.addEventListener("beforeprint", beforePrint);
+    window.addEventListener("afterprint", afterPrint);
+
+    return () => {
+      style.remove();
+      window.removeEventListener("beforeprint", beforePrint);
+      window.removeEventListener("afterprint", afterPrint);
+    };
   }, []);
 }
 
