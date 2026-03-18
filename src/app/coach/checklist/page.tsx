@@ -73,6 +73,7 @@ function buildPlayerChecklist(
   contracts: PlayerContract[]
 ): ChecklistItem[] {
   const regDocs = docs.filter((d) => d.registration_id === reg.id);
+  const hasAccepted = regDocs.some((d) => d.document_type === "selection_acceptance");
   const birthCertDoc = regDocs.find(
     (d) => d.document_type === "birth_certificate"
   );
@@ -83,10 +84,28 @@ function buildPlayerChecklist(
 
   return [
     {
+      label: "Selection Accepted",
+      status: hasAccepted ? "complete" : "pending",
+      note: hasAccepted ? "Accepted" : "Awaiting parent acceptance",
+    },
+    {
+      label: "Player Contract",
+      status: contract ? "complete" : "pending",
+      note: contract
+        ? `Signed${contract.signed_at ? ` ${new Date(contract.signed_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}` : ""}`
+        : "Pending",
+    },
+    {
       label: "Birth Certificate",
       status: birthCertDoc ? "complete" : "pending",
       note: birthCertDoc ? "Uploaded" : "Pending",
       viewUrl: birthCertDoc?.file_path ?? null,
+    },
+    {
+      label: "Player Photo",
+      status: photoDoc ? "complete" : "pending",
+      note: photoDoc ? "Uploaded" : "Pending",
+      viewUrl: photoDoc?.file_path ?? null,
     },
     {
       label: "Medical Release",
@@ -97,19 +116,6 @@ function buildPlayerChecklist(
       label: "Pitching Log",
       status: pitchingRequired ? "pending" : "not_required",
       note: pitchingRequired ? "Pending" : "Not Required",
-    },
-    {
-      label: "Player Photo",
-      status: photoDoc ? "complete" : "pending",
-      note: photoDoc ? "Uploaded" : "Pending",
-      viewUrl: photoDoc?.file_path ?? null,
-    },
-    {
-      label: "Player Contract",
-      status: contract ? "complete" : "pending",
-      note: contract
-        ? `Signed${contract.signed_at ? ` ${new Date(contract.signed_at).toLocaleDateString("en-US", { month: "short", day: "numeric" })}` : ""}`
-        : "Pending",
     },
   ];
 }

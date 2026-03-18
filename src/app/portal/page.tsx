@@ -157,6 +157,39 @@ export default function PortalPage() {
   const [tryoutSessions, setTryoutSessions] = useState<TryoutSession[]>([]);
   const [tryoutAssignments, setTryoutAssignments] = useState<TryoutAssignment[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
+  const [acceptingId, setAcceptingId] = useState<string | null>(null);
+
+  async function acceptSelection(regId: string) {
+    if (!supabase || !user) return;
+    const reg = registrations.find((r) => r.id === regId);
+    if (!reg) return;
+
+    setAcceptingId(regId);
+    const { error } = await supabase.from("player_documents").insert({
+      registration_id: regId,
+      player_name: `${reg.player_first_name} ${reg.player_last_name}`,
+      division: reg.division,
+      document_type: "selection_acceptance",
+      file_path: null,
+      file_name: JSON.stringify({
+        accepted_by: user.email,
+        accepted_at: new Date().toISOString(),
+      }),
+      status: "approved",
+      uploaded_by: user.id,
+    });
+    if (!error) {
+      setDocuments((prev) => [
+        ...prev,
+        {
+          id: crypto.randomUUID(),
+          registration_id: regId,
+          document_type: "selection_acceptance",
+        },
+      ]);
+    }
+    setAcceptingId(null);
+  }
 
   // Client-side auth guard
   useEffect(() => {
@@ -539,6 +572,11 @@ export default function PortalPage() {
                     d.registration_id === reg.id &&
                     d.document_type === "medical_release"
                 );
+                const hasAcceptedSelection = documents.some(
+                  (d) =>
+                    d.registration_id === reg.id &&
+                    d.document_type === "selection_acceptance"
+                );
 
                 const isSelected = reg.status === "selected";
                 const isOnTeam = isSelected || reg.status === "alternate";
@@ -546,10 +584,17 @@ export default function PortalPage() {
                 const items = [
                   { label: "Register for tryouts", done: true, href: "#", locked: false },
                   {
+                    label: "Accept All-Stars selection",
+                    done: hasAcceptedSelection,
+                    href: "#accept",
+                    locked: !isOnTeam,
+                    acceptAction: isOnTeam && !hasAcceptedSelection ? reg.id : undefined,
+                  },
+                  {
                     label: "Sign player contract",
                     done: hasContract,
                     href: `/portal/contract?player=${reg.id}`,
-                    locked: !isOnTeam,
+                    locked: !hasAcceptedSelection,
                   },
                   {
                     label: "Upload player photo",
@@ -569,7 +614,7 @@ export default function PortalPage() {
                     href: `/portal/medical-release?player=${reg.id}`,
                     locked: !hasContract,
                   },
-                ];
+                ] as Array<{ label: string; done: boolean; href: string; locked: boolean; acceptAction?: string }>;
 
                 const completedCount = items.filter((i) => i.done).length;
                 const totalCount = items.length;
@@ -658,6 +703,25 @@ export default function PortalPage() {
                                 {item.label}
                               </span>
                             </div>
+                          ) : item.acceptAction ? (
+                            <button
+                              onClick={() => {
+                                if (confirm("Are you sure you want to accept the All-Stars selection? This confirms your family's commitment to the full All-Stars season.")) {
+                                  acceptSelection(item.acceptAction!);
+                                }
+                              }}
+                              disabled={acceptingId === item.acceptAction}
+                              className="flex items-center gap-3 text-sm w-full text-left group"
+                            >
+                              <div className="h-5 w-5 shrink-0 rounded-full border-2 border-green-500 bg-green-50 group-hover:bg-green-100 transition-colors flex items-center justify-center">
+                                <svg className="h-3 w-3 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                                  <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                                </svg>
+                              </div>
+                              <span className="font-semibold text-green-700 group-hover:text-green-800">
+                                {acceptingId === item.acceptAction ? "Accepting..." : "Accept All-Stars Selection"}
+                              </span>
+                            </button>
                           ) : item.locked ? (
                             <div className="flex items-center gap-3 text-sm text-gray-400 cursor-not-allowed">
                               <svg
@@ -706,10 +770,15 @@ export default function PortalPage() {
                     {/* Hint messages for locked items */}
                     {!isOnTeam && (
                       <p className="mt-3 text-xs text-gray-400 italic">
-                        Steps 2-4 will unlock once your player is selected for a team.
+                        Steps 2-6 will unlock once your player is selected for a team.
                       </p>
                     )}
-                    {isOnTeam && !hasContract && (
+                    {isOnTeam && !hasAcceptedSelection && (
+                      <p className="mt-3 text-xs text-flag-blue italic font-medium">
+                        Accept the selection above to unlock the remaining steps.
+                      </p>
+                    )}
+                    {hasAcceptedSelection && !hasContract && (
                       <p className="mt-3 text-xs text-gray-400 italic">
                         Sign the player contract to unlock document uploads.
                       </p>

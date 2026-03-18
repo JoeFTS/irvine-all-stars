@@ -177,6 +177,7 @@ export default function TryoutsPage() {
   const [sessions, setSessions] = useState<TryoutSession[]>([]);
   const [assignments, setAssignments] = useState<TryoutAssignment[]>([]);
   const [coachSelections, setCoachSelections] = useState<CoachSelection[]>([]);
+  const [acceptedRegIds, setAcceptedRegIds] = useState<Set<string>>(new Set());
   const [loading, setLoading] = useState(true);
 
   // Players tab state
@@ -237,7 +238,7 @@ export default function TryoutsPage() {
     if (!supabase) return;
     setLoading(true);
 
-    const [regsRes, sessionsRes, assignmentsRes, coachSelectionsRes] = await Promise.all([
+    const [regsRes, sessionsRes, assignmentsRes, coachSelectionsRes, acceptancesRes] = await Promise.all([
       supabase
         .from("tryout_registrations")
         .select("*")
@@ -249,12 +250,16 @@ export default function TryoutsPage() {
         .order("start_time"),
       supabase.from("tryout_assignments").select("*"),
       supabase.from("coach_selections").select("registration_id, coach_id, division, notes, selected_at"),
+      supabase.from("player_documents").select("registration_id").eq("document_type", "selection_acceptance"),
     ]);
 
     if (regsRes.data) setRegistrations(regsRes.data);
     if (sessionsRes.data) setSessions(sessionsRes.data);
     if (assignmentsRes.data) setAssignments(assignmentsRes.data);
     if (coachSelectionsRes.data) setCoachSelections(coachSelectionsRes.data);
+    if (acceptancesRes?.data) {
+      setAcceptedRegIds(new Set(acceptancesRes.data.map((a: { registration_id: string }) => a.registration_id)));
+    }
 
     setLoading(false);
   }, []);
@@ -1014,6 +1019,19 @@ export default function TryoutsPage() {
                               <Star size={10} />
                               Coach Pick
                             </span>
+                          )}
+                          {(reg.status === "selected" || reg.status === "alternate") && emailSentIds.has(reg.id) && (
+                            acceptedRegIds.has(reg.id) ? (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-green-100 text-green-700 border border-green-300">
+                                <Check size={10} />
+                                Accepted
+                              </span>
+                            ) : (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-700 border border-amber-300">
+                                <Clock size={10} />
+                                Awaiting Acceptance
+                              </span>
+                            )
                           )}
                         </div>
                         <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-400">

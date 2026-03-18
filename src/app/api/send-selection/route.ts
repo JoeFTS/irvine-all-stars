@@ -58,16 +58,16 @@ function getSelectedHtml(data: SelectionRequest) {
 ${teamLine}
 <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#FFF8E1;border-left:4px solid #F4B400;border-radius:4px;margin:0 0 24px 0;">
 <tr><td style="padding:20px;">
-<h3 style="color:#0A2342;font-size:14px;font-weight:700;margin:0 0 12px 0;text-transform:uppercase;letter-spacing:1px;">What Happens Next</h3>
+<h3 style="color:#0A2342;font-size:14px;font-weight:700;margin:0 0 12px 0;text-transform:uppercase;letter-spacing:1px;">Action Required: Accept Your Spot</h3>
 <table cellpadding="0" cellspacing="0">
+<tr><td style="padding:4px 12px 4px 0;vertical-align:top;color:#F4B400;font-size:14px;">&#9733;</td><td style="padding:4px 0;color:#4B5563;font-size:14px;line-height:1.5;"><strong style="color:#0A2342;">Log in to the Parent Portal and accept ${player_name}'s selection.</strong> This confirms your family's commitment to the All-Stars season.</td></tr>
+<tr><td style="padding:4px 12px 4px 0;vertical-align:top;color:#F4B400;font-size:14px;">&#9733;</td><td style="padding:4px 0;color:#4B5563;font-size:14px;line-height:1.5;">Once accepted, you'll be able to sign the player contract and complete all required documents.</td></tr>
 <tr><td style="padding:4px 12px 4px 0;vertical-align:top;color:#F4B400;font-size:14px;">&#9733;</td><td style="padding:4px 0;color:#4B5563;font-size:14px;line-height:1.5;">Your head coach will be reaching out soon with practice schedules and details.</td></tr>
-<tr><td style="padding:4px 12px 4px 0;vertical-align:top;color:#F4B400;font-size:14px;">&#9733;</td><td style="padding:4px 0;color:#4B5563;font-size:14px;line-height:1.5;">Log in to the Parent Portal to complete all required documents.</td></tr>
-<tr><td style="padding:4px 12px 4px 0;vertical-align:top;color:#F4B400;font-size:14px;">&#9733;</td><td style="padding:4px 0;color:#4B5563;font-size:14px;line-height:1.5;">Tournament season kicks off with the Memorial Day Tournament.</td></tr>
 </table></td></tr></table>
 <p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0 0 24px 0;">Being an All-Star means representing Irvine PONY beyond the regular season. ${player_name} is now part of something bigger &mdash; a group of kids who earned this through hard work, and a community that's going to be cheering them on all summer.</p>
 <table cellpadding="0" cellspacing="0" style="margin:0 0 24px 0;" width="100%">
 <tr><td align="center">
-<a href="${portalUrl}" style="display:inline-block;background-color:#C1121F;color:#FFFFFF;font-size:16px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:6px;text-transform:uppercase;letter-spacing:1px;">Log In to Parent Portal</a>
+<a href="${portalUrl}" style="display:inline-block;background-color:#C1121F;color:#FFFFFF;font-size:16px;font-weight:700;text-decoration:none;padding:14px 32px;border-radius:6px;text-transform:uppercase;letter-spacing:1px;">Log In &amp; Accept Selection</a>
 </td></tr></table>
 <p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0 0 4px 0;">See you on the diamond.</p>
 <p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0;"><strong style="color:#0A2342;">Irvine PONY All-Stars Coordinator</strong><br><a href="mailto:AllStars@irvinepony.com" style="color:#0A2342;text-decoration:underline;">AllStars@irvinepony.com</a></p>
