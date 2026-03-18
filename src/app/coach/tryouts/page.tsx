@@ -237,7 +237,11 @@ export default function CoachTryoutsPage() {
 
   // Derived data
   const players = computePlayerData(registrations, scores).sort(
-    (a, b) => b.avgTotal - a.avgTotal
+    (a, b) => {
+      const aTotal = a.scores.length > 0 ? (computeTotal(a.scores[0]) ?? 0) : 0;
+      const bTotal = b.scores.length > 0 ? (computeTotal(b.scores[0]) ?? 0) : 0;
+      return bTotal - aTotal;
+    }
   );
 
   const selectedCount = localSelected.size;
@@ -444,7 +448,7 @@ export default function CoachTryoutsPage() {
                   <div className="shrink-0 text-right w-16">
                     {p.scores.length > 0 ? (
                       <p className="font-display text-lg font-bold text-flag-blue">
-                        {p.avgTotal.toFixed(1)}
+                        {computeTotal(p.scores[0])}
                       </p>
                     ) : (
                       <p className="text-xs text-gray-400">No score</p>
@@ -527,76 +531,53 @@ export default function CoachTryoutsPage() {
                       </div>
                     </div>
 
-                    {/* Score breakdown */}
+                    {/* Score breakdown — single evaluator */}
                     {p.scores.length > 0 ? (
                       <div className="space-y-4">
                         <h3 className="font-display text-sm font-bold uppercase tracking-wide text-flag-blue">
                           Score Breakdown
                         </h3>
 
-                        {/* Average scores */}
-                        {p.scores.length > 1 && (
-                          <div className="bg-white border border-gray-200 rounded-lg p-4">
-                            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
-                              Average ({p.scores.length} evaluators)
-                            </p>
-                            <div className="space-y-2">
-                              {SCORE_CATEGORIES.map((cat) => (
-                                <div key={cat.key} className="flex items-center gap-3">
-                                  <span className="w-24 text-xs font-medium text-gray-600">
-                                    {cat.label}
-                                  </span>
-                                  <div className="flex-1">
-                                    <ScoreBar value={Math.round(p.avgCategories[cat.key] * 10) / 10} />
+                        {(() => {
+                          // Use the most recent score entry
+                          const s = p.scores[0];
+                          return (
+                            <div className="bg-white border border-gray-200 rounded-lg p-4">
+                              <div className="space-y-2">
+                                {SCORE_CATEGORIES.map((cat) => (
+                                  <div key={cat.key} className="flex items-center gap-3">
+                                    <span className="w-28 text-xs font-medium text-gray-600">
+                                      {cat.label}
+                                    </span>
+                                    <div className="flex-1">
+                                      <ScoreBar value={s[cat.key]} />
+                                    </div>
                                   </div>
-                                </div>
-                              ))}
-                              <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
-                                <span className="w-24 text-xs font-bold text-charcoal">Total</span>
-                                <span className="font-display text-lg font-bold text-flag-blue">
-                                  {p.avgTotal.toFixed(1)}
-                                </span>
-                                <span className="text-xs text-gray-400">/ 54</span>
-                              </div>
-                            </div>
-                          </div>
-                        )}
-
-                        {/* Individual evaluator scores */}
-                        {p.scores.map((s) => (
-                          <div
-                            key={s.id}
-                            className="bg-white border border-gray-200 rounded-lg p-4"
-                          >
-                            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide mb-3">
-                              {s.evaluator_name}
-                            </p>
-                            <div className="space-y-2">
-                              {SCORE_CATEGORIES.map((cat) => (
-                                <div key={cat.key} className="flex items-center gap-3">
-                                  <span className="w-24 text-xs font-medium text-gray-600">
-                                    {cat.label}
+                                ))}
+                                <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
+                                  <span className="w-28 text-xs font-bold text-charcoal">Total</span>
+                                  <span className="font-display text-lg font-bold text-flag-blue">
+                                    {computeTotal(s)}
                                   </span>
-                                  <div className="flex-1">
-                                    <ScoreBar value={s[cat.key]} />
-                                  </div>
+                                  <span className="text-xs text-gray-400">/ 54</span>
                                 </div>
-                              ))}
-                              <div className="flex items-center gap-3 pt-2 border-t border-gray-100">
-                                <span className="w-24 text-xs font-bold text-charcoal">Total</span>
-                                <span className="font-display text-lg font-bold text-flag-blue">
-                                  {computeTotal(s)}
-                                </span>
-                                <span className="text-xs text-gray-400">/ 54</span>
                               </div>
-                            </div>
-                            {s.notes && (
-                              <p className="mt-3 text-sm text-gray-600 italic border-t border-gray-100 pt-3">
-                                {s.notes}
+                              {s.notes && (
+                                <div className="mt-3 border-t border-gray-100 pt-3">
+                                  <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-1">
+                                    Notes
+                                  </p>
+                                  <p className="text-sm text-gray-700">
+                                    {s.notes}
+                                  </p>
+                                </div>
+                              )}
+                              <p className="text-[10px] text-gray-300 mt-3">
+                                Evaluated by {s.evaluator_name}
                               </p>
-                            )}
-                          </div>
-                        ))}
+                            </div>
+                          );
+                        })()}
                       </div>
                     ) : (
                       <div className="text-sm text-gray-400 italic">
