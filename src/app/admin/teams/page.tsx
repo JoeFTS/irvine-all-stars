@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { Plus, Trash2, Shield, ShieldCheck } from "lucide-react";
+import Link from "next/link";
+import { Plus, Trash2, Shield, ShieldCheck, FileText } from "lucide-react";
 
 interface Team {
   id: string;
@@ -518,6 +519,19 @@ export default function TeamsPage() {
                             </p>
                           </div>
                         </div>
+
+                        {/* View Contracts Link */}
+                        {compliance.contractSigned > 0 && (
+                          <div className="mt-3 pt-3 border-t border-gray-100">
+                            <Link
+                              href={`/coach/contracts?division=${encodeURIComponent(team.division)}`}
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wide bg-flag-blue/10 text-flag-blue hover:bg-flag-blue/20 transition-colors"
+                            >
+                              <FileText size={14} />
+                              View Contracts ({compliance.contractSigned})
+                            </Link>
+                          </div>
+                        )}
                       </>
                     )}
                   </div>
