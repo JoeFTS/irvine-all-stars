@@ -99,12 +99,14 @@ function getPlayerCompliance(
   );
   const hasPhoto = regDocs.some((d) => d.document_type === "player_photo");
   const hasContract = contracts.some((c) => c.registration_id === regId);
+  const hasMedical = regDocs.some((d) => d.document_type === "medical_release");
 
   return {
     birthCert: hasBirthCert,
     photo: hasPhoto,
     contract: hasContract,
-    ready: hasBirthCert && hasPhoto && hasContract,
+    medical: hasMedical,
+    ready: hasBirthCert && hasPhoto && hasContract && hasMedical,
   };
 }
 
@@ -194,16 +196,7 @@ function DocBadge({
   );
 }
 
-function MedicalBadge() {
-  return (
-    <div className="flex items-center gap-1.5">
-      <span className="text-xs text-gray-500">Medical:</span>
-      <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-gray-100 text-gray-500">
-        Pending
-      </span>
-    </div>
-  );
-}
+// MedicalBadge removed — now uses DocBadge with real data
 
 /* ------------------------------------------------------------------ */
 /*  Player Card                                                        */
@@ -343,7 +336,12 @@ function PlayerCard({
             window.open(`/contract-view?id=${reg.id}`, "_blank");
           } : undefined}
         />
-        <MedicalBadge />
+        <DocBadge
+          label="Medical"
+          ok={compliance.medical}
+          okText="Complete"
+          missingText="Pending"
+        />
       </div>
     </div>
   );
@@ -529,6 +527,7 @@ export default function CoachRosterPage() {
                   birthCert: false,
                   photo: false,
                   contract: false,
+                  medical: false,
                   ready: false,
                 }
               }
