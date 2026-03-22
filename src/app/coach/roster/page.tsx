@@ -10,6 +10,7 @@ import {
   Phone,
   Mail,
   Shield,
+  ExternalLink,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
@@ -36,6 +37,7 @@ interface Registration {
 interface PlayerDocument {
   registration_id: string;
   document_type: string;
+  file_path: string | null;
 }
 
 interface PlayerContract {
@@ -157,26 +159,37 @@ function DocBadge({
   ok,
   okText,
   missingText,
+  onClick,
 }: {
   label: string;
   ok: boolean;
   okText: string;
   missingText: string;
+  onClick?: () => void;
 }) {
+  const badge = ok ? (
+    <span
+      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700 ${
+        onClick ? "cursor-pointer hover:bg-green-200 transition-colors" : ""
+      }`}
+      onClick={onClick}
+      role={onClick ? "button" : undefined}
+    >
+      <CheckCircle2 size={12} />
+      {okText}
+      {onClick && <ExternalLink size={10} className="ml-0.5" />}
+    </span>
+  ) : (
+    <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-flag-red">
+      <XCircle size={12} />
+      {missingText}
+    </span>
+  );
+
   return (
     <div className="flex items-center gap-1.5">
       <span className="text-xs text-gray-500">{label}:</span>
-      {ok ? (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-          <CheckCircle2 size={12} />
-          {okText}
-        </span>
-      ) : (
-        <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-flag-red">
-          <XCircle size={12} />
-          {missingText}
-        </span>
-      )}
+      {badge}
     </div>
   );
 }
@@ -199,9 +212,11 @@ function MedicalBadge() {
 function PlayerCard({
   reg,
   compliance,
+  docs,
 }: {
   reg: Registration;
   compliance: ReturnType<typeof getPlayerCompliance>;
+  docs: PlayerDocument[];
 }) {
   return (
     <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
@@ -298,18 +313,35 @@ function PlayerCard({
           ok={compliance.birthCert}
           okText="Uploaded"
           missingText="Missing"
+          onClick={compliance.birthCert ? async () => {
+            const doc = docs.find(d => d.registration_id === reg.id && d.document_type === "birth_certificate");
+            if (doc?.file_path && supabase) {
+              const { data } = await supabase.storage.from("player-documents").createSignedUrl(doc.file_path, 300);
+              if (data?.signedUrl) window.open(data.signedUrl, "_blank");
+            }
+          } : undefined}
         />
         <DocBadge
           label="Photo"
           ok={compliance.photo}
           okText="Uploaded"
           missingText="Missing"
+          onClick={compliance.photo ? async () => {
+            const doc = docs.find(d => d.registration_id === reg.id && d.document_type === "player_photo");
+            if (doc?.file_path && supabase) {
+              const { data } = await supabase.storage.from("player-documents").createSignedUrl(doc.file_path, 300);
+              if (data?.signedUrl) window.open(data.signedUrl, "_blank");
+            }
+          } : undefined}
         />
         <DocBadge
           label="Contract"
           ok={compliance.contract}
           okText="Signed"
           missingText="Not Signed"
+          onClick={compliance.contract ? () => {
+            window.open(`/contract-view?id=${reg.id}`, "_blank");
+          } : undefined}
         />
         <MedicalBadge />
       </div>
@@ -351,7 +383,7 @@ export default function CoachRosterPage() {
         .order("player_last_name"),
       supabase
         .from("player_documents")
-        .select("registration_id, document_type"),
+        .select("registration_id, document_type, file_path"),
       supabase.from("player_contracts").select("registration_id"),
     ]);
 
@@ -500,6 +532,7 @@ export default function CoachRosterPage() {
                   ready: false,
                 }
               }
+              docs={documents}
             />
           ))}
         </div>
