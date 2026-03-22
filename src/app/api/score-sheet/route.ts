@@ -14,6 +14,24 @@ const CATEGORIES = [
   { name: "Attitude", max: 9 },
 ];
 
+const POSITION_ABBREV: Record<string, string> = {
+  "Pitcher": "P",
+  "Catcher": "C",
+  "First Base": "1B",
+  "Second Base": "2B",
+  "Third Base": "3B",
+  "Shortstop": "SS",
+  "Left Field": "LF",
+  "Center Field": "CF",
+  "Right Field": "RF",
+  "Designated Hitter": "DH",
+  "Utility": "UTIL",
+};
+
+function abbrevPosition(pos: string): string {
+  return POSITION_ABBREV[pos] || pos;
+}
+
 export async function GET(request: NextRequest) {
   const sessionId = request.nextUrl.searchParams.get("session_id");
   const divisionParam = request.nextUrl.searchParams.get("division");
@@ -152,7 +170,7 @@ export async function GET(request: NextRequest) {
     { width: 5 },   // A: #
     { width: 16 },  // B: Last Name
     { width: 14 },  // C: First Name
-    { width: 14 },  // D: Position
+    { width: 10 },  // D: Position (abbreviated)
     { width: 8 },   // E: Bats
     { width: 8 },   // F: Throws
     { width: 14 },  // G: Team
@@ -229,7 +247,7 @@ export async function GET(request: NextRequest) {
     "#",
     "Last Name",
     "First Name",
-    "Position",
+    "Pos",
     "Bats",
     "Throws",
     "Team",
@@ -261,9 +279,11 @@ export async function GET(request: NextRequest) {
   players.forEach((player, idx) => {
     const rowNum = 6 + idx;
     const row = ws.getRow(rowNum);
-    const position = player.secondary_position && player.secondary_position !== "None"
-      ? `${player.primary_position} / ${player.secondary_position}`
-      : player.primary_position;
+    const pos1 = abbrevPosition(player.primary_position);
+    const pos2 = player.secondary_position && player.secondary_position !== "None"
+      ? abbrevPosition(player.secondary_position)
+      : null;
+    const position = pos2 ? `${pos1} / ${pos2}` : pos1;
 
     const values = [
       idx + 1,
@@ -376,14 +396,25 @@ export async function GET(request: NextRequest) {
   footerCell.alignment = { horizontal: "center", vertical: "middle" };
   ws.getRow(footerRowNum).height = 32;
 
-  // Print settings
+  // Print settings — landscape, fit to one page wide, narrow margins
   ws.pageSetup = {
     orientation: "landscape",
     fitToPage: true,
     fitToWidth: 1,
     fitToHeight: 0,
     paperSize: 1 as ExcelJS.PaperSize,
+    margins: {
+      left: 0.25,
+      right: 0.25,
+      top: 0.5,
+      bottom: 0.5,
+      header: 0.25,
+      footer: 0.25,
+    },
   };
+
+  // Repeat header rows (title + column headers) on every printed page
+  ws.pageSetup.printTitlesRow = "1:5";
 
   // Generate buffer
   const buffer = await wb.xlsx.writeBuffer();
