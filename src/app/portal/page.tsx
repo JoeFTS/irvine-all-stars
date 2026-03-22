@@ -165,28 +165,34 @@ export default function PortalPage() {
     if (!reg) return;
 
     setAcceptingId(regId);
-    const { error } = await supabase.from("player_documents").insert({
-      registration_id: regId,
-      player_name: `${reg.player_first_name} ${reg.player_last_name}`,
-      division: reg.division,
-      document_type: "selection_acceptance",
-      file_path: null,
-      file_name: JSON.stringify({
-        accepted_by: user.email,
-        accepted_at: new Date().toISOString(),
-      }),
-      status: "approved",
-      uploaded_by: user.id,
-    });
-    if (!error) {
-      setDocuments((prev) => [
-        ...prev,
-        {
-          id: crypto.randomUUID(),
-          registration_id: regId,
-          document_type: "selection_acceptance",
-        },
-      ]);
+    try {
+      const { error } = await supabase.from("player_documents").insert({
+        registration_id: regId,
+        player_name: `${reg.player_first_name} ${reg.player_last_name}`,
+        division: reg.division,
+        document_type: "selection_acceptance",
+        file_path: null,
+        file_name: JSON.stringify({
+          accepted_by: user.email,
+          accepted_at: new Date().toISOString(),
+        }),
+        status: "approved",
+        uploaded_by: user.id,
+      });
+      if (error) {
+        alert(`Failed to accept selection: ${error.message}. Please try again.`);
+      } else {
+        setDocuments((prev) => [
+          ...prev,
+          {
+            id: crypto.randomUUID(),
+            registration_id: regId,
+            document_type: "selection_acceptance",
+          },
+        ]);
+      }
+    } catch {
+      alert("Network error. Please check your connection and try again.");
     }
     setAcceptingId(null);
   }
@@ -494,18 +500,22 @@ export default function PortalPage() {
                                 <button
                                   onClick={async () => {
                                     try {
-                                      await fetch("/api/confirm-tryout", {
+                                      const res = await fetch("/api/confirm-tryout", {
                                         method: "POST",
                                         headers: { "Content-Type": "application/json" },
                                         body: JSON.stringify({ registration_id: reg.id }),
                                       });
-                                      setRegistrations((prev) =>
-                                        prev.map((r) =>
-                                          r.id === reg.id ? { ...r, status: "confirmed" } : r
-                                        )
-                                      );
+                                      if (res.ok) {
+                                        setRegistrations((prev) =>
+                                          prev.map((r) =>
+                                            r.id === reg.id ? { ...r, status: "confirmed" } : r
+                                          )
+                                        );
+                                      } else {
+                                        alert("Failed to confirm attendance. Please try again.");
+                                      }
                                     } catch {
-                                      // silently fail
+                                      alert("Network error. Please check your connection and try again.");
                                     }
                                   }}
                                   className="mt-3 inline-block bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded font-display text-xs font-semibold uppercase tracking-widest transition-colors"

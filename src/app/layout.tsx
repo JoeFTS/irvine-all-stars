@@ -24,13 +24,20 @@ export const metadata: Metadata = {
     template: "%s | Irvine All-Stars",
   },
   description:
-    "Official home of Irvine Pony Baseball All-Stars. Fair selection, transparent process, unforgettable summer. Six divisions from 7U to 12U.",
+    "Official home of Irvine Pony Baseball All-Stars. Fair selection, transparent process, unforgettable summer. Twelve divisions from Shetland to Pony.",
   openGraph: {
     title: "Irvine All-Stars | Irvine Pony Baseball",
     description:
-      "Official home of Irvine Pony Baseball All-Stars. Coach applications, tryout registration, and parent portal.",
+      "Official home of Irvine Pony Baseball All-Stars. Coach applications, tryout registration, and parent portal for all twelve divisions.",
     siteName: "Irvine All-Stars",
     type: "website",
+    url: "https://irvineallstars.com",
+  },
+  twitter: {
+    card: "summary",
+    title: "Irvine All-Stars | Irvine Pony Baseball",
+    description:
+      "Official home of Irvine Pony Baseball All-Stars. Coach applications, tryout registration, and parent portal.",
   },
 };
 

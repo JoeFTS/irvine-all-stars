@@ -197,7 +197,7 @@ export default function CoachDashboardPage() {
 
   // Build sets for quick lookup
   const hasBirthCert = new Set(
-    documents.filter((d) => d.document_type === "birth_cert").map((d) => d.registration_id)
+    documents.filter((d) => d.document_type === "birth_certificate").map((d) => d.registration_id)
   );
   const hasPhoto = new Set(
     documents.filter((d) => d.document_type === "player_photo").map((d) => d.registration_id)

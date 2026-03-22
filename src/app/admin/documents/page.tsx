@@ -167,7 +167,9 @@ export default function AdminDocumentsPage() {
       .update({ status: newStatus })
       .eq("id", docId);
 
-    if (!error) {
+    if (error) {
+      alert(`Failed to update document status: ${error.message}`);
+    } else {
       setDocuments((prev) =>
         prev.map((d) => (d.id === docId ? { ...d, status: newStatus } : d))
       );

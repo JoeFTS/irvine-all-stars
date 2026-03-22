@@ -144,7 +144,7 @@ export async function POST(request: NextRequest) {
         return NextResponse.json({ error: error.message }, { status: 500 });
       }
     } else {
-      console.log("Resend not configured, email skipped for:", parent_email);
+      console.warn("Resend not configured, email skipped for:", parent_email);
     }
 
     return NextResponse.json({ success: true });

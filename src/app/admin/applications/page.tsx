@@ -81,7 +81,9 @@ export default function ApplicationsPage() {
       .update({ status: newStatus })
       .eq("id", id);
 
-    if (!error) {
+    if (error) {
+      alert(`Failed to update status: ${error.message}`);
+    } else {
       setApplications((prev) =>
         prev.map((app) => (app.id === id ? { ...app, status: newStatus } : app))
       );
