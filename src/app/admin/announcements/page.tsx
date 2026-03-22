@@ -14,8 +14,12 @@ interface Announcement {
 }
 
 const DIVISIONS = [
-  "7U-Shetland",
-  "8U-Pinto",
+  "5U-Shetland",
+  "6U-Shetland",
+  "7U MP-Pinto",
+  "7U KP-Pinto",
+  "8U MP-Pinto",
+  "8U KP-Pinto",
   "9U-Mustang",
   "10U-Mustang",
   "11U-Bronco",
