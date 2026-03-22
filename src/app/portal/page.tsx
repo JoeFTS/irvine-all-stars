@@ -171,7 +171,7 @@ export default function PortalPage() {
         player_name: `${reg.player_first_name} ${reg.player_last_name}`,
         division: reg.division,
         document_type: "selection_acceptance",
-        file_path: null,
+        file_path: "",
         file_name: JSON.stringify({
           accepted_by: user.email,
           accepted_at: new Date().toISOString(),
