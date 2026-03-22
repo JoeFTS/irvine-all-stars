@@ -172,6 +172,7 @@ export default function CoachTryoutsPage() {
   const { user } = useAuth();
 
   const [division, setDivision] = useState<string | null>(null);
+  const [coachName, setCoachName] = useState<string | null>(null);
   const [divisionLoading, setDivisionLoading] = useState(true);
 
   const [registrations, setRegistrations] = useState<Registration[]>([]);
@@ -190,10 +191,11 @@ export default function CoachTryoutsPage() {
     (async () => {
       const { data } = await supabase
         .from("profiles")
-        .select("division")
+        .select("division, full_name")
         .eq("id", user.id)
         .single();
       setDivision(data?.division ?? null);
+      setCoachName(data?.full_name ?? null);
       setDivisionLoading(false);
     })();
   }, [user]);
@@ -309,6 +311,29 @@ export default function CoachTryoutsPage() {
 
       // Refresh
       await fetchData();
+
+      // Send notification email to coordinator with full pick list
+      const pickedPlayers = registrations
+        .filter((r) => localSelected.has(r.id))
+        .map((r) => ({
+          name: `${r.player_first_name} ${r.player_last_name}`,
+          position: r.primary_position,
+          parentName: r.parent_name,
+          parentEmail: r.parent_email,
+        }));
+
+      if (pickedPlayers.length > 0) {
+        fetch("/api/send-coach-picks", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            coachName: coachName || "Unknown Coach",
+            division,
+            players: pickedPlayers,
+          }),
+        }).catch(() => {}); // Non-blocking — don't fail the save if email fails
+      }
+
       setSubmitMsg("Recommendations saved successfully.");
     } catch (err: unknown) {
       const msg = err instanceof Error ? err.message : "Failed to save recommendations";
