@@ -24,7 +24,6 @@ interface MedicalDoc {
   player_name: string;
   division: string;
   file_name: string;
-  created_at: string;
 }
 
 export default function MedicalViewPage() {
@@ -56,7 +55,7 @@ export default function MedicalViewPage() {
 
       const { data: rows, error: fetchError } = await supabase
         .from("player_documents")
-        .select("id, registration_id, player_name, division, file_name, created_at")
+        .select("id, registration_id, player_name, division, file_name")
         .eq("registration_id", regId)
         .eq("document_type", "medical_release")
         .limit(1);
