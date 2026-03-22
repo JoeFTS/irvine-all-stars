@@ -938,14 +938,30 @@ export default function TryoutsPage() {
                     const alternateCount = emailRegs.filter((r) => r.status === "alternate").length;
                     const notSelectedCount = emailRegs.filter((r) => r.status === "not_selected").length;
 
+                    const selectedPlayers = emailRegs.filter((r) => r.status === "selected");
+                    const alternatePlayers = emailRegs.filter((r) => r.status === "alternate");
+                    const notSelectedPlayers = emailRegs.filter((r) => r.status === "not_selected");
+
                     let breakdown = "This will send the following emails:\n\n";
-                    if (selectedCount > 0) breakdown += `  ✅ ${selectedCount} SELECTED (congratulations email)\n`;
-                    if (alternateCount > 0) breakdown += `  🔶 ${alternateCount} ALTERNATE (alternate notification)\n`;
-                    if (notSelectedCount > 0) breakdown += `  ❌ ${notSelectedCount} NOT SELECTED (rejection email)\n`;
-                    breakdown += `\nTotal: ${emailRegs.length} email(s)`;
+                    if (selectedPlayers.length > 0) {
+                      breakdown += `✅ SELECTED (${selectedPlayers.length}):\n`;
+                      selectedPlayers.forEach((r) => breakdown += `  • ${r.player_first_name} ${r.player_last_name} → ${r.parent_email}\n`);
+                      breakdown += "\n";
+                    }
+                    if (alternatePlayers.length > 0) {
+                      breakdown += `🔶 ALTERNATE (${alternatePlayers.length}):\n`;
+                      alternatePlayers.forEach((r) => breakdown += `  • ${r.player_first_name} ${r.player_last_name} → ${r.parent_email}\n`);
+                      breakdown += "\n";
+                    }
+                    if (notSelectedPlayers.length > 0) {
+                      breakdown += `❌ NOT SELECTED (${notSelectedPlayers.length}):\n`;
+                      notSelectedPlayers.forEach((r) => breakdown += `  • ${r.player_first_name} ${r.player_last_name} → ${r.parent_email}\n`);
+                      breakdown += "\n";
+                    }
+                    breakdown += `Total: ${emailRegs.length} email(s)`;
 
                     if (selectedCount > 12) {
-                      breakdown += `\n\n⚠️ WARNING: You are selecting ${selectedCount} players. Rosters are typically 12. Please double-check before sending.`;
+                      breakdown += `\n\n⚠️ WARNING: You are selecting ${selectedCount} players. Rosters are typically 12. Please double-check.`;
                     }
 
                     breakdown += `\n\nType SEND to confirm:`;
