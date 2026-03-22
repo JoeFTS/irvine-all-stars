@@ -153,12 +153,37 @@ export default function CoachScoresPage() {
         return;
       }
 
-      // Always delete all previous scores by this coach in this division
-      await supabase
+      // Delete all previous scores by this coach in this division
+      const { error: deleteError } = await supabase
         .from("evaluator_scores")
         .delete()
         .eq("evaluator_name", coachName)
         .eq("division", division);
+
+      // Verify deletion actually worked (RLS may silently block it)
+      if (!deleteError) {
+        const { count } = await supabase
+          .from("evaluator_scores")
+          .select("id", { count: "exact", head: true })
+          .eq("evaluator_name", coachName)
+          .eq("division", division);
+
+        if (count && count > 0) {
+          setResult({
+            success: false,
+            message: "Could not clear previous scores. Please contact the coordinator.",
+          });
+          setUploading(false);
+          return;
+        }
+      } else {
+        setResult({
+          success: false,
+          message: "Could not clear previous scores. Please contact the coordinator.",
+        });
+        setUploading(false);
+        return;
+      }
 
       // Insert new scores
       const dbRows = valid.map((score) => ({
