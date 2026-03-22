@@ -850,19 +850,41 @@ export default function BinderChecklistPage() {
                   <div className="ml-8 flex items-center gap-4 text-xs text-gray-500">
                     <span className="flex items-center gap-1">
                       {hasConcussion ? (
-                        <CheckCircle2 size={14} className="text-green-600" />
+                        <>
+                          <CheckCircle2 size={14} className="text-green-600" />
+                          Concussion
+                          <button
+                            onClick={() => { if (ac.concussion_cert_path) handleViewDocument(ac.concussion_cert_path); }}
+                            className="ml-1 px-2 py-0.5 rounded text-[10px] font-semibold text-flag-blue bg-flag-blue/5 hover:bg-flag-blue/10 transition-colors"
+                          >
+                            View
+                          </button>
+                        </>
                       ) : (
-                        <XCircle size={14} className="text-flag-red" />
+                        <>
+                          <XCircle size={14} className="text-flag-red" />
+                          Concussion
+                        </>
                       )}
-                      Concussion
                     </span>
                     <span className="flex items-center gap-1">
                       {hasCardiac ? (
-                        <CheckCircle2 size={14} className="text-green-600" />
+                        <>
+                          <CheckCircle2 size={14} className="text-green-600" />
+                          Cardiac Arrest
+                          <button
+                            onClick={() => { if (ac.cardiac_cert_path) handleViewDocument(ac.cardiac_cert_path); }}
+                            className="ml-1 px-2 py-0.5 rounded text-[10px] font-semibold text-flag-blue bg-flag-blue/5 hover:bg-flag-blue/10 transition-colors"
+                          >
+                            View
+                          </button>
+                        </>
                       ) : (
-                        <XCircle size={14} className="text-flag-red" />
+                        <>
+                          <XCircle size={14} className="text-flag-red" />
+                          Cardiac Arrest
+                        </>
                       )}
-                      Cardiac Arrest
                     </span>
                   </div>
                 </div>
