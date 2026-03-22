@@ -341,6 +341,9 @@ function PlayerCard({
           ok={compliance.medical}
           okText="Complete"
           missingText="Pending"
+          onClick={compliance.medical ? () => {
+            window.open(`/medical-view?id=${reg.id}`, "_blank");
+          } : undefined}
         />
       </div>
     </div>

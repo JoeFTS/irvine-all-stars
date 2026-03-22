@@ -549,6 +549,16 @@ export default function BinderChecklistPage() {
                   >
                     {doc ? "Complete" : "Pending"}
                   </span>
+                  {doc && (
+                    <a
+                      href={`/medical-view?id=${reg.id}`}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="ml-1 px-2 py-1 rounded text-xs font-semibold text-flag-blue hover:bg-flag-blue/10 transition-colors"
+                    >
+                      View
+                    </a>
+                  )}
                 </div>
               );
             })
