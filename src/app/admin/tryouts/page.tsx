@@ -21,6 +21,7 @@ import {
   Square,
   AlertTriangle,
   Star,
+  XCircle,
 } from "lucide-react";
 
 /* ---------- Types ---------- */
@@ -183,6 +184,7 @@ export default function TryoutsPage() {
   // Players tab state
   const [divisionFilter, setDivisionFilter] = useState<string>("all");
   const [showCoachPicks, setShowCoachPicks] = useState(false);
+  const [showNotPicked, setShowNotPicked] = useState(false);
   const [statusFilter, setStatusFilter] = useState<Status | "all">("all");
   const [expandedPlayerId, setExpandedPlayerId] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -719,6 +721,7 @@ export default function TryoutsPage() {
     if (divisionFilter !== "all" && r.division !== divisionFilter) return false;
     if (statusFilter !== "all" && r.status !== statusFilter) return false;
     if (showCoachPicks && !coachPickRegIds.has(r.id)) return false;
+    if (showNotPicked && coachPickRegIds.has(r.id)) return false;
     return true;
   });
 
@@ -867,10 +870,10 @@ export default function TryoutsPage() {
               </div>
             </div>
 
-            {/* Coach Picks Filter */}
-            <div>
+            {/* Coach Picks / Not Picked Filters */}
+            <div className="flex gap-2">
               <button
-                onClick={() => setShowCoachPicks(!showCoachPicks)}
+                onClick={() => { setShowCoachPicks(!showCoachPicks); setShowNotPicked(false); }}
                 className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide transition-colors ${
                   showCoachPicks
                     ? "bg-star-gold text-white"
@@ -880,6 +883,22 @@ export default function TryoutsPage() {
                 <Star size={10} className="inline -mt-0.5 mr-1" />
                 Coach Picks{coachSelections.length > 0 ? ` (${coachSelections.length})` : ""}
               </button>
+              {coachSelections.length > 0 && (
+                <button
+                  onClick={() => { setShowNotPicked(!showNotPicked); setShowCoachPicks(false); }}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide transition-colors ${
+                    showNotPicked
+                      ? "bg-flag-red text-white"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
+                >
+                  <XCircle size={10} className="inline -mt-0.5 mr-1" />
+                  Not Picked
+                  {divisionFilter !== "all"
+                    ? ` (${registrations.filter((r) => r.division === divisionFilter && !coachPickRegIds.has(r.id)).length})`
+                    : ""}
+                </button>
+              )}
             </div>
           </div>
 
