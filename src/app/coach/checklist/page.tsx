@@ -678,14 +678,7 @@ export default function BinderChecklistPage() {
               Upload Signed Release Sheet
             </p>
             {signedReleaseDoc ? (
-              <div className="flex items-center gap-3 flex-wrap">
-                <CheckCircle2 size={16} className="text-green-600 shrink-0" />
-                <span className="text-xs text-gray-600 flex-1 min-w-0">
-                  {signedReleaseDoc.file_name ?? "Signed release"} — uploaded{" "}
-                  {signedReleaseDoc.created_at
-                    ? new Date(signedReleaseDoc.created_at).toLocaleDateString()
-                    : ""}
-                </span>
+              <div className="flex items-center gap-2">
                 <button
                   onClick={() =>
                     signedReleaseDoc.file_path &&
@@ -694,22 +687,6 @@ export default function BinderChecklistPage() {
                   className="px-3 py-1.5 rounded-lg text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors"
                 >
                   View / Print
-                </button>
-                <button
-                  onClick={async () => {
-                    if (!supabase || !signedReleaseDoc.file_path) return;
-                    const { data } = await supabase.storage.from("player-documents").createSignedUrl(signedReleaseDoc.file_path, 300);
-                    if (data?.signedUrl) {
-                      const a = document.createElement("a");
-                      a.href = data.signedUrl;
-                      a.download = signedReleaseDoc.file_name ?? "signed-medical-release";
-                      a.click();
-                    }
-                  }}
-                  className="px-3 py-1.5 rounded-lg text-xs font-semibold text-charcoal bg-gray-100 hover:bg-gray-200 transition-colors"
-                >
-                  <Download size={12} className="inline -mt-0.5 mr-1" />
-                  Download
                 </button>
                 <FileUpload
                   bucket="player-documents"
