@@ -74,39 +74,34 @@ export async function GET(request: NextRequest) {
   ws.mergeCells("A1:E1");
   const titleCell = ws.getCell("A1");
   titleCell.value = "IRVINE PONY BASEBALL — MEDICAL RELEASE / HOLD HARMLESS";
-  titleCell.font = { bold: true, size: 14, color: { argb: white } };
+  titleCell.font = { bold: true, size: 11, color: { argb: white } };
   titleCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: navy } };
   titleCell.alignment = { horizontal: "center", vertical: "middle" };
-  ws.getRow(1).height = 36;
+  ws.getRow(1).height = 22;
 
   // Row 2: Division and season info
   ws.mergeCells("A2:E2");
   const infoCell = ws.getCell("A2");
   infoCell.value = `Division: ${division}    2026 All-Stars Season`;
-  infoCell.font = { size: 11, color: { argb: navy } };
+  infoCell.font = { size: 9, color: { argb: navy } };
   infoCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: lightGray } };
   infoCell.alignment = { horizontal: "center", vertical: "middle" };
-  ws.getRow(2).height = 24;
+  ws.getRow(2).height = 18;
 
-  // Rows 3-7: Legal waiver text
-  ws.mergeCells("A3:E7");
+  // Rows 3-4: Legal waiver text (compact — 2 merged rows with tiny font)
+  ws.mergeCells("A3:E4");
   const waiverCell = ws.getCell("A3");
   waiverCell.value = WAIVER_TEXT;
-  waiverCell.font = { size: 7.5 };
+  waiverCell.font = { size: 6 };
   waiverCell.alignment = {
     horizontal: "left",
     vertical: "top",
     wrapText: true,
   };
-  // Set row heights for the waiver block
-  for (let r = 3; r <= 7; r++) {
-    ws.getRow(r).height = 36;
-  }
+  ws.getRow(3).height = 58;
+  ws.getRow(4).height = 58;
 
-  // Row 8: Empty spacer
-  ws.getRow(8).height = 10;
-
-  // Row 9: Column headers
+  // Row 5: Column headers
   const headers = [
     "Full Name (Last, First Middle)",
     "Signature of Parent or Legal Guardian",
@@ -114,11 +109,11 @@ export async function GET(request: NextRequest) {
     "Relationship",
     "Date",
   ];
-  const headerRow = ws.getRow(9);
+  const headerRow = ws.getRow(5);
   headers.forEach((h, i) => {
     const cell = headerRow.getCell(i + 1);
     cell.value = h;
-    cell.font = { bold: true, size: 9, color: { argb: white } };
+    cell.font = { bold: true, size: 8, color: { argb: white } };
     cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: navy } };
     cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
     cell.border = {
@@ -128,9 +123,10 @@ export async function GET(request: NextRequest) {
       right: { style: "thin", color: { argb: navy } },
     };
   });
-  headerRow.height = 26;
+  headerRow.height = 22;
 
-  // Row 10+: Player data rows
+  // Row 6+: Player data rows
+  const DATA_START_ROW = 6;
   const borderStyle: Partial<ExcelJS.Borders> = {
     top: { style: "thin", color: { argb: "CCCCCC" } },
     bottom: { style: "thin", color: { argb: "CCCCCC" } },
@@ -146,19 +142,17 @@ export async function GET(request: NextRequest) {
       },
       idx: number
     ) => {
-      const rowNum = 10 + idx;
+      const rowNum = DATA_START_ROW + idx;
       const row = ws.getRow(rowNum);
       const bgColor = idx % 2 === 1 ? lightGray : white;
 
-      // Column A: pre-filled name
       const nameCell = row.getCell(1);
       nameCell.value = `${player.player_last_name}, ${player.player_first_name}`;
-      nameCell.font = { size: 10 };
+      nameCell.font = { size: 9 };
       nameCell.alignment = { vertical: "middle" };
       nameCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: bgColor } };
       nameCell.border = borderStyle;
 
-      // Columns B-E: empty for parent to fill
       for (let c = 2; c <= 5; c++) {
         const cell = row.getCell(c);
         cell.value = null;
@@ -166,13 +160,13 @@ export async function GET(request: NextRequest) {
         cell.border = borderStyle;
       }
 
-      row.height = 28;
+      row.height = 22;
     }
   );
 
-  // Add 3 blank rows at the bottom for walk-ins
+  // Add 3 blank rows for walk-ins
   for (let i = 0; i < 3; i++) {
-    const rowNum = 10 + players.length + i;
+    const rowNum = DATA_START_ROW + players.length + i;
     const row = ws.getRow(rowNum);
     const bgColor = (players.length + i) % 2 === 1 ? lightGray : white;
 
@@ -182,7 +176,7 @@ export async function GET(request: NextRequest) {
       cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: bgColor } };
       cell.border = borderStyle;
     }
-    row.height = 28;
+    row.height = 22;
   }
 
   // Print settings — landscape, fit to 1 page wide, narrow margins
@@ -190,7 +184,7 @@ export async function GET(request: NextRequest) {
     orientation: "landscape",
     fitToPage: true,
     fitToWidth: 1,
-    fitToHeight: 0,
+    fitToHeight: 1,
     paperSize: 1 as ExcelJS.PaperSize,
     margins: {
       left: 0.25,
@@ -203,7 +197,7 @@ export async function GET(request: NextRequest) {
   };
 
   // Repeat header rows (title through column headers) on every printed page
-  ws.pageSetup.printTitlesRow = "1:9";
+  ws.pageSetup.printTitlesRow = "1:5";
 
   // Generate buffer
   const buffer = await wb.xlsx.writeBuffer();
