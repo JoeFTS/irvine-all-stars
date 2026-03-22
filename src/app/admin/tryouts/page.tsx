@@ -961,29 +961,32 @@ export default function TryoutsPage() {
                     const alternatePlayers = emailRegs.filter((r) => r.status === "alternate");
                     const notSelectedPlayers = emailRegs.filter((r) => r.status === "not_selected");
 
-                    let breakdown = "This will send the following emails:\n\n";
+                    const MAX_SHOW = 15;
+                    function listPlayers(players: typeof emailRegs): string {
+                      const shown = players.slice(0, MAX_SHOW);
+                      let text = shown.map((r) => `  • ${r.player_first_name} ${r.player_last_name} → ${r.parent_email}`).join("\n");
+                      if (players.length > MAX_SHOW) {
+                        text += `\n  ... and ${players.length - MAX_SHOW} more`;
+                      }
+                      return text + "\n";
+                    }
+
+                    let breakdown = "SEND EMAILS — CONFIRM\n\n";
                     if (selectedPlayers.length > 0) {
-                      breakdown += `✅ SELECTED (${selectedPlayers.length}):\n`;
-                      selectedPlayers.forEach((r) => breakdown += `  • ${r.player_first_name} ${r.player_last_name} → ${r.parent_email}\n`);
-                      breakdown += "\n";
+                      breakdown += `✅ SELECTED (${selectedPlayers.length}):\n${listPlayers(selectedPlayers)}\n`;
                     }
                     if (alternatePlayers.length > 0) {
-                      breakdown += `🔶 ALTERNATE (${alternatePlayers.length}):\n`;
-                      alternatePlayers.forEach((r) => breakdown += `  • ${r.player_first_name} ${r.player_last_name} → ${r.parent_email}\n`);
-                      breakdown += "\n";
+                      breakdown += `🔶 ALTERNATE (${alternatePlayers.length}):\n${listPlayers(alternatePlayers)}\n`;
                     }
                     if (notSelectedPlayers.length > 0) {
-                      breakdown += `❌ NOT SELECTED (${notSelectedPlayers.length}):\n`;
-                      notSelectedPlayers.forEach((r) => breakdown += `  • ${r.player_first_name} ${r.player_last_name} → ${r.parent_email}\n`);
-                      breakdown += "\n";
+                      breakdown += `❌ NOT SELECTED (${notSelectedPlayers.length}):\n${listPlayers(notSelectedPlayers)}\n`;
                     }
-                    breakdown += `Total: ${emailRegs.length} email(s)`;
 
                     if (selectedCount > 12) {
-                      breakdown += `\n\n⚠️ WARNING: You are selecting ${selectedCount} players. Rosters are typically 12. Please double-check.`;
+                      breakdown += `⚠️ WARNING: ${selectedCount} selected — rosters are typically 12.\n\n`;
                     }
 
-                    breakdown += `\n\nType SEND to confirm:`;
+                    breakdown += `TOTAL: ${emailRegs.length} email(s)\n\nType SEND below to confirm:`;
                     const confirmation = prompt(breakdown);
                     if (confirmation?.trim().toUpperCase() === "SEND") {
                       bulkSendEmails();
