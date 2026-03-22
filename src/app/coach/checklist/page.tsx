@@ -47,7 +47,16 @@ interface TeamDocument {
 interface CoachCertification {
   id: string;
   cert_type: string;
-  file_path: string | null;
+  cert_file_path: string | null;
+}
+
+interface AssistantCoach {
+  id: string;
+  name: string;
+  concussion_cert_path: string | null;
+  concussion_cert_name: string | null;
+  cardiac_cert_path: string | null;
+  cardiac_cert_name: string | null;
 }
 
 type SectionItemStatus = "complete" | "pending" | "not_required";
@@ -144,6 +153,7 @@ export default function BinderChecklistPage() {
   const [playerDocs, setPlayerDocs] = useState<PlayerDocument[]>([]);
   const [teamDocs, setTeamDocs] = useState<TeamDocument[]>([]);
   const [coachCerts, setCoachCerts] = useState<CoachCertification[]>([]);
+  const [assistantCoaches, setAssistantCoaches] = useState<AssistantCoach[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
@@ -159,7 +169,7 @@ export default function BinderChecklistPage() {
     if (!supabase) return;
     setLoading(true);
 
-    const [regsRes, docsRes, teamDocsRes, certsRes] = await Promise.all([
+    const [regsRes, docsRes, teamDocsRes, certsRes, assistantsRes] = await Promise.all([
       supabase
         .from("tryout_registrations")
         .select("id, player_first_name, player_last_name, division, status")
@@ -176,9 +186,15 @@ export default function BinderChecklistPage() {
       user
         ? supabase
             .from("coach_certifications")
-            .select("id, cert_type, file_path")
+            .select("id, cert_type, cert_file_path")
             .eq("coach_id", user.id)
             .in("cert_type", ["concussion", "cardiac_arrest"])
+        : Promise.resolve({ data: [] }),
+      user
+        ? supabase
+            .from("assistant_coaches")
+            .select("*")
+            .eq("head_coach_id", user.id)
         : Promise.resolve({ data: [] }),
     ]);
 
@@ -186,6 +202,7 @@ export default function BinderChecklistPage() {
     if (docsRes.data) setPlayerDocs(docsRes.data);
     if (teamDocsRes.data) setTeamDocs(teamDocsRes.data);
     if (certsRes.data) setCoachCerts(certsRes.data as CoachCertification[]);
+    if (assistantsRes.data) setAssistantCoaches(assistantsRes.data as AssistantCoach[]);
 
     setLoading(false);
   }
@@ -268,8 +285,14 @@ export default function BinderChecklistPage() {
   const s7Complete = cardiacCert ? 1 : 0;
   const s7Total = 1;
 
-  const totalItems = s1Total + s2Total + s3Total + s4Total + s5Total + s6Total + s7Total;
-  const completedItems = s1Complete + s2Complete + s3Complete + s4Complete + s5Complete + s6Complete + s7Complete;
+  // Section 8: assistant coach certifications (2 certs per assistant)
+  const s8Total = assistantCoaches.length * 2;
+  const s8Complete = assistantCoaches.reduce((acc, ac) => {
+    return acc + (ac.concussion_cert_path ? 1 : 0) + (ac.cardiac_cert_path ? 1 : 0);
+  }, 0);
+
+  const totalItems = s1Total + s2Total + s3Total + s4Total + s5Total + s6Total + s7Total + s8Total;
+  const completedItems = s1Complete + s2Complete + s3Complete + s4Complete + s5Complete + s6Complete + s7Complete + s8Complete;
   const progressPct = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
 
   /* ---------------------------------------------------------------- */
@@ -299,7 +322,7 @@ export default function BinderChecklistPage() {
           <div className="h-8 bg-gray-200 rounded w-56" />
           <div className="h-6 bg-gray-200 rounded w-80" />
           <div className="h-4 bg-gray-200 rounded w-full max-w-md" />
-          {[1, 2, 3, 4, 5, 6, 7].map((i) => (
+          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
             <div key={i} className="h-28 bg-gray-200 rounded-lg" />
           ))}
         </div>
@@ -318,7 +341,7 @@ export default function BinderChecklistPage() {
           Binder Checklist
         </h1>
         <p className="text-gray-500 text-sm mt-1 max-w-xl">
-          7 sections matching your physical tournament binder. Green means ready,
+          8 sections matching your physical tournament binder. Green means ready,
           red means action needed.
         </p>
       </div>
@@ -760,6 +783,83 @@ export default function BinderChecklistPage() {
           </div>
         </div>
       </div>
+
+      {/* ================================================================ */}
+      {/*  SECTION 8: Assistant Coach Certifications                       */}
+      {/* ================================================================ */}
+      {assistantCoaches.length > 0 && (
+        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+          <div className="p-5 flex items-center gap-3 border-b border-gray-100">
+            <SectionNumber n={8} />
+            <div className="flex-1">
+              <h2 className="font-display text-lg font-bold uppercase tracking-wider">
+                Assistant Coach Certifications
+              </h2>
+              <p className="text-xs text-gray-400 mt-0.5">
+                {s8Complete} of {s8Total} certificates uploaded
+              </p>
+            </div>
+            {s8Complete === s8Total && s8Total > 0 ? (
+              <CheckCircle2 size={20} className="text-green-600" />
+            ) : (
+              <XCircle size={20} className="text-flag-red" />
+            )}
+          </div>
+          <div className="divide-y divide-gray-100">
+            {assistantCoaches.map((ac) => {
+              const hasConcussion = !!ac.concussion_cert_path;
+              const hasCardiac = !!ac.cardiac_cert_path;
+              const allComplete = hasConcussion && hasCardiac;
+              const status: SectionItemStatus = allComplete ? "complete" : "pending";
+              return (
+                <div
+                  key={ac.id}
+                  className={`px-5 py-3 ${statusBg(status)}`}
+                >
+                  <div className="flex items-center gap-3 mb-1">
+                    <StatusIcon status={status} />
+                    <span className="flex-1 text-sm font-semibold text-charcoal">
+                      {ac.name}
+                    </span>
+                    <span
+                      className={`px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${statusBadgeClasses(status)}`}
+                    >
+                      {allComplete ? "Complete" : "Incomplete"}
+                    </span>
+                  </div>
+                  <div className="ml-8 flex items-center gap-4 text-xs text-gray-500">
+                    <span className="flex items-center gap-1">
+                      {hasConcussion ? (
+                        <CheckCircle2 size={14} className="text-green-600" />
+                      ) : (
+                        <XCircle size={14} className="text-flag-red" />
+                      )}
+                      Concussion
+                    </span>
+                    <span className="flex items-center gap-1">
+                      {hasCardiac ? (
+                        <CheckCircle2 size={14} className="text-green-600" />
+                      ) : (
+                        <XCircle size={14} className="text-flag-red" />
+                      )}
+                      Cardiac Arrest
+                    </span>
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+          <div className="px-5 py-3 bg-gray-50 border-t border-gray-100">
+            <p className="text-xs text-gray-400 italic">
+              Upload certificates on the{" "}
+              <Link href="/coach/certifications" className="text-flag-blue underline">
+                Certifications
+              </Link>{" "}
+              page
+            </p>
+          </div>
+        </div>
+      )}
 
       {/* ---- Footer Note ---- */}
       <div className="flex items-start gap-3 p-4 rounded-lg bg-gray-50 border border-gray-200">

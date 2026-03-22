@@ -4,15 +4,24 @@ import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { supabase } from "@/lib/supabase";
 import FileUpload from "@/components/file-upload";
-import { ExternalLink, CheckCircle2, Clock } from "lucide-react";
+import { ExternalLink, CheckCircle2, Clock, UserPlus, Plus, Trash2 } from "lucide-react";
+
+interface AssistantCoach {
+  id: string;
+  name: string;
+  concussion_cert_path: string | null;
+  concussion_cert_name: string | null;
+  cardiac_cert_path: string | null;
+  cardiac_cert_name: string | null;
+}
 
 interface CertRecord {
   id: string;
   cert_type: string;
   completed: boolean;
   completed_at: string | null;
-  file_path: string | null;
-  file_name: string | null;
+  cert_file_path: string | null;
+  cert_file_name: string | null;
 }
 
 const CERT_CONFIGS = [
@@ -61,6 +70,9 @@ const CERT_CONFIGS = [
 export default function CertificationsPage() {
   const { user } = useAuth();
   const [certs, setCerts] = useState<CertRecord[]>([]);
+  const [assistantCoaches, setAssistantCoaches] = useState<AssistantCoach[]>([]);
+  const [showAddAssistant, setShowAddAssistant] = useState(false);
+  const [newAssistantName, setNewAssistantName] = useState("");
   const [loading, setLoading] = useState(true);
 
   const fetchCerts = useCallback(async () => {
@@ -72,6 +84,15 @@ export default function CertificationsPage() {
         .eq("coach_id", user.id);
       if (!error && data) {
         setCerts(data as CertRecord[]);
+      }
+
+      // Fetch assistant coaches
+      const { data: assistants } = await supabase
+        .from("assistant_coaches")
+        .select("*")
+        .eq("head_coach_id", user.id);
+      if (assistants) {
+        setAssistantCoaches(assistants as AssistantCoach[]);
       }
     } catch {
       // silently fail
@@ -109,8 +130,8 @@ export default function CertificationsPage() {
         .update({
           completed: true,
           completed_at: now,
-          file_path: filePath,
-          file_name: fileName,
+          cert_file_path: filePath,
+          cert_file_name: fileName,
         })
         .eq("id", existing.id);
     } else {
@@ -119,12 +140,47 @@ export default function CertificationsPage() {
         cert_type: certType,
         completed: true,
         completed_at: now,
-        file_path: filePath,
-        file_name: fileName,
+        cert_file_path: filePath,
+        cert_file_name: fileName,
       });
     }
 
     // Refresh
+    await fetchCerts();
+  };
+
+  const addAssistant = async () => {
+    if (!supabase || !user || !newAssistantName.trim()) return;
+    await supabase.from("assistant_coaches").insert({
+      head_coach_id: user.id,
+      name: newAssistantName.trim(),
+    });
+    setNewAssistantName("");
+    setShowAddAssistant(false);
+    await fetchCerts();
+  };
+
+  const removeAssistant = async (id: string) => {
+    if (!supabase) return;
+    await supabase.from("assistant_coaches").delete().eq("id", id);
+    await fetchCerts();
+  };
+
+  const uploadAssistantCert = async (
+    assistantId: string,
+    certType: "concussion" | "cardiac",
+    filePath: string,
+    fileName: string
+  ) => {
+    if (!supabase) return;
+    const updateData =
+      certType === "concussion"
+        ? { concussion_cert_path: filePath, concussion_cert_name: fileName }
+        : { cardiac_cert_path: filePath, cardiac_cert_name: fileName };
+    await supabase
+      .from("assistant_coaches")
+      .update(updateData)
+      .eq("id", assistantId);
     await fetchCerts();
   };
 
@@ -236,7 +292,7 @@ export default function CertificationsPage() {
                       {cert.completed_at && (
                         <> on {new Date(cert.completed_at).toLocaleDateString()}</>
                       )}
-                      {cert.file_name && <> ({cert.file_name})</>}
+                      {cert.cert_file_name && <> ({cert.cert_file_name})</>}
                     </div>
                   ) : (
                     <FileUpload
@@ -253,6 +309,136 @@ export default function CertificationsPage() {
               </div>
             );
           })}
+        </div>
+      )}
+
+      {/* ---- Assistant Coaches ---- */}
+      {!loading && (
+        <div className="mt-10">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="font-display text-xl font-bold uppercase tracking-wide">
+              Assistant Coaches
+            </h2>
+            {!showAddAssistant && (
+              <button
+                onClick={() => setShowAddAssistant(true)}
+                className="inline-flex items-center gap-1.5 bg-flag-blue text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-flag-blue/90 transition-colors"
+              >
+                <Plus size={16} />
+                Add Assistant Coach
+              </button>
+            )}
+          </div>
+
+          {showAddAssistant && (
+            <div className="flex items-center gap-3 mb-4">
+              <input
+                type="text"
+                value={newAssistantName}
+                onChange={(e) => setNewAssistantName(e.target.value)}
+                placeholder="Assistant coach name"
+                className="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-flag-blue/50 focus:border-flag-blue"
+                onKeyDown={(e) => {
+                  if (e.key === "Enter") addAssistant();
+                }}
+              />
+              <button
+                onClick={addAssistant}
+                disabled={!newAssistantName.trim()}
+                className="inline-flex items-center gap-1.5 bg-flag-blue text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-flag-blue/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                <UserPlus size={16} />
+                Add
+              </button>
+              <button
+                onClick={() => {
+                  setShowAddAssistant(false);
+                  setNewAssistantName("");
+                }}
+                className="text-sm font-semibold text-gray-500 hover:text-gray-700 px-3 py-2"
+              >
+                Cancel
+              </button>
+            </div>
+          )}
+
+          {assistantCoaches.length === 0 && !showAddAssistant && (
+            <p className="text-sm text-gray-400">
+              No assistant coaches added yet.
+            </p>
+          )}
+
+          <div className="space-y-4">
+            {assistantCoaches.map((ac) => (
+              <div
+                key={ac.id}
+                className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
+              >
+                {/* Card Header */}
+                <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
+                  <h3 className="font-display text-lg font-bold uppercase tracking-wide text-charcoal">
+                    {ac.name}
+                  </h3>
+                  <button
+                    onClick={() => removeAssistant(ac.id)}
+                    className="inline-flex items-center gap-1.5 text-flag-red text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-red-50 transition-colors"
+                  >
+                    <Trash2 size={14} />
+                    Remove
+                  </button>
+                </div>
+
+                {/* Card Body */}
+                <div className="px-6 py-5 space-y-4">
+                  {/* Concussion Cert */}
+                  <div>
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                      Concussion Certificate
+                    </p>
+                    {ac.concussion_cert_path ? (
+                      <div className="text-sm text-green-700 bg-green-50 rounded-lg p-3 flex items-center gap-2">
+                        <CheckCircle2 size={16} className="text-green-600 shrink-0" />
+                        Uploaded{ac.concussion_cert_name && <> ({ac.concussion_cert_name})</>}
+                      </div>
+                    ) : (
+                      <FileUpload
+                        bucket="player-documents"
+                        folder={`coach-certs/assistants/${ac.id}/concussion`}
+                        label="Concussion Certificate"
+                        description="Upload certificate (image or PDF)"
+                        onUploadComplete={(filePath, fileName) =>
+                          uploadAssistantCert(ac.id, "concussion", filePath, fileName)
+                        }
+                      />
+                    )}
+                  </div>
+
+                  {/* Cardiac Cert */}
+                  <div>
+                    <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
+                      Cardiac Arrest Certificate
+                    </p>
+                    {ac.cardiac_cert_path ? (
+                      <div className="text-sm text-green-700 bg-green-50 rounded-lg p-3 flex items-center gap-2">
+                        <CheckCircle2 size={16} className="text-green-600 shrink-0" />
+                        Uploaded{ac.cardiac_cert_name && <> ({ac.cardiac_cert_name})</>}
+                      </div>
+                    ) : (
+                      <FileUpload
+                        bucket="player-documents"
+                        folder={`coach-certs/assistants/${ac.id}/cardiac`}
+                        label="Cardiac Arrest Certificate"
+                        description="Upload certificate (image or PDF)"
+                        onUploadComplete={(filePath, fileName) =>
+                          uploadAssistantCert(ac.id, "cardiac", filePath, fileName)
+                        }
+                      />
+                    )}
+                  </div>
+                </div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
