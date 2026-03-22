@@ -926,15 +926,34 @@ export default function TryoutsPage() {
                 <span className="text-xs text-gray-300">|</span>
                 <button
                   onClick={() => {
-                    const selectedRegs = registrations.filter(
+                    const emailRegs = registrations.filter(
                       (r) => bulkSelectedIds.has(r.id) && (r.status === "selected" || r.status === "not_selected" || r.status === "alternate")
                     );
-                    if (selectedRegs.length === 0) {
+                    if (emailRegs.length === 0) {
                       alert("No checked players have a status of Selected, Alternate, or Not Selected. Set their status first, then send emails.");
                       return;
                     }
-                    if (confirm(`Send notification emails to ${selectedRegs.length} parent(s)?\n\nEach parent will be notified of their player's current status.`)) {
+
+                    const selectedCount = emailRegs.filter((r) => r.status === "selected").length;
+                    const alternateCount = emailRegs.filter((r) => r.status === "alternate").length;
+                    const notSelectedCount = emailRegs.filter((r) => r.status === "not_selected").length;
+
+                    let breakdown = "This will send the following emails:\n\n";
+                    if (selectedCount > 0) breakdown += `  ✅ ${selectedCount} SELECTED (congratulations email)\n`;
+                    if (alternateCount > 0) breakdown += `  🔶 ${alternateCount} ALTERNATE (alternate notification)\n`;
+                    if (notSelectedCount > 0) breakdown += `  ❌ ${notSelectedCount} NOT SELECTED (rejection email)\n`;
+                    breakdown += `\nTotal: ${emailRegs.length} email(s)`;
+
+                    if (selectedCount > 12) {
+                      breakdown += `\n\n⚠️ WARNING: You are selecting ${selectedCount} players. Rosters are typically 12. Please double-check before sending.`;
+                    }
+
+                    breakdown += `\n\nType SEND to confirm:`;
+                    const confirmation = prompt(breakdown);
+                    if (confirmation?.trim().toUpperCase() === "SEND") {
                       bulkSendEmails();
+                    } else if (confirmation !== null) {
+                      alert("Email sending cancelled. You must type SEND to confirm.");
                     }
                   }}
                   className="px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wide transition-colors border border-flag-blue bg-flag-blue text-white hover:bg-flag-blue/90"
@@ -1105,7 +1124,8 @@ export default function TryoutsPage() {
                             </div>
                             <button
                               onClick={() => {
-                                if (confirm(`Send notification email to ${reg.parent_name} (${reg.parent_email})?`)) {
+                                const statusLabel = reg.status === "selected" ? "SELECTED ✅" : reg.status === "alternate" ? "ALTERNATE 🔶" : "NOT SELECTED ❌";
+                                if (confirm(`Send "${statusLabel}" email to ${reg.parent_name} (${reg.parent_email}) for ${reg.player_first_name} ${reg.player_last_name}?\n\nMake sure the status is correct before sending.`)) {
                                   sendSelectionEmail(reg.id);
                                 }
                               }}
