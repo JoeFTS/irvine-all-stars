@@ -152,7 +152,7 @@ export default function MedicalReleasePage() {
         player_name: `${registration.player_first_name} ${registration.player_last_name}`,
         division: registration.division,
         document_type: "medical_release",
-        file_path: null,
+        file_path: "",
         file_name: metadata,
         status: "approved",
         uploaded_by: user.id,
