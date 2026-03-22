@@ -678,9 +678,9 @@ export default function BinderChecklistPage() {
               Upload Signed Release Sheet
             </p>
             {signedReleaseDoc ? (
-              <div className="flex items-center gap-3">
-                <CheckCircle2 size={16} className="text-green-600" />
-                <span className="text-xs text-gray-600 flex-1">
+              <div className="flex items-center gap-3 flex-wrap">
+                <CheckCircle2 size={16} className="text-green-600 shrink-0" />
+                <span className="text-xs text-gray-600 flex-1 min-w-0">
                   {signedReleaseDoc.file_name ?? "Signed release"} — uploaded{" "}
                   {signedReleaseDoc.created_at
                     ? new Date(signedReleaseDoc.created_at).toLocaleDateString()
@@ -689,16 +689,32 @@ export default function BinderChecklistPage() {
                 <button
                   onClick={() =>
                     signedReleaseDoc.file_path &&
-                    handleViewDocument(signedReleaseDoc.file_path, "player-documents")
+                    handleViewDocument(signedReleaseDoc.file_path)
                   }
-                  className="px-2 py-1 rounded text-xs font-semibold text-flag-blue hover:bg-flag-blue/10 transition-colors"
+                  className="px-3 py-1.5 rounded-lg text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors"
                 >
-                  View
+                  View / Print
+                </button>
+                <button
+                  onClick={async () => {
+                    if (!supabase || !signedReleaseDoc.file_path) return;
+                    const { data } = await supabase.storage.from("player-documents").createSignedUrl(signedReleaseDoc.file_path, 300);
+                    if (data?.signedUrl) {
+                      const a = document.createElement("a");
+                      a.href = data.signedUrl;
+                      a.download = signedReleaseDoc.file_name ?? "signed-medical-release";
+                      a.click();
+                    }
+                  }}
+                  className="px-3 py-1.5 rounded-lg text-xs font-semibold text-charcoal bg-gray-100 hover:bg-gray-200 transition-colors"
+                >
+                  <Download size={12} className="inline -mt-0.5 mr-1" />
+                  Download
                 </button>
                 <FileUpload
                   bucket="player-documents"
                   folder="team-docs/medical-release-signed"
-                  accept="image/*,.pdf"
+                  accept="image/*,.pdf,.xlsx,.xls"
                   maxSizeMB={10}
                   label="Replace"
                   onUploadComplete={(filePath, fileName) =>
@@ -715,10 +731,10 @@ export default function BinderChecklistPage() {
               <FileUpload
                 bucket="player-documents"
                 folder="team-docs/medical-release-signed"
-                accept="image/*,.pdf"
+                accept="image/*,.pdf,.xlsx,.xls"
                 maxSizeMB={10}
                 label="Upload Signed Sheet"
-                description="Upload the signed medical release sheet (PDF or image)"
+                description="Upload the signed medical release sheet (PDF, image, or Excel)"
                 onUploadComplete={(filePath, fileName) =>
                   handleTeamDocUpload(
                     "signed_medical_release",
