@@ -132,8 +132,6 @@ const keyDates = [
 /* ------------------------------------------------------------------ */
 
 const quickLinks = [
-  { label: "Tryout Schedule", href: "/tryouts", icon: "\u2733" },
-  { label: "How Players Are Scored", href: "/tryouts#scoring", icon: "\u2605" },
   { label: "FAQ", href: "/faq", icon: "?" },
   { label: "Documents", href: "/documents", icon: "\u2193" },
   {
