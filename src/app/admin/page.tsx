@@ -22,6 +22,7 @@ interface Stats {
     division: string;
     created_at: string;
   }>;
+  coachPickDivisions: Array<{ division: string; pickCount: number }>;
 }
 
 export default function AdminDashboard() {
@@ -35,7 +36,7 @@ export default function AdminDashboard() {
     }
 
     async function fetchStats() {
-      const [appCount, regCount, recentApps, recentRegs, allRegs] =
+      const [appCount, regCount, recentApps, recentRegs, allRegs, coachPicksRes] =
         await Promise.all([
           supabase!
             .from("coach_applications")
@@ -56,6 +57,9 @@ export default function AdminDashboard() {
           supabase!
             .from("tryout_registrations")
             .select("division"),
+          supabase!
+            .from("coach_selections")
+            .select("id, division, coach_id"),
         ]);
 
       const divisionCounts: Record<string, number> = {};
@@ -66,12 +70,27 @@ export default function AdminDashboard() {
         }
       }
 
+      // Process coach picks by division
+      const coachPickDivisions: Array<{ division: string; pickCount: number }> = [];
+      if (coachPicksRes.data && coachPicksRes.data.length > 0) {
+        const picksByDivision: Record<string, number> = {};
+        for (const row of coachPicksRes.data) {
+          const d = row.division || "Unknown";
+          picksByDivision[d] = (picksByDivision[d] || 0) + 1;
+        }
+        for (const [division, pickCount] of Object.entries(picksByDivision)) {
+          coachPickDivisions.push({ division, pickCount });
+        }
+        coachPickDivisions.sort((a, b) => a.division.localeCompare(b.division));
+      }
+
       setStats({
         totalApplications: appCount.count ?? 0,
         totalRegistrations: regCount.count ?? 0,
         divisionCounts,
         recentApplications: recentApps.data ?? [],
         recentRegistrations: recentRegs.data ?? [],
+        coachPickDivisions,
       });
       setLoading(false);
     }
@@ -142,6 +161,43 @@ export default function AdminDashboard() {
           Dashboard
         </h1>
       </div>
+
+      {/* Coach Recommendations Banner */}
+      {stats?.coachPickDivisions && stats.coachPickDivisions.length > 0 && (
+        <div className="bg-amber-50 border border-amber-200 rounded-lg p-5 mb-6">
+          <div className="flex items-start gap-3">
+            <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
+              <svg className="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+              </svg>
+            </div>
+            <div className="flex-1">
+              <h3 className="font-display text-sm font-bold uppercase tracking-wide text-amber-800 mb-1">
+                Coach Recommendations Pending Review
+              </h3>
+              <p className="text-amber-700 text-sm mb-3">
+                Coaches have submitted their player recommendations for the following divisions:
+              </p>
+              <div className="flex flex-wrap gap-2 mb-3">
+                {stats.coachPickDivisions.map((d) => (
+                  <span key={d.division} className="inline-flex items-center gap-1.5 bg-amber-100 text-amber-800 px-3 py-1 rounded-full text-xs font-semibold">
+                    {d.division}
+                    <span className="bg-amber-200 text-amber-900 px-1.5 py-0.5 rounded-full text-xs">
+                      {d.pickCount} pick{d.pickCount !== 1 ? "s" : ""}
+                    </span>
+                  </span>
+                ))}
+              </div>
+              <Link
+                href="/admin/tryouts"
+                className="inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition-colors"
+              >
+                Review Selections
+              </Link>
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* Stat Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">

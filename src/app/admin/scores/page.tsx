@@ -4,17 +4,6 @@ import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import { ChevronDown, ChevronUp, Download } from "lucide-react";
 
-interface TryoutSession {
-  id: string;
-  division: string;
-  session_date: string;
-  start_time: string;
-  end_time: string | null;
-  location: string;
-  field: string | null;
-  max_players: number;
-}
-
 interface Score {
   id: string;
   player_number: string | null;
@@ -59,23 +48,9 @@ function computeTotal(score: Score): number {
   return (score.hitting || 0) + (score.fielding || 0) + (score.throwing || 0) + (score.running || 0) + (score.effort || 0) + (score.attitude || 0);
 }
 
-function formatDate(dateStr: string): string {
-  const d = new Date(dateStr + "T00:00:00");
-  return d.toLocaleDateString("en-US", { weekday: "short", month: "short", day: "numeric", year: "numeric" });
-}
-
-function formatTime(timeStr: string): string {
-  const [h, m] = timeStr.split(":");
-  const hour = parseInt(h, 10);
-  const ampm = hour >= 12 ? "PM" : "AM";
-  const display = hour > 12 ? hour - 12 : hour === 0 ? 12 : hour;
-  return `${display}:${m} ${ampm}`;
-}
-
 export default function ScoresPage() {
   const [scores, setScores] = useState<Score[]>([]);
-  const [sessions, setSessions] = useState<TryoutSession[]>([]);
-  const [assignmentCounts, setAssignmentCounts] = useState<Record<string, number>>({});
+  const [divisionRegCounts, setDivisionRegCounts] = useState<Record<string, number>>({});
   const [loading, setLoading] = useState(true);
   const [divisionFilter, setDivisionFilter] = useState<string>("all");
   const [expandedId, setExpandedId] = useState<string | null>(null);
@@ -84,23 +59,21 @@ export default function ScoresPage() {
     if (!supabase) return;
     setLoading(true);
 
-    const [scoresRes, sessionsRes, assignmentsRes] = await Promise.all([
+    const [scoresRes, divRegsRes] = await Promise.all([
       supabase.from("evaluator_scores").select("*"),
-      supabase.from("tryout_sessions").select("*").order("session_date").order("start_time"),
-      supabase.from("tryout_assignments").select("session_id"),
+      supabase.from("tryout_registrations").select("division"),
     ]);
 
     if (scoresRes.data) setScores(scoresRes.data);
-    if (sessionsRes.data) setSessions(sessionsRes.data);
 
-    // Count assignments per session
-    if (assignmentsRes.data) {
-      const counts: Record<string, number> = {};
-      for (const a of assignmentsRes.data) {
-        counts[a.session_id] = (counts[a.session_id] || 0) + 1;
+    // Count registrations per division
+    const divRegCounts: Record<string, number> = {};
+    if (divRegsRes.data) {
+      for (const r of divRegsRes.data) {
+        divRegCounts[r.division] = (divRegCounts[r.division] || 0) + 1;
       }
-      setAssignmentCounts(counts);
     }
+    setDivisionRegCounts(divRegCounts);
 
     setLoading(false);
   }, []);
@@ -196,35 +169,31 @@ export default function ScoresPage() {
             Blank Template
           </a>
         </div>
-        {sessions.length > 0 && (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-            {sessions.map((session) => {
-              const count = assignmentCounts[session.id] || 0;
-              return (
-                <a
-                  key={session.id}
-                  href={count > 0 ? `/api/score-sheet?session_id=${session.id}` : undefined}
-                  download={count > 0 ? true : undefined}
-                  className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
-                    count > 0
-                      ? "border-flag-blue/20 bg-flag-blue/5 hover:bg-flag-blue/10 cursor-pointer"
-                      : "border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed"
-                  }`}
-                >
-                  <Download size={16} className={count > 0 ? "text-flag-blue" : "text-gray-300"} />
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-charcoal truncate">{session.division}</p>
-                    <p className="text-xs text-gray-400">
-                      {formatDate(session.session_date)} &middot; {formatTime(session.start_time)}
-                      {session.location ? ` &middot; ${session.location}` : ""}
-                      &middot; {count} player{count !== 1 ? "s" : ""}
-                    </p>
-                  </div>
-                </a>
-              );
-            })}
-          </div>
-        )}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+          {DIVISIONS.map((div) => {
+            const count = divisionRegCounts[div] || 0;
+            return (
+              <a
+                key={div}
+                href={count > 0 ? `/api/score-sheet?division=${encodeURIComponent(div)}` : undefined}
+                download={count > 0 ? true : undefined}
+                className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
+                  count > 0
+                    ? "border-flag-blue/20 bg-flag-blue/5 hover:bg-flag-blue/10 cursor-pointer"
+                    : "border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed"
+                }`}
+              >
+                <Download size={16} className={count > 0 ? "text-flag-blue" : "text-gray-300"} />
+                <div className="flex-1 min-w-0">
+                  <p className="text-sm font-semibold text-charcoal truncate">{div}</p>
+                  <p className="text-xs text-gray-400">
+                    {count} registered player{count !== 1 ? "s" : ""}
+                  </p>
+                </div>
+              </a>
+            );
+          })}
+        </div>
       </div>
 
       {/* Division Filter */}
