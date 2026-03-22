@@ -54,16 +54,23 @@ export default function MedicalViewPage() {
         return;
       }
 
-      const { data, error: fetchError } = await supabase
+      const { data: rows, error: fetchError } = await supabase
         .from("player_documents")
         .select("id, registration_id, player_name, division, file_name, created_at")
         .eq("registration_id", regId)
         .eq("document_type", "medical_release")
-        .limit(1)
-        .single();
+        .limit(1);
 
-      if (fetchError || !data) {
-        setError("Medical release not found.");
+      if (fetchError) {
+        console.error("Medical view fetch error:", fetchError);
+        setError("Could not load medical release.");
+        setLoading(false);
+        return;
+      }
+
+      const data = rows && rows.length > 0 ? rows[0] : null;
+      if (!data) {
+        setError("Medical release not found for this player.");
         setLoading(false);
         return;
       }
