@@ -285,14 +285,40 @@ export default function CertificationsPage() {
                     </div>
                   </div>
 
-                  {/* Upload Area */}
+                  {/* Upload / View Area */}
                   {cert ? (
-                    <div className="text-sm text-green-700 bg-green-50 rounded-lg p-3">
-                      Certificate uploaded
-                      {cert.completed_at && (
-                        <> on {new Date(cert.completed_at).toLocaleDateString()}</>
-                      )}
-                      {cert.cert_file_name && <> ({cert.cert_file_name})</>}
+                    <div className="bg-green-50 rounded-lg p-3 flex items-center gap-3">
+                      <CheckCircle2 size={16} className="text-green-600 shrink-0" />
+                      <div className="flex-1 min-w-0">
+                        <p className="text-sm text-green-700">
+                          Certificate uploaded
+                          {cert.completed_at && (
+                            <> on {new Date(cert.completed_at).toLocaleDateString()}</>
+                          )}
+                        </p>
+                        {cert.cert_file_name && (
+                          <p className="text-xs text-green-600 truncate">{cert.cert_file_name}</p>
+                        )}
+                      </div>
+                      <button
+                        onClick={async () => {
+                          if (!supabase || !cert.cert_file_path) return;
+                          const { data } = await supabase.storage.from("player-documents").createSignedUrl(cert.cert_file_path, 300);
+                          if (data?.signedUrl) window.open(data.signedUrl, "_blank");
+                        }}
+                        className="px-3 py-1.5 rounded-lg text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors shrink-0"
+                      >
+                        View / Print
+                      </button>
+                      <FileUpload
+                        key={`replace-${cfg.type}`}
+                        bucket="player-documents"
+                        folder={`coach-certs/${user?.id}/${cfg.folder}`}
+                        label="Replace"
+                        onUploadComplete={(filePath, fileName) =>
+                          handleUploadComplete(cfg.type, filePath, fileName)
+                        }
+                      />
                     </div>
                   ) : (
                     <FileUpload

@@ -719,9 +719,19 @@ export default function BinderChecklistPage() {
               </p>
             </div>
             {concussionCert ? (
-              <span className="px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide bg-green-100 text-green-700">
-                Complete
-              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    if (concussionCert.cert_file_path) handleViewDocument(concussionCert.cert_file_path);
+                  }}
+                  className="px-3 py-1.5 rounded-md text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors"
+                >
+                  View / Print
+                </button>
+                <span className="px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide bg-green-100 text-green-700">
+                  Complete
+                </span>
+              </div>
             ) : (
               <Link
                 href="/coach/certifications"
@@ -768,9 +778,19 @@ export default function BinderChecklistPage() {
               </p>
             </div>
             {cardiacCert ? (
-              <span className="px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide bg-green-100 text-green-700">
-                Complete
-              </span>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => {
+                    if (cardiacCert.cert_file_path) handleViewDocument(cardiacCert.cert_file_path);
+                  }}
+                  className="px-3 py-1.5 rounded-md text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors"
+                >
+                  View / Print
+                </button>
+                <span className="px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide bg-green-100 text-green-700">
+                  Complete
+                </span>
+              </div>
             ) : (
               <Link
                 href="/coach/certifications"
