@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/contexts/auth-context";
 import {
   Users,
   CheckCircle2,
@@ -11,6 +12,8 @@ import {
   Mail,
   Shield,
   ExternalLink,
+  Clock,
+  UserCheck,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
@@ -354,20 +357,51 @@ function PlayerCard({
 /*  Page Component                                                     */
 /* ------------------------------------------------------------------ */
 
+interface AwaitingPlayer {
+  id: string;
+  player_first_name: string;
+  player_last_name: string;
+  division: string;
+  primary_position: string;
+  parent_name: string;
+  parent_email: string;
+  status: string;
+  accepted: boolean;
+}
+
 export default function CoachRosterPage() {
+  const { user } = useAuth();
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [documents, setDocuments] = useState<PlayerDocument[]>([]);
   const [contracts, setContracts] = useState<PlayerContract[]>([]);
+  const [awaitingPlayers, setAwaitingPlayers] = useState<AwaitingPlayer[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedDivision, setSelectedDivision] = useState<string>("All");
+  const [coachDivision, setCoachDivision] = useState<string | null>(null);
+  const [coachDivisions, setCoachDivisions] = useState<string[]>([]);
+  const [selectedDivision, setSelectedDivision] = useState<string | null>(null);
+
+  // Fetch coach's division from profile
+  useEffect(() => {
+    if (!supabase || !user) return;
+    (async () => {
+      const { data } = await supabase
+        .from("profiles")
+        .select("division")
+        .eq("id", user.id)
+        .single();
+      const div = data?.division ?? null;
+      setCoachDivision(div);
+      setSelectedDivision(div);
+    })();
+  }, [user]);
 
   useEffect(() => {
-    if (!supabase) {
+    if (!supabase || !coachDivision) {
       setLoading(false);
       return;
     }
     fetchAll();
-  }, []);
+  }, [coachDivision]);
 
   async function fetchAll() {
     if (!supabase) return;
@@ -377,7 +411,7 @@ export default function CoachRosterPage() {
       supabase
         .from("tryout_registrations")
         .select(
-          "id, player_first_name, player_last_name, division, jersey_number, primary_position, secondary_position, bats, throws, parent_name, parent_email, parent_phone, emergency_contact_name, emergency_contact_phone"
+          "id, player_first_name, player_last_name, division, jersey_number, primary_position, secondary_position, bats, throws, parent_name, parent_email, parent_phone, emergency_contact_name, emergency_contact_phone, status"
         )
         .in("status", ["selected", "alternate"])
         .order("division")
@@ -388,26 +422,56 @@ export default function CoachRosterPage() {
       supabase.from("player_contracts").select("registration_id"),
     ]);
 
-    // Only show players who have signed their contracts
-    const signedRegIds = new Set(
-      (contractsRes.data ?? []).map((c: any) => c.registration_id)
+    const allRegs = (regsRes.data ?? []) as (Registration & { status: string })[];
+    const allDocs = (docsRes.data ?? []) as PlayerDocument[];
+    const allContracts = (contractsRes.data ?? []) as PlayerContract[];
+
+    // Find which divisions this coach has players in
+    const uniqueDivs = [...new Set(allRegs.map((r) => r.division))];
+    setCoachDivisions(uniqueDivs);
+
+    // Determine acceptance status for each selected player
+    const acceptedIds = new Set(
+      allDocs
+        .filter((d) => d.document_type === "selection_acceptance")
+        .map((d) => d.registration_id)
     );
-    const allRegs = regsRes.data ?? [];
-    const signedRegs = allRegs.filter((r: any) => signedRegIds.has(r.id));
 
+    // Players who have signed contracts → show in roster
+    const signedRegIds = new Set(allContracts.map((c) => c.registration_id));
+    const signedRegs = allRegs.filter((r) => signedRegIds.has(r.id));
     setRegistrations(signedRegs);
-    if (docsRes.data) setDocuments(docsRes.data);
-    if (contractsRes.data) setContracts(contractsRes.data);
 
+    // Players awaiting acceptance (selected/alternate but haven't accepted OR haven't signed contract yet)
+    const awaiting: AwaitingPlayer[] = allRegs
+      .filter((r) => !signedRegIds.has(r.id))
+      .map((r) => ({
+        id: r.id,
+        player_first_name: r.player_first_name,
+        player_last_name: r.player_last_name,
+        division: r.division,
+        primary_position: r.primary_position,
+        parent_name: r.parent_name,
+        parent_email: r.parent_email,
+        status: r.status,
+        accepted: acceptedIds.has(r.id),
+      }));
+    setAwaitingPlayers(awaiting);
+
+    setDocuments(allDocs);
+    setContracts(allContracts);
     setLoading(false);
   }
 
   /* ---- Filtered data ---- */
 
-  const filtered =
-    selectedDivision === "All"
-      ? registrations
-      : registrations.filter((r) => r.division === selectedDivision);
+  const filtered = selectedDivision
+    ? registrations.filter((r) => r.division === selectedDivision)
+    : registrations;
+
+  const filteredAwaiting = selectedDivision
+    ? awaitingPlayers.filter((r) => r.division === selectedDivision)
+    : awaitingPlayers;
 
   const complianceMap = new Map(
     registrations.map((r) => [
@@ -416,8 +480,8 @@ export default function CoachRosterPage() {
     ])
   );
 
-  const totalPlayers = registrations.length;
-  const readyCount = registrations.filter(
+  const totalPlayers = filtered.length;
+  const readyCount = filtered.filter(
     (r) => complianceMap.get(r.id)?.ready
   ).length;
   const needsAttentionCount = totalPlayers - readyCount;
@@ -472,7 +536,8 @@ export default function CoachRosterPage() {
           Team Roster
         </h1>
         <p className="text-gray-500 text-sm mt-1">
-          {totalPlayers} player{totalPlayers !== 1 ? "s" : ""} on roster
+          {coachDivision ?? "No division assigned"}
+          {totalPlayers > 0 && ` · ${totalPlayers} player${totalPlayers !== 1 ? "s" : ""} on roster`}
         </p>
       </div>
 
@@ -487,27 +552,78 @@ export default function CoachRosterPage() {
         />
       </div>
 
-      {/* ---- Division Filter ---- */}
-      <div className="flex flex-wrap gap-2">
-        {DIVISIONS.map((div) => {
-          const label = DIVISION_LABELS[div] ?? div;
-          const active = selectedDivision === div;
-          return (
-            <button
-              key={div}
-              type="button"
-              onClick={() => setSelectedDivision(div)}
-              className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide border transition-colors ${
-                active
-                  ? "bg-flag-blue text-white border-flag-blue"
-                  : "bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-charcoal"
-              }`}
-            >
-              {label}
-            </button>
-          );
-        })}
-      </div>
+      {/* ---- Division Filter (only if coach has multiple divisions) ---- */}
+      {coachDivisions.length > 1 && (
+        <div className="flex flex-wrap gap-2">
+          {coachDivisions.map((div) => {
+            const label = DIVISION_LABELS[div] ?? div;
+            const active = selectedDivision === div;
+            return (
+              <button
+                key={div}
+                type="button"
+                onClick={() => setSelectedDivision(div)}
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide border transition-colors ${
+                  active
+                    ? "bg-flag-blue text-white border-flag-blue"
+                    : "bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-charcoal"
+                }`}
+              >
+                {label}
+              </button>
+            );
+          })}
+        </div>
+      )}
+
+      {/* ---- Awaiting Acceptance ---- */}
+      {filteredAwaiting.length > 0 && (
+        <div>
+          <h2 className="font-display text-lg font-bold uppercase tracking-wide mb-3 flex items-center gap-2">
+            <Clock size={18} className="text-amber-500" />
+            Awaiting Response ({filteredAwaiting.length})
+          </h2>
+          <div className="space-y-2 mb-6">
+            {filteredAwaiting.map((p) => (
+              <div
+                key={p.id}
+                className="bg-white border border-amber-200 rounded-lg p-4 flex flex-wrap items-center gap-3"
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <p className="text-sm font-semibold text-charcoal">
+                      {p.player_first_name} {p.player_last_name}
+                    </p>
+                    <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wide ${
+                      p.status === "selected"
+                        ? "bg-green-100 text-green-700"
+                        : "bg-amber-100 text-amber-700"
+                    }`}>
+                      {p.status === "selected" ? "Selected" : "Alternate"}
+                    </span>
+                  </div>
+                  <p className="text-xs text-gray-500">
+                    {p.primary_position} &middot; Parent: {p.parent_name} ({p.parent_email})
+                  </p>
+                </div>
+                <div className="shrink-0">
+                  {p.accepted ? (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                      <UserCheck size={14} />
+                      Accepted — Awaiting Contract
+                    </span>
+                  ) : (
+                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
+                      <Clock size={14} />
+                      Awaiting Parent Response
+                    </span>
+                  )}
+                </div>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
 
       {/* ---- Roster Cards ---- */}
       {filtered.length === 0 ? (
@@ -516,7 +632,7 @@ export default function CoachRosterPage() {
           <p className="text-gray-500 text-sm max-w-md mx-auto">
             {registrations.length === 0
               ? "No players on your roster yet. Players appear here after they are selected for a team and their parent signs the player contract."
-              : `No players on roster in the ${divisionShortName(selectedDivision)} division.`}
+              : `No players on roster in the ${divisionShortName(selectedDivision ?? "")} division.`}
           </p>
         </div>
       ) : (
@@ -541,12 +657,11 @@ export default function CoachRosterPage() {
       )}
 
       {/* ---- Footer count ---- */}
-      {filtered.length > 0 && (
+      {filtered.length > 0 && coachDivisions.length > 1 && (
         <p className="text-xs text-gray-400 text-center">
-          Showing {filtered.length} of {totalPlayers} player
-          {totalPlayers !== 1 ? "s" : ""}
-          {selectedDivision !== "All" &&
-            ` in ${divisionShortName(selectedDivision)}`}
+          Showing {filtered.length} of {registrations.length} player
+          {registrations.length !== 1 ? "s" : ""}
+          {selectedDivision && ` in ${divisionShortName(selectedDivision)}`}
         </p>
       )}
     </div>
