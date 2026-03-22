@@ -12,8 +12,8 @@ interface PlayerScore {
   fielding: number | null;
   throwing: number | null;
   running: number | null;
-  baseballIq: number | null;
   effort: number | null;
+  attitude: number | null;
   notes: string;
   standoutSkills: string;
   concerns: string;
@@ -31,8 +31,8 @@ const CATEGORIES = [
   { key: "fielding", label: "FLD" },
   { key: "throwing", label: "THR" },
   { key: "running", label: "RUN" },
-  { key: "baseballIq", label: "IQ" },
   { key: "effort", label: "EFF" },
+  { key: "attitude", label: "ATT" },
 ] as const;
 
 function totalScore(p: PlayerScore): number {

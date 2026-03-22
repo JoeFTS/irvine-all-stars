@@ -34,11 +34,11 @@ const faqSections: FaqSection[] = [
         answer: (
           <>
             Every player who tries out is evaluated by independent evaluators
-            using a standardized 100-point rubric. The rubric covers hitting,
-            fielding, throwing, speed, and baseball IQ. Scores are combined with
-            regular-season performance data to build balanced, competitive
-            rosters. The process is designed to be fair, transparent, and free
-            from politics.
+            using a standardized 54-point rubric. The rubric covers hitting,
+            fielding, throwing, running/speed, effort, and attitude — each
+            scored 1–9. Scores are combined with regular-season performance
+            data to build balanced, competitive rosters. The process is
+            designed to be fair, transparent, and free from politics.
           </>
         ),
       },

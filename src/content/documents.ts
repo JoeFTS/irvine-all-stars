@@ -37,7 +37,7 @@ export const documents: Document[] = [
       {
         heading: "Tryout Process",
         content:
-          "Every player who registers for tryouts is evaluated by independent evaluators using a standardized rubric. Evaluators score each player across 6 categories on a 1–9 scale:\n\n• Hitting — bat speed, contact, mechanics, plate discipline\n• Fielding — glove work, footwork, range, consistency\n• Throwing — arm strength, accuracy, mechanics, release\n• Speed — base running, first-step quickness, overall athleticism\n• Baseball IQ — situational awareness, positioning, decision-making\n• Coachability — attitude, effort, receptiveness to instruction\n\nMultiple evaluators score each player independently, and scores are averaged for fairness. The maximum possible score is 54 points.",
+          "Every player who registers for tryouts is evaluated by independent evaluators using a standardized rubric. Evaluators score each player across 6 categories on a 1–9 scale:\n\n• Hitting — bat speed, contact, mechanics, plate discipline\n• Fielding — glove work, footwork, range, consistency\n• Throwing — arm strength, accuracy, mechanics, release\n• Running / Speed — base running, first-step quickness, overall athleticism\n• Effort — hustle, intensity, competing hard on every play\n• Attitude — sportsmanship, coachability, enthusiasm\n\nMultiple evaluators score each player independently, and scores are averaged for fairness. The maximum possible score is 54 points.",
       },
       {
         heading: "Commitment Expectations",
@@ -89,19 +89,19 @@ export const documents: Document[] = [
           "Evaluates the player's arm and throwing mechanics.\n\n• Arm strength — velocity and carry on throws\n• Accuracy — ability to hit targets consistently\n• Mechanics — proper arm path, follow-through, and body alignment\n• Release — quick transfer and clean release point",
       },
       {
-        heading: "Category 4: Speed",
+        heading: "Category 4: Running / Speed",
         content:
           "Evaluates the player's athleticism and base running.\n\n• Base running — technique and instincts on the bases\n• First-step quickness — reaction time and acceleration\n• Overall athleticism — coordination, agility, and body control",
       },
       {
-        heading: "Category 5: Baseball IQ",
+        heading: "Category 5: Effort",
         content:
-          "Evaluates the player's mental understanding of the game.\n\n• Situational awareness — understanding of game situations and appropriate responses\n• Positioning — knowing where to be on defense based on count, runners, and outs\n• Decision-making — making smart choices under pressure (cutoffs, backups, leads)",
+          "Evaluates the player's hustle and intensity.\n\n• Hustle — running out every play, sprinting on and off the field\n• Intensity — competing hard during every drill and evaluation\n• Consistency — maintaining high effort throughout the entire tryout, not just early on",
       },
       {
-        heading: "Category 6: Coachability",
+        heading: "Category 6: Attitude",
         content:
-          "Evaluates the player's attitude, effort, and receptiveness.\n\n• Attitude — positive demeanor, good sportsmanship, team-first mentality\n• Effort — hustle and intensity throughout the tryout\n• Receptiveness to instruction — ability to listen, process, and apply coaching feedback",
+          "Evaluates the player's character and demeanor.\n\n• Sportsmanship — positive demeanor, respect for opponents and officials\n• Coachability — ability to listen, process, and apply coaching feedback\n• Enthusiasm — team-first mentality, encouraging teammates, love for the game",
       },
       {
         heading: "Score Ranges",

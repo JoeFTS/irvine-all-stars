@@ -17,37 +17,44 @@ export const metadata: Metadata = {
 const rubricItems = [
   {
     category: "Hitting",
-    points: 20,
+    points: 9,
     description:
       "Swing mechanics, bat speed, contact consistency, and ability to drive the ball. Evaluated through live batting practice and tee work.",
     color: "bg-flag-blue",
   },
   {
     category: "Fielding",
-    points: 20,
+    points: 9,
     description:
       "Glove work, footwork, range, and ability to field ground balls and fly balls cleanly. Evaluated at multiple positions.",
     color: "bg-flag-red",
   },
   {
     category: "Throwing",
-    points: 15,
+    points: 9,
     description:
       "Arm strength, accuracy, and proper throwing mechanics. Measured through distance throws and positional throwing drills.",
     color: "bg-flag-blue",
   },
   {
     category: "Running / Speed",
-    points: 15,
+    points: 9,
     description:
       "Base running speed, agility, and instincts. Timed sprints and base-to-base running evaluated.",
     color: "bg-flag-red",
   },
   {
-    category: "Effort & Attitude",
-    points: 30,
+    category: "Effort",
+    points: 9,
     description:
-      "Hustle, coachability, sportsmanship, and enthusiasm. Players who give 100% and support their teammates stand out.",
+      "Hustle, intensity, and willingness to give 100% throughout the tryout. Players who compete hard on every play stand out.",
+    color: "bg-flag-blue",
+  },
+  {
+    category: "Attitude",
+    points: 9,
+    description:
+      "Sportsmanship, coachability, and enthusiasm. How a player treats teammates, coaches, and the game matters.",
     color: "bg-flag-red",
   },
 ];
@@ -119,7 +126,7 @@ export default function TryoutsPage() {
           </h1>
           <p className="text-white/60 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
             Every player gets a fair shot. Independent evaluators, a
-            standardized 100-point rubric, and a process built on merit — not
+            standardized 54-point rubric, and a process built on merit — not
             connections.
           </p>
         </div>
@@ -230,8 +237,8 @@ export default function TryoutsPage() {
             How Players Are Scored
           </h2>
           <p className="text-gray-600 text-lg max-w-xl mb-10 leading-relaxed">
-            Every player is evaluated on the same 100-point scale. No
-            subjectivity, no shortcuts — just skills.
+            Every player is evaluated on the same 54-point scale across 6
+            categories. No subjectivity, no shortcuts — just skills.
           </p>
 
           <div className="space-y-4">

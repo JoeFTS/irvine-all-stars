@@ -23,7 +23,7 @@ const announcements = [
     date: "March 10, 2026",
     tag: "Coaches",
     title: "Coach Applications Now Open",
-    body: "Are you ready to lead an All-Stars team this summer? Coach applications are now being accepted for all ten divisions. Head to the Coach Application page to submit your interest. All applicants will be evaluated using a standardized 100-point rubric and interviewed by the selection committee. The application deadline will be announced soon, so don\u2019t wait to get started.",
+    body: "Are you ready to lead an All-Stars team this summer? Coach applications are now being accepted for all twelve divisions. Head to the Coach Application page to submit your interest. All applicants will be evaluated and interviewed by the selection committee. The application deadline will be announced soon, so don\u2019t wait to get started.",
   },
   {
     date: "March 7, 2026",

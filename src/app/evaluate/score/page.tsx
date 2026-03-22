@@ -24,7 +24,6 @@ interface PlayerScore {
   fielding: number | null;
   throwing: number | null;
   running: number | null;
-  baseballIq: number | null;
   effort: number | null;
   attitude: number | null;
   notes: string;
@@ -58,7 +57,6 @@ function emptyPlayer(num: number): PlayerScore {
     fielding: null,
     throwing: null,
     running: null,
-    baseballIq: null,
     effort: null,
     attitude: null,
     notes: "",

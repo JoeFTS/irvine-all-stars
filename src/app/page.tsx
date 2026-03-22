@@ -239,7 +239,7 @@ export default function Home() {
               {
                 num: 2,
                 title: "Evaluate",
-                desc: "Independent evaluators score every player on a 100-point rubric. Fair and consistent.",
+                desc: "Independent evaluators score every player on a 54-point rubric across 6 categories. Fair and consistent.",
                 color: "bg-[#C1121F]",
               },
               {
