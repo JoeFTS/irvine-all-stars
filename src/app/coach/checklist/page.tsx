@@ -41,6 +41,7 @@ interface TeamDocument {
   id: string;
   document_type: string;
   file_path: string | null;
+  division: string | null;
 }
 
 interface CoachCertification {
@@ -170,7 +171,7 @@ export default function BinderChecklistPage() {
         .select("id, registration_id, document_type, file_path"),
       supabase
         .from("team_documents")
-        .select("id, document_type, file_path")
+        .select("id, document_type, file_path, division")
         .in("document_type", ["tournament_rules", "insurance_certificate"]),
       user
         ? supabase
@@ -214,8 +215,12 @@ export default function BinderChecklistPage() {
   const pitchingRule = ponyName ? getPitchingRuleForDivision(ponyName) : null;
   const noPitchingRequired = pitchingRule ? !pitchingRule.hasPitching : false;
 
-  // Team documents
-  const tournamentRulesDoc = teamDocs.find((d) => d.document_type === "tournament_rules");
+  // Team documents — tournament rules filtered by coach's division, insurance is global
+  const tournamentRulesDoc = teamDocs.find(
+    (d) => d.document_type === "tournament_rules" && d.division === primaryDivision
+  ) ?? teamDocs.find(
+    (d) => d.document_type === "tournament_rules" && d.division === null
+  );
   const insuranceDoc = teamDocs.find((d) => d.document_type === "insurance_certificate");
 
   // Coach certifications
@@ -437,7 +442,7 @@ export default function BinderChecklistPage() {
             </div>
             {tournamentRulesDoc ? (
               <button
-                onClick={() => handleViewDocument(tournamentRulesDoc.file_path!, "team-documents")}
+                onClick={() => handleViewDocument(tournamentRulesDoc.file_path!)}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
               >
                 <Eye size={14} />
@@ -486,7 +491,7 @@ export default function BinderChecklistPage() {
             </div>
             {insuranceDoc ? (
               <button
-                onClick={() => handleViewDocument(insuranceDoc.file_path!, "team-documents")}
+                onClick={() => handleViewDocument(insuranceDoc.file_path!)}
                 className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
               >
                 <Eye size={14} />

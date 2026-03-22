@@ -51,6 +51,7 @@ interface TeamDocument {
   document_type: string;
   file_path: string;
   file_name: string;
+  division: string | null;
   created_at: string;
 }
 
@@ -150,7 +151,7 @@ export default function AdminDocumentsPage() {
       supabase.from("player_contracts").select("registration_id"),
       supabase
         .from("team_documents")
-        .select("id, document_type, file_path, file_name, created_at"),
+        .select("id, document_type, file_path, file_name, division, created_at"),
     ]);
 
     if (regsRes.data) setRegistrations(regsRes.data);
@@ -213,17 +214,19 @@ export default function AdminDocumentsPage() {
   async function handleTeamDocUpload(
     documentType: string,
     filePath: string,
-    fileName: string
+    fileName: string,
+    division: string | null = null
   ) {
     if (!supabase) return;
 
     const userId = (await supabase.auth.getUser()).data.user?.id;
 
-    // Delete existing document of this type (upsert pattern)
-    const existing = teamDocs.find((d) => d.document_type === documentType);
+    // Delete existing document of this type + division (upsert pattern)
+    const existing = teamDocs.find(
+      (d) => d.document_type === documentType && d.division === division
+    );
     if (existing) {
       await supabase.from("team_documents").delete().eq("id", existing.id);
-      // Also remove old file from storage
       await supabase.storage
         .from("player-documents")
         .remove([existing.file_path]);
@@ -235,14 +238,17 @@ export default function AdminDocumentsPage() {
         document_type: documentType,
         file_path: filePath,
         file_name: fileName,
+        division,
         uploaded_by: userId,
       })
-      .select("id, document_type, file_path, file_name, created_at")
+      .select("id, document_type, file_path, file_name, division, created_at")
       .single();
 
     if (!error && data) {
       setTeamDocs((prev) => [
-        ...prev.filter((d) => d.document_type !== documentType),
+        ...prev.filter(
+          (d) => !(d.document_type === documentType && d.division === division)
+        ),
         data,
       ]);
     }
@@ -406,79 +412,119 @@ export default function AdminDocumentsPage() {
             Shared Team Documents
           </h2>
         </div>
-        <p className="text-xs text-gray-400 mb-4">
-          Upload documents shared with all coaching staff
+        <p className="text-xs text-gray-400 mb-5">
+          Upload documents shared with coaching staff. Insurance is shared across all divisions. Tournament rules can be uploaded per division.
         </p>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-          {(
-            [
-              {
-                type: "insurance_certificate",
-                label: "Certificate of Liability Insurance",
-              },
-              {
-                type: "tournament_rules",
-                label: "Pre-Tournament Rules / Coach's Agreement",
-              },
-            ] as const
-          ).map(({ type, label }) => {
-            const doc = teamDocs.find((d) => d.document_type === type);
+        {/* Insurance Certificate — global */}
+        <div className="border border-gray-200 rounded-lg p-4 mb-5">
+          <p className="text-sm font-semibold text-charcoal mb-2">
+            Certificate of Liability Insurance
+          </p>
+          <p className="text-xs text-gray-400 mb-3">
+            Shared with all coaches across all divisions
+          </p>
+          {(() => {
+            const doc = teamDocs.find((d) => d.document_type === "insurance_certificate");
+            return doc ? (
+              <div className="flex items-center gap-3">
+                <div className="flex-1 min-w-0">
+                  <p className="text-xs text-gray-500 truncate">{doc.file_name}</p>
+                  <p className="text-[10px] text-gray-400">
+                    Uploaded {new Date(doc.created_at).toLocaleDateString()}
+                  </p>
+                </div>
+                <button
+                  onClick={() => handleViewTeamDoc(doc.file_path, doc.file_name)}
+                  className="px-3 py-1.5 rounded-lg text-xs font-semibold text-flag-blue bg-flag-blue/5 hover:bg-flag-blue/10 transition-colors"
+                >
+                  View
+                </button>
+                <FileUpload
+                  bucket="player-documents"
+                  folder="team-docs/insurance_certificate"
+                  accept="image/*,.pdf"
+                  maxSizeMB={10}
+                  label="Replace"
+                  onUploadComplete={(filePath, fileName) =>
+                    handleTeamDocUpload("insurance_certificate", filePath, fileName, null)
+                  }
+                />
+              </div>
+            ) : (
+              <FileUpload
+                bucket="player-documents"
+                folder="team-docs/insurance_certificate"
+                accept="image/*,.pdf"
+                maxSizeMB={10}
+                label="Upload"
+                description="PDF or image, max 10 MB"
+                onUploadComplete={(filePath, fileName) =>
+                  handleTeamDocUpload("insurance_certificate", filePath, fileName, null)
+                }
+              />
+            );
+          })()}
+        </div>
 
-            return (
-              <div
-                key={type}
-                className="border border-gray-200 rounded-lg p-4"
-              >
-                <p className="text-sm font-semibold text-charcoal mb-2">
-                  {label}
-                </p>
-                {doc ? (
-                  <div className="flex items-center gap-3">
-                    <div className="flex-1 min-w-0">
-                      <p className="text-xs text-gray-500 truncate">
-                        {doc.file_name}
-                      </p>
-                      <p className="text-[10px] text-gray-400">
-                        Uploaded{" "}
-                        {new Date(doc.created_at).toLocaleDateString()}
-                      </p>
+        {/* Tournament Rules — per division */}
+        <div className="border border-gray-200 rounded-lg p-4">
+          <p className="text-sm font-semibold text-charcoal mb-1">
+            Pre-Tournament Rules / Coach&apos;s Agreement
+          </p>
+          <p className="text-xs text-gray-400 mb-4">
+            Upload rules per division — each division may have different tournament rules
+          </p>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+            {DIVISIONS.map((div) => {
+              const doc = teamDocs.find(
+                (d) => d.document_type === "tournament_rules" && d.division === div
+              );
+              return (
+                <div key={div} className="border border-gray-100 rounded-lg p-3">
+                  <p className="text-xs font-semibold text-charcoal mb-2">{div}</p>
+                  {doc ? (
+                    <div className="flex items-center gap-2">
+                      <div className="flex-1 min-w-0">
+                        <p className="text-[10px] text-gray-500 truncate">{doc.file_name}</p>
+                        <p className="text-[10px] text-gray-400">
+                          {new Date(doc.created_at).toLocaleDateString()}
+                        </p>
+                      </div>
+                      <button
+                        onClick={() => handleViewTeamDoc(doc.file_path, doc.file_name)}
+                        className="px-2 py-1 rounded text-[10px] font-semibold text-flag-blue bg-flag-blue/5 hover:bg-flag-blue/10 transition-colors"
+                      >
+                        View
+                      </button>
+                      <FileUpload
+                        bucket="player-documents"
+                        folder={`team-docs/tournament_rules/${div.replace(/\s+/g, "-")}`}
+                        accept="image/*,.pdf"
+                        maxSizeMB={10}
+                        label="Replace"
+                        onUploadComplete={(filePath, fileName) =>
+                          handleTeamDocUpload("tournament_rules", filePath, fileName, div)
+                        }
+                      />
                     </div>
-                    <button
-                      onClick={() =>
-                        handleViewTeamDoc(doc.file_path, doc.file_name)
-                      }
-                      className="px-3 py-1.5 rounded-lg text-xs font-semibold text-flag-blue bg-flag-blue/5 hover:bg-flag-blue/10 transition-colors"
-                    >
-                      View
-                    </button>
+                  ) : (
                     <FileUpload
                       bucket="player-documents"
-                      folder={`team-docs/${type}`}
+                      folder={`team-docs/tournament_rules/${div.replace(/\s+/g, "-")}`}
                       accept="image/*,.pdf"
                       maxSizeMB={10}
-                      label="Replace"
+                      label="Upload"
+                      description="PDF or image"
                       onUploadComplete={(filePath, fileName) =>
-                        handleTeamDocUpload(type, filePath, fileName)
+                        handleTeamDocUpload("tournament_rules", filePath, fileName, div)
                       }
                     />
-                  </div>
-                ) : (
-                  <FileUpload
-                    bucket="player-documents"
-                    folder={`team-docs/${type}`}
-                    accept="image/*,.pdf"
-                    maxSizeMB={10}
-                    label="Upload"
-                    description="PDF or image, max 10 MB"
-                    onUploadComplete={(filePath, fileName) =>
-                      handleTeamDocUpload(type, filePath, fileName)
-                    }
-                  />
-                )}
-              </div>
-            );
-          })}
+                  )}
+                </div>
+              );
+            })}
+          </div>
         </div>
       </div>
 
