@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { ShieldCheck } from "lucide-react";
 import FileUpload from "@/components/file-upload";
@@ -34,9 +34,7 @@ const DIVISIONS = [
 export default function AdminDocumentsPage() {
   const [teamDocs, setTeamDocs] = useState<TeamDocument[]>([]);
   const [loading, setLoading] = useState(true);
-  const [selectedRulesDivision, setSelectedRulesDivision] = useState<string>(
-    DIVISIONS[0]
-  );
+  const [selectedRulesDivision, setSelectedRulesDivision] = useState<string>("");
 
   useEffect(() => {
     if (!supabase) {
@@ -111,18 +109,6 @@ export default function AdminDocumentsPage() {
       window.open(data.signedUrl, "_blank");
     }
   }
-
-  const uploadedRules = useMemo(
-    () =>
-      teamDocs
-        .filter((d) => d.document_type === "tournament_rules" && d.division)
-        .sort((a, b) => {
-          const aIdx = DIVISIONS.indexOf(a.division!);
-          const bIdx = DIVISIONS.indexOf(b.division!);
-          return aIdx - bIdx;
-        }),
-    [teamDocs]
-  );
 
   if (!supabase) {
     return (
@@ -250,94 +236,96 @@ export default function AdminDocumentsPage() {
             Pre-Tournament Rules / Coach&apos;s Agreement
           </p>
           <p className="text-xs text-gray-400 mb-4">
-            Upload rules per division — each division may have different
-            tournament rules
+            Select a division to upload or view its tournament rules
           </p>
 
-          {/* Upload controls */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 mb-5">
-            <select
-              value={selectedRulesDivision}
-              onChange={(e) => setSelectedRulesDivision(e.target.value)}
-              className="px-3 py-2 border border-gray-200 rounded-lg text-sm text-charcoal bg-white focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
-            >
-              {DIVISIONS.map((div) => (
-                <option key={div} value={div}>
-                  {div}
-                </option>
-              ))}
-            </select>
-            <FileUpload
-              bucket="player-documents"
-              folder={`team-docs/tournament_rules/${selectedRulesDivision.replace(/\s+/g, "-")}`}
-              accept="image/*,.pdf"
-              maxSizeMB={10}
-              label="Upload PDF"
-              onUploadComplete={(filePath, fileName) =>
-                handleTeamDocUpload(
-                  "tournament_rules",
-                  filePath,
-                  fileName,
-                  selectedRulesDivision
-                )
-              }
-            />
+          {/* Division buttons */}
+          <div className="flex flex-wrap gap-2 mb-4">
+            {DIVISIONS.map((div) => {
+              const hasDoc = teamDocs.some(
+                (d) => d.document_type === "tournament_rules" && d.division === div
+              );
+              const isSelected = selectedRulesDivision === div;
+              return (
+                <button
+                  key={div}
+                  onClick={() => setSelectedRulesDivision(isSelected ? "" : div)}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide border transition-colors flex items-center gap-1.5 ${
+                    isSelected
+                      ? "bg-flag-blue text-white border-flag-blue"
+                      : hasDoc
+                      ? "bg-green-50 text-green-700 border-green-200 hover:bg-green-100"
+                      : "bg-gray-50 text-gray-500 border-gray-200 hover:bg-gray-100"
+                  }`}
+                >
+                  {hasDoc && !isSelected && (
+                    <svg className="w-3 h-3" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+                      <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                    </svg>
+                  )}
+                  {div.split("-")[0]}
+                </button>
+              );
+            })}
           </div>
 
-          {/* Uploaded rules list */}
-          {uploadedRules.length > 0 && (
-            <div>
-              <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
-                Uploaded Rules
-              </p>
-              <div className="border border-gray-200 rounded-lg divide-y divide-gray-100">
-                {uploadedRules.map((doc) => (
-                  <div
-                    key={doc.id}
-                    className="flex items-center gap-3 px-4 py-3"
-                  >
-                    <p className="text-sm font-semibold text-charcoal w-28 shrink-0">
-                      {doc.division}
-                    </p>
-                    <p className="text-xs text-gray-500 truncate flex-1 min-w-0">
-                      {doc.file_name}
-                    </p>
-                    <p className="text-xs text-gray-400 shrink-0">
-                      {new Date(doc.created_at).toLocaleDateString()}
-                    </p>
+          {/* Selected division detail */}
+          {selectedRulesDivision && (() => {
+            const doc = teamDocs.find(
+              (d) => d.document_type === "tournament_rules" && d.division === selectedRulesDivision
+            );
+            return (
+              <div className="border border-flag-blue/20 bg-flag-blue/5 rounded-lg p-4">
+                <p className="text-sm font-semibold text-charcoal mb-3">
+                  {selectedRulesDivision}
+                </p>
+                {doc ? (
+                  <div className="flex items-center gap-3">
+                    <div className="flex-1 min-w-0">
+                      <p className="text-xs text-gray-600 truncate">{doc.file_name}</p>
+                      <p className="text-[10px] text-gray-400">
+                        Uploaded {new Date(doc.created_at).toLocaleDateString()}
+                      </p>
+                    </div>
                     <button
-                      onClick={() =>
-                        handleViewTeamDoc(doc.file_path, doc.file_name)
-                      }
-                      className="px-3 py-1 rounded-lg text-xs font-semibold text-flag-blue bg-flag-blue/5 hover:bg-flag-blue/10 transition-colors shrink-0"
+                      onClick={() => handleViewTeamDoc(doc.file_path, doc.file_name)}
+                      className="px-3 py-1.5 rounded-lg text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors shrink-0"
                     >
                       View
                     </button>
                     <FileUpload
+                      key={`replace-${selectedRulesDivision}`}
                       bucket="player-documents"
-                      folder={`team-docs/tournament_rules/${doc.division!.replace(/\s+/g, "-")}`}
+                      folder={`team-docs/tournament_rules/${selectedRulesDivision.replace(/\s+/g, "-")}`}
                       accept="image/*,.pdf"
                       maxSizeMB={10}
                       label="Replace"
                       onUploadComplete={(filePath, fileName) =>
-                        handleTeamDocUpload(
-                          "tournament_rules",
-                          filePath,
-                          fileName,
-                          doc.division
-                        )
+                        handleTeamDocUpload("tournament_rules", filePath, fileName, selectedRulesDivision)
                       }
                     />
                   </div>
-                ))}
+                ) : (
+                  <FileUpload
+                    key={`upload-${selectedRulesDivision}`}
+                    bucket="player-documents"
+                    folder={`team-docs/tournament_rules/${selectedRulesDivision.replace(/\s+/g, "-")}`}
+                    accept="image/*,.pdf"
+                    maxSizeMB={10}
+                    label="Upload"
+                    description="PDF or image, max 10 MB"
+                    onUploadComplete={(filePath, fileName) =>
+                      handleTeamDocUpload("tournament_rules", filePath, fileName, selectedRulesDivision)
+                    }
+                  />
+                )}
               </div>
-            </div>
-          )}
+            );
+          })()}
 
-          {uploadedRules.length === 0 && (
+          {!selectedRulesDivision && (
             <p className="text-xs text-gray-400">
-              No tournament rules uploaded yet. Select a division above and
-              upload a PDF.
+              Select a division above to upload or manage its tournament rules.
             </p>
           )}
         </div>
