@@ -14,7 +14,6 @@ import {
   UserCircle,
   ClipboardList,
   FileText,
-  ClipboardPlus,
 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 
@@ -26,7 +25,6 @@ const navItems = [
   { href: "/coach/pitching-log", label: "Pitching Log", icon: ClipboardList },
   { href: "/coach/roster", label: "Roster", icon: Users },
   { href: "/coach/contracts", label: "Contracts", icon: FileText },
-  { href: "/coach/medical-form", label: "Medical Forms", icon: ClipboardPlus },
   { href: "/coach/certifications", label: "Certifications", icon: Award },
   { href: "/coach/tournament-rules", label: "Tournament Rules", icon: BookOpen },
   { href: "/coach/updates", label: "Updates", icon: Megaphone },

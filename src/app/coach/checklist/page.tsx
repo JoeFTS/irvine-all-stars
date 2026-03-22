@@ -16,7 +16,9 @@ import {
   Info,
   AlertTriangle,
   Camera,
+  Download,
 } from "lucide-react";
+import FileUpload from "@/components/file-upload";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -41,7 +43,9 @@ interface TeamDocument {
   id: string;
   document_type: string;
   file_path: string | null;
+  file_name: string | null;
   division: string | null;
+  created_at: string | null;
 }
 
 interface CoachCertification {
@@ -181,8 +185,8 @@ export default function BinderChecklistPage() {
         .select("id, registration_id, document_type, file_path"),
       supabase
         .from("team_documents")
-        .select("id, document_type, file_path, division")
-        .in("document_type", ["tournament_rules", "insurance_certificate"]),
+        .select("id, document_type, file_path, file_name, division, created_at")
+        .in("document_type", ["tournament_rules", "insurance_certificate", "signed_medical_release"]),
       user
         ? supabase
             .from("coach_certifications")
@@ -222,6 +226,55 @@ export default function BinderChecklistPage() {
   }
 
   /* ---------------------------------------------------------------- */
+  /*  Team document upload (signed medical release, etc.)               */
+  /* ---------------------------------------------------------------- */
+
+  async function handleTeamDocUpload(
+    documentType: string,
+    filePath: string,
+    fileName: string,
+    division: string | null = null
+  ) {
+    if (!supabase) return;
+
+    const userId = (await supabase.auth.getUser()).data.user?.id;
+
+    // Delete existing document of this type + division (upsert pattern)
+    const existing = teamDocs.find(
+      (d) => d.document_type === documentType && d.division === division
+    );
+    if (existing) {
+      await supabase.from("team_documents").delete().eq("id", existing.id);
+      if (existing.file_path) {
+        await supabase.storage
+          .from("player-documents")
+          .remove([existing.file_path]);
+      }
+    }
+
+    const { data, error } = await supabase
+      .from("team_documents")
+      .insert({
+        document_type: documentType,
+        file_path: filePath,
+        file_name: fileName,
+        division,
+        uploaded_by: userId,
+      })
+      .select("id, document_type, file_path, file_name, division, created_at")
+      .single();
+
+    if (!error && data) {
+      setTeamDocs((prev) => [
+        ...prev.filter(
+          (d) => !(d.document_type === documentType && d.division === division)
+        ),
+        data,
+      ]);
+    }
+  }
+
+  /* ---------------------------------------------------------------- */
   /*  Derived data                                                     */
   /* ---------------------------------------------------------------- */
 
@@ -239,6 +292,9 @@ export default function BinderChecklistPage() {
     (d) => d.document_type === "tournament_rules" && d.division === null
   );
   const insuranceDoc = teamDocs.find((d) => d.document_type === "insurance_certificate");
+  const signedReleaseDoc = teamDocs.find(
+    (d) => d.document_type === "signed_medical_release" && d.division === primaryDivision
+  );
 
   // Coach certifications
   const concussionCert = coachCerts.find((c) => c.cert_type === "concussion");
@@ -597,6 +653,84 @@ export default function BinderChecklistPage() {
             Parent completes in portal
           </p>
         </div>
+
+        {/* Download blank sign-off sheet */}
+        {primaryDivision && (
+          <div className="px-5 py-3 border-t border-gray-100 flex items-center gap-3">
+            <a
+              href={`/api/medical-release-sheet?division=${encodeURIComponent(primaryDivision)}`}
+              download
+              className="inline-flex items-center gap-2 px-4 py-2 bg-flag-blue text-white rounded-lg text-xs font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors"
+            >
+              <Download size={14} />
+              Download Sign-Off Sheet
+            </a>
+            <span className="text-xs text-gray-400">
+              Pre-filled with player names — print for parents to sign in person
+            </span>
+          </div>
+        )}
+
+        {/* Upload signed release sheet */}
+        {primaryDivision && (
+          <div className="px-5 py-3 border-t border-gray-100">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider mb-2">
+              Upload Signed Release Sheet
+            </p>
+            {signedReleaseDoc ? (
+              <div className="flex items-center gap-3">
+                <CheckCircle2 size={16} className="text-green-600" />
+                <span className="text-xs text-gray-600 flex-1">
+                  {signedReleaseDoc.file_name ?? "Signed release"} — uploaded{" "}
+                  {signedReleaseDoc.created_at
+                    ? new Date(signedReleaseDoc.created_at).toLocaleDateString()
+                    : ""}
+                </span>
+                <button
+                  onClick={() =>
+                    signedReleaseDoc.file_path &&
+                    handleViewDocument(signedReleaseDoc.file_path, "player-documents")
+                  }
+                  className="px-2 py-1 rounded text-xs font-semibold text-flag-blue hover:bg-flag-blue/10 transition-colors"
+                >
+                  View
+                </button>
+                <FileUpload
+                  bucket="player-documents"
+                  folder="team-docs/medical-release-signed"
+                  accept="image/*,.pdf"
+                  maxSizeMB={10}
+                  label="Replace"
+                  onUploadComplete={(filePath, fileName) =>
+                    handleTeamDocUpload(
+                      "signed_medical_release",
+                      filePath,
+                      fileName,
+                      primaryDivision
+                    )
+                  }
+                />
+              </div>
+            ) : (
+              <FileUpload
+                bucket="player-documents"
+                folder="team-docs/medical-release-signed"
+                accept="image/*,.pdf"
+                maxSizeMB={10}
+                label="Upload Signed Sheet"
+                description="Upload the signed medical release sheet (PDF or image)"
+                onUploadComplete={(filePath, fileName) =>
+                  handleTeamDocUpload(
+                    "signed_medical_release",
+                    filePath,
+                    fileName,
+                    primaryDivision
+                  )
+                }
+              />
+            )}
+          </div>
+        )}
       </div>
 
       {/* ================================================================ */}
