@@ -61,13 +61,13 @@ export async function GET(request: NextRequest) {
   const lightGray = "F5F5F5";
   const white = "FFFFFF";
 
-  // Column widths — sized to fill landscape letter (10" printable)
+  // Column widths — sized to fill landscape letter (~10" printable, 1 char ≈ 0.075")
   ws.columns = [
-    { width: 32 }, // A: Full Name
-    { width: 36 }, // B: Signature
-    { width: 36 }, // C: Print Name
-    { width: 18 }, // D: Relationship
-    { width: 16 }, // E: Date
+    { width: 38 }, // A: Full Name
+    { width: 44 }, // B: Signature
+    { width: 44 }, // C: Print Name
+    { width: 20 }, // D: Relationship
+    { width: 18 }, // E: Date
   ];
 
   // Row 1: Title
