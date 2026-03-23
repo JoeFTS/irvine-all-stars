@@ -30,6 +30,17 @@ interface Contract {
   registration_id: string;
 }
 
+interface Team {
+  division: string;
+  coach_id: string | null;
+  coach_email: string | null;
+}
+
+interface CoachCert {
+  coach_id: string;
+  cert_type: string;
+}
+
 const DIVISIONS = [
   "5U-Shetland",
   "6U-Shetland",
@@ -66,6 +77,8 @@ export default function CompliancePage() {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [documents, setDocuments] = useState<Document[]>([]);
   const [contracts, setContracts] = useState<Contract[]>([]);
+  const [teams, setTeams] = useState<Team[]>([]);
+  const [coachCerts, setCoachCerts] = useState<CoachCert[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedDivisions, setExpandedDivisions] = useState<Set<string>>(
     new Set()
@@ -83,7 +96,7 @@ export default function CompliancePage() {
     if (!supabase) return;
     setLoading(true);
 
-    const [regsRes, docsRes, contractsRes] = await Promise.all([
+    const [regsRes, docsRes, contractsRes, teamsRes, certsRes] = await Promise.all([
       supabase
         .from("tryout_registrations")
         .select("id, player_first_name, player_last_name, division, status")
@@ -94,11 +107,15 @@ export default function CompliancePage() {
         .from("player_documents")
         .select("registration_id, document_type"),
       supabase.from("player_contracts").select("registration_id"),
+      supabase.from("teams").select("division, coach_id, coach_email"),
+      supabase.from("coach_certifications").select("coach_id, cert_type"),
     ]);
 
     if (regsRes.data) setRegistrations(regsRes.data);
     if (docsRes.data) setDocuments(docsRes.data);
     if (contractsRes.data) setContracts(contractsRes.data);
+    if (teamsRes.data) setTeams(teamsRes.data);
+    if (certsRes.data) setCoachCerts(certsRes.data);
     setLoading(false);
   }
 
@@ -145,6 +162,24 @@ export default function CompliancePage() {
       };
     }).filter((d) => d.totalPlayers > 0);
   }, [registrations, docsByReg, contractSet]);
+
+  // Coach cert status per division
+  const coachCertsByDivision = useMemo(() => {
+    const map = new Map<string, { coachEmail: string | null; hasConcussion: boolean; hasCardiac: boolean }>();
+    for (const team of teams) {
+      if (!team.coach_id) {
+        map.set(team.division, { coachEmail: team.coach_email, hasConcussion: false, hasCardiac: false });
+        continue;
+      }
+      const certs = coachCerts.filter((c) => c.coach_id === team.coach_id);
+      map.set(team.division, {
+        coachEmail: team.coach_email,
+        hasConcussion: certs.some((c) => c.cert_type === "concussion"),
+        hasCardiac: certs.some((c) => c.cert_type === "cardiac_arrest"),
+      });
+    }
+    return map;
+  }, [teams, coachCerts]);
 
   const overallReady = divisionData.reduce((s, d) => s + d.readyCount, 0);
   const overallTotal = divisionData.reduce((s, d) => s + d.totalPlayers, 0);
@@ -395,6 +430,37 @@ export default function CompliancePage() {
                         </div>
                       </div>
                     ))}
+
+                    {/* Coach Certifications */}
+                    {(() => {
+                      const coachInfo = coachCertsByDivision.get(div.division);
+                      if (!coachInfo) return null;
+                      return (
+                        <div className="border-t border-gray-200 bg-flag-blue/5 px-5 py-3">
+                          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">
+                            Coach Certifications {coachInfo.coachEmail && <span className="normal-case font-normal">— {coachInfo.coachEmail}</span>}
+                          </p>
+                          <div className="flex flex-wrap gap-4">
+                            <div className="flex items-center gap-1.5">
+                              {coachInfo.hasConcussion ? (
+                                <CheckCircle2 size={16} className="text-green-500" />
+                              ) : (
+                                <XCircle size={16} className="text-gray-300" />
+                              )}
+                              <span className="text-xs text-charcoal">Concussion Training</span>
+                            </div>
+                            <div className="flex items-center gap-1.5">
+                              {coachInfo.hasCardiac ? (
+                                <CheckCircle2 size={16} className="text-green-500" />
+                              ) : (
+                                <XCircle size={16} className="text-gray-300" />
+                              )}
+                              <span className="text-xs text-charcoal">Sudden Cardiac Arrest</span>
+                            </div>
+                          </div>
+                        </div>
+                      );
+                    })()}
                   </div>
                 )}
               </div>
