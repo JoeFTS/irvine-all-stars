@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
-import { Plus, Trash2, Shield, ShieldCheck, FileText } from "lucide-react";
+import { Plus, Trash2, Shield, ShieldCheck, FileText, Pencil, Check, X } from "lucide-react";
 
 interface Team {
   id: string;
@@ -130,6 +130,10 @@ export default function TeamsPage() {
   // Delete confirmation
   const [deletingId, setDeletingId] = useState<string | null>(null);
 
+  // Inline team name editing
+  const [editingTeamId, setEditingTeamId] = useState<string | null>(null);
+  const [editingTeamName, setEditingTeamName] = useState("");
+
   useEffect(() => {
     if (!supabase) {
       setLoading(false);
@@ -220,6 +224,20 @@ export default function TeamsPage() {
       setTeams((prev) => prev.filter((t) => t.id !== id));
     }
     setDeletingId(null);
+  }
+
+  async function handleRenameTeam(id: string) {
+    if (!supabase || !editingTeamName.trim()) return;
+    const { error } = await supabase
+      .from("teams")
+      .update({ team_name: editingTeamName.trim() })
+      .eq("id", id);
+    if (!error) {
+      setTeams((prev) =>
+        prev.map((t) => (t.id === id ? { ...t, team_name: editingTeamName.trim() } : t))
+      );
+    }
+    setEditingTeamId(null);
   }
 
   const filtered = teams.filter((t) => {
@@ -326,7 +344,14 @@ export default function TeamsPage() {
             {formCoachSource === "dropdown" ? (
               <select
                 value={formCoachEmail}
-                onChange={(e) => setFormCoachEmail(e.target.value)}
+                onChange={(e) => {
+                  const coachId = e.target.value;
+                  setFormCoachEmail(coachId);
+                  const coach = acceptedCoaches.find((c) => c.id === coachId);
+                  if (coach?.division_preference) {
+                    setFormDivision(coach.division_preference);
+                  }
+                }}
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
               >
                 <option value="">Select accepted coach...</option>
@@ -425,9 +450,51 @@ export default function TeamsPage() {
                   <div className="flex items-start justify-between gap-4">
                     <div className="flex-1 min-w-0">
                       <div className="flex flex-wrap items-center gap-2 mb-1">
-                        <h3 className="font-display text-lg font-bold uppercase tracking-wide text-charcoal">
-                          {team.team_name}
-                        </h3>
+                        {editingTeamId === team.id ? (
+                          <div className="flex items-center gap-1.5">
+                            <input
+                              type="text"
+                              value={editingTeamName}
+                              onChange={(e) => setEditingTeamName(e.target.value)}
+                              onKeyDown={(e) => {
+                                if (e.key === "Enter") handleRenameTeam(team.id);
+                                if (e.key === "Escape") setEditingTeamId(null);
+                              }}
+                              autoFocus
+                              className="font-display text-lg font-bold uppercase tracking-wide text-charcoal border border-flag-blue/30 rounded px-2 py-0.5 focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                            />
+                            <button
+                              onClick={() => handleRenameTeam(team.id)}
+                              className="p-1 rounded text-green-600 hover:bg-green-50 transition-colors"
+                              title="Save"
+                            >
+                              <Check size={16} />
+                            </button>
+                            <button
+                              onClick={() => setEditingTeamId(null)}
+                              className="p-1 rounded text-gray-400 hover:bg-gray-100 transition-colors"
+                              title="Cancel"
+                            >
+                              <X size={16} />
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="flex items-center gap-1.5 group">
+                            <h3 className="font-display text-lg font-bold uppercase tracking-wide text-charcoal">
+                              {team.team_name}
+                            </h3>
+                            <button
+                              onClick={() => {
+                                setEditingTeamId(team.id);
+                                setEditingTeamName(team.team_name);
+                              }}
+                              className="p-1 rounded text-gray-300 opacity-0 group-hover:opacity-100 hover:text-flag-blue hover:bg-flag-blue/5 transition-all"
+                              title="Rename team"
+                            >
+                              <Pencil size={14} />
+                            </button>
+                          </div>
+                        )}
                         <span className="inline-block px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide bg-flag-blue/10 text-flag-blue">
                           {team.division}
                         </span>
