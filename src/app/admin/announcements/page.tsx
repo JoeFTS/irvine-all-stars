@@ -2,7 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { Pencil, Trash2, X } from "lucide-react";
+import { Pencil, Trash2, X, CheckCircle2 } from "lucide-react";
 
 interface Announcement {
   id: string;
@@ -38,6 +38,8 @@ export default function AnnouncementsPage() {
   const [division, setDivision] = useState("");
   const [submitting, setSubmitting] = useState(false);
   const [formError, setFormError] = useState("");
+
+  const [successMessage, setSuccessMessage] = useState("");
 
   // Edit mode
   const [editingId, setEditingId] = useState<string | null>(null);
@@ -151,8 +153,11 @@ export default function AnnouncementsPage() {
       setAnnouncements((prev) => [data, ...prev]);
     }
 
+    const msg = editingId ? "Announcement updated!" : "Announcement posted!";
     resetForm();
     setSubmitting(false);
+    setSuccessMessage(msg);
+    setTimeout(() => setSuccessMessage(""), 4000);
   }
 
   async function handleDelete(id: string) {
@@ -302,6 +307,14 @@ export default function AnnouncementsPage() {
           </button>
         </form>
       </div>
+
+      {/* Success Banner */}
+      {successMessage && (
+        <div className="mb-4 bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
+          <CheckCircle2 size={20} className="text-green-600 shrink-0" />
+          <p className="text-sm font-semibold text-green-700">{successMessage}</p>
+        </div>
+      )}
 
       {/* Announcements List */}
       <h2 className="font-display text-lg font-bold uppercase tracking-wide mb-4">
