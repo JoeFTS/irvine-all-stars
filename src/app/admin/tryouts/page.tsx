@@ -1096,12 +1096,13 @@ export default function TryoutsPage() {
                             </span>
                           )}
                           {emailSentIds.has(reg.id) && (
-                            reg.status === "not_selected" ? (
-                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-gray-100 text-gray-500 border border-gray-300">
-                                <Mail size={10} />
-                                Email Sent
-                              </span>
-                            ) : acceptedRegIds.has(reg.id) ? (
+                            <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-gray-100 text-gray-500 border border-gray-300">
+                              <Mail size={10} />
+                              Email Sent
+                            </span>
+                          )}
+                          {(reg.status === "selected" || reg.status === "alternate") && emailSentIds.has(reg.id) && (
+                            acceptedRegIds.has(reg.id) ? (
                               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-green-100 text-green-700 border border-green-300">
                                 <Check size={10} />
                                 Accepted
