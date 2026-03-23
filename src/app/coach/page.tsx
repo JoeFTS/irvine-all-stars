@@ -42,7 +42,7 @@ interface PlayerContract {
 }
 
 interface CoachCert {
-  certification_type: string;
+  cert_type: string;
 }
 
 interface TournamentAgreement {
@@ -136,7 +136,7 @@ export default function CoachDashboardPage() {
           // 5. Coach certifications
           supabase
             .from("coach_certifications")
-            .select("certification_type")
+            .select("cert_type")
             .eq("coach_id", user.id),
 
           // 6. Tournament agreements
@@ -208,7 +208,7 @@ export default function CoachDashboardPage() {
   const missingPhoto = registrations.filter((r) => !hasPhoto.has(r.id)).length;
   const missingContract = registrations.filter((r) => !hasContract.has(r.id)).length;
 
-  const certTypes = new Set(coachCerts.map((c) => c.certification_type));
+  const certTypes = new Set(coachCerts.map((c) => c.cert_type));
   const hasConcussion = certTypes.has("concussion");
   const hasCardiac = certTypes.has("cardiac_arrest");
   const hasTournamentAck = tournamentAgreements.length > 0;

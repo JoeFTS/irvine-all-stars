@@ -226,7 +226,7 @@ export default function SummaryPage() {
                         <div className="font-display text-xl font-bold text-flag-blue leading-none">
                           {total}
                         </div>
-                        <div className="text-[10px] text-gray-400">/ 30</div>
+                        <div className="text-[10px] text-gray-400">/ 54</div>
                       </div>
                       <button
                         onClick={() => editPlayer(i)}

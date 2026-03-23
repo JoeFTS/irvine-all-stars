@@ -422,9 +422,21 @@ export default function CertificationsPage() {
                       Concussion Certificate
                     </p>
                     {ac.concussion_cert_path ? (
-                      <div className="text-sm text-green-700 bg-green-50 rounded-lg p-3 flex items-center gap-2">
+                      <div className="bg-green-50 rounded-lg p-3 flex items-center gap-3">
                         <CheckCircle2 size={16} className="text-green-600 shrink-0" />
-                        Uploaded{ac.concussion_cert_name && <> ({ac.concussion_cert_name})</>}
+                        <span className="text-sm text-green-700 flex-1 min-w-0 truncate">
+                          Uploaded{ac.concussion_cert_name && <> ({ac.concussion_cert_name})</>}
+                        </span>
+                        <button
+                          onClick={async () => {
+                            if (!supabase) return;
+                            const { data } = await supabase.storage.from("player-documents").createSignedUrl(ac.concussion_cert_path!, 300);
+                            if (data?.signedUrl) window.open(data.signedUrl, "_blank");
+                          }}
+                          className="px-3 py-1.5 rounded-lg text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors shrink-0"
+                        >
+                          View / Print
+                        </button>
                       </div>
                     ) : (
                       <FileUpload
@@ -445,9 +457,21 @@ export default function CertificationsPage() {
                       Cardiac Arrest Certificate
                     </p>
                     {ac.cardiac_cert_path ? (
-                      <div className="text-sm text-green-700 bg-green-50 rounded-lg p-3 flex items-center gap-2">
+                      <div className="bg-green-50 rounded-lg p-3 flex items-center gap-3">
                         <CheckCircle2 size={16} className="text-green-600 shrink-0" />
-                        Uploaded{ac.cardiac_cert_name && <> ({ac.cardiac_cert_name})</>}
+                        <span className="text-sm text-green-700 flex-1 min-w-0 truncate">
+                          Uploaded{ac.cardiac_cert_name && <> ({ac.cardiac_cert_name})</>}
+                        </span>
+                        <button
+                          onClick={async () => {
+                            if (!supabase) return;
+                            const { data } = await supabase.storage.from("player-documents").createSignedUrl(ac.cardiac_cert_path!, 300);
+                            if (data?.signedUrl) window.open(data.signedUrl, "_blank");
+                          }}
+                          className="px-3 py-1.5 rounded-lg text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors shrink-0"
+                        >
+                          View / Print
+                        </button>
                       </div>
                     ) : (
                       <FileUpload
