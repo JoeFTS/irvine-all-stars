@@ -61,6 +61,7 @@ interface Registration {
   parent_code_of_conduct: boolean;
   status: Status;
   submitted_at: string;
+  selection_email_sent_at: string | null;
 }
 
 interface TryoutSession {
@@ -193,7 +194,8 @@ export default function TryoutsPage() {
   const [bulkSelectedIds, setBulkSelectedIds] = useState<Set<string>>(new Set());
   const [bulkUpdating, setBulkUpdating] = useState(false);
   const [bulkProgress, setBulkProgress] = useState({ done: 0, total: 0, emailsSent: 0, emailsFailed: 0 });
-  const [emailSentIds, setEmailSentIds] = useState<Set<string>>(new Set());
+  // Derived: IDs where selection email has been sent (persisted in DB)
+  const emailSentIds = new Set(registrations.filter((r) => r.selection_email_sent_at).map((r) => r.id));
 
   // Sessions tab state
   const [sessionDivisionFilter, setSessionDivisionFilter] = useState<string>("all");
@@ -316,8 +318,15 @@ export default function TryoutsPage() {
           parent_email: reg.parent_email,
         }),
       });
-      if (res.ok) {
-        setEmailSentIds((prev) => new Set([...prev, id]));
+      if (res.ok && supabase) {
+        const now = new Date().toISOString();
+        await supabase
+          .from("tryout_registrations")
+          .update({ selection_email_sent_at: now })
+          .eq("id", id);
+        setRegistrations((prev) =>
+          prev.map((r) => (r.id === id ? { ...r, selection_email_sent_at: now } : r))
+        );
       }
     } catch {
       // silent
@@ -410,7 +419,16 @@ export default function TryoutsPage() {
           });
           if (res.ok) {
             emailsSent++;
-            setEmailSentIds((prev) => new Set([...prev, id]));
+            if (supabase) {
+              const now = new Date().toISOString();
+              await supabase
+                .from("tryout_registrations")
+                .update({ selection_email_sent_at: now })
+                .eq("id", id);
+              setRegistrations((prev) =>
+                prev.map((r) => (r.id === id ? { ...r, selection_email_sent_at: now } : r))
+              );
+            }
           } else emailsFailed++;
         } catch {
           emailsFailed++;
@@ -1077,8 +1095,13 @@ export default function TryoutsPage() {
                               Coach Pick
                             </span>
                           )}
-                          {(reg.status === "selected" || reg.status === "alternate") && emailSentIds.has(reg.id) && (
-                            acceptedRegIds.has(reg.id) ? (
+                          {emailSentIds.has(reg.id) && (
+                            reg.status === "not_selected" ? (
+                              <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-gray-100 text-gray-500 border border-gray-300">
+                                <Mail size={10} />
+                                Email Sent
+                              </span>
+                            ) : acceptedRegIds.has(reg.id) ? (
                               <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-green-100 text-green-700 border border-green-300">
                                 <Check size={10} />
                                 Accepted
