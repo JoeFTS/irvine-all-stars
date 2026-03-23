@@ -479,21 +479,9 @@ export default function TeamsPage() {
                             </button>
                           </div>
                         ) : (
-                          <div className="flex items-center gap-1.5 group">
-                            <h3 className="font-display text-lg font-bold uppercase tracking-wide text-charcoal">
-                              {team.team_name}
-                            </h3>
-                            <button
-                              onClick={() => {
-                                setEditingTeamId(team.id);
-                                setEditingTeamName(team.team_name);
-                              }}
-                              className="p-1 rounded text-gray-300 opacity-0 group-hover:opacity-100 hover:text-flag-blue hover:bg-flag-blue/5 transition-all"
-                              title="Rename team"
-                            >
-                              <Pencil size={14} />
-                            </button>
-                          </div>
+                          <h3 className="font-display text-lg font-bold uppercase tracking-wide text-charcoal">
+                            {team.team_name}
+                          </h3>
                         )}
                         <span className="inline-block px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide bg-flag-blue/10 text-flag-blue">
                           {team.division}
@@ -522,8 +510,18 @@ export default function TeamsPage() {
                       </div>
                     </div>
 
-                    {/* Delete Button */}
-                    <div className="shrink-0">
+                    {/* Edit / Delete Buttons */}
+                    <div className="shrink-0 flex items-center gap-1">
+                      <button
+                        onClick={() => {
+                          setEditingTeamId(team.id);
+                          setEditingTeamName(team.team_name);
+                        }}
+                        className="p-2 rounded-lg text-gray-300 hover:text-flag-blue hover:bg-flag-blue/5 transition-colors"
+                        title="Rename team"
+                      >
+                        <Pencil size={16} />
+                      </button>
                       {deletingId === team.id ? (
                         <div className="flex items-center gap-2">
                           <span className="text-xs text-flag-red font-semibold">Delete?</span>
