@@ -232,7 +232,7 @@ export default function AdminDashboard() {
         </Link>
 
         <Link
-          href="/admin/registrations"
+          href="/admin/tryouts"
           className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
         >
           <p className="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-1">
@@ -325,7 +325,7 @@ export default function AdminDashboard() {
               Recent Registrations
             </h2>
             <Link
-              href="/admin/registrations"
+              href="/admin/tryouts"
               className="text-flag-blue text-sm font-semibold hover:underline"
             >
               View All
