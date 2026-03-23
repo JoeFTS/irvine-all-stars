@@ -63,7 +63,7 @@ export default function CoachUpdatesPage() {
 
       <div className="space-y-6">
         {/* Important Links */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
           <h2 className="font-display text-xl font-bold uppercase tracking-wide text-charcoal mb-4">
             Important Links
           </h2>
@@ -72,7 +72,7 @@ export default function CoachUpdatesPage() {
               href="https://west.pony.org"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 text-flag-blue font-semibold hover:underline"
+              className="flex items-center gap-2 text-flag-blue font-semibold hover:underline py-2 min-h-[44px]"
             >
               All-Star Tournament Updates
               <ExternalLink size={16} />
@@ -84,7 +84,7 @@ export default function CoachUpdatesPage() {
               href="https://www.pony.org/rules"
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center gap-2 text-flag-blue font-semibold hover:underline"
+              className="flex items-center gap-2 text-flag-blue font-semibold hover:underline py-2 min-h-[44px]"
             >
               PONY Baseball Rules
               <ExternalLink size={16} />
@@ -93,7 +93,7 @@ export default function CoachUpdatesPage() {
         </div>
 
         {/* Season Overview */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
             <Calendar size={20} className="text-flag-blue" />
             <h2 className="font-display text-xl font-bold uppercase tracking-wide text-charcoal">
@@ -129,7 +129,7 @@ export default function CoachUpdatesPage() {
         </div>
 
         {/* Rules of Note */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
             <AlertTriangle size={20} className="text-star-gold" />
             <h2 className="font-display text-xl font-bold uppercase tracking-wide text-charcoal">
@@ -159,7 +159,7 @@ export default function CoachUpdatesPage() {
         </div>
 
         {/* Uniform Info */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
             <Shirt size={20} className="text-flag-blue" />
             <h2 className="font-display text-xl font-bold uppercase tracking-wide text-charcoal">
@@ -183,7 +183,7 @@ export default function CoachUpdatesPage() {
         </div>
 
         {/* Announcements Feed */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
             <Info size={20} className="text-flag-blue" />
             <h2 className="font-display text-xl font-bold uppercase tracking-wide text-charcoal">

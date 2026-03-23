@@ -184,7 +184,7 @@ export default function TournamentRulesPage() {
             <button
               key={div.key}
               onClick={() => setActiveDivision(div.key)}
-              className={`relative px-4 py-2.5 rounded-lg text-sm font-semibold transition-colors border ${
+              className={`relative px-4 py-3 sm:py-2.5 min-h-[44px] rounded-lg text-sm font-semibold transition-colors border ${
                 isActive
                   ? "bg-flag-blue text-white border-flag-blue"
                   : "bg-white text-charcoal border-gray-200 hover:border-flag-blue hover:text-flag-blue"
@@ -215,7 +215,7 @@ export default function TournamentRulesPage() {
                 {COMMON_RULES.title}
               </h2>
             </div>
-            <div className="px-6 py-5 space-y-5">
+            <div className="px-4 sm:px-6 py-5 space-y-5">
               {COMMON_RULES.sections.map((section) => (
                 <div key={section.heading}>
                   <h3 className="font-display text-sm font-bold uppercase tracking-wider text-charcoal mb-2">
@@ -271,7 +271,7 @@ export default function TournamentRulesPage() {
                 {DIVISIONS.find((d) => d.key === activeDivision)?.label} Rules
               </h2>
             </div>
-            <div className="px-6 py-5 space-y-4">
+            <div className="px-4 sm:px-6 py-5 space-y-4">
               {/* Division note */}
               <div className="bg-blue-50 border-l-4 border-flag-blue rounded-r-lg p-4">
                 <p className="text-sm text-charcoal font-medium leading-relaxed">
@@ -306,7 +306,7 @@ export default function TournamentRulesPage() {
                 Acknowledgment
               </h2>
             </div>
-            <div className="px-6 py-5">
+            <div className="px-4 sm:px-6 py-5">
               {existingAgreement ? (
                 <div className="flex items-center gap-3 bg-green-50 border border-green-200 rounded-lg p-4">
                   <CheckCircle2 className="text-green-600 shrink-0" size={24} />
@@ -355,7 +355,7 @@ export default function TournamentRulesPage() {
                       value={coachName}
                       onChange={(e) => setCoachName(e.target.value)}
                       placeholder="e.g. John Smith"
-                      className="w-full rounded-lg border border-gray-300 px-4 py-2.5 text-sm text-charcoal placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-flag-blue focus:border-transparent"
+                      className="w-full rounded-lg border border-gray-300 px-4 py-3 sm:py-2.5 min-h-[44px] text-sm text-charcoal placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-flag-blue focus:border-transparent"
                     />
                   </div>
 
@@ -363,7 +363,7 @@ export default function TournamentRulesPage() {
                   <button
                     onClick={handleSubmit}
                     disabled={!checked || !coachName.trim() || submitting}
-                    className="w-full sm:w-auto px-6 py-3 bg-flag-blue text-white font-display font-bold uppercase tracking-wider text-sm rounded-lg hover:bg-flag-blue/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="w-full sm:w-auto px-6 py-3 min-h-[44px] bg-flag-blue text-white font-display font-bold uppercase tracking-wider text-sm rounded-lg hover:bg-flag-blue/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {submitting ? "Submitting..." : "Acknowledge Rules"}
                   </button>

@@ -174,7 +174,7 @@ function DocBadge({
 }) {
   const badge = ok ? (
     <span
-      className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-green-100 text-green-700 ${
+      className={`inline-flex items-center gap-1 px-2 py-1 min-h-[44px] rounded-full text-xs font-semibold bg-green-100 text-green-700 ${
         onClick ? "cursor-pointer hover:bg-green-200 transition-colors" : ""
       }`}
       onClick={onClick}
@@ -512,7 +512,7 @@ export default function CoachRosterPage() {
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-gray-200 rounded w-56" />
           <div className="h-6 bg-gray-200 rounded w-80" />
-          <div className="grid grid-cols-3 gap-4">
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[1, 2, 3].map((i) => (
               <div key={i} className="h-20 bg-gray-200 rounded-lg" />
             ))}
@@ -542,7 +542,7 @@ export default function CoachRosterPage() {
       </div>
 
       {/* ---- Summary Stats ---- */}
-      <div className="grid grid-cols-3 gap-3 md:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
         <StatCard label="Total Players" value={totalPlayers} accent="blue" />
         <StatCard label="Tournament Ready" value={readyCount} accent="green" />
         <StatCard
@@ -563,7 +563,7 @@ export default function CoachRosterPage() {
                 key={div}
                 type="button"
                 onClick={() => setSelectedDivision(div)}
-                className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide border transition-colors ${
+                className={`px-3 py-2 min-h-[44px] rounded-full text-xs font-semibold uppercase tracking-wide border transition-colors ${
                   active
                     ? "bg-flag-blue text-white border-flag-blue"
                     : "bg-white text-gray-600 border-gray-200 hover:border-gray-400 hover:text-charcoal"

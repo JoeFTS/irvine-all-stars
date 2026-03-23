@@ -728,11 +728,11 @@ export default function PortalPage() {
                                   </p>
                                 </div>
                               </div>
-                              <div className="flex gap-3 pl-11">
+                              <div className="flex flex-col sm:flex-row gap-3 pl-0 sm:pl-11">
                                 <button
                                   onClick={() => acceptSelection(item.acceptAction!)}
                                   disabled={acceptingId === item.acceptAction}
-                                  className="bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white px-5 py-2.5 rounded font-display text-xs font-semibold uppercase tracking-widest transition-colors"
+                                  className="w-full sm:w-auto bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white px-5 py-3 sm:py-2.5 rounded font-display text-xs font-semibold uppercase tracking-widest transition-colors min-h-[44px]"
                                 >
                                   {acceptingId === item.acceptAction ? "Accepting..." : "Accept Spot"}
                                 </button>
@@ -742,7 +742,7 @@ export default function PortalPage() {
                                       alert("Please contact AllStars@irvinepony.com to formally decline the selection.");
                                     }
                                   }}
-                                  className="border border-gray-300 hover:border-gray-400 text-gray-600 px-5 py-2.5 rounded font-display text-xs font-semibold uppercase tracking-widest transition-colors"
+                                  className="w-full sm:w-auto border border-gray-300 hover:border-gray-400 text-gray-600 px-5 py-3 sm:py-2.5 rounded font-display text-xs font-semibold uppercase tracking-widest transition-colors min-h-[44px]"
                                 >
                                   Decline
                                 </button>
@@ -884,7 +884,7 @@ export default function PortalPage() {
             Important Links
           </h2>
 
-          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3">
+          <div className="grid grid-cols-1 sm:grid-cols-3 lg:grid-cols-5 gap-3">
             {quickLinks.map((link) => (
               <Link
                 key={link.label}

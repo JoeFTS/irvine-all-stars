@@ -122,23 +122,24 @@ export default function ContractViewPage() {
   return (
     <div className="min-h-screen bg-gray-100 print:bg-white">
       {/* Print Button */}
-      <div className="no-print sticky top-0 z-10 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between">
-        <h1 className="font-display text-sm font-bold uppercase tracking-wider text-flag-blue">
+      <div className="no-print sticky top-0 z-10 bg-white border-b border-gray-200 px-4 py-3 flex items-center justify-between gap-2">
+        <h1 className="font-display text-sm font-bold uppercase tracking-wider text-flag-blue truncate">
           Player Contract
         </h1>
         <button
           onClick={() => window.print()}
-          className="flex items-center gap-2 px-4 py-2 bg-flag-blue text-white rounded-lg text-sm font-semibold hover:bg-flag-blue/90 transition-colors"
+          className="flex items-center gap-2 px-4 py-2 bg-flag-blue text-white rounded-lg text-sm font-semibold hover:bg-flag-blue/90 transition-colors shrink-0 min-h-[44px]"
         >
           <Printer size={16} />
-          Print / Save as PDF
+          <span className="hidden sm:inline">Print / Save as PDF</span>
+          <span className="sm:hidden">Print</span>
         </button>
       </div>
 
       {/* Contract Document */}
-      <div className="max-w-[800px] mx-auto my-6 print:my-0 bg-white shadow-lg print:shadow-none">
+      <div className="max-w-[800px] mx-auto my-4 sm:my-6 mx-2 sm:mx-auto print:my-0 bg-white shadow-lg print:shadow-none">
         {/* Header */}
-        <div className="bg-flag-blue text-white px-8 py-6 print:py-5">
+        <div className="bg-flag-blue text-white px-4 sm:px-8 py-6 print:py-5">
           <h1 className="font-display text-2xl font-bold uppercase tracking-wider text-center">
             Irvine Pony Baseball
           </h1>
@@ -150,7 +151,7 @@ export default function ContractViewPage() {
         {/* Gold stripe */}
         <div className="h-1.5 bg-star-gold" />
 
-        <div className="px-8 py-6 print:px-6 print:py-4">
+        <div className="px-4 sm:px-8 py-6 print:px-6 print:py-4">
           {/* Player Info */}
           <div className="mb-6 pb-4 border-b-2 border-gray-100">
             <div className="flex flex-wrap items-baseline gap-x-6 gap-y-2">

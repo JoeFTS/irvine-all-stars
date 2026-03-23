@@ -19,7 +19,7 @@ export default function Home() {
       <section className="relative min-h-screen flex items-center pt-[98px] pb-20 overflow-hidden">
         {/* Background image */}
         <Image
-          src="/images/hero-aerial.png"
+          src="/images/hero-aerial.webp"
           alt="Aerial view of a baseball diamond at golden hour"
           fill
           className="object-cover"
@@ -280,7 +280,7 @@ export default function Home() {
       {/* ===== CTA ===== */}
       <section className="relative py-24 px-6 md:px-10 text-center overflow-hidden">
         <Image
-          src="/images/hero-aerial.png"
+          src="/images/hero-aerial.webp"
           alt=""
           fill
           className="object-cover"

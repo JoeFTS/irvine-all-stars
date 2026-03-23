@@ -1,5 +1,5 @@
 {
-  "timestamp": "2026-03-23T03:58:48.846Z",
+  "timestamp": "2026-03-23T04:01:23.318Z",
   "routes": {
     "pass": 43,
     "fail": 0,
@@ -266,23 +266,23 @@
     ]
   },
   "apis": {
-    "pass": 2,
-    "fail": 2,
+    "pass": 4,
+    "fail": 0,
     "total": 4,
     "results": [
       {
         "path": "/api/medical-release-sheet",
         "method": "GET",
         "expected": 401,
-        "actual": 400,
-        "pass": false
+        "actual": 401,
+        "pass": true
       },
       {
         "path": "/api/score-sheet",
         "method": "GET",
         "expected": 401,
-        "actual": 400,
-        "pass": false
+        "actual": 401,
+        "pass": true
       },
       {
         "path": "/api/send-selection",

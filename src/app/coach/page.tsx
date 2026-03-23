@@ -275,7 +275,7 @@ export default function CoachDashboardPage() {
       </div>
 
       {/* 1. Your Team Card */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
+      <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
         <p className="text-xs font-bold text-flag-red uppercase tracking-[2px] mb-1">
           Your Team
         </p>
@@ -297,7 +297,7 @@ export default function CoachDashboardPage() {
       </div>
 
       {/* 2. Compliance Progress */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
+      <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
         <h3 className="font-display text-lg font-bold uppercase tracking-wide text-flag-blue mb-3">
           Compliance Progress
         </h3>
@@ -331,7 +331,7 @@ export default function CoachDashboardPage() {
 
       {/* 3. Action Items */}
       <div
-        className={`bg-white border rounded-lg p-6 ${
+        className={`bg-white border rounded-lg p-4 sm:p-6 ${
           division
             ? allClear
               ? "border-l-4 border-l-green-500 border-gray-200"
@@ -359,7 +359,7 @@ export default function CoachDashboardPage() {
               <li key={i}>
                 <Link
                   href={item.href}
-                  className="flex items-center justify-between group hover:bg-gray-50 -mx-2 px-2 py-1.5 rounded-lg transition-colors"
+                  className="flex items-center justify-between group hover:bg-gray-50 -mx-2 px-2 py-2.5 min-h-[44px] rounded-lg transition-colors"
                 >
                   <span className="flex items-center gap-2 text-gray-700">
                     <AlertCircle size={18} className="text-flag-red shrink-0" />
@@ -386,7 +386,7 @@ export default function CoachDashboardPage() {
       </div>
 
       {/* 4. Upcoming */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
+      <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
         <h3 className="font-display text-lg font-bold uppercase tracking-wide text-flag-blue mb-3">
           Upcoming
         </h3>
@@ -414,7 +414,7 @@ export default function CoachDashboardPage() {
 
       {/* 5. Announcements (if any) */}
       {announcements.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
           <h3 className="font-display text-lg font-bold uppercase tracking-wide text-flag-blue mb-3">
             Latest Announcements
           </h3>
@@ -448,7 +448,7 @@ export default function CoachDashboardPage() {
               <Link
                 key={link.href}
                 href={link.href}
-                className="bg-white border border-gray-200 rounded-lg p-5 flex items-center gap-4 hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+                className="bg-white border border-gray-200 rounded-lg p-4 sm:p-5 flex items-center gap-4 min-h-[56px] hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
               >
                 <div className="bg-flag-blue/10 text-flag-blue p-2.5 rounded-lg">
                   <Icon size={22} />

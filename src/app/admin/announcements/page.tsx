@@ -357,7 +357,7 @@ export default function AnnouncementsPage() {
                 <div className="flex items-center gap-1 shrink-0">
                   <button
                     onClick={() => startEdit(ann)}
-                    className="p-2 text-gray-400 hover:text-flag-blue transition-colors rounded-lg hover:bg-gray-100"
+                    className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-400 hover:text-flag-blue transition-colors rounded-lg hover:bg-gray-100"
                     title="Edit"
                   >
                     <Pencil size={16} />
@@ -381,7 +381,7 @@ export default function AnnouncementsPage() {
                   ) : (
                     <button
                       onClick={() => setDeletingId(ann.id)}
-                      className="p-2 text-gray-400 hover:text-flag-red transition-colors rounded-lg hover:bg-gray-100"
+                      className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-400 hover:text-flag-red transition-colors rounded-lg hover:bg-gray-100"
                       title="Delete"
                     >
                       <Trash2 size={16} />

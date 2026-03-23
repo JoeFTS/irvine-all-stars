@@ -175,8 +175,8 @@ export default function AdminDocumentsPage() {
               (d) => d.document_type === "insurance_certificate"
             );
             return doc ? (
-              <div className="flex items-center gap-3">
-                <div className="flex-1 min-w-0">
+              <div className="flex flex-wrap items-center gap-3">
+                <div className="flex-1 min-w-0 w-full sm:w-auto">
                   <p className="text-xs text-gray-500 truncate">
                     {doc.file_name}
                   </p>
@@ -189,7 +189,7 @@ export default function AdminDocumentsPage() {
                   onClick={() =>
                     handleViewTeamDoc(doc.file_path, doc.file_name)
                   }
-                  className="px-3 py-1.5 rounded-lg text-xs font-semibold text-flag-blue bg-flag-blue/5 hover:bg-flag-blue/10 transition-colors"
+                  className="px-3 py-2 min-h-[44px] rounded-lg text-xs font-semibold text-flag-blue bg-flag-blue/5 hover:bg-flag-blue/10 transition-colors"
                 >
                   View
                 </button>
@@ -280,8 +280,8 @@ export default function AdminDocumentsPage() {
                   {selectedRulesDivision}
                 </p>
                 {doc ? (
-                  <div className="flex items-center gap-3">
-                    <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-3">
+                    <div className="flex-1 min-w-0 w-full sm:w-auto">
                       <p className="text-xs text-gray-600 truncate">{doc.file_name}</p>
                       <p className="text-[10px] text-gray-400">
                         Uploaded {new Date(doc.created_at).toLocaleDateString()}
@@ -289,7 +289,7 @@ export default function AdminDocumentsPage() {
                     </div>
                     <button
                       onClick={() => handleViewTeamDoc(doc.file_path, doc.file_name)}
-                      className="px-3 py-1.5 rounded-lg text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors shrink-0"
+                      className="px-3 py-2 min-h-[44px] rounded-lg text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors shrink-0"
                     >
                       View
                     </button>

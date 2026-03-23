@@ -921,10 +921,10 @@ export default function TryoutsPage() {
           </div>
 
           {/* Bulk Action Bar */}
-          <div className="flex flex-wrap items-center gap-3 mb-3">
+          <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3">
             <button
               onClick={toggleSelectAllFiltered}
-              className="flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wide border border-gray-200 text-gray-600 hover:bg-gray-100 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 min-h-[44px] rounded text-xs font-semibold uppercase tracking-wide border border-gray-200 text-gray-600 hover:bg-gray-100 transition-colors"
             >
               {filteredPlayers.length > 0 && filteredPlayers.every((r) => bulkSelectedIds.has(r.id))
                 ? <><CheckSquare size={14} /> Deselect All</>
@@ -1171,7 +1171,7 @@ export default function TryoutsPage() {
 
                         {/* Send Email — only for selected/alternate/not_selected */}
                         {(reg.status === "selected" || reg.status === "not_selected" || reg.status === "alternate") && (
-                          <div className="flex items-center gap-3 bg-flag-blue/5 border border-flag-blue/10 rounded-lg p-3">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-3 bg-flag-blue/5 border border-flag-blue/10 rounded-lg p-3">
                             <div className="flex-1">
                               <p className="text-sm font-semibold text-charcoal">
                                 Notify Parent
@@ -1795,8 +1795,11 @@ export default function TryoutsPage() {
                                       <span className="text-sm font-semibold text-charcoal">
                                         {player.player_first_name} {player.player_last_name}
                                       </span>
-                                      <span className="text-xs text-gray-400 ml-2">
+                                      <span className="text-xs text-gray-400 ml-2 hidden sm:inline">
                                         ({player.parent_name} &middot; {player.parent_email})
+                                      </span>
+                                      <span className="block text-xs text-gray-400 sm:hidden truncate">
+                                        {player.parent_name} &middot; {player.parent_email}
                                       </span>
                                     </div>
                                     {isInvited ? (

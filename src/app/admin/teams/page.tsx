@@ -519,7 +519,7 @@ export default function TeamsPage() {
                           setEditingTeamId(team.id);
                           setEditingTeamName(team.team_name);
                         }}
-                        className="p-2 rounded-lg text-gray-300 hover:text-flag-blue hover:bg-flag-blue/5 transition-colors"
+                        className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-gray-300 hover:text-flag-blue hover:bg-flag-blue/5 transition-colors"
                         title="Rename team"
                       >
                         <Pencil size={16} />
@@ -543,7 +543,7 @@ export default function TeamsPage() {
                       ) : (
                         <button
                           onClick={() => setDeletingId(team.id)}
-                          className="p-2 rounded-lg text-gray-300 hover:text-flag-red hover:bg-flag-red/5 transition-colors"
+                          className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-gray-300 hover:text-flag-red hover:bg-flag-red/5 transition-colors"
                           title="Delete team"
                         >
                           <Trash2 size={16} />

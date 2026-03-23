@@ -303,13 +303,13 @@ export default function CoachScoresPage() {
       )}
 
       {/* Step 1: Download Template */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6 mb-4">
-        <div className="flex items-start gap-4">
+      <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 mb-4">
+        <div className="flex items-start gap-3 sm:gap-4">
           <div className="w-10 h-10 rounded-full bg-flag-blue text-white font-display text-lg font-bold flex items-center justify-center shrink-0">
             1
           </div>
-          <div className="flex-1">
-            <h2 className="font-display text-lg font-bold uppercase tracking-wide mb-2">
+          <div className="flex-1 min-w-0">
+            <h2 className="font-display text-base sm:text-lg font-bold uppercase tracking-wide mb-2">
               Download the Score Sheet
             </h2>
             <p className="text-gray-500 text-sm mb-4">
@@ -319,7 +319,7 @@ export default function CoachScoresPage() {
             <a
               href={`/api/score-sheet?division=${encodeURIComponent(division)}`}
               download
-              className="inline-flex items-center gap-2 bg-flag-blue text-white px-5 py-2.5 rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors"
+              className="inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-flag-blue text-white px-5 py-3 sm:py-2.5 min-h-[44px] rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors"
             >
               <Download size={16} />
               Download Score Sheet
@@ -329,13 +329,13 @@ export default function CoachScoresPage() {
       </div>
 
       {/* Step 2: Fill in scores */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6 mb-4">
-        <div className="flex items-start gap-4">
+      <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 mb-4">
+        <div className="flex items-start gap-3 sm:gap-4">
           <div className="w-10 h-10 rounded-full bg-flag-blue text-white font-display text-lg font-bold flex items-center justify-center shrink-0">
             2
           </div>
-          <div className="flex-1">
-            <h2 className="font-display text-lg font-bold uppercase tracking-wide mb-2">
+          <div className="flex-1 min-w-0">
+            <h2 className="font-display text-base sm:text-lg font-bold uppercase tracking-wide mb-2">
               Fill In Scores
             </h2>
             <p className="text-gray-500 text-sm mb-3">
@@ -378,13 +378,13 @@ export default function CoachScoresPage() {
       </div>
 
       {/* Step 3: Upload */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6">
-        <div className="flex items-start gap-4">
+      <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
+        <div className="flex items-start gap-3 sm:gap-4">
           <div className="w-10 h-10 rounded-full bg-flag-blue text-white font-display text-lg font-bold flex items-center justify-center shrink-0">
             3
           </div>
-          <div className="flex-1">
-            <h2 className="font-display text-lg font-bold uppercase tracking-wide mb-2">
+          <div className="flex-1 min-w-0">
+            <h2 className="font-display text-base sm:text-lg font-bold uppercase tracking-wide mb-2">
               Upload Your Completed File
             </h2>
             <p className="text-gray-500 text-sm mb-4">
@@ -412,7 +412,7 @@ export default function CoachScoresPage() {
                   <button
                     onClick={handleUpload}
                     disabled={uploading}
-                    className="inline-flex items-center gap-2 bg-flag-blue text-white px-5 py-2 rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors disabled:opacity-50"
+                    className="inline-flex items-center gap-2 bg-flag-blue text-white px-5 py-2.5 min-h-[44px] rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors disabled:opacity-50"
                   >
                     <Upload size={14} />
                     {uploading ? "Uploading..." : "Upload Scores"}
@@ -420,7 +420,7 @@ export default function CoachScoresPage() {
                   <button
                     onClick={handleClearFile}
                     disabled={uploading}
-                    className="inline-flex items-center gap-2 bg-gray-100 text-gray-600 px-4 py-2 rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-gray-200 transition-colors disabled:opacity-50"
+                    className="inline-flex items-center gap-2 bg-gray-100 text-gray-600 px-4 py-2.5 min-h-[44px] rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-gray-200 transition-colors disabled:opacity-50"
                   >
                     Replace File
                   </button>

@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Oswald, Barlow } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
@@ -16,6 +16,11 @@ const barlow = Barlow({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800"],
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+};
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://irvineallstars.com"),

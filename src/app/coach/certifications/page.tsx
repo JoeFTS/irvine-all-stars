@@ -241,8 +241,8 @@ export default function CertificationsPage() {
                 className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
               >
                 {/* Card Header */}
-                <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                  <h2 className="font-display text-lg font-bold uppercase tracking-wide text-charcoal">
+                <div className="px-4 sm:px-6 py-4 border-b border-gray-100 flex flex-wrap items-center justify-between gap-2">
+                  <h2 className="font-display text-base sm:text-lg font-bold uppercase tracking-wide text-charcoal">
                     {cfg.title}
                   </h2>
                   {cert ? (
@@ -259,7 +259,7 @@ export default function CertificationsPage() {
                 </div>
 
                 {/* Card Body */}
-                <div className="px-6 py-5 space-y-4">
+                <div className="px-4 sm:px-6 py-5 space-y-4">
                   <p className="text-sm text-gray-700 leading-relaxed">
                     {cfg.description}
                   </p>
@@ -287,7 +287,7 @@ export default function CertificationsPage() {
 
                   {/* Upload / View Area */}
                   {cert ? (
-                    <div className="bg-green-50 rounded-lg p-3 flex items-center gap-3">
+                    <div className="bg-green-50 rounded-lg p-3 flex flex-wrap items-center gap-3">
                       <CheckCircle2 size={16} className="text-green-600 shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p className="text-sm text-green-700">
@@ -306,7 +306,7 @@ export default function CertificationsPage() {
                           const { data } = await supabase.storage.from("player-documents").createSignedUrl(cert.cert_file_path, 300);
                           if (data?.signedUrl) window.open(data.signedUrl, "_blank");
                         }}
-                        className="px-3 py-1.5 rounded-lg text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors shrink-0"
+                        className="px-3 py-2 min-h-[44px] rounded-lg text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors shrink-0"
                       >
                         View / Print
                       </button>
@@ -357,13 +357,13 @@ export default function CertificationsPage() {
           </div>
 
           {showAddAssistant && (
-            <div className="flex items-center gap-3 mb-4">
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-3 mb-4">
               <input
                 type="text"
                 value={newAssistantName}
                 onChange={(e) => setNewAssistantName(e.target.value)}
                 placeholder="Assistant coach name"
-                className="flex-1 border border-gray-300 rounded-lg px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-flag-blue/50 focus:border-flag-blue"
+                className="flex-1 border border-gray-300 rounded-lg px-4 py-3 sm:py-2 min-h-[44px] text-sm focus:outline-none focus:ring-2 focus:ring-flag-blue/50 focus:border-flag-blue"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") addAssistant();
                 }}
@@ -371,7 +371,7 @@ export default function CertificationsPage() {
               <button
                 onClick={addAssistant}
                 disabled={!newAssistantName.trim()}
-                className="inline-flex items-center gap-1.5 bg-flag-blue text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-flag-blue/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center justify-center gap-1.5 bg-flag-blue text-white text-sm font-semibold px-4 py-3 sm:py-2 min-h-[44px] rounded-lg hover:bg-flag-blue/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <UserPlus size={16} />
                 Add
@@ -381,7 +381,7 @@ export default function CertificationsPage() {
                   setShowAddAssistant(false);
                   setNewAssistantName("");
                 }}
-                className="text-sm font-semibold text-gray-500 hover:text-gray-700 px-3 py-2"
+                className="text-sm font-semibold text-gray-500 hover:text-gray-700 px-3 py-3 sm:py-2 min-h-[44px]"
               >
                 Cancel
               </button>
@@ -401,13 +401,13 @@ export default function CertificationsPage() {
                 className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden"
               >
                 {/* Card Header */}
-                <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-                  <h3 className="font-display text-lg font-bold uppercase tracking-wide text-charcoal">
+                <div className="px-4 sm:px-6 py-4 border-b border-gray-100 flex flex-wrap items-center justify-between gap-2">
+                  <h3 className="font-display text-base sm:text-lg font-bold uppercase tracking-wide text-charcoal">
                     {ac.name}
                   </h3>
                   <button
                     onClick={() => removeAssistant(ac.id)}
-                    className="inline-flex items-center gap-1.5 text-flag-red text-xs font-semibold px-3 py-1.5 rounded-lg hover:bg-red-50 transition-colors"
+                    className="inline-flex items-center gap-1.5 text-flag-red text-xs font-semibold px-3 py-2 min-h-[44px] rounded-lg hover:bg-red-50 transition-colors"
                   >
                     <Trash2 size={14} />
                     Remove
@@ -415,14 +415,14 @@ export default function CertificationsPage() {
                 </div>
 
                 {/* Card Body */}
-                <div className="px-6 py-5 space-y-4">
+                <div className="px-4 sm:px-6 py-5 space-y-4">
                   {/* Concussion Cert */}
                   <div>
                     <p className="text-xs font-semibold text-gray-500 uppercase tracking-wider mb-2">
                       Concussion Certificate
                     </p>
                     {ac.concussion_cert_path ? (
-                      <div className="bg-green-50 rounded-lg p-3 flex items-center gap-3">
+                      <div className="bg-green-50 rounded-lg p-3 flex flex-wrap items-center gap-3">
                         <CheckCircle2 size={16} className="text-green-600 shrink-0" />
                         <span className="text-sm text-green-700 flex-1 min-w-0 truncate">
                           Uploaded{ac.concussion_cert_name && <> ({ac.concussion_cert_name})</>}
@@ -433,7 +433,7 @@ export default function CertificationsPage() {
                             const { data } = await supabase.storage.from("player-documents").createSignedUrl(ac.concussion_cert_path!, 300);
                             if (data?.signedUrl) window.open(data.signedUrl, "_blank");
                           }}
-                          className="px-3 py-1.5 rounded-lg text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors shrink-0"
+                          className="px-3 py-2 min-h-[44px] rounded-lg text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors shrink-0"
                         >
                           View / Print
                         </button>
@@ -457,7 +457,7 @@ export default function CertificationsPage() {
                       Cardiac Arrest Certificate
                     </p>
                     {ac.cardiac_cert_path ? (
-                      <div className="bg-green-50 rounded-lg p-3 flex items-center gap-3">
+                      <div className="bg-green-50 rounded-lg p-3 flex flex-wrap items-center gap-3">
                         <CheckCircle2 size={16} className="text-green-600 shrink-0" />
                         <span className="text-sm text-green-700 flex-1 min-w-0 truncate">
                           Uploaded{ac.cardiac_cert_name && <> ({ac.cardiac_cert_name})</>}
@@ -468,7 +468,7 @@ export default function CertificationsPage() {
                             const { data } = await supabase.storage.from("player-documents").createSignedUrl(ac.cardiac_cert_path!, 300);
                             if (data?.signedUrl) window.open(data.signedUrl, "_blank");
                           }}
-                          className="px-3 py-1.5 rounded-lg text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors shrink-0"
+                          className="px-3 py-2 min-h-[44px] rounded-lg text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors shrink-0"
                         >
                           View / Print
                         </button>

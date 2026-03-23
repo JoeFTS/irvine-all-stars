@@ -482,9 +482,9 @@ export default function BinderChecklistPage() {
             </div>
           ) : (
             <>
-              <div className="flex items-center gap-3 p-3 rounded-lg bg-gray-50">
+              <div className="flex flex-wrap items-center gap-3 p-3 rounded-lg bg-gray-50">
                 <FileText size={18} className="text-flag-blue shrink-0" />
-                <div className="flex-1">
+                <div className="flex-1 min-w-0">
                   <p className="text-sm font-semibold text-charcoal">
                     Pitching Log
                   </p>
@@ -496,7 +496,7 @@ export default function BinderChecklistPage() {
                 </div>
                 <Link
                   href="/coach/pitching-log"
-                  className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-2 min-h-[44px] w-full sm:w-auto justify-center rounded-md text-xs font-semibold bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
                 >
                   <Printer size={14} />
                   View &amp; Print Pitching Log
@@ -525,7 +525,7 @@ export default function BinderChecklistPage() {
           )}
         </div>
         <div className="p-5">
-          <div className={`flex items-center gap-3 p-3 rounded-lg ${tournamentRulesDoc ? "bg-green-50" : "bg-amber-50"}`}>
+          <div className={`flex flex-wrap items-center gap-3 p-3 rounded-lg ${tournamentRulesDoc ? "bg-green-50" : "bg-amber-50"}`}>
             {tournamentRulesDoc ? (
               <CheckCircle2 size={18} className="text-green-600 shrink-0" />
             ) : (
@@ -574,7 +574,7 @@ export default function BinderChecklistPage() {
           )}
         </div>
         <div className="p-5">
-          <div className={`flex items-center gap-3 p-3 rounded-lg ${insuranceDoc ? "bg-green-50" : "bg-amber-50"}`}>
+          <div className={`flex flex-wrap items-center gap-3 p-3 rounded-lg ${insuranceDoc ? "bg-green-50" : "bg-amber-50"}`}>
             {insuranceDoc ? (
               <CheckCircle2 size={18} className="text-green-600 shrink-0" />
             ) : (
@@ -639,13 +639,13 @@ export default function BinderChecklistPage() {
               return (
                 <div
                   key={reg.id}
-                  className={`flex items-center gap-3 px-5 py-3 ${statusBg(status)}`}
+                  className={`flex flex-wrap items-center gap-2 sm:gap-3 px-4 sm:px-5 py-3 ${statusBg(status)}`}
                 >
                   <StatusIcon status={status} />
-                  <span className="flex-1 text-sm text-charcoal">
+                  <span className="flex-1 min-w-0 text-sm text-charcoal truncate">
                     {reg.player_first_name} {reg.player_last_name}
                   </span>
-                  <span className="text-xs text-gray-400 mr-2">
+                  <span className="text-xs text-gray-400">
                     {divisionShortName(reg.division)}
                   </span>
                   <span
@@ -658,7 +658,7 @@ export default function BinderChecklistPage() {
                       href={`/medical-view?id=${reg.id}`}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="ml-1 px-2 py-1 rounded text-xs font-semibold text-flag-blue hover:bg-flag-blue/10 transition-colors"
+                      className="px-3 py-2 min-h-[44px] flex items-center rounded text-xs font-semibold text-flag-blue hover:bg-flag-blue/10 transition-colors"
                     >
                       View
                     </a>
@@ -676,11 +676,11 @@ export default function BinderChecklistPage() {
 
         {/* Download blank sign-off sheet */}
         {primaryDivision && (
-          <div className="px-5 py-3 border-t border-gray-100 flex items-center gap-3">
+          <div className="px-4 sm:px-5 py-3 border-t border-gray-100 flex flex-col sm:flex-row sm:items-center gap-3">
             <a
               href={`/api/medical-release-sheet?division=${encodeURIComponent(primaryDivision)}`}
               download
-              className="inline-flex items-center gap-2 px-4 py-2 bg-flag-blue text-white rounded-lg text-xs font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors"
+              className="inline-flex items-center justify-center gap-2 px-4 py-3 sm:py-2 min-h-[44px] w-full sm:w-auto bg-flag-blue text-white rounded-lg text-xs font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors"
             >
               <Download size={14} />
               Download Sign-Off Sheet
@@ -781,20 +781,20 @@ export default function BinderChecklistPage() {
               return (
                 <div
                   key={reg.id}
-                  className={`flex items-center gap-3 px-5 py-3 ${statusBg(status)}`}
+                  className={`flex flex-wrap items-center gap-2 sm:gap-3 px-4 sm:px-5 py-3 ${statusBg(status)}`}
                 >
                   <StatusIcon status={status} />
-                  <span className="flex-1 text-sm text-charcoal">
+                  <span className="flex-1 min-w-0 text-sm text-charcoal truncate">
                     {reg.player_first_name} {reg.player_last_name}
                   </span>
-                  <div className="flex items-center gap-2">
+                  <div className="flex flex-wrap items-center gap-2">
                     <span className="text-xs text-gray-400">
                       {divisionShortName(reg.division)}
                     </span>
                     {birthCert?.file_path && (
                       <button
                         onClick={() => handleViewDocument(birthCert.file_path!)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
+                        className="flex items-center gap-1.5 px-3 py-2 min-h-[44px] rounded-md text-xs font-semibold bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
                         title="View birth certificate"
                       >
                         <Eye size={14} />
@@ -804,7 +804,7 @@ export default function BinderChecklistPage() {
                     {photo?.file_path && (
                       <button
                         onClick={() => handleViewDocument(photo.file_path!)}
-                        className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
+                        className="flex items-center gap-1.5 px-3 py-2 min-h-[44px] rounded-md text-xs font-semibold bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
                         title="View player photo"
                       >
                         <Camera size={14} />
@@ -851,13 +851,13 @@ export default function BinderChecklistPage() {
           )}
         </div>
         <div className="p-5">
-          <div className={`flex items-center gap-3 p-3 rounded-lg ${concussionCert ? "bg-green-50" : "bg-red-50"}`}>
+          <div className={`flex flex-wrap items-center gap-3 p-3 rounded-lg ${concussionCert ? "bg-green-50" : "bg-red-50"}`}>
             {concussionCert ? (
               <CheckCircle2 size={18} className="text-green-600 shrink-0" />
             ) : (
               <XCircle size={18} className="text-flag-red shrink-0" />
             )}
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-charcoal">
                 Concussion Protocol Certificate
               </p>
@@ -910,13 +910,13 @@ export default function BinderChecklistPage() {
           )}
         </div>
         <div className="p-5">
-          <div className={`flex items-center gap-3 p-3 rounded-lg ${cardiacCert ? "bg-green-50" : "bg-red-50"}`}>
+          <div className={`flex flex-wrap items-center gap-3 p-3 rounded-lg ${cardiacCert ? "bg-green-50" : "bg-red-50"}`}>
             {cardiacCert ? (
               <CheckCircle2 size={18} className="text-green-600 shrink-0" />
             ) : (
               <XCircle size={18} className="text-flag-red shrink-0" />
             )}
-            <div className="flex-1">
+            <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-charcoal">
                 Sudden Cardiac Arrest Prevention Certificate
               </p>
@@ -994,7 +994,7 @@ export default function BinderChecklistPage() {
                       {allComplete ? "Complete" : "Incomplete"}
                     </span>
                   </div>
-                  <div className="ml-8 flex items-center gap-4 text-xs text-gray-500">
+                  <div className="ml-8 flex flex-wrap items-center gap-3 sm:gap-4 text-xs text-gray-500">
                     <span className="flex items-center gap-1">
                       {hasConcussion ? (
                         <>
@@ -1002,7 +1002,7 @@ export default function BinderChecklistPage() {
                           Concussion
                           <button
                             onClick={() => { if (ac.concussion_cert_path) handleViewDocument(ac.concussion_cert_path); }}
-                            className="ml-1 px-2 py-0.5 rounded text-[10px] font-semibold text-flag-blue bg-flag-blue/5 hover:bg-flag-blue/10 transition-colors"
+                            className="ml-1 px-2 py-1.5 min-h-[44px] flex items-center rounded text-[10px] font-semibold text-flag-blue bg-flag-blue/5 hover:bg-flag-blue/10 transition-colors"
                           >
                             View
                           </button>
@@ -1021,7 +1021,7 @@ export default function BinderChecklistPage() {
                           Cardiac Arrest
                           <button
                             onClick={() => { if (ac.cardiac_cert_path) handleViewDocument(ac.cardiac_cert_path); }}
-                            className="ml-1 px-2 py-0.5 rounded text-[10px] font-semibold text-flag-blue bg-flag-blue/5 hover:bg-flag-blue/10 transition-colors"
+                            className="ml-1 px-2 py-1.5 min-h-[44px] flex items-center rounded text-[10px] font-semibold text-flag-blue bg-flag-blue/5 hover:bg-flag-blue/10 transition-colors"
                           >
                             View
                           </button>
