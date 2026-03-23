@@ -151,7 +151,7 @@ function SectionNumber({ n }: { n: number }) {
 /* ------------------------------------------------------------------ */
 
 export default function BinderChecklistPage() {
-  const { user } = useAuth();
+  const { user, role } = useAuth();
 
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [playerDocs, setPlayerDocs] = useState<PlayerDocument[]>([]);
@@ -173,13 +173,33 @@ export default function BinderChecklistPage() {
     if (!supabase) return;
     setLoading(true);
 
+    // If user is a coach (not admin), find their division from the teams table
+    let coachDivision: string | null = null;
+    if (role !== "admin" && user) {
+      const { data: teamData } = await supabase
+        .from("teams")
+        .select("division")
+        .eq("coach_id", user.id)
+        .single();
+      if (teamData) {
+        coachDivision = teamData.division;
+      }
+    }
+
+    // Build registrations query, filtered by coach's division if applicable
+    let regsQuery = supabase
+      .from("tryout_registrations")
+      .select("id, player_first_name, player_last_name, division, status")
+      .in("status", ["selected", "alternate"])
+      .order("division")
+      .order("player_last_name");
+
+    if (coachDivision) {
+      regsQuery = regsQuery.eq("division", coachDivision);
+    }
+
     const [regsRes, docsRes, teamDocsRes, certsRes, assistantsRes] = await Promise.all([
-      supabase
-        .from("tryout_registrations")
-        .select("id, player_first_name, player_last_name, division, status")
-        .in("status", ["selected", "alternate"])
-        .order("division")
-        .order("player_last_name"),
+      regsQuery,
       supabase
         .from("player_documents")
         .select("id, registration_id, document_type, file_path"),

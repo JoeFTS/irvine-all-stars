@@ -25,6 +25,27 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Supabase not configured" }, { status: 500 });
   }
 
+  // Auth check
+  const authHeader = request.headers.get("authorization");
+  const cookieHeader = request.headers.get("cookie");
+  const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
+    db: { schema: "irvine_allstars" },
+    global: {
+      headers: {
+        ...(authHeader ? { Authorization: authHeader } : {}),
+        ...(cookieHeader ? { Cookie: cookieHeader } : {}),
+      },
+    },
+  });
+  const { data: { user } } = await supabaseAuth.auth.getUser();
+  if (!user) {
+    return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+  }
+  const { data: profile } = await supabaseAuth.from("profiles").select("role").eq("id", user.id).single();
+  if (!profile || !["admin", "coach"].includes(profile.role)) {
+    return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
   const supabase = createClient(supabaseUrl, supabaseAnonKey, {
     db: { schema: "irvine_allstars" },
   });

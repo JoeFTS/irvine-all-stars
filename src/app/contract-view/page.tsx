@@ -63,12 +63,21 @@ export default function ContractViewPage() {
         return;
       }
 
+      // Ownership check: parents can only view their own player's contract
+      if (role !== "admin" && role !== "coach") {
+        if (data.parent_email !== user?.email) {
+          setError("You don't have permission to view this contract.");
+          setLoading(false);
+          return;
+        }
+      }
+
       setContract(data as Contract);
       setLoading(false);
     }
 
     fetchContract();
-  }, [user, authLoading]);
+  }, [user, role, authLoading]);
 
   if (loading || authLoading) {
     return (

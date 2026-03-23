@@ -27,7 +27,7 @@ interface MedicalDoc {
 }
 
 export default function MedicalViewPage() {
-  const { user, loading: authLoading } = useAuth();
+  const { user, role, loading: authLoading } = useAuth();
   const [doc, setDoc] = useState<MedicalDoc | null>(null);
   const [medData, setMedData] = useState<MedicalData | null>(null);
   const [loading, setLoading] = useState(true);
@@ -74,6 +74,20 @@ export default function MedicalViewPage() {
         return;
       }
 
+      // Ownership check: parents can only view their own player's medical data
+      if (role !== "admin" && role !== "coach") {
+        const { data: reg } = await supabase
+          .from("tryout_registrations")
+          .select("parent_email")
+          .eq("id", regId)
+          .single();
+        if (!reg || reg.parent_email !== user?.email) {
+          setError("You don't have permission to view this medical release.");
+          setLoading(false);
+          return;
+        }
+      }
+
       setDoc(data as MedicalDoc);
 
       try {
@@ -87,7 +101,7 @@ export default function MedicalViewPage() {
     }
 
     fetchData();
-  }, [user, authLoading]);
+  }, [user, role, authLoading]);
 
   if (loading || authLoading) {
     return (

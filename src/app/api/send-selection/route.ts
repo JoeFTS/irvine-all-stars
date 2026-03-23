@@ -1,5 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { createClient } from "@supabase/supabase-js";
 import { Resend } from "resend";
+
+const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!;
 
 const resendApiKey = process.env.RESEND_API_KEY;
 const resend = resendApiKey ? new Resend(resendApiKey) : null;
@@ -121,6 +125,27 @@ ${getEmailFooter()}`;
 
 export async function POST(request: NextRequest) {
   try {
+    // Auth check — admin only
+    const authHeader = request.headers.get("authorization");
+    const cookieHeader = request.headers.get("cookie");
+    const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+      db: { schema: "irvine_allstars" },
+      global: {
+        headers: {
+          ...(authHeader ? { Authorization: authHeader } : {}),
+          ...(cookieHeader ? { Cookie: cookieHeader } : {}),
+        },
+      },
+    });
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const { data: profile } = await supabase.from("profiles").select("role").eq("id", user.id).single();
+    if (!profile || profile.role !== "admin") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const body = (await request.json()) as SelectionRequest;
     const {
       registration_id,
