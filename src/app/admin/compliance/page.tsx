@@ -32,6 +32,7 @@ interface Contract {
 
 interface Team {
   division: string;
+  team_name: string;
   coach_id: string | null;
   coach_email: string | null;
 }
@@ -107,7 +108,7 @@ export default function CompliancePage() {
         .from("player_documents")
         .select("registration_id, document_type"),
       supabase.from("player_contracts").select("registration_id"),
-      supabase.from("teams").select("division, coach_id, coach_email"),
+      supabase.from("teams").select("division, team_name, coach_id, coach_email"),
       supabase.from("coach_certifications").select("coach_id, cert_type"),
     ]);
 
@@ -160,19 +161,20 @@ export default function CompliancePage() {
         birthCertCount: players.filter((p) => p.hasBirthCert).length,
         photoCount: players.filter((p) => p.hasPhoto).length,
       };
-    }).filter((d) => d.totalPlayers > 0);
-  }, [registrations, docsByReg, contractSet]);
+    }).filter((d) => d.totalPlayers > 0 || teams.some((t) => t.division === d.division));
+  }, [registrations, docsByReg, contractSet, teams]);
 
   // Coach cert status per division
   const coachCertsByDivision = useMemo(() => {
-    const map = new Map<string, { coachEmail: string | null; hasConcussion: boolean; hasCardiac: boolean }>();
+    const map = new Map<string, { teamName: string; coachEmail: string | null; hasConcussion: boolean; hasCardiac: boolean }>();
     for (const team of teams) {
       if (!team.coach_id) {
-        map.set(team.division, { coachEmail: team.coach_email, hasConcussion: false, hasCardiac: false });
+        map.set(team.division, { teamName: team.team_name, coachEmail: team.coach_email, hasConcussion: false, hasCardiac: false });
         continue;
       }
       const certs = coachCerts.filter((c) => c.coach_id === team.coach_id);
       map.set(team.division, {
+        teamName: team.team_name,
         coachEmail: team.coach_email,
         hasConcussion: certs.some((c) => c.cert_type === "concussion"),
         hasCardiac: certs.some((c) => c.cert_type === "cardiac_arrest"),
@@ -320,16 +322,30 @@ export default function CompliancePage() {
                       <span className="font-display text-lg font-bold uppercase tracking-wide text-charcoal">
                         {div.division}
                       </span>
-                      {isReady ? (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-green-100 text-green-700">
-                          Tournament Ready
-                        </span>
+                      {div.totalPlayers > 0 ? (
+                        isReady ? (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-green-100 text-green-700">
+                            Tournament Ready
+                          </span>
+                        ) : (
+                          <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-700">
+                            {div.readyCount}/{div.totalPlayers} Ready
+                          </span>
+                        )
                       ) : (
-                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-700">
-                          {div.readyCount}/{div.totalPlayers} Ready
+                        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-gray-100 text-gray-500">
+                          No Players Yet
                         </span>
                       )}
                     </div>
+                    {coachCertsByDivision.get(div.division) && (
+                      <div className="flex flex-wrap gap-x-4 text-xs text-gray-400 mt-0.5">
+                        <span>Team: {coachCertsByDivision.get(div.division)!.teamName}</span>
+                        {coachCertsByDivision.get(div.division)!.coachEmail && (
+                          <span>Coach: {coachCertsByDivision.get(div.division)!.coachEmail}</span>
+                        )}
+                      </div>
+                    )}
                   </div>
 
                   {/* Progress bar */}
