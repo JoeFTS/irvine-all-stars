@@ -15,6 +15,13 @@ interface Team {
   created_at: string;
 }
 
+interface AcceptedCoach {
+  id: string;
+  full_name: string;
+  email: string;
+  division: string;
+}
+
 interface Registration {
   id: string;
   division: string;
@@ -108,6 +115,7 @@ export default function TeamsPage() {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [documents, setDocuments] = useState<Document[]>([]);
   const [contracts, setContracts] = useState<Contract[]>([]);
+  const [acceptedCoaches, setAcceptedCoaches] = useState<AcceptedCoach[]>([]);
   const [loading, setLoading] = useState(true);
   const [divisionFilter, setDivisionFilter] = useState<string>("all");
 
@@ -115,6 +123,7 @@ export default function TeamsPage() {
   const [formDivision, setFormDivision] = useState(DIVISIONS[0]);
   const [formTeamName, setFormTeamName] = useState("");
   const [formCoachEmail, setFormCoachEmail] = useState("");
+  const [formCoachSource, setFormCoachSource] = useState<"dropdown" | "manual">("dropdown");
   const [creating, setCreating] = useState(false);
   const [createError, setCreateError] = useState<string | null>(null);
 
@@ -133,19 +142,25 @@ export default function TeamsPage() {
     if (!supabase) return;
     setLoading(true);
 
-    const [teamsRes, regsRes, docsRes, contractsRes] = await Promise.all([
+    const [teamsRes, regsRes, docsRes, contractsRes, coachAppsRes] = await Promise.all([
       supabase.from("teams").select("*").order("division"),
       supabase
         .from("tryout_registrations")
         .select("id, division, player_first_name, player_last_name"),
       supabase.from("player_documents").select("registration_id, document_type"),
       supabase.from("player_contracts").select("registration_id"),
+      supabase
+        .from("coach_applications")
+        .select("id, full_name, email, division")
+        .eq("status", "accepted")
+        .order("full_name"),
     ]);
 
     if (teamsRes.data) setTeams(teamsRes.data);
     if (regsRes.data) setRegistrations(regsRes.data);
     if (docsRes.data) setDocuments(docsRes.data);
     if (contractsRes.data) setContracts(contractsRes.data);
+    if (coachAppsRes.data) setAcceptedCoaches(coachAppsRes.data);
 
     setLoading(false);
   }
@@ -155,6 +170,10 @@ export default function TeamsPage() {
     if (!supabase) return;
     setCreating(true);
     setCreateError(null);
+
+    const coachEmail = formCoachSource === "dropdown"
+      ? acceptedCoaches.find((c) => c.id === formCoachEmail)?.email ?? null
+      : formCoachEmail.trim() || null;
 
     const teamData: {
       division: string;
@@ -166,16 +185,16 @@ export default function TeamsPage() {
       division: formDivision,
       team_name: formTeamName.trim(),
       season: 2026,
-      coach_email: formCoachEmail.trim() || null,
+      coach_email: coachEmail,
       coach_id: null,
     };
 
     // Try to look up coach by email in profiles
-    if (formCoachEmail.trim()) {
+    if (coachEmail) {
       const { data: profile } = await supabase
         .from("profiles")
         .select("id")
-        .eq("email", formCoachEmail.trim())
+        .eq("email", coachEmail)
         .single();
       if (profile) {
         teamData.coach_id = profile.id;
@@ -289,16 +308,43 @@ export default function TeamsPage() {
             />
           </div>
           <div className="flex-1 min-w-[200px]">
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
-              Coach Email
-            </label>
-            <input
-              type="email"
-              value={formCoachEmail}
-              onChange={(e) => setFormCoachEmail(e.target.value)}
-              placeholder="coach@example.com"
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
-            />
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                Coach
+              </label>
+              <button
+                type="button"
+                onClick={() => {
+                  setFormCoachSource((s) => s === "dropdown" ? "manual" : "dropdown");
+                  setFormCoachEmail("");
+                }}
+                className="text-[10px] text-flag-blue hover:underline"
+              >
+                {formCoachSource === "dropdown" ? "Enter email manually" : "Select from list"}
+              </button>
+            </div>
+            {formCoachSource === "dropdown" ? (
+              <select
+                value={formCoachEmail}
+                onChange={(e) => setFormCoachEmail(e.target.value)}
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+              >
+                <option value="">Select accepted coach...</option>
+                {acceptedCoaches.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.full_name} — {c.email} ({c.division})
+                  </option>
+                ))}
+              </select>
+            ) : (
+              <input
+                type="email"
+                value={formCoachEmail}
+                onChange={(e) => setFormCoachEmail(e.target.value)}
+                placeholder="coach@example.com"
+                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+              />
+            )}
           </div>
           <button
             type="submit"
