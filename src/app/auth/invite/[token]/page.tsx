@@ -224,6 +224,42 @@ export default function InviteSignupPage({
         }
       }
 
+      // 4c. If coach, also process any pending parent invites for the same email
+      if (inviteState.invite.role === "coach") {
+        const { data: parentInvites } = await supabase
+          .from("invites")
+          .select("id, child_first_name, child_last_name, division")
+          .eq("email", inviteState.invite.email)
+          .eq("role", "parent")
+          .eq("used", false);
+
+        if (parentInvites && parentInvites.length > 0) {
+          for (const pInvite of parentInvites) {
+            if (pInvite.child_first_name && pInvite.child_last_name) {
+              const { data: existingReg } = await supabase
+                .from("tryout_registrations")
+                .select("id")
+                .eq("player_first_name", pInvite.child_first_name.trim())
+                .eq("player_last_name", pInvite.child_last_name.trim())
+                .maybeSingle();
+
+              if (!existingReg) {
+                await supabase.from("tryout_registrations").insert({
+                  parent_name: name,
+                  parent_email: inviteState.invite.email,
+                  player_first_name: pInvite.child_first_name.trim(),
+                  player_last_name: pInvite.child_last_name.trim(),
+                  division: pInvite.division || "",
+                  status: "registered",
+                });
+              }
+              childrenNames.push(pInvite.child_first_name.trim());
+            }
+            await supabase.from("invites").update({ used: true }).eq("id", pInvite.id);
+          }
+        }
+      }
+
       // 5. Success — show email confirmation message
       setRegisteredChildren(childrenNames);
       setSuccess(true);

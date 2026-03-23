@@ -127,6 +127,73 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Coach + parent flow: coach invite with children attached
+    if (role === "coach" && Array.isArray(children) && children.length > 0) {
+      // 1. Create the coach invite record
+      const coachInsert: Record<string, string> = { email, role: "coach" };
+      if (division) coachInsert.division = division;
+
+      const { data: coachInvite, error: coachErr } = await supabase
+        .from("invites")
+        .insert(coachInsert)
+        .select("id, token")
+        .single();
+
+      if (coachErr || !coachInvite) {
+        console.error("Coach invite insert error:", coachErr);
+        return NextResponse.json({ error: "Failed to create coach invite" }, { status: 500 });
+      }
+
+      // Auto-accept coach application
+      await supabase
+        .from("coach_applications")
+        .update({ status: "accepted" })
+        .eq("email", email)
+        .in("status", ["submitted", "under_review"]);
+
+      // 2. Create parent invite records for each child (picked up during signup)
+      for (const child of children) {
+        const childInsert: Record<string, string> = {
+          email,
+          role: "parent",
+        };
+        if (child.division) childInsert.division = child.division;
+        if (child.child_first_name) childInsert.child_first_name = child.child_first_name;
+        if (child.child_last_name) childInsert.child_last_name = child.child_last_name;
+
+        await supabase.from("invites").insert(childInsert);
+      }
+
+      // 3. Send ONE email mentioning both coach role and children
+      const childNames = children
+        .map((c) => `${c.child_first_name} ${c.child_last_name}`)
+        .filter(Boolean);
+      const childMention = childNames.length > 0
+        ? ` We've also set up registrations for your ${childNames.length === 1 ? "child" : "children"}: <strong>${childNames.join(" and ")}</strong>. You'll have access to both the Coach Portal and Parent Portal with a single login.`
+        : "";
+
+      const coachHtml = getCoachInviteHtml(coachInvite.token, division).replace(
+        "</p>\n</td></tr>\n</table>",
+        `${childMention}</p>\n</td></tr>\n</table>`
+      );
+
+      if (resend) {
+        const { error: emailError } = await resend.emails.send({
+          from: "Irvine All-Stars <AllStars@irvineallstars.com>",
+          replyTo: "AllStars@irvinepony.com",
+          to: [email],
+          subject: "Welcome to the Irvine All-Stars Coaching Portal",
+          html: coachHtml,
+        });
+        if (emailError) {
+          console.error("Resend error:", emailError);
+          return NextResponse.json({ error: "Failed to send invite email" }, { status: 500 });
+        }
+      }
+
+      return NextResponse.json({ success: true, token: coachInvite.token });
+    }
+
     // Multi-child flow: when children array is provided for parent invites
     if (role === "parent" && Array.isArray(children) && children.length > 0) {
       const results: Array<{ child: string; status: "created" | "duplicate" }> = [];

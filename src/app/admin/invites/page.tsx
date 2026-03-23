@@ -114,6 +114,7 @@ export default function AdminInvitesPage() {
   const [division, setDivision] = useState<string>("");
   const [parentName, setParentName] = useState("");
   const [children, setChildren] = useState<ChildEntry[]>([emptyChild()]);
+  const [coachIsParent, setCoachIsParent] = useState(false);
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [invites, setInvites] = useState<Invite[]>([]);
@@ -151,6 +152,13 @@ export default function AdminInvitesPage() {
       const payload: Record<string, unknown> = { email, role };
       if (role === "coach") {
         if (division) payload.division = division;
+        if (coachIsParent) {
+          payload.children = children.map((c) => ({
+            child_first_name: c.firstName,
+            child_last_name: c.lastName,
+            division: c.division,
+          }));
+        }
       } else {
         if (parentName) payload.parent_name = parentName;
         payload.children = children.map((c) => ({
@@ -176,6 +184,7 @@ export default function AdminInvitesPage() {
       setDivision("");
       setParentName("");
       setChildren([emptyChild()]);
+      setCoachIsParent(false);
       fetchInvites();
     } catch (err) {
       setMessage({
@@ -345,6 +354,7 @@ export default function AdminInvitesPage() {
                   if (newRole === "coach") {
                     setParentName("");
                     setChildren([emptyChild()]);
+                    setCoachIsParent(false);
                   }
                 }}
                 className="w-full border border-gray-200 rounded px-4 py-2.5 text-charcoal bg-white focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
@@ -378,6 +388,121 @@ export default function AdminInvitesPage() {
               </div>
             )}
           </div>
+
+          {/* Coach also a parent? */}
+          {role === "coach" && (
+            <div className="space-y-4">
+              <label className="flex items-center gap-3 cursor-pointer group">
+                <input
+                  type="checkbox"
+                  checked={coachIsParent}
+                  onChange={(e) => {
+                    setCoachIsParent(e.target.checked);
+                    if (!e.target.checked) setChildren([emptyChild()]);
+                  }}
+                  className="w-4 h-4 rounded border-gray-300 text-flag-blue focus:ring-flag-blue cursor-pointer"
+                />
+                <span className="text-sm font-semibold text-charcoal group-hover:text-flag-blue transition-colors">
+                  This coach also has a child in All-Stars
+                </span>
+              </label>
+
+              {coachIsParent && (
+                <div className="border border-gray-200 rounded-lg p-4 space-y-3">
+                  <p className="text-sm font-semibold text-charcoal uppercase tracking-wide font-display">
+                    Children
+                  </p>
+                  {children.map((child, idx) => (
+                    <div
+                      key={idx}
+                      className="flex flex-col sm:flex-row gap-3 items-start sm:items-end"
+                    >
+                      <div className="flex-1">
+                        {idx === 0 && (
+                          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 font-display">
+                            First Name
+                          </label>
+                        )}
+                        <input
+                          type="text"
+                          required
+                          value={child.firstName}
+                          onChange={(e) => {
+                            const updated = [...children];
+                            updated[idx] = { ...updated[idx], firstName: e.target.value };
+                            setChildren(updated);
+                          }}
+                          className="w-full border border-gray-200 rounded px-4 py-2.5 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+                          placeholder="Tommy"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        {idx === 0 && (
+                          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 font-display">
+                            Last Name
+                          </label>
+                        )}
+                        <input
+                          type="text"
+                          required
+                          value={child.lastName}
+                          onChange={(e) => {
+                            const updated = [...children];
+                            updated[idx] = { ...updated[idx], lastName: e.target.value };
+                            setChildren(updated);
+                          }}
+                          className="w-full border border-gray-200 rounded px-4 py-2.5 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+                          placeholder="Smith"
+                        />
+                      </div>
+                      <div className="flex-1">
+                        {idx === 0 && (
+                          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 font-display">
+                            Child&apos;s Division
+                          </label>
+                        )}
+                        <select
+                          required
+                          value={child.division}
+                          onChange={(e) => {
+                            const updated = [...children];
+                            updated[idx] = { ...updated[idx], division: e.target.value };
+                            setChildren(updated);
+                          }}
+                          className="w-full border border-gray-200 rounded px-4 py-2.5 text-charcoal bg-white focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+                        >
+                          <option value="">Select division...</option>
+                          {DIVISION_OPTIONS.map((d) => (
+                            <option key={d} value={d}>
+                              {d}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      {children.length > 1 && (
+                        <button
+                          type="button"
+                          onClick={() => setChildren(children.filter((_, i) => i !== idx))}
+                          className="shrink-0 p-2 text-gray-400 hover:text-flag-red transition-colors"
+                          title="Remove child"
+                        >
+                          <X size={16} />
+                        </button>
+                      )}
+                    </div>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => setChildren([...children, emptyChild()])}
+                    className="inline-flex items-center gap-1.5 text-sm font-display font-semibold text-flag-blue hover:text-flag-blue-mid uppercase tracking-wide transition-colors mt-1"
+                  >
+                    <Plus size={15} />
+                    Add Another Child
+                  </button>
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Parent-specific fields */}
           {role === "parent" && (
