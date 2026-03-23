@@ -39,6 +39,7 @@ export default function InviteSignupPage({
   const [error, setError] = useState<string | null>(null);
   const [submitting, setSubmitting] = useState(false);
   const [success, setSuccess] = useState(false);
+  const [registeredChildren, setRegisteredChildren] = useState<string[]>([]);
 
   useEffect(() => {
     async function checkToken() {
@@ -143,6 +144,8 @@ export default function InviteSignupPage({
         .eq("token", token);
 
       // 4. Auto-create or link registration for the child
+      const childrenNames: string[] = [];
+
       if (inviteState.invite.role === "parent" && inviteState.invite.child_first_name && inviteState.invite.child_last_name) {
         // Check if registration already exists (second parent case)
         const { data: existingReg } = await supabase
@@ -171,9 +174,58 @@ export default function InviteSignupPage({
             status: "registered",
           });
         }
+        childrenNames.push(inviteState.invite.child_first_name.trim());
+
+        // 4b. Process sibling invites for the same parent email
+        const { data: siblingInvites } = await supabase
+          .from("invites")
+          .select("id, child_first_name, child_last_name, division, token")
+          .eq("email", inviteState.invite.email)
+          .eq("role", "parent")
+          .eq("used", false)
+          .neq("id", inviteState.invite.id);
+
+        if (siblingInvites && siblingInvites.length > 0) {
+          for (const sibling of siblingInvites) {
+            if (sibling.child_first_name && sibling.child_last_name) {
+              const { data: existingSiblingReg } = await supabase
+                .from("tryout_registrations")
+                .select("id, secondary_parent_email")
+                .eq("player_first_name", sibling.child_first_name.trim())
+                .eq("player_last_name", sibling.child_last_name.trim())
+                .maybeSingle();
+
+              if (existingSiblingReg) {
+                if (!existingSiblingReg.secondary_parent_email) {
+                  await supabase
+                    .from("tryout_registrations")
+                    .update({ secondary_parent_email: inviteState.invite.email })
+                    .eq("id", existingSiblingReg.id);
+                }
+              } else {
+                await supabase.from("tryout_registrations").insert({
+                  parent_name: name,
+                  parent_email: inviteState.invite.email,
+                  player_first_name: sibling.child_first_name.trim(),
+                  player_last_name: sibling.child_last_name.trim(),
+                  division: sibling.division || "",
+                  status: "registered",
+                });
+              }
+              childrenNames.push(sibling.child_first_name.trim());
+            }
+
+            // Mark sibling invite as used
+            await supabase
+              .from("invites")
+              .update({ used: true })
+              .eq("id", sibling.id);
+          }
+        }
       }
 
       // 5. Success — show email confirmation message
+      setRegisteredChildren(childrenNames);
       setSuccess(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unexpected error occurred.");
@@ -324,6 +376,21 @@ export default function InviteSignupPage({
               <h2 className="font-display text-xl font-bold text-flag-blue uppercase tracking-wider mb-3">
                 Account Created!
               </h2>
+              {registeredChildren.length > 0 && (
+                <div className="bg-star-gold-bright/10 border border-star-gold-bright/30 rounded-lg p-4 mb-4">
+                  <p className="text-charcoal text-sm leading-relaxed">
+                    {registeredChildren.length === 1 ? (
+                      <>We&apos;ve set up a tryout registration for <strong>{registeredChildren[0]}</strong>.</>
+                    ) : (
+                      <>We&apos;ve set up tryout registrations for{" "}
+                        <strong>
+                          {registeredChildren.slice(0, -1).join(", ")} and {registeredChildren[registeredChildren.length - 1]}
+                        </strong>.
+                      </>
+                    )}
+                  </p>
+                </div>
+              )}
               <div className="bg-flag-blue/5 border border-flag-blue/20 rounded-lg p-5 mb-4">
                 <p className="text-flag-blue font-semibold text-sm mb-2">
                   Check Your Email

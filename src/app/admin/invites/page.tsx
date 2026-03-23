@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
-import { Mail, RefreshCw, Upload, Download } from "lucide-react";
+import { Mail, RefreshCw, Upload, Download, Plus, X } from "lucide-react";
 
 const DIVISION_OPTIONS = [
   "5U-Shetland",
@@ -100,13 +100,20 @@ function downloadTemplate() {
   URL.revokeObjectURL(url);
 }
 
+interface ChildEntry {
+  firstName: string;
+  lastName: string;
+  division: string;
+}
+
+const emptyChild = (): ChildEntry => ({ firstName: "", lastName: "", division: "" });
+
 export default function AdminInvitesPage() {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<"coach" | "parent">("coach");
   const [division, setDivision] = useState<string>("");
   const [parentName, setParentName] = useState("");
-  const [childFirstName, setChildFirstName] = useState("");
-  const [childLastName, setChildLastName] = useState("");
+  const [children, setChildren] = useState<ChildEntry[]>([emptyChild()]);
   const [sending, setSending] = useState(false);
   const [message, setMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   const [invites, setInvites] = useState<Invite[]>([]);
@@ -141,12 +148,16 @@ export default function AdminInvitesPage() {
     setSending(true);
 
     try {
-      const payload: Record<string, string> = { email, role };
-      if (division) payload.division = division;
-      if (role === "parent") {
+      const payload: Record<string, unknown> = { email, role };
+      if (role === "coach") {
+        if (division) payload.division = division;
+      } else {
         if (parentName) payload.parent_name = parentName;
-        if (childFirstName) payload.child_first_name = childFirstName;
-        if (childLastName) payload.child_last_name = childLastName;
+        payload.children = children.map((c) => ({
+          child_first_name: c.firstName,
+          child_last_name: c.lastName,
+          division: c.division,
+        }));
       }
 
       const res = await fetch("/api/send-invite", {
@@ -164,8 +175,7 @@ export default function AdminInvitesPage() {
       setEmail("");
       setDivision("");
       setParentName("");
-      setChildFirstName("");
-      setChildLastName("");
+      setChildren([emptyChild()]);
       fetchInvites();
     } catch (err) {
       setMessage({
@@ -334,8 +344,7 @@ export default function AdminInvitesPage() {
                   setRole(newRole);
                   if (newRole === "coach") {
                     setParentName("");
-                    setChildFirstName("");
-                    setChildLastName("");
+                    setChildren([emptyChild()]);
                   }
                 }}
                 className="w-full border border-gray-200 rounded px-4 py-2.5 text-charcoal bg-white focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
@@ -344,33 +353,35 @@ export default function AdminInvitesPage() {
                 <option value="parent">Parent</option>
               </select>
             </div>
-            <div className="w-full sm:w-48">
-              <label
-                htmlFor="invite-division"
-                className="block text-sm font-semibold text-charcoal uppercase tracking-wide mb-1.5 font-display"
-              >
-                Division
-              </label>
-              <select
-                id="invite-division"
-                required
-                value={division}
-                onChange={(e) => setDivision(e.target.value)}
-                className="w-full border border-gray-200 rounded px-4 py-2.5 text-charcoal bg-white focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
-              >
-                <option value="">Select division...</option>
-                {DIVISION_OPTIONS.map((d) => (
-                  <option key={d} value={d}>
-                    {d}
-                  </option>
-                ))}
-              </select>
-            </div>
+            {role === "coach" && (
+              <div className="w-full sm:w-48">
+                <label
+                  htmlFor="invite-division"
+                  className="block text-sm font-semibold text-charcoal uppercase tracking-wide mb-1.5 font-display"
+                >
+                  Division
+                </label>
+                <select
+                  id="invite-division"
+                  required
+                  value={division}
+                  onChange={(e) => setDivision(e.target.value)}
+                  className="w-full border border-gray-200 rounded px-4 py-2.5 text-charcoal bg-white focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+                >
+                  <option value="">Select division...</option>
+                  {DIVISION_OPTIONS.map((d) => (
+                    <option key={d} value={d}>
+                      {d}
+                    </option>
+                  ))}
+                </select>
+              </div>
+            )}
           </div>
 
           {/* Parent-specific fields */}
           {role === "parent" && (
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+            <div className="space-y-4">
               <div>
                 <label
                   htmlFor="invite-parent-name"
@@ -384,45 +395,102 @@ export default function AdminInvitesPage() {
                   required
                   value={parentName}
                   onChange={(e) => setParentName(e.target.value)}
-                  className="w-full border border-gray-200 rounded px-4 py-2.5 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+                  className="w-full sm:w-1/2 border border-gray-200 rounded px-4 py-2.5 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
                   placeholder="Jane Smith"
                 />
               </div>
-              <div className="grid grid-cols-2 gap-3">
-                <div>
-                  <label
-                    htmlFor="invite-child-first"
-                    className="block text-sm font-semibold text-charcoal uppercase tracking-wide mb-1.5 font-display"
+
+              <div className="border border-gray-200 rounded-lg p-4 space-y-3">
+                <p className="text-sm font-semibold text-charcoal uppercase tracking-wide font-display">
+                  Children
+                </p>
+                {children.map((child, idx) => (
+                  <div
+                    key={idx}
+                    className="flex flex-col sm:flex-row gap-3 items-start sm:items-end"
                   >
-                    Child First Name
-                  </label>
-                  <input
-                    id="invite-child-first"
-                    type="text"
-                    required
-                    value={childFirstName}
-                    onChange={(e) => setChildFirstName(e.target.value)}
-                    className="w-full border border-gray-200 rounded px-4 py-2.5 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
-                    placeholder="Tommy"
-                  />
-                </div>
-                <div>
-                  <label
-                    htmlFor="invite-child-last"
-                    className="block text-sm font-semibold text-charcoal uppercase tracking-wide mb-1.5 font-display"
-                  >
-                    Child Last Name
-                  </label>
-                  <input
-                    id="invite-child-last"
-                    type="text"
-                    required
-                    value={childLastName}
-                    onChange={(e) => setChildLastName(e.target.value)}
-                    className="w-full border border-gray-200 rounded px-4 py-2.5 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
-                    placeholder="Smith"
-                  />
-                </div>
+                    <div className="flex-1">
+                      {idx === 0 && (
+                        <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 font-display">
+                          First Name
+                        </label>
+                      )}
+                      <input
+                        type="text"
+                        required
+                        value={child.firstName}
+                        onChange={(e) => {
+                          const updated = [...children];
+                          updated[idx] = { ...updated[idx], firstName: e.target.value };
+                          setChildren(updated);
+                        }}
+                        className="w-full border border-gray-200 rounded px-4 py-2.5 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+                        placeholder="Tommy"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      {idx === 0 && (
+                        <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 font-display">
+                          Last Name
+                        </label>
+                      )}
+                      <input
+                        type="text"
+                        required
+                        value={child.lastName}
+                        onChange={(e) => {
+                          const updated = [...children];
+                          updated[idx] = { ...updated[idx], lastName: e.target.value };
+                          setChildren(updated);
+                        }}
+                        className="w-full border border-gray-200 rounded px-4 py-2.5 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+                        placeholder="Smith"
+                      />
+                    </div>
+                    <div className="flex-1">
+                      {idx === 0 && (
+                        <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1 font-display">
+                          Division
+                        </label>
+                      )}
+                      <select
+                        required
+                        value={child.division}
+                        onChange={(e) => {
+                          const updated = [...children];
+                          updated[idx] = { ...updated[idx], division: e.target.value };
+                          setChildren(updated);
+                        }}
+                        className="w-full border border-gray-200 rounded px-4 py-2.5 text-charcoal bg-white focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+                      >
+                        <option value="">Select division...</option>
+                        {DIVISION_OPTIONS.map((d) => (
+                          <option key={d} value={d}>
+                            {d}
+                          </option>
+                        ))}
+                      </select>
+                    </div>
+                    {children.length > 1 && (
+                      <button
+                        type="button"
+                        onClick={() => setChildren(children.filter((_, i) => i !== idx))}
+                        className="shrink-0 p-2 text-gray-400 hover:text-flag-red transition-colors"
+                        title="Remove child"
+                      >
+                        <X size={16} />
+                      </button>
+                    )}
+                  </div>
+                ))}
+                <button
+                  type="button"
+                  onClick={() => setChildren([...children, emptyChild()])}
+                  className="inline-flex items-center gap-1.5 text-sm font-display font-semibold text-flag-blue hover:text-flag-blue-mid uppercase tracking-wide transition-colors mt-1"
+                >
+                  <Plus size={15} />
+                  Add Another Child
+                </button>
               </div>
             </div>
           )}

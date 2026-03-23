@@ -54,12 +54,19 @@ function getCoachInviteHtml(token: string, division?: string) {
 </table></td></tr></table></body></html>`;
 }
 
-function getParentInviteHtml(token: string, options?: { parent_name?: string; child_first_name?: string; child_last_name?: string; division?: string }) {
+function getParentInviteHtml(token: string, options?: { parent_name?: string; child_first_name?: string; child_last_name?: string; division?: string; children?: Array<{ child_first_name: string; child_last_name: string; division?: string }> }) {
   const ctaUrl = `https://irvineallstars.com/auth/invite/${token}`;
   const greeting = options?.parent_name ? `Welcome, ${options.parent_name}!` : "Welcome, All-Stars Family!";
-  const childLine = options?.child_first_name && options?.child_last_name
-    ? `<p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0 0 24px 0;">Your child <strong>${options.child_first_name} ${options.child_last_name}</strong> has been invited to try out for the <strong>${options.division || "Irvine PONY"}</strong> division of the Irvine PONY All-Stars.</p>`
-    : "";
+  let childLine = "";
+  if (options?.children && options.children.length > 0) {
+    const names = options.children.map(c => `${c.child_first_name} ${c.child_last_name}`);
+    const nameStr = names.length === 1 ? names[0] : names.slice(0, -1).join(", ") + " and " + names[names.length - 1];
+    const divisions = Array.from(new Set(options.children.map(c => c.division).filter(Boolean)));
+    const divStr = divisions.length === 1 ? divisions[0]! : divisions.length > 0 ? divisions.join(" and ") : "Irvine PONY";
+    childLine = `<p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0 0 24px 0;">Your ${options.children.length === 1 ? "child" : "children"} <strong>${nameStr}</strong> ${options.children.length === 1 ? "has" : "have"} been invited to try out for the <strong>${divStr}</strong> ${divisions.length <= 1 ? "division" : "divisions"} of the Irvine PONY All-Stars.</p>`;
+  } else if (options?.child_first_name && options?.child_last_name) {
+    childLine = `<p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0 0 24px 0;">Your child <strong>${options.child_first_name} ${options.child_last_name}</strong> has been invited to try out for the <strong>${options.division || "Irvine PONY"}</strong> division of the Irvine PONY All-Stars.</p>`;
+  }
   return `<!DOCTYPE html>
 <html><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"></head>
 <body style="margin:0;padding:0;background-color:#FAFAF8;font-family:system-ui,-apple-system,sans-serif;">
@@ -104,7 +111,7 @@ ${childLine}<p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0 0 24
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, role, division, parent_name, child_first_name, child_last_name } = body;
+    const { email, role, division, parent_name, child_first_name, child_last_name, children } = body;
 
     if (!email || !role || !["coach", "parent"].includes(role)) {
       return NextResponse.json(
@@ -119,6 +126,88 @@ export async function POST(request: NextRequest) {
         { status: 500 }
       );
     }
+
+    // Multi-child flow: when children array is provided for parent invites
+    if (role === "parent" && Array.isArray(children) && children.length > 0) {
+      const results: Array<{ child: string; status: "created" | "duplicate" }> = [];
+      let firstToken: string | null = null;
+
+      for (const child of children) {
+        const childName = `${child.child_first_name} ${child.child_last_name}`;
+
+        // Check for existing active invite with same email + child
+        const { data: existing } = await supabase
+          .from("invites")
+          .select("id")
+          .eq("email", email)
+          .eq("child_first_name", child.child_first_name)
+          .eq("child_last_name", child.child_last_name)
+          .eq("used", false)
+          .maybeSingle();
+
+        if (existing) {
+          results.push({ child: childName, status: "duplicate" });
+          continue;
+        }
+
+        // Create invite record for this child
+        const insertData: Record<string, string> = { email, role };
+        if (child.division) insertData.division = child.division;
+        if (parent_name) insertData.parent_name = parent_name;
+        if (child.child_first_name) insertData.child_first_name = child.child_first_name;
+        if (child.child_last_name) insertData.child_last_name = child.child_last_name;
+
+        const { data: invite, error: insertError } = await supabase
+          .from("invites")
+          .insert(insertData)
+          .select("id, token")
+          .single();
+
+        if (insertError || !invite) {
+          console.error("Supabase insert error for child:", childName, insertError);
+          continue;
+        }
+
+        if (!firstToken) firstToken = invite.token;
+        results.push({ child: childName, status: "created" });
+      }
+
+      // If no children were created (all duplicates or errors), return conflict
+      if (!firstToken) {
+        return NextResponse.json(
+          { error: "duplicate", message: "All children already have active invites", results },
+          { status: 409 }
+        );
+      }
+
+      // Send ONE email mentioning all children
+      const subject = "Welcome to Irvine All-Stars \u2014 Parent Portal Access";
+      const htmlContent = getParentInviteHtml(firstToken, { parent_name, children });
+
+      if (resend) {
+        const { error: emailError } = await resend.emails.send({
+          from: "Irvine All-Stars <AllStars@irvineallstars.com>",
+          replyTo: "AllStars@irvinepony.com",
+          to: [email],
+          subject,
+          html: htmlContent,
+        });
+
+        if (emailError) {
+          console.error("Resend error:", emailError);
+          return NextResponse.json(
+            { error: "Failed to send invite email" },
+            { status: 500 }
+          );
+        }
+      } else {
+        console.warn("RESEND_API_KEY not configured, invite email not sent");
+      }
+
+      return NextResponse.json({ success: true, results, token: firstToken });
+    }
+
+    // Single-child / legacy flow (backward compatible)
 
     // Check for existing active invite with same email + child
     if (child_first_name && child_last_name) {
