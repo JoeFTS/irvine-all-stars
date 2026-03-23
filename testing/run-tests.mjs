@@ -61,19 +61,21 @@ const ROUTES = [
 ];
 
 const API_TESTS = [
-  { path: "/api/medical-release-sheet", method: "GET", expectStatus: 400 },
-  { path: "/api/score-sheet", method: "GET", expectStatus: 400 },
+  { path: "/api/medical-release-sheet", method: "GET", expectStatus: 401, desc: "requires auth" },
+  { path: "/api/score-sheet", method: "GET", expectStatus: 401, desc: "requires auth" },
   {
     path: "/api/send-selection",
     method: "POST",
     body: "{}",
-    expectStatus: 400,
+    expectStatus: 401,
+    desc: "requires admin auth",
   },
   {
     path: "/api/send-confirmation",
     method: "POST",
     body: "{}",
     expectStatus: 400,
+    desc: "no auth required (public)",
   },
 ];
 

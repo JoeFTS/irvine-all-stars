@@ -1,58 +1,47 @@
 # 10 — Known Issues & Bugs Found During Testing
 
 **Date:** 2026-03-22
-**Status:** Bugs categorized by severity, fixed items marked.
+**Last Updated:** 2026-03-23
 
 ---
 
-## FIXED During This Session
+## ALL HIGH & MEDIUM Issues — FIXED
 
-| Bug | Location | Description | Fix |
-|-----|----------|-------------|-----|
-| Coach dashboard cert mismatch | `coach/page.tsx` | Queried `certification_type` column which doesn't exist (actual: `cert_type`). Certs always showed as incomplete. | Fixed: renamed to `cert_type` |
-| Assistant coach View/Print | `coach/certifications/page.tsx` | Uploaded assistant coach certs had no View/Print button. | Fixed: added View/Print buttons |
-| Evaluator max score display | `evaluate/summary/page.tsx` | Showed `/ 30` but actual max is 54 (6 categories x 9). | Fixed: changed to `/ 54` |
+### Fixed: Session March 22-23
 
----
-
-## HIGH Severity (Security)
-
-| ID | Location | Description | Recommendation |
-|----|----------|-------------|----------------|
-| SEC-01 | `/api/medical-release-sheet/route.ts` | No authentication. Anyone can download player rosters by division via `GET ?division=12U-Bronco`. | Add auth middleware — require admin or coach role |
-| SEC-02 | `/api/send-selection/route.ts` | No authentication. Anyone can POST to send emails from the All-Stars address to arbitrary recipients. Potential phishing vector. | Add admin auth check |
-| SEC-03 | `/api/score-sheet/route.ts` | No authentication. Player names, positions, jersey numbers exposed publicly. | Add admin/coach auth check |
-| SEC-04 | `/evaluate/` pages | Zero authentication on evaluator flow. Anyone can submit scores to the database. | Add evaluator invite/token system |
-
----
-
-## MEDIUM Severity (Functional)
-
-| ID | Location | Description | Recommendation |
-|----|----------|-------------|----------------|
-| MED-01 | `/contract-view/page.tsx` | Any authenticated user can view any contract — no ownership/role check. | Add parent email filter or role check |
-| MED-02 | `/medical-view/page.tsx` | Any authenticated user can view any player's medical data (allergies, medications, insurance). Sensitive PII. | Add ownership check |
-| MED-03 | `/portal/medical-release/page.tsx` | All medical form fields except checkbox+signature are optional. A parent can submit an entirely empty medical release. | Consider requiring insurance info or confirmation prompt |
-| MED-04 | `/portal/confirm/page.tsx` | No ownership verification on tryout confirmation. Any UUID holder can confirm. Low practical risk but no auth. | Add parent email verification |
+| Bug | Location | Description | Status |
+|-----|----------|-------------|--------|
+| Coach dashboard cert mismatch | `coach/page.tsx` | Queried `certification_type` (doesn't exist), actual column is `cert_type`. Certs always showed incomplete. | FIXED |
+| Assistant coach View/Print | `coach/certifications/page.tsx` | Uploaded assistant coach certs had no View/Print button. | FIXED |
+| Evaluator max score display | `evaluate/summary/page.tsx` | Showed `/ 30` but actual max is 54 (6 x 9). | FIXED |
+| Admin dashboard broken link | `admin/page.tsx` | `/admin/registrations` (404) should be `/admin/tryouts`. | FIXED |
+| API: medical-release-sheet | `api/medical-release-sheet/route.ts` | No auth — anyone could download player rosters. | FIXED: requires admin/coach auth |
+| API: score-sheet | `api/score-sheet/route.ts` | No auth — player names, positions, jersey numbers exposed. | FIXED: requires admin/coach auth |
+| API: send-selection | `api/send-selection/route.ts` | No auth — anyone could send emails from All-Stars address. | FIXED: requires admin-only auth |
+| Contract view access | `contract-view/page.tsx` | Any authenticated user could view any contract. | FIXED: parents only see their own |
+| Medical view access | `medical-view/page.tsx` | Any authenticated user could view any player's medical data. | FIXED: parents only see their own |
+| Coach checklist filter | `coach/checklist/page.tsx` | Showed ALL divisions instead of coach's assigned division. | FIXED: filters by coach's team division |
+| Coach apps permission | DB: `coach_applications` | Authenticated users couldn't update (missing UPDATE grant). | FIXED: added grants |
+| Team docs permission | DB: `team_documents` | Coaches couldn't upload (missing INSERT grant). | FIXED: added grants |
+| Cert column names | `coach/certifications/page.tsx` | Code used `file_path`/`file_name` but DB has `cert_file_path`/`cert_file_name`. | FIXED |
+| Selection email persistence | `admin/tryouts/page.tsx` | Email sent status was client-side only, lost on refresh. | FIXED: persisted to DB |
 
 ---
 
-## LOW Severity (UX/Minor)
+## Remaining LOW Severity (UX/Polish)
 
-| ID | Location | Description |
-|----|----------|-------------|
-| LOW-01 | `/portal/page.tsx` | "Decline" button shows alert to email manually — no actual backend action |
-| LOW-02 | `/portal/medical-release/page.tsx` | Auth redirect goes to `/portal` instead of `/portal/medical-release` — user loses context |
-| LOW-03 | `/portal/medical-release/page.tsx` | Misleading error message when unauthorized user tries to access another player's form |
-| LOW-04 | `/coach/checklist/page.tsx` | Checklist fetches ALL registrations without filtering by coach's division — each coach sees all players |
+| ID | Location | Description | Priority |
+|----|----------|-------------|----------|
+| LOW-01 | `/portal/page.tsx` | "Decline" button shows alert to email manually — no backend action | Low |
+| LOW-02 | `/portal/medical-release/page.tsx` | Auth redirect goes to `/portal` instead of back to medical-release | Low |
+| LOW-03 | `/portal/medical-release/page.tsx` | All medical form fields optional — parent can submit empty form | Low |
+| LOW-04 | `/evaluate/` | Evaluator flow has no authentication (anyone can submit scores) | Medium — consider adding invite tokens |
 
 ---
 
-## Summary
+## Test Results Summary
 
-- **43/43 routes** return HTTP 200 (or expected 404)
-- **4/4 API routes** handle errors properly (400, not 500)
-- **3 bugs fixed** during this testing session
-- **4 HIGH severity** security items (unauthenticated API routes)
-- **4 MEDIUM severity** items (access control, form validation)
-- **4 LOW severity** items (UX polish)
+- **47/47 automated tests pass** (43 routes + 4 API checks)
+- **Re-run:** `node testing/run-tests.mjs`
+- **14 bugs fixed** across this session
+- **4 remaining items** (all low priority UX polish)

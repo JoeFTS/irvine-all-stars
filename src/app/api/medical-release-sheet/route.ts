@@ -16,16 +16,11 @@ I acknowledge that participation includes possible exposure to an illness from C
 I hereby release and hold harmless PONY Baseball, Inc., their officers, officials, and/or employees, other participants, sponsors, and advertisers, with respect to any and all illness, disability, death, or loss or damage to person or property, whether arising from the negligence of releasees or otherwise, to the fullest extent permitted by law.`;
 
 export async function GET(request: NextRequest) {
-  const division = request.nextUrl.searchParams.get("division");
-
-  if (!division) {
-    return NextResponse.json({ error: "Missing division parameter" }, { status: 400 });
-  }
   if (!supabaseUrl || !supabaseAnonKey) {
     return NextResponse.json({ error: "Supabase not configured" }, { status: 500 });
   }
 
-  // Auth check
+  // Auth check — must come before any data access
   const authHeader = request.headers.get("authorization");
   const cookieHeader = request.headers.get("cookie");
   const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
@@ -44,6 +39,11 @@ export async function GET(request: NextRequest) {
   const { data: profile } = await supabaseAuth.from("profiles").select("role").eq("id", user.id).single();
   if (!profile || !["admin", "coach"].includes(profile.role)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const division = request.nextUrl.searchParams.get("division");
+  if (!division) {
+    return NextResponse.json({ error: "Missing division parameter" }, { status: 400 });
   }
 
   const supabase = createClient(supabaseUrl, supabaseAnonKey, {

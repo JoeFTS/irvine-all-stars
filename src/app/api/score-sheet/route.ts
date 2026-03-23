@@ -33,25 +33,14 @@ function abbrevPosition(pos: string): string {
 }
 
 export async function GET(request: NextRequest) {
-  const sessionId = request.nextUrl.searchParams.get("session_id");
-  const divisionParam = request.nextUrl.searchParams.get("division");
-  const isBlank = request.nextUrl.searchParams.get("blank") === "true";
-
-  // Blank template doesn't need session_id or supabase
-  if (!isBlank && !divisionParam && (!sessionId || !supabaseUrl || !supabaseAnonKey)) {
-    return NextResponse.json({ error: "Missing parameters" }, { status: 400 });
-  }
-  if (divisionParam && (!supabaseUrl || !supabaseAnonKey)) {
-    return NextResponse.json({ error: "Supabase not configured" }, { status: 500 });
-  }
-
-  // Auth check
   if (!supabaseUrl || !supabaseAnonKey) {
     return NextResponse.json({ error: "Supabase not configured" }, { status: 500 });
   }
+
+  // Auth check — must come before any data access
   const authHeader = request.headers.get("authorization");
   const cookieHeader = request.headers.get("cookie");
-  const supabaseAuth = createClient(supabaseUrl!, supabaseAnonKey!, {
+  const supabaseAuth = createClient(supabaseUrl, supabaseAnonKey, {
     db: { schema: "irvine_allstars" },
     global: {
       headers: {
@@ -67,6 +56,14 @@ export async function GET(request: NextRequest) {
   const { data: profile } = await supabaseAuth.from("profiles").select("role").eq("id", user.id).single();
   if (!profile || !["admin", "coach"].includes(profile.role)) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+  }
+
+  const sessionId = request.nextUrl.searchParams.get("session_id");
+  const divisionParam = request.nextUrl.searchParams.get("division");
+  const isBlank = request.nextUrl.searchParams.get("blank") === "true";
+
+  if (!isBlank && !divisionParam && !sessionId) {
+    return NextResponse.json({ error: "Missing parameters" }, { status: 400 });
   }
 
   let session: {
