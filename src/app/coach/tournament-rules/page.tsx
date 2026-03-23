@@ -3,7 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { supabase } from "@/lib/supabase";
-import { CheckCircle2, AlertTriangle, BookOpen } from "lucide-react";
+import { CheckCircle2, AlertTriangle, BookOpen, ExternalLink } from "lucide-react";
 
 interface AgreementRecord {
   id: string;
@@ -47,44 +47,58 @@ const COMMON_RULES = {
   ],
 };
 
+interface RuleBook {
+  name: string;
+  url: string;
+}
+
+const PONY_RULEBOOK_URL =
+  "https://cdn3.sportngin.com/attachments/document/f8cc-2645833/2026_PONY_Baseball_Rule_Book_Final_Proof__1_.pdf";
+const MLB_RULES_URL =
+  "https://mktg.mlbstatic.com/mlb/official-information/2025-official-baseball-rules.pdf";
+
+const COMMON_RULE_BOOKS: RuleBook[] = [
+  { name: "2026 PONY Baseball Rule Book (Blue & White Pages)", url: PONY_RULEBOOK_URL },
+  { name: "Official MLB Baseball Rules (2025)", url: MLB_RULES_URL },
+];
+
 const DIVISION_SPECIFIC: Record<
   string,
-  { note: string; ruleBooks: string[] }
+  { note: string; ruleBooks: RuleBook[] }
 > = {
   shetland: {
     note: "Shetland — West Zone Tournament Supplemental Rules apply.",
     ruleBooks: [
-      "PONY Baseball Rule Book (Blue Pages)",
-      "PONY Baseball Rule (White Pages)",
-      "Official MLB Baseball Rules",
-      "Shetland West Zone Tournament Supplemental Rules",
+      ...COMMON_RULE_BOOKS,
+      {
+        name: "Shetland West Zone Tournament Supplemental Rules",
+        url: "https://ponybbsb.freshdesk.com/en/support/solutions/articles/27000078348-2025-west-zone-supplemental-rules-for-shetland-league-tournaments",
+      },
     ],
   },
   pinto_machine: {
     note: "Supplement Rules (Pinto Machine) apply. Check rules regarding balls in play hitting the machine or coach specifically.",
     ruleBooks: [
-      "PONY Baseball Rule Book (Blue Pages)",
-      "PONY Baseball Rule (White Pages)",
-      "Official MLB Baseball Rules",
-      "Pinto Machine Pitch Supplemental Rules",
+      ...COMMON_RULE_BOOKS,
+      {
+        name: "Pinto Machine Pitch Supplemental Rules",
+        url: "https://ponybbsb.freshdesk.com/en/support/solutions/articles/27000078350-2025-west-zone-supplemental-rules-for-pinto-machine-pitch-league-tournaments",
+      },
     ],
   },
   pinto_kid: {
     note: "Pinto Pitch — West Zone Tournament Supplemental Rules apply. Know by heart the bat 9 play 9 rules regarding substitutions, pitch counts, and rest day language.",
     ruleBooks: [
-      "PONY Baseball Rule Book (Blue Pages)",
-      "PONY Baseball Rule (White Pages)",
-      "Official MLB Baseball Rules",
-      "Pinto Kid Pitch West Zone Tournament Supplemental Rules",
+      ...COMMON_RULE_BOOKS,
+      {
+        name: "Pinto Kid Pitch West Zone Tournament Supplemental Rules",
+        url: "https://ponybbsb.freshdesk.com/en/support/solutions/articles/27000078349-2025-west-zone-supplemental-rules-for-pinto-player-pitch-league-tournaments",
+      },
     ],
   },
   mustang_bronco: {
     note: "PONY Baseball Rule Book (Blue Pages), PONY Baseball Rule (White Pages), Official MLB Baseball Rules apply.",
-    ruleBooks: [
-      "PONY Baseball Rule Book (Blue Pages)",
-      "PONY Baseball Rule (White Pages)",
-      "Official MLB Baseball Rules",
-    ],
+    ruleBooks: [...COMMON_RULE_BOOKS],
   },
 };
 
@@ -284,14 +298,19 @@ export default function TournamentRulesPage() {
                 <h3 className="font-display text-sm font-bold uppercase tracking-wider text-charcoal mb-2">
                   Applicable Rule Books
                 </h3>
-                <ul className="space-y-1.5">
+                <ul className="space-y-2">
                   {divisionConfig.ruleBooks.map((book) => (
-                    <li
-                      key={book}
-                      className="flex items-center gap-2 text-sm text-gray-700"
-                    >
-                      <BookOpen size={14} className="text-flag-blue shrink-0" />
-                      {book}
+                    <li key={book.name}>
+                      <a
+                        href={book.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-2 text-sm text-flag-blue hover:text-flag-blue/80 hover:underline transition-colors"
+                      >
+                        <BookOpen size={14} className="shrink-0" />
+                        <span className="flex-1">{book.name}</span>
+                        <ExternalLink size={12} className="shrink-0 opacity-50" />
+                      </a>
                     </li>
                   ))}
                 </ul>
