@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Printer, AlertTriangle } from "lucide-react";
+import { Printer, AlertTriangle, FileDown } from "lucide-react";
 import {
   pitchingRules,
   universalPitchingRules,
@@ -15,7 +15,17 @@ const PITCHING_DIVISIONS = [
   { key: "Pony", label: "Pony" },
 ] as const;
 
-const BLANK_ROWS = 12;
+// Official PONY Baseball pitch count worksheet PDFs (two age groups)
+const PONY_PITCHING_LOG_URLS: Record<string, string> = {
+  "Pinto Kid Pitch":
+    "https://cdn1.sportngin.com/attachments/document/8fbf-1583484/PINTO_MUSTANG_-_pony_baseball_pitch_count_worksheets.pdf",
+  Mustang:
+    "https://cdn1.sportngin.com/attachments/document/8fbf-1583484/PINTO_MUSTANG_-_pony_baseball_pitch_count_worksheets.pdf",
+  Bronco:
+    "https://cdn1.sportngin.com/attachments/document/3ffb-1583485/BRONCO_PONY_-_pony_baseball_pitch_count_worksheets.pdf",
+  Pony:
+    "https://cdn1.sportngin.com/attachments/document/3ffb-1583485/BRONCO_PONY_-_pony_baseball_pitch_count_worksheets.pdf",
+};
 
 /**
  * On beforeprint: walk up from #pitching-log-print-area to body,
@@ -145,6 +155,18 @@ export default function PitchingLogPage() {
           <Printer size={16} />
           Print This Page
         </button>
+
+        {PONY_PITCHING_LOG_URLS[selectedDivision] && (
+          <a
+            href={PONY_PITCHING_LOG_URLS[selectedDivision]}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="flex items-center gap-2 px-6 py-2.5 bg-white text-flag-blue border-2 border-flag-blue font-display font-bold uppercase tracking-wider text-sm rounded-lg hover:bg-flag-blue/5 transition-colors"
+          >
+            <FileDown size={16} />
+            Official PONY Pitching Log
+          </a>
+        )}
       </div>
 
       {/* ============================================================== */}
@@ -230,37 +252,6 @@ export default function PitchingLogPage() {
               </ul>
             </div>
           </div>
-        </div>
-
-        {/* Pitching Record Table */}
-        <div className="mt-6 bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden print:mt-1 print:shadow-none print:rounded-none print:border print:border-gray-400">
-          <div className="px-6 py-4 border-b border-gray-100 print:border-gray-400 print:px-2 print:py-1">
-            <h2 className="font-display text-lg font-bold uppercase tracking-wide text-charcoal print:text-black print:text-[10px]">
-              Pitching Record
-            </h2>
-          </div>
-          <table className="w-full text-sm border-collapse print:text-[8px]">
-            <thead>
-              <tr className="border-b-2 border-gray-200 print:border-gray-400 bg-gray-50 print:bg-white">
-                {["Date", "Game / Opponent", "Player Name", "Jersey #", "Pitches", "Rest Days", "Eligible Date"].map((h) => (
-                  <th key={h} className="text-left py-2.5 px-3 font-display uppercase tracking-wider text-charcoal text-xs whitespace-nowrap print:border print:border-gray-400 print:text-[7px] print:py-0.5 print:px-1">
-                    {h}
-                  </th>
-                ))}
-              </tr>
-            </thead>
-            <tbody>
-              {Array.from({ length: BLANK_ROWS }).map((_, i) => (
-                <tr key={i} className="border-b border-gray-100 print:border-gray-400">
-                  {Array.from({ length: 7 }).map((_, j) => (
-                    <td key={j} className="py-3 px-3 print:py-[4px] print:px-1 print:border print:border-gray-400">
-                      &nbsp;
-                    </td>
-                  ))}
-                </tr>
-              ))}
-            </tbody>
-          </table>
         </div>
 
         {/* Print Footer */}
