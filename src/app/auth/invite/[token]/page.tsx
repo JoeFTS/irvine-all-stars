@@ -147,12 +147,12 @@ export default function InviteSignupPage({
       const childrenNames: string[] = [];
 
       if (inviteState.invite.role === "parent" && inviteState.invite.child_first_name && inviteState.invite.child_last_name) {
-        // Check if registration already exists (second parent case)
+        // Check if registration already exists (case-insensitive)
         const { data: existingReg } = await supabase
           .from("tryout_registrations")
           .select("id, secondary_parent_email")
-          .eq("player_first_name", inviteState.invite.child_first_name.trim())
-          .eq("player_last_name", inviteState.invite.child_last_name.trim())
+          .ilike("player_first_name", inviteState.invite.child_first_name.trim())
+          .ilike("player_last_name", inviteState.invite.child_last_name.trim())
           .maybeSingle();
 
         if (existingReg) {
@@ -167,7 +167,7 @@ export default function InviteSignupPage({
           // First parent — create partial registration
           await supabase.from("tryout_registrations").insert({
             parent_name: name,
-            parent_email: inviteState.invite.email,
+            parent_email: inviteState.invite.email.toLowerCase(),
             player_first_name: inviteState.invite.child_first_name.trim(),
             player_last_name: inviteState.invite.child_last_name.trim(),
             division: inviteState.invite.division || "",
@@ -191,8 +191,8 @@ export default function InviteSignupPage({
               const { data: existingSiblingReg } = await supabase
                 .from("tryout_registrations")
                 .select("id, secondary_parent_email")
-                .eq("player_first_name", sibling.child_first_name.trim())
-                .eq("player_last_name", sibling.child_last_name.trim())
+                .ilike("player_first_name", sibling.child_first_name.trim())
+                .ilike("player_last_name", sibling.child_last_name.trim())
                 .maybeSingle();
 
               if (existingSiblingReg) {
@@ -205,7 +205,7 @@ export default function InviteSignupPage({
               } else {
                 await supabase.from("tryout_registrations").insert({
                   parent_name: name,
-                  parent_email: inviteState.invite.email,
+                  parent_email: inviteState.invite.email.toLowerCase(),
                   player_first_name: sibling.child_first_name.trim(),
                   player_last_name: sibling.child_last_name.trim(),
                   division: sibling.division || "",
@@ -239,14 +239,14 @@ export default function InviteSignupPage({
               const { data: existingReg } = await supabase
                 .from("tryout_registrations")
                 .select("id")
-                .eq("player_first_name", pInvite.child_first_name.trim())
-                .eq("player_last_name", pInvite.child_last_name.trim())
+                .ilike("player_first_name", pInvite.child_first_name.trim())
+                .ilike("player_last_name", pInvite.child_last_name.trim())
                 .maybeSingle();
 
               if (!existingReg) {
                 await supabase.from("tryout_registrations").insert({
                   parent_name: name,
-                  parent_email: inviteState.invite.email,
+                  parent_email: inviteState.invite.email.toLowerCase(),
                   player_first_name: pInvite.child_first_name.trim(),
                   player_last_name: pInvite.child_last_name.trim(),
                   division: pInvite.division || "",
