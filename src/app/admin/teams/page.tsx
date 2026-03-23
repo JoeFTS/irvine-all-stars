@@ -19,7 +19,7 @@ interface AcceptedCoach {
   id: string;
   full_name: string;
   email: string;
-  division: string;
+  division_preference: string;
 }
 
 interface Registration {
@@ -151,7 +151,7 @@ export default function TeamsPage() {
       supabase.from("player_contracts").select("registration_id"),
       supabase
         .from("coach_applications")
-        .select("id, full_name, email, division")
+        .select("id, full_name, email, division_preference")
         .eq("status", "accepted")
         .order("full_name"),
     ]);
@@ -332,7 +332,7 @@ export default function TeamsPage() {
                 <option value="">Select accepted coach...</option>
                 {acceptedCoaches.map((c) => (
                   <option key={c.id} value={c.id}>
-                    {c.full_name} — {c.email} ({c.division})
+                    {c.full_name} — {c.email} ({c.division_preference})
                   </option>
                 ))}
               </select>
