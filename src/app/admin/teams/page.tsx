@@ -15,11 +15,12 @@ interface Team {
   created_at: string;
 }
 
-interface AcceptedCoach {
+interface CoachApplication {
   id: string;
   full_name: string;
   email: string;
   division_preference: string;
+  status: string;
 }
 
 interface Registration {
@@ -115,7 +116,7 @@ export default function TeamsPage() {
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [documents, setDocuments] = useState<Document[]>([]);
   const [contracts, setContracts] = useState<Contract[]>([]);
-  const [acceptedCoaches, setAcceptedCoaches] = useState<AcceptedCoach[]>([]);
+  const [allCoachApps, setAllCoachApps] = useState<CoachApplication[]>([]);
   const [loading, setLoading] = useState(true);
   const [divisionFilter, setDivisionFilter] = useState<string>("all");
 
@@ -155,8 +156,7 @@ export default function TeamsPage() {
       supabase.from("player_contracts").select("registration_id"),
       supabase
         .from("coach_applications")
-        .select("id, full_name, email, division_preference")
-        .eq("status", "accepted")
+        .select("id, full_name, email, division_preference, status")
         .order("full_name"),
     ]);
 
@@ -164,7 +164,7 @@ export default function TeamsPage() {
     if (regsRes.data) setRegistrations(regsRes.data);
     if (docsRes.data) setDocuments(docsRes.data);
     if (contractsRes.data) setContracts(contractsRes.data);
-    if (coachAppsRes.data) setAcceptedCoaches(coachAppsRes.data);
+    if (coachAppsRes.data) setAllCoachApps(coachAppsRes.data);
 
     setLoading(false);
   }
@@ -176,7 +176,7 @@ export default function TeamsPage() {
     setCreateError(null);
 
     const coachEmail = formCoachSource === "dropdown"
-      ? acceptedCoaches.find((c) => c.id === formCoachEmail)?.email ?? null
+      ? allCoachApps.find((c) => c.id === formCoachEmail)?.email ?? null
       : formCoachEmail.trim() || null;
 
     const teamData: {
@@ -347,7 +347,7 @@ export default function TeamsPage() {
                 onChange={(e) => {
                   const coachId = e.target.value;
                   setFormCoachEmail(coachId);
-                  const coach = acceptedCoaches.find((c) => c.id === coachId);
+                  const coach = allCoachApps.find((c) => c.id === coachId);
                   if (coach?.division_preference) {
                     setFormDivision(coach.division_preference);
                   }
@@ -355,7 +355,7 @@ export default function TeamsPage() {
                 className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
               >
                 <option value="">Select accepted coach...</option>
-                {acceptedCoaches.map((c) => (
+                {allCoachApps.filter((c) => c.status === "accepted").map((c) => (
                   <option key={c.id} value={c.id}>
                     {c.full_name} — {c.email} ({c.division_preference})
                   </option>
@@ -500,7 +500,9 @@ export default function TeamsPage() {
                       </div>
                       <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-400">
                         <span>Season: {team.season}</span>
-                        {team.coach_email && <span>Coach: {team.coach_email}</span>}
+                        {team.coach_email && (
+                          <span>Coach: {allCoachApps.find((c) => c.email.toLowerCase() === team.coach_email!.toLowerCase())?.full_name ?? team.coach_email}</span>
+                        )}
                         {!team.coach_email && team.coach_id && (
                           <span>Coach ID: {team.coach_id.slice(0, 8)}...</span>
                         )}

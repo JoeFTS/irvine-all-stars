@@ -42,6 +42,11 @@ interface CoachCert {
   cert_type: string;
 }
 
+interface CoachApp {
+  email: string;
+  full_name: string;
+}
+
 const DIVISIONS = [
   "5U-Shetland",
   "6U-Shetland",
@@ -80,6 +85,7 @@ export default function CompliancePage() {
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
   const [coachCerts, setCoachCerts] = useState<CoachCert[]>([]);
+  const [coachApps, setCoachApps] = useState<CoachApp[]>([]);
   const [loading, setLoading] = useState(true);
   const [expandedDivisions, setExpandedDivisions] = useState<Set<string>>(
     new Set()
@@ -97,7 +103,7 @@ export default function CompliancePage() {
     if (!supabase) return;
     setLoading(true);
 
-    const [regsRes, docsRes, contractsRes, teamsRes, certsRes] = await Promise.all([
+    const [regsRes, docsRes, contractsRes, teamsRes, certsRes, coachAppsRes] = await Promise.all([
       supabase
         .from("tryout_registrations")
         .select("id, player_first_name, player_last_name, division, status")
@@ -110,6 +116,7 @@ export default function CompliancePage() {
       supabase.from("player_contracts").select("registration_id"),
       supabase.from("teams").select("division, team_name, coach_id, coach_email"),
       supabase.from("coach_certifications").select("coach_id, cert_type"),
+      supabase.from("coach_applications").select("email, full_name"),
     ]);
 
     if (regsRes.data) setRegistrations(regsRes.data);
@@ -117,6 +124,7 @@ export default function CompliancePage() {
     if (contractsRes.data) setContracts(contractsRes.data);
     if (teamsRes.data) setTeams(teamsRes.data);
     if (certsRes.data) setCoachCerts(certsRes.data);
+    if (coachAppsRes.data) setCoachApps(coachAppsRes.data);
     setLoading(false);
   }
 
@@ -164,24 +172,36 @@ export default function CompliancePage() {
     }).filter((d) => d.totalPlayers > 0 || teams.some((t) => t.division === d.division));
   }, [registrations, docsByReg, contractSet, teams]);
 
+  // Email → name lookup from coach applications
+  const coachNameByEmail = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const app of coachApps) {
+      map.set(app.email.toLowerCase(), app.full_name);
+    }
+    return map;
+  }, [coachApps]);
+
   // Coach cert status per division
   const coachCertsByDivision = useMemo(() => {
-    const map = new Map<string, { teamName: string; coachEmail: string | null; hasConcussion: boolean; hasCardiac: boolean }>();
+    const map = new Map<string, { teamName: string; coachName: string | null; hasConcussion: boolean; hasCardiac: boolean }>();
     for (const team of teams) {
+      const coachName = team.coach_email
+        ? coachNameByEmail.get(team.coach_email.toLowerCase()) ?? team.coach_email
+        : null;
       if (!team.coach_id) {
-        map.set(team.division, { teamName: team.team_name, coachEmail: team.coach_email, hasConcussion: false, hasCardiac: false });
+        map.set(team.division, { teamName: team.team_name, coachName, hasConcussion: false, hasCardiac: false });
         continue;
       }
       const certs = coachCerts.filter((c) => c.coach_id === team.coach_id);
       map.set(team.division, {
         teamName: team.team_name,
-        coachEmail: team.coach_email,
+        coachName,
         hasConcussion: certs.some((c) => c.cert_type === "concussion"),
         hasCardiac: certs.some((c) => c.cert_type === "cardiac_arrest"),
       });
     }
     return map;
-  }, [teams, coachCerts]);
+  }, [teams, coachCerts, coachNameByEmail]);
 
   const overallReady = divisionData.reduce((s, d) => s + d.readyCount, 0);
   const overallTotal = divisionData.reduce((s, d) => s + d.totalPlayers, 0);
@@ -341,8 +361,8 @@ export default function CompliancePage() {
                     {coachCertsByDivision.get(div.division) && (
                       <div className="flex flex-wrap gap-x-4 text-xs text-gray-400 mt-0.5">
                         <span>Team: {coachCertsByDivision.get(div.division)!.teamName}</span>
-                        {coachCertsByDivision.get(div.division)!.coachEmail && (
-                          <span>Coach: {coachCertsByDivision.get(div.division)!.coachEmail}</span>
+                        {coachCertsByDivision.get(div.division)!.coachName && (
+                          <span>Coach: {coachCertsByDivision.get(div.division)!.coachName}</span>
                         )}
                       </div>
                     )}
@@ -454,7 +474,7 @@ export default function CompliancePage() {
                       return (
                         <div className="border-t border-gray-200 bg-flag-blue/5 px-5 py-3">
                           <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">
-                            Coach Certifications {coachInfo.coachEmail && <span className="normal-case font-normal">— {coachInfo.coachEmail}</span>}
+                            Coach Certifications {coachInfo.coachName && <span className="normal-case font-normal">— {coachInfo.coachName}</span>}
                           </p>
                           <div className="flex flex-wrap gap-4">
                             <div className="flex items-center gap-1.5">
