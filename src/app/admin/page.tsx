@@ -59,7 +59,7 @@ export default function AdminDashboard() {
             .select("division"),
           supabase!
             .from("coach_selections")
-            .select("id, division, coach_id"),
+            .select("id, division, coach_id, registration_id"),
         ]);
 
       const divisionCounts: Record<string, number> = {};
@@ -70,11 +70,29 @@ export default function AdminDashboard() {
         }
       }
 
-      // Process coach picks by division
+      // Process coach picks — only show banner for divisions where selections haven't been emailed yet
       const coachPickDivisions: Array<{ division: string; pickCount: number }> = [];
       if (coachPicksRes.data && coachPicksRes.data.length > 0) {
+        // Check which picked registrations have already had emails sent
+        const pickedRegIds = coachPicksRes.data.map((r: { registration_id: string }) => r.registration_id);
+        const { data: pickedRegs } = await supabase!
+          .from("tryout_registrations")
+          .select("id, division, selection_email_sent_at")
+          .in("id", pickedRegIds);
+
+        const emailedIds = new Set(
+          (pickedRegs ?? [])
+            .filter((r: { selection_email_sent_at: string | null }) => r.selection_email_sent_at)
+            .map((r: { id: string }) => r.id)
+        );
+
+        // Only count picks where the player hasn't been emailed yet
+        const unreviewedPicks = coachPicksRes.data.filter(
+          (p: { registration_id: string }) => !emailedIds.has(p.registration_id)
+        );
+
         const picksByDivision: Record<string, number> = {};
-        for (const row of coachPicksRes.data) {
+        for (const row of unreviewedPicks) {
           const d = row.division || "Unknown";
           picksByDivision[d] = (picksByDivision[d] || 0) + 1;
         }
