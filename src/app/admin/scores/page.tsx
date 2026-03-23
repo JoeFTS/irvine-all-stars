@@ -160,24 +160,51 @@ export default function ScoresPage() {
               Pre-filled Excel sheets with player names and scoring columns. Print for coaches or fill in digitally.
             </p>
           </div>
-          <a
-            href="/api/score-sheet?blank=true"
-            download
+          <button
+            onClick={async () => {
+              if (!supabase) return;
+              const { data: { session } } = await supabase.auth.getSession();
+              const res = await fetch("/api/score-sheet?blank=true", {
+                headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {},
+              });
+              if (!res.ok) return alert("Download failed");
+              const blob = await res.blob();
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = "Blank_Score_Sheet.xlsx";
+              a.click();
+              URL.revokeObjectURL(url);
+            }}
             className="inline-flex items-center gap-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wide hover:bg-gray-200 transition-colors shrink-0"
           >
             <Download size={14} />
             Blank Template
-          </a>
+          </button>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
           {DIVISIONS.map((div) => {
             const count = divisionRegCounts[div] || 0;
             return (
-              <a
+              <button
                 key={div}
-                href={count > 0 ? `/api/score-sheet?division=${encodeURIComponent(div)}` : undefined}
-                download={count > 0 ? true : undefined}
-                className={`flex items-center gap-3 p-3 rounded-lg border transition-colors ${
+                disabled={count === 0}
+                onClick={async () => {
+                  if (!supabase || count === 0) return;
+                  const { data: { session } } = await supabase.auth.getSession();
+                  const res = await fetch(`/api/score-sheet?division=${encodeURIComponent(div)}`, {
+                    headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {},
+                  });
+                  if (!res.ok) return alert("Download failed");
+                  const blob = await res.blob();
+                  const url = URL.createObjectURL(blob);
+                  const a = document.createElement("a");
+                  a.href = url;
+                  a.download = `${div}_Score_Sheet.xlsx`;
+                  a.click();
+                  URL.revokeObjectURL(url);
+                }}
+                className={`flex items-center gap-3 p-3 rounded-lg border transition-colors text-left ${
                   count > 0
                     ? "border-flag-blue/20 bg-flag-blue/5 hover:bg-flag-blue/10 cursor-pointer"
                     : "border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed"
@@ -190,7 +217,7 @@ export default function ScoresPage() {
                     {count} registered player{count !== 1 ? "s" : ""}
                   </p>
                 </div>
-              </a>
+              </button>
             );
           })}
         </div>

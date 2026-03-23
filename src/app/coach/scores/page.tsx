@@ -316,14 +316,27 @@ export default function CoachScoresPage() {
               This template already has your players&apos; names filled in.
               Just enter the scores.
             </p>
-            <a
-              href={`/api/score-sheet?division=${encodeURIComponent(division)}`}
-              download
+            <button
+              onClick={async () => {
+                if (!supabase) return;
+                const { data: { session } } = await supabase.auth.getSession();
+                const res = await fetch(`/api/score-sheet?division=${encodeURIComponent(division)}`, {
+                  headers: session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {},
+                });
+                if (!res.ok) return alert("Download failed");
+                const blob = await res.blob();
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement("a");
+                a.href = url;
+                a.download = `${division}_Score_Sheet.xlsx`;
+                a.click();
+                URL.revokeObjectURL(url);
+              }}
               className="inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-flag-blue text-white px-5 py-3 sm:py-2.5 min-h-[44px] rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors"
             >
               <Download size={16} />
               Download Score Sheet
-            </a>
+            </button>
           </div>
         </div>
       </div>
