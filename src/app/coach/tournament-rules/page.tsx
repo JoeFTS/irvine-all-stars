@@ -17,7 +17,20 @@ const DIVISIONS = [
   { key: "pinto_machine", label: "Pinto Machine Pitch", subtitle: "7U MP, 8U MP" },
   { key: "pinto_kid", label: "Pinto Kid Pitch", subtitle: "7U KP, 8U KP" },
   { key: "mustang_bronco", label: "Mustang / Bronco", subtitle: "9U-12U" },
+  { key: "pony", label: "Pony", subtitle: "13U, 14U" },
 ] as const;
+
+// Map coach profile division (e.g. "12U-Bronco") to tab key
+function divisionToTabKey(division: string | null): string | null {
+  if (!division) return null;
+  const d = division.toLowerCase();
+  if (d.includes("shetland")) return "shetland";
+  if (d.includes("pinto") && d.includes("mp")) return "pinto_machine";
+  if (d.includes("pinto") && d.includes("kp")) return "pinto_kid";
+  if (d.includes("mustang") || d.includes("bronco")) return "mustang_bronco";
+  if (d.includes("pony")) return "pony";
+  return null;
+}
 
 const COMMON_RULES = {
   title: "TOURNAMENT BASEBALL RULES: KNOW THE RULES!",
@@ -100,6 +113,10 @@ const DIVISION_SPECIFIC: Record<
     note: "PONY Baseball Rule Book (Blue Pages), PONY Baseball Rule (White Pages), Official MLB Baseball Rules apply.",
     ruleBooks: [...COMMON_RULE_BOOKS],
   },
+  pony: {
+    note: "PONY Baseball Rule Book (Blue Pages), PONY Baseball Rule (White Pages), Official MLB Baseball Rules apply. Pony division is inter-league — know host league ground rules.",
+    ruleBooks: [...COMMON_RULE_BOOKS],
+  },
 };
 
 export default function TournamentRulesPage() {
@@ -110,6 +127,7 @@ export default function TournamentRulesPage() {
   const [coachName, setCoachName] = useState("");
   const [checked, setChecked] = useState(false);
   const [submitting, setSubmitting] = useState(false);
+  const [submitMessage, setSubmitMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
 
   const fetchAgreements = useCallback(async () => {
     if (!supabase || !user) return;
@@ -132,10 +150,30 @@ export default function TournamentRulesPage() {
     fetchAgreements();
   }, [fetchAgreements]);
 
+  // Auto-select division tab based on coach's profile
+  const [divisionLoaded, setDivisionLoaded] = useState(false);
+  useEffect(() => {
+    async function loadCoachDivision() {
+      if (!supabase || !user || divisionLoaded) return;
+      const { data } = await supabase
+        .from("profiles")
+        .select("division")
+        .eq("id", user.id)
+        .single();
+      if (data?.division) {
+        const tabKey = divisionToTabKey(data.division);
+        if (tabKey) setActiveDivision(tabKey);
+      }
+      setDivisionLoaded(true);
+    }
+    loadCoachDivision();
+  }, [user, divisionLoaded]);
+
   // Reset form when switching divisions
   useEffect(() => {
     setChecked(false);
     setCoachName("");
+    setSubmitMessage(null);
   }, [activeDivision]);
 
   const getAgreement = (divKey: string) =>
@@ -149,24 +187,34 @@ export default function TournamentRulesPage() {
 
     const existing = getAgreement(activeDivision);
 
+    let error;
     if (existing) {
-      await supabase
+      ({ error } = await supabase
         .from("tournament_agreements")
         .update({
           coach_name: coachName.trim(),
           acknowledged_at: now,
         })
-        .eq("id", existing.id);
+        .eq("id", existing.id));
     } else {
-      await supabase.from("tournament_agreements").insert({
+      ({ error } = await supabase.from("tournament_agreements").insert({
         coach_id: user.id,
         agreement_type: activeDivision,
         coach_name: coachName.trim(),
         acknowledged_at: now,
-      });
+      }));
     }
 
-    await fetchAgreements();
+    if (error) {
+      console.error("Acknowledgment error:", error);
+      setSubmitMessage({ type: "error", text: "Failed to save acknowledgment. Please try again." });
+    } else {
+      await fetchAgreements();
+      const divLabel = DIVISIONS.find((d) => d.key === activeDivision)?.label ?? activeDivision;
+      setSubmitMessage({ type: "success", text: `${divLabel} rules acknowledged successfully!` });
+      setTimeout(() => setSubmitMessage(null), 6000);
+    }
+
     setSubmitting(false);
     setChecked(false);
     setCoachName("");
@@ -317,6 +365,20 @@ export default function TournamentRulesPage() {
               </div>
             </div>
           </div>
+
+          {/* Submit Message */}
+          {submitMessage && (
+            <div
+              className={`rounded-lg px-4 py-3 text-sm font-semibold flex items-center gap-2 ${
+                submitMessage.type === "success"
+                  ? "bg-green-50 border border-green-200 text-green-800"
+                  : "bg-red-50 border border-red-200 text-red-800"
+              }`}
+            >
+              {submitMessage.type === "success" ? <CheckCircle2 size={16} /> : <AlertTriangle size={16} />}
+              {submitMessage.text}
+            </div>
+          )}
 
           {/* Acknowledgment Section */}
           <div className="bg-white rounded-xl border border-gray-200 shadow-sm overflow-hidden">
