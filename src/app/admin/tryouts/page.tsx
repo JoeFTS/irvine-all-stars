@@ -905,7 +905,7 @@ export default function TryoutsPage() {
                 }`}
               >
                 <Star size={10} className="inline -mt-0.5 mr-1" />
-                All Picks{coachSelections.length > 0 ? ` (${coachSelections.length})` : ""}
+                Coaches&apos; Picks{coachSelections.length > 0 ? ` (${coachSelections.length})` : ""}
               </button>
               {coachSelections.length > 0 && (
                 <>
@@ -918,7 +918,7 @@ export default function TryoutsPage() {
                   }`}
                 >
                   <UserPlus size={10} className="inline -mt-0.5 mr-1" />
-                  New Picks
+                  New Coaches&apos; Picks
                   {` (${registrations.filter((r) => (divisionFilter === "all" || r.division === divisionFilter) && coachPickRegIds.has(r.id) && !r.selection_email_sent_at).length})`}
                 </button>
                 <button
