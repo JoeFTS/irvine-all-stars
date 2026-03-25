@@ -47,6 +47,16 @@ interface CoachApp {
   full_name: string;
 }
 
+interface TournamentAgreement {
+  id: string;
+  coach_id: string;
+  division: string;
+  agreement_type: string;
+  coach_name: string;
+  acknowledged: boolean;
+  acknowledged_at: string;
+}
+
 const DIVISIONS = [
   "5U-Shetland",
   "6U-Shetland",
@@ -86,6 +96,8 @@ export default function CompliancePage() {
   const [teams, setTeams] = useState<Team[]>([]);
   const [coachCerts, setCoachCerts] = useState<CoachCert[]>([]);
   const [coachApps, setCoachApps] = useState<CoachApp[]>([]);
+  const [agreements, setAgreements] = useState<TournamentAgreement[]>([]);
+  const [profiles, setProfiles] = useState<Array<{ id: string; email: string; full_name: string; division: string | null }>>([]);
   const [loading, setLoading] = useState(true);
   const [expandedDivisions, setExpandedDivisions] = useState<Set<string>>(
     new Set()
@@ -103,7 +115,7 @@ export default function CompliancePage() {
     if (!supabase) return;
     setLoading(true);
 
-    const [regsRes, docsRes, contractsRes, teamsRes, certsRes, coachAppsRes] = await Promise.all([
+    const [regsRes, docsRes, contractsRes, teamsRes, certsRes, coachAppsRes, agreementsRes, profilesRes] = await Promise.all([
       supabase
         .from("tryout_registrations")
         .select("id, player_first_name, player_last_name, division, status")
@@ -117,6 +129,8 @@ export default function CompliancePage() {
       supabase.from("teams").select("division, team_name, coach_id, coach_email"),
       supabase.from("coach_certifications").select("coach_id, cert_type"),
       supabase.from("coach_applications").select("email, full_name"),
+      supabase.from("tournament_agreements").select("*"),
+      supabase.from("profiles").select("id, email, full_name, division").eq("role", "coach"),
     ]);
 
     if (regsRes.data) setRegistrations(regsRes.data);
@@ -125,6 +139,8 @@ export default function CompliancePage() {
     if (teamsRes.data) setTeams(teamsRes.data);
     if (certsRes.data) setCoachCerts(certsRes.data);
     if (coachAppsRes.data) setCoachApps(coachAppsRes.data);
+    if (agreementsRes.data) setAgreements(agreementsRes.data);
+    if (profilesRes.data) setProfiles(profilesRes.data);
     setLoading(false);
   }
 
@@ -504,6 +520,87 @@ export default function CompliancePage() {
           })}
         </div>
       )}
+
+      {/* Coach Pre-Tournament Agreements */}
+      <div className="mt-10">
+        <div className="mb-4">
+          <h2 className="font-display text-2xl font-bold uppercase tracking-wide">
+            Pre-Tournament Coach Agreements
+          </h2>
+          <p className="text-gray-400 text-sm mt-1">
+            Coaches must acknowledge they have read and understand the tournament rules for their division.
+          </p>
+        </div>
+
+        {profiles.length === 0 ? (
+          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+            <p className="text-gray-400 text-sm">No coaches registered yet.</p>
+          </div>
+        ) : (
+          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+            {/* Header */}
+            <div className="hidden sm:grid grid-cols-[1fr_150px_150px_180px] gap-2 px-5 py-3 bg-gray-50 text-[10px] font-semibold text-gray-400 uppercase tracking-wider border-b border-gray-100">
+              <span>Coach</span>
+              <span>Division</span>
+              <span>Status</span>
+              <span>Signed</span>
+            </div>
+
+            {profiles.map((coach) => {
+              const agreement = agreements.find((a) => a.coach_id === coach.id);
+              const signed = agreement?.acknowledged;
+
+              return (
+                <div
+                  key={coach.id}
+                  className={`grid grid-cols-1 sm:grid-cols-[1fr_150px_150px_180px] gap-2 px-5 py-3 border-b border-gray-50 last:border-0 items-center ${
+                    signed ? "" : "bg-red-50/30"
+                  }`}
+                >
+                  <div>
+                    <p className="text-sm font-semibold text-charcoal">{coach.full_name}</p>
+                    <p className="text-xs text-gray-400">{coach.email}</p>
+                  </div>
+                  <div>
+                    <span className="text-xs font-semibold text-gray-600">
+                      {coach.division || "—"}
+                    </span>
+                  </div>
+                  <div>
+                    {signed ? (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-green-100 text-green-700">
+                        <CheckCircle2 size={12} />
+                        Signed
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-700">
+                        <XCircle size={12} />
+                        Not Signed
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {signed && agreement ? (
+                      <span>
+                        {agreement.coach_name} — {new Date(agreement.acknowledged_at).toLocaleDateString()}
+                      </span>
+                    ) : (
+                      <span className="text-gray-300">—</span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+
+            {/* Summary */}
+            <div className="px-5 py-3 bg-gray-50 border-t border-gray-200 flex items-center justify-between">
+              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                {agreements.filter((a) => a.acknowledged).length} of {profiles.length} coaches signed
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
     </div>
   );
 }
