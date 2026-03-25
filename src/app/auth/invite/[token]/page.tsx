@@ -13,6 +13,7 @@ interface Invite {
   parent_name: string | null;
   child_first_name: string | null;
   child_last_name: string | null;
+  current_team: string | null;
   token: string;
   used: boolean;
   created_at: string;
@@ -50,7 +51,7 @@ export default function InviteSignupPage({
 
       const { data, error: fetchError } = await supabase
         .from("invites")
-        .select("id, email, role, division, parent_name, child_first_name, child_last_name, token, used, created_at, expires_at")
+        .select("id, email, role, division, parent_name, child_first_name, child_last_name, current_team, token, used, created_at, expires_at")
         .eq("token", token)
         .single();
 
@@ -165,21 +166,23 @@ export default function InviteSignupPage({
           }
         } else {
           // First parent — create partial registration
-          await supabase.from("tryout_registrations").insert({
+          const regData: Record<string, string> = {
             parent_name: name,
             parent_email: inviteState.invite.email.toLowerCase(),
             player_first_name: inviteState.invite.child_first_name.trim(),
             player_last_name: inviteState.invite.child_last_name.trim(),
             division: inviteState.invite.division || "",
             status: "registered",
-          });
+          };
+          if (inviteState.invite.current_team) regData.current_team = inviteState.invite.current_team;
+          await supabase.from("tryout_registrations").insert(regData);
         }
         childrenNames.push(inviteState.invite.child_first_name.trim());
 
         // 4b. Process sibling invites for the same parent email
         const { data: siblingInvites } = await supabase
           .from("invites")
-          .select("id, child_first_name, child_last_name, division, token")
+          .select("id, child_first_name, child_last_name, division, current_team, token")
           .eq("email", inviteState.invite.email)
           .eq("role", "parent")
           .eq("used", false)
@@ -203,14 +206,16 @@ export default function InviteSignupPage({
                     .eq("id", existingSiblingReg.id);
                 }
               } else {
-                await supabase.from("tryout_registrations").insert({
+                const sibRegData: Record<string, string> = {
                   parent_name: name,
                   parent_email: inviteState.invite.email.toLowerCase(),
                   player_first_name: sibling.child_first_name.trim(),
                   player_last_name: sibling.child_last_name.trim(),
                   division: sibling.division || "",
                   status: "registered",
-                });
+                };
+                if (sibling.current_team) sibRegData.current_team = sibling.current_team;
+                await supabase.from("tryout_registrations").insert(sibRegData);
               }
               childrenNames.push(sibling.child_first_name.trim());
             }
@@ -228,7 +233,7 @@ export default function InviteSignupPage({
       if (inviteState.invite.role === "coach") {
         const { data: parentInvites } = await supabase
           .from("invites")
-          .select("id, child_first_name, child_last_name, division")
+          .select("id, child_first_name, child_last_name, division, current_team")
           .eq("email", inviteState.invite.email)
           .eq("role", "parent")
           .eq("used", false);
@@ -244,14 +249,16 @@ export default function InviteSignupPage({
                 .maybeSingle();
 
               if (!existingReg) {
-                await supabase.from("tryout_registrations").insert({
+                const pRegData: Record<string, string> = {
                   parent_name: name,
                   parent_email: inviteState.invite.email.toLowerCase(),
                   player_first_name: pInvite.child_first_name.trim(),
                   player_last_name: pInvite.child_last_name.trim(),
                   division: pInvite.division || "",
                   status: "registered",
-                });
+                };
+                if (pInvite.current_team) pRegData.current_team = pInvite.current_team;
+                await supabase.from("tryout_registrations").insert(pRegData);
               }
               childrenNames.push(pInvite.child_first_name.trim());
             }

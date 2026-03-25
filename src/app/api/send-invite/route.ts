@@ -111,7 +111,7 @@ ${childLine}<p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0 0 24
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, role, division, parent_name, child_first_name, child_last_name, children } = body;
+    const { email, role, division, parent_name, child_first_name, child_last_name, children, current_team } = body;
 
     if (!email || !role || !["coach", "parent"].includes(role)) {
       return NextResponse.json(
@@ -160,6 +160,7 @@ export async function POST(request: NextRequest) {
         if (child.division) childInsert.division = child.division;
         if (child.child_first_name) childInsert.child_first_name = child.child_first_name;
         if (child.child_last_name) childInsert.child_last_name = child.child_last_name;
+        if (child.current_team) childInsert.current_team = child.current_team;
 
         await supabase.from("invites").insert(childInsert);
       }
@@ -223,6 +224,7 @@ export async function POST(request: NextRequest) {
         if (parent_name) insertData.parent_name = parent_name;
         if (child.child_first_name) insertData.child_first_name = child.child_first_name;
         if (child.child_last_name) insertData.child_last_name = child.child_last_name;
+        if (child.current_team) insertData.current_team = child.current_team;
 
         const { data: invite, error: insertError } = await supabase
           .from("invites")
@@ -300,6 +302,7 @@ export async function POST(request: NextRequest) {
     if (parent_name) insertData.parent_name = parent_name;
     if (child_first_name) insertData.child_first_name = child_first_name;
     if (child_last_name) insertData.child_last_name = child_last_name;
+    if (current_team) insertData.current_team = current_team;
 
     const { data: invite, error: insertError } = await supabase
       .from("invites")

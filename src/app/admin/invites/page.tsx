@@ -19,6 +19,19 @@ const DIVISION_OPTIONS = [
   "14U-Pony",
 ] as const;
 
+const TEAM_OPTIONS = [
+  "Astros",
+  "Baystars",
+  "Blue Jays",
+  "Cardinals",
+  "Dodgers",
+  "Marlins",
+  "Red Sox",
+  "Royals",
+  "Twins",
+  "Yankees",
+] as const;
+
 interface Invite {
   id: string;
   email: string;
@@ -39,6 +52,7 @@ interface CsvRow {
   child_first_name: string;
   child_last_name: string;
   division: string;
+  current_team: string;
   status: "pending" | "sent" | "duplicate" | "error";
 }
 
@@ -82,20 +96,68 @@ function parseCSV(text: string): CsvRow[] {
         child_first_name: cols[2] || "",
         child_last_name: cols[3] || "",
         division: cols[4] || "",
+        current_team: cols[5] || "",
         status: "pending" as const,
       };
     })
     .filter((row) => row.parent_email); // Skip empty rows
 }
 
-function downloadTemplate() {
-  const csv =
-    "parent_name,parent_email,child_first_name,child_last_name,division\nJane Smith,jane@example.com,Tommy,Smith,9U-Mustang\n";
-  const blob = new Blob([csv], { type: "text/csv" });
+async function downloadTemplate() {
+  const ExcelJS = (await import("exceljs")).default;
+  const workbook = new ExcelJS.Workbook();
+  const sheet = workbook.addWorksheet("invite-template");
+
+  // Header row
+  const headers = ["parent_name", "parent_email", "child_first_name", "child_last_name", "division", "current_team"];
+  const headerRow = sheet.addRow(headers);
+  headerRow.eachCell((cell) => {
+    cell.font = { bold: true };
+  });
+
+  // Sample data row
+  sheet.addRow(["Jane Smith", "jane@example.com", "Tommy", "Smith", "9U-Mustang", "Dodgers"]);
+
+  // Set column widths
+  sheet.columns = [
+    { width: 20 }, // parent_name
+    { width: 28 }, // parent_email
+    { width: 18 }, // child_first_name
+    { width: 18 }, // child_last_name
+    { width: 18 }, // division
+    { width: 18 }, // current_team
+  ];
+
+  // Add dropdown validations (rows 2-200)
+  const divisionList = DIVISION_OPTIONS.join(",");
+  const teamList = TEAM_OPTIONS.join(",");
+  for (let row = 2; row <= 200; row++) {
+    sheet.getCell(`E${row}`).dataValidation = {
+      type: "list",
+      allowBlank: true,
+      formulae: [`"${divisionList}"`],
+      showErrorMessage: true,
+      errorTitle: "Invalid Division",
+      error: "Please select a division from the dropdown list.",
+    };
+    sheet.getCell(`F${row}`).dataValidation = {
+      type: "list",
+      allowBlank: true,
+      formulae: [`"${teamList}"`],
+      showErrorMessage: true,
+      errorTitle: "Invalid Team",
+      error: "Please select a team from the dropdown list.",
+    };
+  }
+
+  const buffer = await workbook.xlsx.writeBuffer();
+  const blob = new Blob([buffer], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  });
   const url = URL.createObjectURL(blob);
   const a = document.createElement("a");
   a.href = url;
-  a.download = "invite-template.csv";
+  a.download = "invite-template.xlsx";
   a.click();
   URL.revokeObjectURL(url);
 }
@@ -226,17 +288,43 @@ export default function AdminInvitesPage() {
     }
   }
 
-  function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
+  async function handleFileUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
     setCsvResults(null);
-    const reader = new FileReader();
-    reader.onload = (evt) => {
-      const text = evt.target?.result as string;
-      const rows = parseCSV(text);
+
+    if (file.name.endsWith(".xlsx") || file.name.endsWith(".xls")) {
+      const ExcelJS = (await import("exceljs")).default;
+      const workbook = new ExcelJS.Workbook();
+      const buffer = await file.arrayBuffer();
+      await workbook.xlsx.load(buffer);
+      const sheet = workbook.worksheets[0];
+      const rows: CsvRow[] = [];
+      sheet.eachRow((row, rowNumber) => {
+        if (rowNumber === 1) return; // Skip header
+        const vals = (row.values as (string | undefined)[]).slice(1); // row.values is 1-indexed
+        const email = (vals[1] || "").toString().trim().toLowerCase();
+        if (!email) return;
+        rows.push({
+          parent_name: (vals[0] || "").toString().trim(),
+          parent_email: email,
+          child_first_name: (vals[2] || "").toString().trim(),
+          child_last_name: (vals[3] || "").toString().trim(),
+          division: (vals[4] || "").toString().trim(),
+          current_team: (vals[5] || "").toString().trim(),
+          status: "pending",
+        });
+      });
       setCsvRows(rows);
-    };
-    reader.readAsText(file);
+    } else {
+      const reader = new FileReader();
+      reader.onload = (evt) => {
+        const text = evt.target?.result as string;
+        const rows = parseCSV(text);
+        setCsvRows(rows);
+      };
+      reader.readAsText(file);
+    }
   }
 
   async function sendAll() {
@@ -262,6 +350,7 @@ export default function AdminInvitesPage() {
             parent_name: row.parent_name,
             child_first_name: row.child_first_name,
             child_last_name: row.child_last_name,
+            current_team: row.current_team || undefined,
           }),
         });
         if (res.ok) {
@@ -651,7 +740,7 @@ export default function AdminInvitesPage() {
             className="inline-flex items-center gap-2 text-sm font-display font-semibold text-flag-blue hover:text-flag-blue-mid uppercase tracking-wide transition-colors"
           >
             <Download size={15} />
-            Download Template CSV
+            Download Template
           </button>
         </div>
 
@@ -660,7 +749,7 @@ export default function AdminInvitesPage() {
           <p className="text-sm text-gray-500 mb-2">Choose a CSV file or drag and drop</p>
           <input
             type="file"
-            accept=".csv"
+            accept=".csv,.xlsx,.xls"
             onChange={handleFileUpload}
             className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-flag-blue/10 file:text-flag-blue hover:file:bg-flag-blue/20 file:cursor-pointer"
           />
@@ -689,6 +778,9 @@ export default function AdminInvitesPage() {
                       Division
                     </th>
                     <th className="px-4 py-2 font-display font-semibold text-charcoal uppercase tracking-wide text-xs">
+                      Current Team
+                    </th>
+                    <th className="px-4 py-2 font-display font-semibold text-charcoal uppercase tracking-wide text-xs">
                       Status
                     </th>
                   </tr>
@@ -701,6 +793,7 @@ export default function AdminInvitesPage() {
                       <td className="px-4 py-2 text-charcoal">{row.child_first_name}</td>
                       <td className="px-4 py-2 text-charcoal">{row.child_last_name}</td>
                       <td className="px-4 py-2 text-charcoal">{row.division}</td>
+                      <td className="px-4 py-2 text-charcoal">{row.current_team}</td>
                       <td className="px-4 py-2">
                         <span
                           className={`inline-block px-2.5 py-0.5 rounded-full text-xs font-semibold capitalize ${csvStatusStyles[row.status]}`}
