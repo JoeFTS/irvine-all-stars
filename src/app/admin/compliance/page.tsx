@@ -9,6 +9,9 @@ import {
   ChevronUp,
   CheckCircle2,
   XCircle,
+  Eye,
+  X,
+  Printer,
 } from "lucide-react";
 
 /* ---------- Types ---------- */
@@ -99,6 +102,7 @@ export default function CompliancePage() {
   const [agreements, setAgreements] = useState<TournamentAgreement[]>([]);
   const [profiles, setProfiles] = useState<Array<{ id: string; email: string; full_name: string; division: string | null }>>([]);
   const [loading, setLoading] = useState(true);
+  const [viewingAgreement, setViewingAgreement] = useState<{ coach: typeof profiles[0]; agreement: TournamentAgreement } | null>(null);
   const [expandedDivisions, setExpandedDivisions] = useState<Set<string>>(
     new Set()
   );
@@ -579,11 +583,20 @@ export default function CompliancePage() {
                       </span>
                     )}
                   </div>
-                  <div className="text-xs text-gray-500">
+                  <div className="flex items-center gap-2 text-xs text-gray-500">
                     {signed && agreement ? (
-                      <span>
-                        {agreement.coach_name} — {new Date(agreement.acknowledged_at).toLocaleDateString()}
-                      </span>
+                      <>
+                        <span>
+                          {agreement.coach_name} — {new Date(agreement.acknowledged_at).toLocaleDateString()}
+                        </span>
+                        <button
+                          onClick={() => setViewingAgreement({ coach, agreement })}
+                          className="inline-flex items-center gap-1 px-2 py-1 rounded text-[10px] font-semibold uppercase tracking-wide bg-flag-blue/10 text-flag-blue hover:bg-flag-blue/20 transition-colors"
+                        >
+                          <Eye size={10} />
+                          View
+                        </button>
+                      </>
                     ) : (
                       <span className="text-gray-300">—</span>
                     )}
@@ -601,6 +614,112 @@ export default function CompliancePage() {
           </div>
         )}
       </div>
+
+      {/* Printable Agreement Modal */}
+      {viewingAgreement && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 print:p-0 print:bg-white print:items-start">
+          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto print:max-h-none print:overflow-visible print:rounded-none print:shadow-none">
+            {/* Modal header — hidden on print */}
+            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 print:hidden">
+              <h3 className="font-display text-lg font-bold uppercase tracking-wide text-charcoal">
+                Tournament Rules Agreement
+              </h3>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => window.print()}
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wide bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
+                >
+                  <Printer size={12} />
+                  Print
+                </button>
+                <button
+                  onClick={() => setViewingAgreement(null)}
+                  className="p-1.5 text-gray-400 hover:text-gray-600 transition-colors"
+                >
+                  <X size={18} />
+                </button>
+              </div>
+            </div>
+
+            {/* Printable content */}
+            <div className="px-6 py-8 print:px-12 print:py-8">
+              {/* Header */}
+              <div className="text-center mb-8">
+                <p className="text-sm text-gray-500 uppercase tracking-widest mb-1">Irvine PONY Baseball</p>
+                <h1 className="text-2xl font-bold uppercase tracking-wide text-flag-blue">
+                  2026 All-Stars Pre-Tournament Rules
+                </h1>
+                <h2 className="text-lg font-semibold text-charcoal mt-1">
+                  Coach Acknowledgment
+                </h2>
+              </div>
+
+              {/* Coach Info */}
+              <div className="border border-gray-200 rounded-lg p-5 mb-6 print:border-gray-400">
+                <div className="grid grid-cols-2 gap-4 text-sm">
+                  <div>
+                    <p className="text-xs text-gray-400 uppercase tracking-wide font-semibold mb-0.5">Coach Name</p>
+                    <p className="font-semibold text-charcoal">{viewingAgreement.coach.full_name}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400 uppercase tracking-wide font-semibold mb-0.5">Email</p>
+                    <p className="text-charcoal">{viewingAgreement.coach.email}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400 uppercase tracking-wide font-semibold mb-0.5">Division</p>
+                    <p className="font-semibold text-charcoal">{viewingAgreement.coach.division || viewingAgreement.agreement.division}</p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400 uppercase tracking-wide font-semibold mb-0.5">Rules Category</p>
+                    <p className="text-charcoal">{viewingAgreement.agreement.division}</p>
+                  </div>
+                </div>
+              </div>
+
+              {/* Agreement Text */}
+              <div className="mb-6">
+                <p className="text-sm text-gray-700 leading-relaxed">
+                  I, <strong>{viewingAgreement.agreement.coach_name}</strong>, hereby acknowledge that I have read,
+                  understand, and agree to abide by all tournament rules and regulations for the{" "}
+                  <strong>{viewingAgreement.agreement.division}</strong> division of the 2026 Irvine PONY All-Stars season.
+                </p>
+                <p className="text-sm text-gray-700 leading-relaxed mt-3">
+                  I understand that it is my responsibility as a coach to know and follow all applicable PONY Baseball rules,
+                  including but not limited to pitch count regulations, substitution rules, bat requirements, and coaching conduct
+                  standards. I acknowledge that local league rules and CIF rules do not apply to tournament play.
+                </p>
+              </div>
+
+              {/* Signature Block */}
+              <div className="border-t border-gray-300 pt-6 mt-8">
+                <div className="grid grid-cols-2 gap-8">
+                  <div>
+                    <p className="text-xs text-gray-400 uppercase tracking-wide font-semibold mb-2">Digital Signature</p>
+                    <p className="text-xl font-serif italic text-charcoal border-b border-gray-300 pb-2">
+                      {viewingAgreement.agreement.coach_name}
+                    </p>
+                  </div>
+                  <div>
+                    <p className="text-xs text-gray-400 uppercase tracking-wide font-semibold mb-2">Date Signed</p>
+                    <p className="text-lg text-charcoal border-b border-gray-300 pb-2">
+                      {new Date(viewingAgreement.agreement.acknowledged_at).toLocaleDateString("en-US", {
+                        weekday: "long",
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}
+                    </p>
+                  </div>
+                </div>
+                <p className="text-[10px] text-gray-400 mt-4 text-center">
+                  This agreement was digitally signed via irvineallstars.com on{" "}
+                  {new Date(viewingAgreement.agreement.acknowledged_at).toLocaleString()}.
+                </p>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
