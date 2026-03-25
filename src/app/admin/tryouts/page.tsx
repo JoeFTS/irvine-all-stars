@@ -197,6 +197,7 @@ export default function TryoutsPage() {
   const [bulkSelectedIds, setBulkSelectedIds] = useState<Set<string>>(new Set());
   const [bulkUpdating, setBulkUpdating] = useState(false);
   const [bulkProgress, setBulkProgress] = useState({ done: 0, total: 0, emailsSent: 0, emailsFailed: 0 });
+  const [bulkResultMessage, setBulkResultMessage] = useState<{ type: "success" | "error"; text: string } | null>(null);
   // Derived: IDs where selection email has been sent (persisted in DB)
   const emailSentIds = new Set(registrations.filter((r) => r.selection_email_sent_at).map((r) => r.id));
 
@@ -391,6 +392,10 @@ export default function TryoutsPage() {
 
     setBulkSelectedIds(new Set());
     setBulkUpdating(false);
+
+    const label = STATUS_OPTIONS.find((o) => o.value === newStatus)?.label ?? newStatus;
+    setBulkResultMessage({ type: "success", text: `${ids.length} player${ids.length > 1 ? "s" : ""} set to "${label}".` });
+    setTimeout(() => setBulkResultMessage(null), 5000);
   }
 
   async function bulkSendEmails() {
@@ -443,6 +448,21 @@ export default function TryoutsPage() {
 
     setBulkSelectedIds(new Set());
     setBulkUpdating(false);
+
+    // Show result message
+    if (emailsSent > 0 && emailsFailed === 0) {
+      setBulkResultMessage({ type: "success", text: `${emailsSent} selection email${emailsSent > 1 ? "s" : ""} sent successfully.` });
+    } else if (emailsSent > 0 && emailsFailed > 0) {
+      setBulkResultMessage({ type: "error", text: `${emailsSent} email${emailsSent > 1 ? "s" : ""} sent, ${emailsFailed} failed. Check failed players and retry.` });
+    } else if (emailsFailed > 0) {
+      setBulkResultMessage({ type: "error", text: `All ${emailsFailed} emails failed to send. Check player statuses and try again.` });
+    }
+
+    // Auto-dismiss after 8 seconds
+    setTimeout(() => setBulkResultMessage(null), 8000);
+
+    // If viewing New Coaches' Picks, the list will auto-update since
+    // selection_email_sent_at is now set on those players
   }
 
   /* ---------- Session CRUD ---------- */
@@ -965,6 +985,25 @@ export default function TryoutsPage() {
               )}
             </div>
           </div>
+
+          {/* Bulk Result Message */}
+          {bulkResultMessage && (
+            <div
+              className={`mb-3 rounded-lg px-4 py-3 text-sm font-semibold flex items-center justify-between ${
+                bulkResultMessage.type === "success"
+                  ? "bg-green-50 border border-green-200 text-green-800"
+                  : "bg-flag-red/10 border border-flag-red/30 text-flag-red"
+              }`}
+            >
+              <span className="flex items-center gap-2">
+                {bulkResultMessage.type === "success" ? <Check size={16} /> : <AlertTriangle size={16} />}
+                {bulkResultMessage.text}
+              </span>
+              <button onClick={() => setBulkResultMessage(null)} className="ml-4 opacity-60 hover:opacity-100">
+                <X size={14} />
+              </button>
+            </div>
+          )}
 
           {/* Bulk Action Bar */}
           <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3">
