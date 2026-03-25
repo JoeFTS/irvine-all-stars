@@ -304,15 +304,25 @@ export default function TryoutsPage() {
     setUpdatingId(null);
   }
 
+  async function getAuthHeaders(): Promise<Record<string, string>> {
+    if (!supabase) return { "Content-Type": "application/json" };
+    const { data: { session } } = await supabase.auth.getSession();
+    return {
+      "Content-Type": "application/json",
+      ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}),
+    };
+  }
+
   async function sendSelectionEmail(id: string) {
     const reg = registrations.find((r) => r.id === id);
     if (!reg) return;
 
     setUpdatingId(id);
     try {
+      const headers = await getAuthHeaders();
       const res = await fetch("/api/send-selection", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           registration_id: id,
           status: reg.status,
@@ -405,6 +415,7 @@ export default function TryoutsPage() {
     setBulkUpdating(true);
     setBulkProgress({ done: 0, total: ids.length, emailsSent: 0, emailsFailed: 0 });
 
+    const headers = await getAuthHeaders();
     let emailsSent = 0;
     let emailsFailed = 0;
 
@@ -415,7 +426,7 @@ export default function TryoutsPage() {
         try {
           const res = await fetch("/api/send-selection", {
             method: "POST",
-            headers: { "Content-Type": "application/json" },
+            headers,
             body: JSON.stringify({
               registration_id: id,
               status: reg.status,
