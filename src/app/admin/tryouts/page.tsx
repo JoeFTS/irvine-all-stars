@@ -186,6 +186,9 @@ export default function TryoutsPage() {
   const [divisionFilter, setDivisionFilter] = useState<string>("all");
   const [showCoachPicks, setShowCoachPicks] = useState(false);
   const [showNotPicked, setShowNotPicked] = useState(false);
+  const [showNewPicks, setShowNewPicks] = useState(false);
+  const [showEmailSent, setShowEmailSent] = useState(false);
+  const [showAccepted, setShowAccepted] = useState(false);
   const [statusFilter, setStatusFilter] = useState<Status | "all">("all");
   const [expandedPlayerId, setExpandedPlayerId] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -740,6 +743,9 @@ export default function TryoutsPage() {
     if (statusFilter !== "all" && r.status !== statusFilter) return false;
     if (showCoachPicks && !coachPickRegIds.has(r.id)) return false;
     if (showNotPicked && coachPickRegIds.has(r.id)) return false;
+    if (showNewPicks && !(coachPickRegIds.has(r.id) && !emailSentIds.has(r.id))) return false;
+    if (showEmailSent && !emailSentIds.has(r.id)) return false;
+    if (showAccepted && !acceptedRegIds.has(r.id)) return false;
     return true;
   });
 
@@ -888,10 +894,10 @@ export default function TryoutsPage() {
               </div>
             </div>
 
-            {/* Coach Picks / Not Picked Filters */}
-            <div className="flex gap-2">
+            {/* Coach Picks Pipeline Filters */}
+            <div className="flex flex-wrap gap-2">
               <button
-                onClick={() => { setShowCoachPicks(!showCoachPicks); setShowNotPicked(false); }}
+                onClick={() => { setShowCoachPicks(!showCoachPicks); setShowNotPicked(false); setShowNewPicks(false); setShowEmailSent(false); setShowAccepted(false); }}
                 className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide transition-colors ${
                   showCoachPicks
                     ? "bg-star-gold text-white"
@@ -899,11 +905,51 @@ export default function TryoutsPage() {
                 }`}
               >
                 <Star size={10} className="inline -mt-0.5 mr-1" />
-                Coach Picks{coachSelections.length > 0 ? ` (${coachSelections.length})` : ""}
+                All Picks{coachSelections.length > 0 ? ` (${coachSelections.length})` : ""}
               </button>
               {coachSelections.length > 0 && (
+                <>
                 <button
-                  onClick={() => { setShowNotPicked(!showNotPicked); setShowCoachPicks(false); }}
+                  onClick={() => { setShowNewPicks(!showNewPicks); setShowCoachPicks(false); setShowNotPicked(false); setShowEmailSent(false); setShowAccepted(false); }}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide transition-colors ${
+                    showNewPicks
+                      ? "bg-flag-blue text-white"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
+                >
+                  <UserPlus size={10} className="inline -mt-0.5 mr-1" />
+                  New Picks
+                  {` (${registrations.filter((r) => (divisionFilter === "all" || r.division === divisionFilter) && coachPickRegIds.has(r.id) && !r.selection_email_sent_at).length})`}
+                </button>
+                <button
+                  onClick={() => { setShowEmailSent(!showEmailSent); setShowCoachPicks(false); setShowNotPicked(false); setShowNewPicks(false); setShowAccepted(false); }}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide transition-colors ${
+                    showEmailSent
+                      ? "bg-gray-600 text-white"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
+                >
+                  <Mail size={10} className="inline -mt-0.5 mr-1" />
+                  Email Sent
+                  {` (${registrations.filter((r) => (divisionFilter === "all" || r.division === divisionFilter) && r.selection_email_sent_at).length})`}
+                </button>
+                <button
+                  onClick={() => { setShowAccepted(!showAccepted); setShowCoachPicks(false); setShowNotPicked(false); setShowNewPicks(false); setShowEmailSent(false); }}
+                  className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide transition-colors ${
+                    showAccepted
+                      ? "bg-green-600 text-white"
+                      : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                  }`}
+                >
+                  <Check size={10} className="inline -mt-0.5 mr-1" />
+                  Accepted
+                  {` (${registrations.filter((r) => (divisionFilter === "all" || r.division === divisionFilter) && acceptedRegIds.has(r.id)).length})`}
+                </button>
+                </>
+              )}
+              {coachSelections.length > 0 && (
+                <button
+                  onClick={() => { setShowNotPicked(!showNotPicked); setShowCoachPicks(false); setShowNewPicks(false); setShowEmailSent(false); setShowAccepted(false); }}
                   className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide transition-colors ${
                     showNotPicked
                       ? "bg-flag-red text-white"
