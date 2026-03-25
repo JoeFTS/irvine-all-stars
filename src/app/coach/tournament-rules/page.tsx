@@ -187,12 +187,14 @@ export default function TournamentRulesPage() {
 
     const existing = getAgreement(activeDivision);
 
+    const divLabel = DIVISIONS.find((d) => d.key === activeDivision)?.label ?? activeDivision;
     let error;
     if (existing) {
       ({ error } = await supabase
         .from("tournament_agreements")
         .update({
           coach_name: coachName.trim(),
+          acknowledged: true,
           acknowledged_at: now,
         })
         .eq("id", existing.id));
@@ -200,7 +202,9 @@ export default function TournamentRulesPage() {
       ({ error } = await supabase.from("tournament_agreements").insert({
         coach_id: user.id,
         agreement_type: activeDivision,
+        division: divLabel,
         coach_name: coachName.trim(),
+        acknowledged: true,
         acknowledged_at: now,
       }));
     }
@@ -210,7 +214,6 @@ export default function TournamentRulesPage() {
       setSubmitMessage({ type: "error", text: "Failed to save acknowledgment. Please try again." });
     } else {
       await fetchAgreements();
-      const divLabel = DIVISIONS.find((d) => d.key === activeDivision)?.label ?? activeDivision;
       setSubmitMessage({ type: "success", text: `${divLabel} rules acknowledged successfully!` });
       setTimeout(() => setSubmitMessage(null), 6000);
     }
