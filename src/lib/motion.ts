@@ -36,7 +36,7 @@ export const stagger = {
   /** Tight — for list items, badges */
   tight: 0.04,
   /** Normal — for cards, sections */
-  normal: 0.06,
+  normal: 0.08,
   /** Relaxed — for hero elements, large reveals */
   relaxed: 0.1,
 } as const;
@@ -100,4 +100,21 @@ export const hoverScale = {
 export const tapPress = {
   scale: 0.97,
   transition: { duration: duration.instant, ease: easing.bounce },
+} as const;
+
+/* ─── Playful Hover Presets (public pages) ─── */
+export const hoverBounce = {
+  scale: 1.04,
+  transition: { duration: duration.micro, ease: easing.bounce },
+} as const;
+
+export const hoverCard = {
+  scale: 1.02,
+  rotate: 1,
+  transition: { duration: duration.fast, ease: easing.smoothOut },
+} as const;
+
+export const hoverStar = {
+  rotate: 15,
+  transition: { duration: duration.fast, ease: easing.gentle },
 } as const;
