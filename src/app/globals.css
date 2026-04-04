@@ -1,13 +1,20 @@
 @import "tailwindcss";
 
 :root {
-  --flag-blue: #002868;
-  --flag-blue-mid: #0A3A7A;
-  --flag-red: #B22234;
+  --flag-blue: #0F1B2D;
+  --flag-blue-mid: #1A2D4A;
+  --flag-red: #C8364B;
   --flag-red-dark: #9A1D2E;
+  --stitch-red: #E23D3D;
+  --star-gold: #E2B74F;
+  --star-gold-bright: #F5C542;
+  --leather: #C4956A;
+  --bat-wood: #8B6F47;
+  --grass: #4A7C59;
+  --dirt: #A68B6B;
   --white: #FFFFFF;
-  --off-white: #FAFAF8;
-  --cream: #F5F1EB;
+  --off-white: #FAF9F6;
+  --cream: #F3EDE4;
   --sand: #EDE8DF;
   --charcoal: #1C1C1C;
   --gray-700: #374151;
@@ -15,8 +22,9 @@
   --gray-400: #9CA3AF;
   --gray-200: #E5E7EB;
   --gray-100: #F3F4F6;
-  --star-gold: #D4A843;
-  --star-gold-bright: #F59E0B;
+  --tint-green: #EFF5F0;
+  --tint-leather: #F5EDE5;
+  --tint-cream: #F3EDE4;
 }
 
 @theme inline {
@@ -24,6 +32,13 @@
   --color-flag-blue-mid: var(--flag-blue-mid);
   --color-flag-red: var(--flag-red);
   --color-flag-red-dark: var(--flag-red-dark);
+  --color-stitch-red: var(--stitch-red);
+  --color-star-gold: var(--star-gold);
+  --color-star-gold-bright: var(--star-gold-bright);
+  --color-leather: var(--leather);
+  --color-bat-wood: var(--bat-wood);
+  --color-grass: var(--grass);
+  --color-dirt: var(--dirt);
   --color-off-white: var(--off-white);
   --color-cream: var(--cream);
   --color-sand: var(--sand);
@@ -33,16 +48,102 @@
   --color-gray-400: var(--gray-400);
   --color-gray-200: var(--gray-200);
   --color-gray-100: var(--gray-100);
-  --color-star-gold: var(--star-gold);
-  --color-star-gold-bright: var(--star-gold-bright);
+  --color-tint-green: var(--tint-green);
+  --color-tint-leather: var(--tint-leather);
+  --color-tint-cream: var(--tint-cream);
   --font-display: var(--font-oswald);
-  --font-body: var(--font-barlow);
+  --font-body: var(--font-rubik);
+  --font-hero: var(--font-dela);
 }
 
 body {
   background: var(--off-white);
   color: var(--charcoal);
   font-family: var(--font-body), system-ui, sans-serif;
+}
+
+/* ─── Baseball Decorative Utilities ─── */
+
+/* Baseball stitch decoration — horizontal */
+.baseball-stitch {
+  position: relative;
+}
+.baseball-stitch::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 0;
+  right: 0;
+  height: 2px;
+  border-top: 2px dashed var(--stitch-red);
+  opacity: 0.4;
+  transform: translateY(-50%);
+  pointer-events: none;
+}
+
+/* Vertical stitch variant */
+.baseball-stitch-v::before {
+  top: 0;
+  bottom: 0;
+  left: 50%;
+  right: auto;
+  width: 2px;
+  height: 100%;
+  border-top: none;
+  border-left: 2px dashed var(--stitch-red);
+  transform: translateX(-50%);
+}
+
+/* Circular stitch (for hero backgrounds) */
+.baseball-stitch-circle {
+  position: absolute;
+  width: 300px;
+  height: 300px;
+  border: 2px dashed var(--stitch-red);
+  border-radius: 50%;
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+/* Grain texture overlay */
+.grain-overlay {
+  position: relative;
+}
+.grain-overlay::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  opacity: 0.04;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  z-index: 1;
+}
+
+/* Diamond shape decoration */
+.diamond-accent {
+  width: 12px;
+  height: 12px;
+  background: var(--star-gold);
+  transform: rotate(45deg);
+  display: inline-block;
+}
+
+/* Home plate badge clip-path */
+.badge-home-plate {
+  clip-path: polygon(0% 0%, 100% 0%, 100% 70%, 50% 100%, 0% 70%);
+}
+
+/* Stitch-style button border */
+.btn-stitch {
+  border: 2px dashed var(--stitch-red);
+  background: transparent;
+  color: var(--stitch-red);
+  transition: all 0.25s ease-out;
+}
+.btn-stitch:hover {
+  background: var(--stitch-red);
+  color: white;
 }
 
 /* Print styles — hide chrome, show only content */
