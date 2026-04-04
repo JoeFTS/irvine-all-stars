@@ -9,6 +9,8 @@ import {
   fadeUp,
   fadeIn,
   hoverLift,
+  hoverBounce,
+  hoverCard,
   tapPress,
 } from "@/lib/motion";
 
@@ -166,9 +168,8 @@ export function HoverLiftCard({
   return (
     <motion.div
       className={className}
-      whileHover={hoverLift}
+      whileHover={hoverCard}
       whileTap={tapPress}
-      transition={{ duration: duration.micro, ease: [0.4, 0, 0.2, 1] }}
     >
       {children}
     </motion.div>
@@ -210,8 +211,8 @@ export function AnimatedButton({
       className={className}
       onClick={onClick}
       disabled={disabled}
-      whileHover={{ y: -2, transition: { duration: duration.micro } }}
-      whileTap={{ scale: 0.97, transition: { duration: duration.instant } }}
+      whileHover={hoverBounce}
+      whileTap={tapPress}
     >
       {children}
     </motion.button>
