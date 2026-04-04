@@ -99,7 +99,7 @@ function Label({
 }
 
 const inputClasses =
-  "w-full min-h-[44px] rounded border border-gray-200 bg-white px-4 py-3 text-base text-charcoal placeholder:text-gray-400 focus:border-flag-blue focus:ring-2 focus:ring-flag-blue/20 focus:outline-none transition-colors";
+  "w-full min-h-[44px] rounded-xl border border-dirt bg-white px-4 py-3 text-base text-charcoal placeholder:text-gray-400 focus:border-star-gold focus:ring-2 focus:ring-star-gold/20 focus:outline-none transition-colors";
 
 const selectClasses = `${inputClasses} appearance-none bg-[url('data:image/svg+xml;charset=utf-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2020%2020%22%20fill%3D%22%234B5563%22%3E%3Cpath%20fill-rule%3D%22evenodd%22%20d%3D%22M5.23%207.21a.75.75%200%20011.06.02L10%2011.168l3.71-3.938a.75.75%200%20111.08%201.04l-4.25%204.5a.75.75%200%2001-1.08%200l-4.25-4.5a.75.75%200%2001.02-1.06z%22%20clip-rule%3D%22evenodd%22%2F%3E%3C%2Fsvg%3E')] bg-[length:20px] bg-[right_12px_center] bg-no-repeat pr-10`;
 
@@ -304,7 +304,7 @@ export function CoachApplicationForm() {
 
   if (submitted) {
     return (
-      <div className="bg-white rounded-lg border border-gray-200 p-8 md:p-12 text-center">
+      <div className="bg-white rounded-2xl border border-gray-200 p-8 md:p-12 text-center">
         <div className="text-5xl mb-4">&#9733;</div>
         <h2 className="font-display text-2xl md:text-3xl font-bold uppercase tracking-wide text-flag-blue mb-3">
           Application Submitted
@@ -316,7 +316,7 @@ export function CoachApplicationForm() {
           <strong>{formData.email}</strong>.
         </p>
 
-        <div className="bg-off-white rounded-lg p-6 md:p-8 text-left max-w-md mx-auto">
+        <div className="bg-off-white rounded-2xl p-6 md:p-8 text-left max-w-md mx-auto">
           <h3 className="font-display text-lg font-semibold uppercase tracking-wide mb-4">
             What Happens Next
           </h3>
@@ -435,7 +435,7 @@ export function CoachApplicationForm() {
         <button
           type="button"
           onClick={handleBack}
-          className="px-4 sm:px-6 py-3.5 rounded border-2 border-gray-200 font-display text-sm font-semibold uppercase tracking-widest text-gray-600 hover:border-gray-400 hover:text-charcoal transition-colors min-h-[44px]"
+          className="px-4 sm:px-6 py-3.5 rounded-full border-2 border-gray-200 font-display text-sm font-semibold uppercase tracking-widest text-gray-600 hover:border-gray-400 hover:text-charcoal transition-colors min-h-[44px]"
         >
           &larr; Back
         </button>
@@ -447,7 +447,7 @@ export function CoachApplicationForm() {
         <button
           type="button"
           onClick={handleNext}
-          className="px-4 sm:px-6 py-3.5 rounded bg-flag-blue text-white font-display text-sm font-semibold uppercase tracking-widest hover:bg-flag-blue-mid transition-colors min-h-[44px]"
+          className="px-4 sm:px-6 py-3.5 rounded-full bg-flag-blue text-white font-display text-sm font-semibold uppercase tracking-widest hover:bg-flag-blue-mid transition-colors min-h-[44px]"
         >
           Next &rarr;
         </button>
@@ -456,7 +456,7 @@ export function CoachApplicationForm() {
           type="button"
           onClick={handleSubmit}
           disabled={submitting}
-          className="px-6 sm:px-8 py-3.5 rounded bg-flag-red text-white font-display text-sm font-semibold uppercase tracking-widest hover:bg-flag-red-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
+          className="px-6 sm:px-8 py-3.5 rounded-full bg-flag-red text-white font-display text-sm font-semibold uppercase tracking-widest hover:bg-flag-red-dark transition-colors disabled:opacity-50 disabled:cursor-not-allowed min-h-[44px]"
         >
           {submitting ? "Submitting..." : "Submit Application \u2605"}
         </button>
@@ -706,13 +706,13 @@ export function CoachApplicationForm() {
           this team.
         </p>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-5 md:p-6 space-y-4">
+        <div className="bg-white rounded-2xl border border-gray-200 p-5 md:p-6 space-y-4">
           {checkboxItems.map((item) => (
             <div key={item.field} className="flex items-start gap-3">
               <input
                 id={item.field}
                 type="checkbox"
-                className="w-5 h-5 mt-0.5 rounded border-gray-200 text-flag-blue focus:ring-flag-blue/20 shrink-0"
+                className="w-5 h-5 mt-0.5 rounded border-dirt text-flag-blue focus:ring-star-gold/20 shrink-0"
                 checked={formData[item.field] as boolean}
                 onChange={(e) => update(item.field, e.target.checked)}
               />
@@ -794,7 +794,7 @@ export function CoachApplicationForm() {
         </div>
       )}
 
-      <div className="bg-white rounded-lg border border-gray-200 p-5 md:p-8">
+      <div className="bg-white rounded-2xl border border-gray-200 p-5 md:p-8">
         {step === 0 && renderStep0()}
         {step === 1 && renderStep1()}
         {step === 2 && renderStep2()}

@@ -174,7 +174,7 @@ function TextInput({
       required={required}
       autoComplete={autoComplete}
       inputMode={inputMode}
-      className="w-full min-h-[44px] px-4 py-3 bg-white border border-gray-200 rounded-lg text-charcoal placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+      className="w-full min-h-[44px] px-4 py-3 bg-white border border-dirt rounded-xl text-charcoal placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-star-gold/30 focus:border-star-gold transition-colors"
     />
   );
 }
@@ -201,7 +201,7 @@ function SelectInput({
       value={value}
       onChange={(e) => onChange(e.target.value)}
       required={required}
-      className="w-full min-h-[44px] px-4 py-3 bg-white border border-gray-200 rounded-lg text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cpath%20fill%3D%22%234B5563%22%20d%3D%22M6%208L1%203h10z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:12px] bg-[right_16px_center] bg-no-repeat"
+      className="w-full min-h-[44px] px-4 py-3 bg-white border border-dirt rounded-xl text-charcoal focus:outline-none focus:ring-2 focus:ring-star-gold/30 focus:border-star-gold transition-colors appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cpath%20fill%3D%22%234B5563%22%20d%3D%22M6%208L1%203h10z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:12px] bg-[right_16px_center] bg-no-repeat"
     >
       <option value="">{placeholder ?? "Select..."}</option>
       {options.map((opt) => {
@@ -464,7 +464,7 @@ export function PlayerRegistrationForm() {
           <strong>{form.parent_email}</strong>.
         </p>
 
-        <div className="bg-white border border-gray-200 rounded-lg p-6 md:p-8 max-w-lg mx-auto text-left mb-8">
+        <div className="bg-white border border-gray-200 rounded-2xl p-6 md:p-8 max-w-lg mx-auto text-left mb-8">
           <h3 className="font-display text-lg font-semibold uppercase tracking-wide mb-4">
             What to Bring to Tryouts
           </h3>
@@ -488,7 +488,7 @@ export function PlayerRegistrationForm() {
           </ul>
         </div>
 
-        <div className="bg-cream border border-sand rounded-lg p-6 max-w-lg mx-auto text-left">
+        <div className="bg-cream border border-sand rounded-2xl p-6 max-w-lg mx-auto text-left">
           <h3 className="font-display text-lg font-semibold uppercase tracking-wide mb-3">
             Key Dates
           </h3>
@@ -526,7 +526,7 @@ export function PlayerRegistrationForm() {
             setEditId(null);
             window.scrollTo({ top: 0, behavior: "smooth" });
           }}
-          className="mt-6 inline-block bg-flag-blue hover:bg-flag-blue-mid text-white px-6 py-3 rounded-lg font-display text-sm font-semibold uppercase tracking-widest transition-colors"
+          className="mt-6 inline-block bg-flag-blue hover:bg-flag-blue-mid text-white px-6 py-3 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-colors"
         >
           Register Another Child
         </button>
@@ -683,7 +683,7 @@ export function PlayerRegistrationForm() {
             value={form.player_dob}
             onChange={(e) => update("player_dob", e.target.value)}
             required
-            className="w-full min-h-[44px] px-4 py-3 bg-white border border-gray-200 rounded-lg text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+            className="w-full min-h-[44px] px-4 py-3 bg-white border border-dirt rounded-xl text-charcoal focus:outline-none focus:ring-2 focus:ring-star-gold/30 focus:border-star-gold transition-colors"
           />
           {fieldError("player_dob")}
         </div>
@@ -817,7 +817,7 @@ export function PlayerRegistrationForm() {
           onChange={(e) => update("medical_conditions", e.target.value)}
           placeholder="Any conditions coaches should be aware of (optional)"
           rows={3}
-          className="w-full min-h-[44px] px-4 py-3 bg-white border border-gray-200 rounded-lg text-charcoal placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors resize-y"
+          className="w-full min-h-[44px] px-4 py-3 bg-white border border-dirt rounded-xl text-charcoal placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-star-gold/30 focus:border-star-gold transition-colors resize-y"
         />
       </div>
 
@@ -867,7 +867,7 @@ export function PlayerRegistrationForm() {
       </p>
 
       {/* Commitment info block */}
-      <div className="bg-cream border border-sand rounded-lg p-5">
+      <div className="bg-cream border border-sand rounded-2xl p-5">
         <p className="text-sm text-gray-600 leading-relaxed">
           <strong className="text-charcoal">Commitment expectations:</strong>{" "}
           All-Stars requires significant commitment: practices 2-4x/week,
@@ -887,7 +887,7 @@ export function PlayerRegistrationForm() {
             type="checkbox"
             checked={form.photo_release}
             onChange={(e) => update("photo_release", e.target.checked)}
-            className="mt-0.5 w-5 h-5 min-w-[20px] rounded border-gray-200 text-flag-blue focus:ring-flag-blue/30 cursor-pointer"
+            className="mt-0.5 w-5 h-5 min-w-[20px] rounded border-dirt text-flag-blue focus:ring-star-gold/30 cursor-pointer"
           />
           <span className="text-sm text-gray-600 leading-relaxed">
             I consent to photos and videos of my child being used for Irvine
@@ -906,7 +906,7 @@ export function PlayerRegistrationForm() {
             type="checkbox"
             checked={form.liability_waiver}
             onChange={(e) => update("liability_waiver", e.target.checked)}
-            className="mt-0.5 w-5 h-5 min-w-[20px] rounded border-gray-200 text-flag-blue focus:ring-flag-blue/30 cursor-pointer"
+            className="mt-0.5 w-5 h-5 min-w-[20px] rounded border-dirt text-flag-blue focus:ring-star-gold/30 cursor-pointer"
           />
           <span className="text-sm text-gray-600 leading-relaxed">
             I acknowledge and accept the inherent risks associated with
@@ -925,7 +925,7 @@ export function PlayerRegistrationForm() {
             type="checkbox"
             checked={form.code_of_conduct}
             onChange={(e) => update("code_of_conduct", e.target.checked)}
-            className="mt-0.5 w-5 h-5 min-w-[20px] rounded border-gray-200 text-flag-blue focus:ring-flag-blue/30 cursor-pointer"
+            className="mt-0.5 w-5 h-5 min-w-[20px] rounded border-dirt text-flag-blue focus:ring-star-gold/30 cursor-pointer"
           />
           <span className="text-sm text-gray-600 leading-relaxed">
             I agree to abide by the Irvine Pony Baseball Parent Code of Conduct,
@@ -937,7 +937,7 @@ export function PlayerRegistrationForm() {
       </div>
 
       {/* Summary */}
-      <div className="bg-white border border-gray-200 rounded-lg p-5 mt-6">
+      <div className="bg-white border border-gray-200 rounded-2xl p-5 mt-6">
         <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-gray-400 mb-3">
           Registration Summary
         </h3>
@@ -975,7 +975,7 @@ export function PlayerRegistrationForm() {
     <div>
       {ProgressBar}
 
-      <div className="bg-white border border-gray-200 rounded-lg p-6 md:p-8">
+      <div className="bg-white border border-gray-200 rounded-2xl p-6 md:p-8">
         {step === 0 && Step1}
         {step === 1 && Step2}
         {step === 2 && Step3}
@@ -986,7 +986,7 @@ export function PlayerRegistrationForm() {
             <button
               type="button"
               onClick={handleBack}
-              className="min-h-[44px] px-6 py-3 border-2 border-gray-200 hover:border-gray-400 rounded-lg font-display text-sm font-semibold uppercase tracking-wider text-gray-600 transition-colors"
+              className="min-h-[44px] px-6 py-3 border-2 border-gray-200 hover:border-gray-400 rounded-full font-display text-sm font-semibold uppercase tracking-wider text-gray-600 transition-colors"
             >
               Back
             </button>
@@ -998,7 +998,7 @@ export function PlayerRegistrationForm() {
             <button
               type="button"
               onClick={handleNext}
-              className="min-h-[44px] px-8 py-3 bg-flag-blue hover:bg-flag-blue-mid text-white rounded-lg font-display text-sm font-semibold uppercase tracking-wider transition-colors"
+              className="min-h-[44px] px-8 py-3 bg-flag-blue hover:bg-flag-blue-mid text-white rounded-full font-display text-sm font-semibold uppercase tracking-wider transition-colors"
             >
               Next
             </button>
@@ -1007,7 +1007,7 @@ export function PlayerRegistrationForm() {
               type="button"
               onClick={handleSubmit}
               disabled={submitting}
-              className="min-h-[44px] px-8 py-3 bg-flag-red hover:bg-flag-red-dark text-white rounded-lg font-display text-sm font-semibold uppercase tracking-wider transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+              className="min-h-[44px] px-8 py-3 bg-flag-red hover:bg-flag-red-dark text-white rounded-full font-display text-sm font-semibold uppercase tracking-wider transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {submitting ? "Submitting..." : "Submit Registration"}
             </button>

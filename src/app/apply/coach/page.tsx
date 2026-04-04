@@ -12,7 +12,7 @@ export default function ApplyCoachPage() {
   return (
     <>
       {/* ===== HERO ===== */}
-      <section className="relative bg-flag-blue pt-[98px] pb-12 md:pb-16 px-6 md:px-10 overflow-hidden">
+      <section className="grain-overlay relative bg-flag-blue pt-[98px] pb-12 md:pb-16 px-6 md:px-10 overflow-hidden">
         <div className="absolute inset-0 text-white/[0.04] text-xl leading-[2.8rem] tracking-widest overflow-hidden pointer-events-none p-4">
           {"★ ".repeat(200)}
         </div>
@@ -20,7 +20,7 @@ export default function ApplyCoachPage() {
           <p className="font-display text-sm font-semibold text-star-gold-bright uppercase tracking-[3px] mb-3">
             &#9733; Take the Field
           </p>
-          <h1 className="font-display text-4xl md:text-6xl font-bold text-white uppercase tracking-wide mb-4">
+          <h1 className="font-hero text-4xl md:text-6xl font-bold text-white uppercase tracking-wide mb-4">
             Coach Application
           </h1>
           <p className="text-white/60 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
