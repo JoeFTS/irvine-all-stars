@@ -378,7 +378,7 @@ export default function BinderChecklistPage() {
   if (!supabase) {
     return (
       <div className="p-6 md:p-10">
-        <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
           <p className="font-display text-xl font-bold uppercase tracking-wide text-flag-blue mb-2">
             Connect Supabase to View Data
           </p>
@@ -424,7 +424,7 @@ export default function BinderChecklistPage() {
 
       {/* ---- Overall Progress ---- */}
       {registrations.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-lg p-5">
+        <div className="bg-white border border-gray-200 rounded-2xl p-5">
           <div className="flex items-center justify-between mb-2">
             <p className="text-sm font-semibold text-charcoal">
               Overall Progress
@@ -435,16 +435,14 @@ export default function BinderChecklistPage() {
           </div>
           <div className="w-full h-3 bg-gray-100 rounded-full overflow-hidden">
             <div
-              className="h-full rounded-full transition-all duration-500"
-              style={{
-                width: `${progressPct}%`,
-                backgroundColor:
-                  progressPct === 100
-                    ? "#16a34a"
-                    : progressPct >= 50
-                    ? "#ca8a04"
-                    : "#dc2626",
-              }}
+              className={`h-full rounded-full transition-all duration-500 ${
+                progressPct === 100
+                  ? "bg-green-600"
+                  : progressPct >= 50
+                  ? "bg-yellow-600"
+                  : "bg-red-600"
+              }`}
+              style={{ width: `${progressPct}%` }}
             />
           </div>
           <p className="text-xs text-gray-400 mt-1">{progressPct}% complete</p>
@@ -454,7 +452,7 @@ export default function BinderChecklistPage() {
       {/* ================================================================ */}
       {/*  SECTION 1: Tournament Pitching Log                              */}
       {/* ================================================================ */}
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
         <div className="p-5 flex items-center gap-3 border-b border-gray-100">
           <SectionNumber n={1} />
           <div className="flex-1">
@@ -496,7 +494,7 @@ export default function BinderChecklistPage() {
                 </div>
                 <Link
                   href="/coach/pitching-log"
-                  className="flex items-center gap-1.5 px-3 py-2 min-h-[44px] w-full sm:w-auto justify-center rounded-md text-xs font-semibold bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
+                  className="flex items-center gap-1.5 px-3 py-2 min-h-[44px] w-full sm:w-auto justify-center rounded-full text-xs font-semibold bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
                 >
                   <Printer size={14} />
                   View &amp; Print Pitching Log
@@ -510,7 +508,7 @@ export default function BinderChecklistPage() {
       {/* ================================================================ */}
       {/*  SECTION 2: Pre-Tournament Rules / Coach's Agreement             */}
       {/* ================================================================ */}
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
         <div className="p-5 flex items-center gap-3 border-b border-gray-100">
           <SectionNumber n={2} />
           <div className="flex-1">
@@ -542,7 +540,7 @@ export default function BinderChecklistPage() {
             {tournamentRulesDoc ? (
               <button
                 onClick={() => handleViewDocument(tournamentRulesDoc.file_path!)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
               >
                 <Eye size={14} />
                 View / Print
@@ -559,7 +557,7 @@ export default function BinderChecklistPage() {
       {/* ================================================================ */}
       {/*  SECTION 3: Certificate of Liability Insurance                   */}
       {/* ================================================================ */}
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
         <div className="p-5 flex items-center gap-3 border-b border-gray-100">
           <SectionNumber n={3} />
           <div className="flex-1">
@@ -591,7 +589,7 @@ export default function BinderChecklistPage() {
             {insuranceDoc ? (
               <button
                 onClick={() => handleViewDocument(insuranceDoc.file_path!)}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
               >
                 <Eye size={14} />
                 View / Print
@@ -608,7 +606,7 @@ export default function BinderChecklistPage() {
       {/* ================================================================ */}
       {/*  SECTION 4: Medical Releases (per player)                        */}
       {/* ================================================================ */}
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
         <div className="p-5 flex items-center gap-3 border-b border-gray-100">
           <SectionNumber n={4} />
           <div className="flex-1">
@@ -693,7 +691,7 @@ export default function BinderChecklistPage() {
                 a.click();
                 URL.revokeObjectURL(url);
               }}
-              className="inline-flex items-center justify-center gap-2 px-4 py-3 sm:py-2 min-h-[44px] w-full sm:w-auto bg-flag-blue text-white rounded-lg text-xs font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors"
+              className="inline-flex items-center justify-center gap-2 px-4 py-3 sm:py-2 min-h-[44px] w-full sm:w-auto bg-flag-blue text-white rounded-full text-xs font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors"
             >
               <Download size={14} />
               Download Sign-Off Sheet
@@ -717,7 +715,7 @@ export default function BinderChecklistPage() {
                     signedReleaseDoc.file_path &&
                     handleViewDocument(signedReleaseDoc.file_path)
                   }
-                  className="px-3 py-1.5 rounded-lg text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors"
+                  className="px-3 py-1.5 rounded-full text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors"
                 >
                   View / Print
                 </button>
@@ -762,7 +760,7 @@ export default function BinderChecklistPage() {
       {/* ================================================================ */}
       {/*  SECTION 5: Birth Certificates & Player Photos (per player)      */}
       {/* ================================================================ */}
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
         <div className="p-5 flex items-center gap-3 border-b border-gray-100">
           <SectionNumber n={5} />
           <div className="flex-1">
@@ -807,7 +805,7 @@ export default function BinderChecklistPage() {
                     {birthCert?.file_path && (
                       <button
                         onClick={() => handleViewDocument(birthCert.file_path!)}
-                        className="flex items-center gap-1.5 px-3 py-2 min-h-[44px] rounded-md text-xs font-semibold bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
+                        className="flex items-center gap-1.5 px-3 py-2 min-h-[44px] rounded-full text-xs font-semibold bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
                         title="View birth certificate"
                       >
                         <Eye size={14} />
@@ -817,7 +815,7 @@ export default function BinderChecklistPage() {
                     {photo?.file_path && (
                       <button
                         onClick={() => handleViewDocument(photo.file_path!)}
-                        className="flex items-center gap-1.5 px-3 py-2 min-h-[44px] rounded-md text-xs font-semibold bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
+                        className="flex items-center gap-1.5 px-3 py-2 min-h-[44px] rounded-full text-xs font-semibold bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
                         title="View player photo"
                       >
                         <Camera size={14} />
@@ -849,7 +847,7 @@ export default function BinderChecklistPage() {
       {/* ================================================================ */}
       {/*  SECTION 6: Concussion Training Certificate                      */}
       {/* ================================================================ */}
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
         <div className="p-5 flex items-center gap-3 border-b border-gray-100">
           <SectionNumber n={6} />
           <div className="flex-1">
@@ -884,7 +882,7 @@ export default function BinderChecklistPage() {
                   onClick={() => {
                     if (concussionCert.cert_file_path) handleViewDocument(concussionCert.cert_file_path);
                   }}
-                  className="px-3 py-1.5 rounded-md text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors"
+                  className="px-3 py-1.5 rounded-full text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors"
                 >
                   View / Print
                 </button>
@@ -895,7 +893,7 @@ export default function BinderChecklistPage() {
             ) : (
               <Link
                 href="/coach/certifications"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-flag-red text-white hover:bg-flag-red/90 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-flag-red text-white hover:bg-flag-red/90 transition-colors"
               >
                 <ShieldCheck size={14} />
                 Upload
@@ -908,7 +906,7 @@ export default function BinderChecklistPage() {
       {/* ================================================================ */}
       {/*  SECTION 7: Sudden Cardiac Arrest Certificate                    */}
       {/* ================================================================ */}
-      <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
         <div className="p-5 flex items-center gap-3 border-b border-gray-100">
           <SectionNumber n={7} />
           <div className="flex-1">
@@ -943,7 +941,7 @@ export default function BinderChecklistPage() {
                   onClick={() => {
                     if (cardiacCert.cert_file_path) handleViewDocument(cardiacCert.cert_file_path);
                   }}
-                  className="px-3 py-1.5 rounded-md text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors"
+                  className="px-3 py-1.5 rounded-full text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors"
                 >
                   View / Print
                 </button>
@@ -954,7 +952,7 @@ export default function BinderChecklistPage() {
             ) : (
               <Link
                 href="/coach/certifications"
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-md text-xs font-semibold bg-flag-red text-white hover:bg-flag-red/90 transition-colors"
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-flag-red text-white hover:bg-flag-red/90 transition-colors"
               >
                 <ShieldCheck size={14} />
                 Upload
@@ -968,7 +966,7 @@ export default function BinderChecklistPage() {
       {/*  SECTION 8: Assistant Coach Certifications                       */}
       {/* ================================================================ */}
       {assistantCoaches.length > 0 && (
-        <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+        <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
           <div className="p-5 flex items-center gap-3 border-b border-gray-100">
             <SectionNumber n={8} />
             <div className="flex-1">
@@ -1064,7 +1062,7 @@ export default function BinderChecklistPage() {
       )}
 
       {/* ---- Footer Note ---- */}
-      <div className="flex items-start gap-3 p-4 rounded-lg bg-gray-50 border border-gray-200">
+      <div className="flex items-start gap-3 p-4 rounded-2xl bg-gray-50 border border-gray-200">
         <Info size={18} className="text-gray-400 shrink-0 mt-0.5" />
         <p className="text-xs text-gray-500">
           Parents upload medical releases and birth certificates through their{" "}

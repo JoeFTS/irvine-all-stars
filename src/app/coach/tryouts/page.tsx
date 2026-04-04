@@ -362,7 +362,7 @@ export default function CoachTryoutsPage() {
   if (!division) {
     return (
       <div className="p-6 md:p-10">
-        <div className="bg-white border border-gray-200 rounded-lg p-8 text-center max-w-md mx-auto">
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center max-w-md mx-auto">
           <AlertTriangle size={40} className="mx-auto text-star-gold mb-4" />
           <h2 className="font-display text-xl font-bold uppercase tracking-wide text-flag-blue mb-2">
             Division Not Assigned
@@ -388,7 +388,7 @@ export default function CoachTryoutsPage() {
       </div>
 
       {/* Summary Banner */}
-      <div className="bg-white border border-gray-200 rounded-lg p-5 flex flex-wrap items-center gap-x-8 gap-y-3">
+      <div className="bg-white border border-gray-200 rounded-2xl p-5 flex flex-wrap items-center gap-x-8 gap-y-3">
         <div>
           <p className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Division</p>
           <p className="font-display text-lg font-bold text-flag-blue">{division}</p>
@@ -411,7 +411,7 @@ export default function CoachTryoutsPage() {
         <button
           onClick={submitRecommendations}
           disabled={submitting || !hasChanges}
-          className="flex items-center gap-2 px-5 py-2.5 bg-flag-blue text-white font-semibold rounded-lg hover:bg-flag-blue/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          className="flex items-center gap-2 px-5 py-2.5 bg-flag-blue text-white font-semibold rounded-full hover:bg-flag-blue/90 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
         >
           <Send size={16} />
           {submitting ? "Saving..." : "Submit Recommendations"}
@@ -421,7 +421,7 @@ export default function CoachTryoutsPage() {
       {/* Submit feedback */}
       {submitMsg && (
         <div
-          className={`px-4 py-3 rounded-lg text-sm font-medium ${
+          className={`px-4 py-3 rounded-2xl text-sm font-medium ${
             submitMsg.startsWith("Error")
               ? "bg-red-50 text-red-700"
               : "bg-green-50 text-green-700"
@@ -442,7 +442,7 @@ export default function CoachTryoutsPage() {
       {dataLoading ? (
         <p className="text-gray-500">Loading players...</p>
       ) : players.length === 0 ? (
-        <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
           <p className="text-gray-500">No players registered for this division yet.</p>
         </div>
       ) : (
@@ -455,7 +455,7 @@ export default function CoachTryoutsPage() {
             return (
               <div
                 key={r.id}
-                className="bg-white border border-gray-200 rounded-lg overflow-hidden"
+                className="bg-white border border-gray-200 rounded-2xl overflow-hidden"
               >
                 {/* Row */}
                 <div className="flex items-center gap-3 px-4 py-3">
@@ -604,7 +604,7 @@ export default function CoachTryoutsPage() {
                           // Use the most recent score entry
                           const s = p.scores[0];
                           return (
-                            <div className="bg-white border border-gray-200 rounded-lg p-4">
+                            <div className="bg-white border border-gray-200 rounded-2xl p-4">
                               <div className="space-y-2">
                                 {SCORE_CATEGORIES.map((cat) => (
                                   <div key={cat.key} className="flex items-center gap-3">

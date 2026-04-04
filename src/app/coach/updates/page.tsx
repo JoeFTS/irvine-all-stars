@@ -63,7 +63,7 @@ export default function CoachUpdatesPage() {
 
       <div className="space-y-6">
         {/* Important Links */}
-        <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
+        <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6">
           <h2 className="font-display text-xl font-bold uppercase tracking-wide text-charcoal mb-4">
             Important Links
           </h2>
@@ -93,7 +93,7 @@ export default function CoachUpdatesPage() {
         </div>
 
         {/* Season Overview */}
-        <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
+        <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
             <Calendar size={20} className="text-flag-blue" />
             <h2 className="font-display text-xl font-bold uppercase tracking-wide text-charcoal">
@@ -129,7 +129,7 @@ export default function CoachUpdatesPage() {
         </div>
 
         {/* Rules of Note */}
-        <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
+        <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
             <AlertTriangle size={20} className="text-star-gold" />
             <h2 className="font-display text-xl font-bold uppercase tracking-wide text-charcoal">
@@ -149,7 +149,7 @@ export default function CoachUpdatesPage() {
                 Know by heart the bat 9 play 9 rules regarding substitutions, pitch counts, and rest day language.
               </p>
             </div>
-            <div className="bg-amber-50 border border-amber-200 rounded-md p-3">
+            <div className="bg-amber-50 border border-amber-200 rounded-2xl p-3">
               <h3 className="font-semibold text-flag-red mb-1">All Divisions</h3>
               <p className="text-gray-700 text-sm">
                 For Colts teams, take all of your USSSA bats out of your bags and store them until summer.
@@ -159,7 +159,7 @@ export default function CoachUpdatesPage() {
         </div>
 
         {/* Uniform Info */}
-        <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
+        <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
             <Shirt size={20} className="text-flag-blue" />
             <h2 className="font-display text-xl font-bold uppercase tracking-wide text-charcoal">
@@ -183,7 +183,7 @@ export default function CoachUpdatesPage() {
         </div>
 
         {/* Announcements Feed */}
-        <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
+        <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6">
           <div className="flex items-center gap-2 mb-4">
             <Info size={20} className="text-flag-blue" />
             <h2 className="font-display text-xl font-bold uppercase tracking-wide text-charcoal">

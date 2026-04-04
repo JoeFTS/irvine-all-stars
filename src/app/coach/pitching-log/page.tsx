@@ -138,7 +138,7 @@ export default function PitchingLogPage() {
             id="division-select"
             value={selectedDivision}
             onChange={(e) => setSelectedDivision(e.target.value)}
-            className="w-full sm:w-auto rounded-lg border border-gray-300 px-4 py-3 sm:py-2.5 min-h-[44px] text-sm text-charcoal bg-white focus:outline-none focus:ring-2 focus:ring-flag-blue focus:border-transparent"
+            className="w-full sm:w-auto rounded-xl border border-gray-300 px-4 py-3 sm:py-2.5 min-h-[44px] text-sm text-charcoal bg-white focus:outline-none focus:ring-2 focus:ring-flag-blue focus:border-transparent"
           >
             {PITCHING_DIVISIONS.map((div) => (
               <option key={div.key} value={div.key}>
@@ -150,7 +150,7 @@ export default function PitchingLogPage() {
 
         <button
           onClick={() => window.print()}
-          className="flex items-center justify-center gap-2 px-6 py-3 min-h-[44px] w-full sm:w-auto bg-flag-blue text-white font-display font-bold uppercase tracking-wider text-sm rounded-lg hover:bg-flag-blue/90 transition-colors"
+          className="flex items-center justify-center gap-2 px-6 py-3 min-h-[44px] w-full sm:w-auto bg-flag-blue text-white font-display font-bold uppercase tracking-wider text-sm rounded-full hover:bg-flag-blue/90 transition-colors"
         >
           <Printer size={16} />
           Print This Page
@@ -161,7 +161,7 @@ export default function PitchingLogPage() {
             href={PONY_PITCHING_LOG_URLS[selectedDivision]}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center justify-center gap-2 px-6 py-3 min-h-[44px] w-full sm:w-auto bg-white text-flag-blue border-2 border-flag-blue font-display font-bold uppercase tracking-wider text-sm rounded-lg hover:bg-flag-blue/5 transition-colors"
+            className="flex items-center justify-center gap-2 px-6 py-3 min-h-[44px] w-full sm:w-auto bg-white text-flag-blue border-2 border-flag-blue font-display font-bold uppercase tracking-wider text-sm rounded-full hover:bg-flag-blue/5 transition-colors"
           >
             <FileDown size={16} />
             Official PONY Pitching Log

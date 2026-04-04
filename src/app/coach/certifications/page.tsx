@@ -205,7 +205,7 @@ export default function CertificationsPage() {
 
       {/* Overall Status */}
       <div
-        className={`rounded-lg px-5 py-4 mb-8 border ${
+        className={`rounded-2xl px-5 py-4 mb-8 border ${
           completedCount === 2
             ? "bg-green-50 border-green-300"
             : "bg-amber-50 border-amber-300"
@@ -276,7 +276,7 @@ export default function CertificationsPage() {
                           href={link.url}
                           target="_blank"
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1.5 bg-flag-blue/10 text-flag-blue text-sm font-semibold px-4 py-2 rounded-lg hover:bg-flag-blue/20 transition-colors"
+                          className="inline-flex items-center gap-1.5 bg-flag-blue/10 text-flag-blue text-sm font-semibold px-4 py-2 rounded-full hover:bg-flag-blue/20 transition-colors"
                         >
                           {link.label}
                           <ExternalLink size={14} />
@@ -306,7 +306,7 @@ export default function CertificationsPage() {
                           const { data } = await supabase.storage.from("player-documents").createSignedUrl(cert.cert_file_path, 300);
                           if (data?.signedUrl) window.open(data.signedUrl, "_blank");
                         }}
-                        className="px-3 py-2 min-h-[44px] rounded-lg text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors shrink-0"
+                        className="px-3 py-2 min-h-[44px] rounded-full text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors shrink-0"
                       >
                         View / Print
                       </button>
@@ -348,7 +348,7 @@ export default function CertificationsPage() {
             {!showAddAssistant && (
               <button
                 onClick={() => setShowAddAssistant(true)}
-                className="inline-flex items-center gap-1.5 bg-flag-blue text-white text-sm font-semibold px-4 py-2 rounded-lg hover:bg-flag-blue/90 transition-colors"
+                className="inline-flex items-center gap-1.5 bg-flag-blue text-white text-sm font-semibold px-4 py-2 rounded-full hover:bg-flag-blue/90 transition-colors"
               >
                 <Plus size={16} />
                 Add Assistant Coach
@@ -363,7 +363,7 @@ export default function CertificationsPage() {
                 value={newAssistantName}
                 onChange={(e) => setNewAssistantName(e.target.value)}
                 placeholder="Assistant coach name"
-                className="flex-1 border border-gray-300 rounded-lg px-4 py-3 sm:py-2 min-h-[44px] text-sm focus:outline-none focus:ring-2 focus:ring-flag-blue/50 focus:border-flag-blue"
+                className="flex-1 border border-gray-300 rounded-xl px-4 py-3 sm:py-2 min-h-[44px] text-sm focus:outline-none focus:ring-2 focus:ring-flag-blue/50 focus:border-flag-blue"
                 onKeyDown={(e) => {
                   if (e.key === "Enter") addAssistant();
                 }}
@@ -371,7 +371,7 @@ export default function CertificationsPage() {
               <button
                 onClick={addAssistant}
                 disabled={!newAssistantName.trim()}
-                className="inline-flex items-center justify-center gap-1.5 bg-flag-blue text-white text-sm font-semibold px-4 py-3 sm:py-2 min-h-[44px] rounded-lg hover:bg-flag-blue/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
+                className="inline-flex items-center justify-center gap-1.5 bg-flag-blue text-white text-sm font-semibold px-4 py-3 sm:py-2 min-h-[44px] rounded-full hover:bg-flag-blue/90 transition-colors disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 <UserPlus size={16} />
                 Add
@@ -407,7 +407,7 @@ export default function CertificationsPage() {
                   </h3>
                   <button
                     onClick={() => removeAssistant(ac.id)}
-                    className="inline-flex items-center gap-1.5 text-flag-red text-xs font-semibold px-3 py-2 min-h-[44px] rounded-lg hover:bg-red-50 transition-colors"
+                    className="inline-flex items-center gap-1.5 text-flag-red text-xs font-semibold px-3 py-2 min-h-[44px] rounded-full hover:bg-red-50 transition-colors"
                   >
                     <Trash2 size={14} />
                     Remove
@@ -433,7 +433,7 @@ export default function CertificationsPage() {
                             const { data } = await supabase.storage.from("player-documents").createSignedUrl(ac.concussion_cert_path!, 300);
                             if (data?.signedUrl) window.open(data.signedUrl, "_blank");
                           }}
-                          className="px-3 py-2 min-h-[44px] rounded-lg text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors shrink-0"
+                          className="px-3 py-2 min-h-[44px] rounded-full text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors shrink-0"
                         >
                           View / Print
                         </button>
@@ -468,7 +468,7 @@ export default function CertificationsPage() {
                             const { data } = await supabase.storage.from("player-documents").createSignedUrl(ac.cardiac_cert_path!, 300);
                             if (data?.signedUrl) window.open(data.signedUrl, "_blank");
                           }}
-                          className="px-3 py-2 min-h-[44px] rounded-lg text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors shrink-0"
+                          className="px-3 py-2 min-h-[44px] rounded-full text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors shrink-0"
                         >
                           View / Print
                         </button>

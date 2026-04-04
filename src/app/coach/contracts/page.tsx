@@ -168,13 +168,13 @@ export default function CoachContractsPage() {
           placeholder="Search by player or parent name..."
           value={search}
           onChange={(e) => setSearch(e.target.value)}
-          className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-flag-blue/20 focus:border-flag-blue"
+          className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-flag-blue/20 focus:border-flag-blue"
         />
       </div>
 
       {/* Results */}
       {filtered.length === 0 ? (
-        <div className="text-center py-16 bg-white rounded-lg border border-gray-200">
+        <div className="text-center py-16 bg-white rounded-2xl border border-gray-200">
           <FileText size={40} className="mx-auto text-gray-200 mb-3" />
           <p className="font-display text-sm font-semibold uppercase tracking-wider text-gray-400">
             No contracts found
@@ -201,7 +201,7 @@ export default function CoachContractsPage() {
             return (
               <div
                 key={contract.id}
-                className="bg-white border border-gray-200 rounded-lg p-4 flex flex-wrap items-center gap-3 sm:gap-4"
+                className="bg-white border border-gray-200 rounded-2xl p-4 flex flex-wrap items-center gap-3 sm:gap-4"
               >
                 {/* Player Info */}
                 <div className="flex-1 min-w-[200px]">
@@ -237,7 +237,7 @@ export default function CoachContractsPage() {
                   href={`/contract-view?id=${contract.registration_id}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-1.5 px-4 py-2.5 min-h-[44px] bg-flag-blue text-white rounded-lg text-xs font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors"
+                  className="flex items-center gap-1.5 px-4 py-2.5 min-h-[44px] bg-flag-blue text-white rounded-full text-xs font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors"
                 >
                   <ExternalLink size={14} />
                   View

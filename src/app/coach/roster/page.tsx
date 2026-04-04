@@ -139,7 +139,7 @@ function StatCard({
 
   return (
     <div
-      className={`bg-white border rounded-lg p-4 md:p-5 ${colors[accent]}`}
+      className={`bg-white border rounded-2xl p-4 md:p-5 ${colors[accent]}`}
     >
       <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1">
         {label}
@@ -215,7 +215,7 @@ function PlayerCard({
   docs: PlayerDocument[];
 }) {
   return (
-    <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+    <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
       {/* Player Info Header */}
       <div className="p-4 md:p-5 border-b border-gray-100">
         <div className="flex items-center justify-between gap-3 mb-2">
@@ -491,7 +491,7 @@ export default function CoachRosterPage() {
   if (!supabase) {
     return (
       <div className="p-6 md:p-10">
-        <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
           <p className="font-display text-xl font-bold uppercase tracking-wide text-flag-blue mb-2">
             Connect Supabase to View Data
           </p>
@@ -587,7 +587,7 @@ export default function CoachRosterPage() {
             {filteredAwaiting.map((p) => (
               <div
                 key={p.id}
-                className="bg-white border border-amber-200 rounded-lg p-4 flex flex-wrap items-center gap-3"
+                className="bg-white border border-amber-200 rounded-2xl p-4 flex flex-wrap items-center gap-3"
               >
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
@@ -627,7 +627,7 @@ export default function CoachRosterPage() {
 
       {/* ---- Roster Cards ---- */}
       {filtered.length === 0 ? (
-        <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
           <Shield size={32} className="text-gray-300 mx-auto mb-3" />
           <p className="text-gray-500 text-sm max-w-md mx-auto">
             {registrations.length === 0

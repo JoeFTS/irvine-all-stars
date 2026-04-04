@@ -248,7 +248,7 @@ export default function CoachScoresPage() {
   if (!division) {
     return (
       <div className="p-6 md:p-10">
-        <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
           <p className="font-display text-xl font-bold uppercase tracking-wide text-flag-blue mb-2">
             Division Not Assigned
           </p>
@@ -287,7 +287,7 @@ export default function CoachScoresPage() {
       {/* Result message */}
       {result && (
         <div
-          className={`mb-6 p-4 rounded-lg border flex items-center gap-2 ${
+          className={`mb-6 p-4 rounded-2xl border flex items-center gap-2 ${
             result.success
               ? "bg-green-50 border-green-200 text-green-800"
               : "bg-red-50 border-red-200 text-flag-red"
@@ -303,7 +303,7 @@ export default function CoachScoresPage() {
       )}
 
       {/* Step 1: Download Template */}
-      <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 mb-4">
+      <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 mb-4">
         <div className="flex items-start gap-3 sm:gap-4">
           <div className="w-10 h-10 rounded-full bg-flag-blue text-white font-display text-lg font-bold flex items-center justify-center shrink-0">
             1
@@ -332,7 +332,7 @@ export default function CoachScoresPage() {
                 a.click();
                 URL.revokeObjectURL(url);
               }}
-              className="inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-flag-blue text-white px-5 py-3 sm:py-2.5 min-h-[44px] rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors"
+              className="inline-flex items-center justify-center gap-2 w-full sm:w-auto bg-flag-blue text-white px-5 py-3 sm:py-2.5 min-h-[44px] rounded-full text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors"
             >
               <Download size={16} />
               Download Score Sheet
@@ -342,7 +342,7 @@ export default function CoachScoresPage() {
       </div>
 
       {/* Step 2: Fill in scores */}
-      <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6 mb-4">
+      <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6 mb-4">
         <div className="flex items-start gap-3 sm:gap-4">
           <div className="w-10 h-10 rounded-full bg-flag-blue text-white font-display text-lg font-bold flex items-center justify-center shrink-0">
             2
@@ -357,7 +357,7 @@ export default function CoachScoresPage() {
               highest).
             </p>
 
-            <div className="bg-flag-blue/5 border border-flag-blue/10 rounded-lg p-4">
+            <div className="bg-flag-blue/5 border border-flag-blue/10 rounded-2xl p-4">
               <p className="font-display text-xs font-semibold uppercase tracking-wider text-flag-blue mb-2">
                 Option A &mdash; Use Excel or Numbers
               </p>
@@ -391,7 +391,7 @@ export default function CoachScoresPage() {
       </div>
 
       {/* Step 3: Upload */}
-      <div className="bg-white border border-gray-200 rounded-lg p-4 sm:p-6">
+      <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6">
         <div className="flex items-start gap-3 sm:gap-4">
           <div className="w-10 h-10 rounded-full bg-flag-blue text-white font-display text-lg font-bold flex items-center justify-center shrink-0">
             3
@@ -414,7 +414,7 @@ export default function CoachScoresPage() {
 
             {selectedFile ? (
               /* File selected — show name with Upload and Replace buttons */
-              <div className="border-2 border-flag-blue/30 bg-flag-blue/5 rounded-lg px-5 py-4 inline-flex flex-col sm:flex-row items-start sm:items-center gap-3">
+              <div className="border-2 border-flag-blue/30 bg-flag-blue/5 rounded-2xl px-5 py-4 inline-flex flex-col sm:flex-row items-start sm:items-center gap-3">
                 <div className="flex items-center gap-2 min-w-0">
                   <FileSpreadsheet size={20} className="text-flag-blue shrink-0" />
                   <span className="text-sm font-semibold text-charcoal truncate">
@@ -425,7 +425,7 @@ export default function CoachScoresPage() {
                   <button
                     onClick={handleUpload}
                     disabled={uploading}
-                    className="inline-flex items-center gap-2 bg-flag-blue text-white px-5 py-2.5 min-h-[44px] rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors disabled:opacity-50"
+                    className="inline-flex items-center gap-2 bg-flag-blue text-white px-5 py-2.5 min-h-[44px] rounded-full text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors disabled:opacity-50"
                   >
                     <Upload size={14} />
                     {uploading ? "Uploading..." : "Upload Scores"}
@@ -433,7 +433,7 @@ export default function CoachScoresPage() {
                   <button
                     onClick={handleClearFile}
                     disabled={uploading}
-                    className="inline-flex items-center gap-2 bg-gray-100 text-gray-600 px-4 py-2.5 min-h-[44px] rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-gray-200 transition-colors disabled:opacity-50"
+                    className="inline-flex items-center gap-2 bg-gray-100 text-gray-600 px-4 py-2.5 min-h-[44px] rounded-full text-sm font-semibold uppercase tracking-wide hover:bg-gray-200 transition-colors disabled:opacity-50"
                   >
                     Replace File
                   </button>
@@ -441,7 +441,7 @@ export default function CoachScoresPage() {
               </div>
             ) : (
               /* No file selected — show file picker */
-              <label className="inline-flex items-center gap-3 border-2 border-dashed border-gray-300 hover:border-flag-blue hover:bg-flag-blue/5 rounded-lg px-8 py-5 transition-colors cursor-pointer">
+              <label className="inline-flex items-center gap-3 border-2 border-dashed border-gray-300 hover:border-flag-blue hover:bg-flag-blue/5 rounded-2xl px-8 py-5 transition-colors cursor-pointer">
                 <Upload size={20} className="text-gray-400" />
                 <span className="text-sm font-semibold text-gray-600">
                   Choose .xlsx or .csv file
@@ -459,7 +459,7 @@ export default function CoachScoresPage() {
       </div>
 
       {/* Score scale reference */}
-      <div className="mt-6 bg-gray-50 border border-gray-200 rounded-lg p-4">
+      <div className="mt-6 bg-gray-50 border border-gray-200 rounded-2xl p-4">
         <p className="font-display text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
           Scoring Scale
         </p>
