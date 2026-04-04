@@ -297,18 +297,18 @@ export default function InviteSignupPage({
           <div className="w-full max-w-md text-center">
             <div className="flex items-center justify-center gap-2 mb-4">
               <span className="text-star-gold-bright text-lg">&#9733;</span>
-              <h1 className="font-display text-3xl font-bold text-flag-blue uppercase tracking-wider">
+              <h1 className="font-hero text-3xl font-bold text-flag-blue uppercase tracking-wider">
                 Invalid Link
               </h1>
               <span className="text-star-gold-bright text-lg">&#9733;</span>
             </div>
-            <div className="bg-white border border-gray-200 rounded-lg p-8">
+            <div className="bg-white border border-gray-200 rounded-2xl p-8">
               <p className="text-gray-600 mb-6">
                 This invite link is not valid. Please check your email for the correct link, or contact the coordinator for a new invitation.
               </p>
               <Link
                 href="/auth/login"
-                className="inline-block bg-flag-blue hover:bg-flag-blue-mid text-white font-display font-bold uppercase tracking-wider py-3 px-6 rounded transition-colors"
+                className="inline-block bg-flag-blue hover:bg-flag-blue-mid text-white font-display font-bold uppercase tracking-wider py-3 px-6 rounded-full transition-colors"
               >
                 Go to Sign In
               </Link>
@@ -328,18 +328,18 @@ export default function InviteSignupPage({
           <div className="w-full max-w-md text-center">
             <div className="flex items-center justify-center gap-2 mb-4">
               <span className="text-star-gold-bright text-lg">&#9733;</span>
-              <h1 className="font-display text-3xl font-bold text-flag-blue uppercase tracking-wider">
+              <h1 className="font-hero text-3xl font-bold text-flag-blue uppercase tracking-wider">
                 Already Used
               </h1>
               <span className="text-star-gold-bright text-lg">&#9733;</span>
             </div>
-            <div className="bg-white border border-gray-200 rounded-lg p-8">
+            <div className="bg-white border border-gray-200 rounded-2xl p-8">
               <p className="text-gray-600 mb-6">
                 This invite has already been used. If you&apos;ve already created your account, you can sign in below.
               </p>
               <Link
                 href="/auth/login"
-                className="inline-block bg-flag-blue hover:bg-flag-blue-mid text-white font-display font-bold uppercase tracking-wider py-3 px-6 rounded transition-colors"
+                className="inline-block bg-flag-blue hover:bg-flag-blue-mid text-white font-display font-bold uppercase tracking-wider py-3 px-6 rounded-full transition-colors"
               >
                 Sign In
               </Link>
@@ -359,18 +359,18 @@ export default function InviteSignupPage({
           <div className="w-full max-w-md text-center">
             <div className="flex items-center justify-center gap-2 mb-4">
               <span className="text-star-gold-bright text-lg">&#9733;</span>
-              <h1 className="font-display text-3xl font-bold text-flag-blue uppercase tracking-wider">
+              <h1 className="font-hero text-3xl font-bold text-flag-blue uppercase tracking-wider">
                 Invite Expired
               </h1>
               <span className="text-star-gold-bright text-lg">&#9733;</span>
             </div>
-            <div className="bg-white border border-gray-200 rounded-lg p-8">
+            <div className="bg-white border border-gray-200 rounded-2xl p-8">
               <p className="text-gray-600 mb-6">
                 This invite has expired. Please contact the coordinator for a new invite.
               </p>
               <Link
                 href="/auth/login"
-                className="inline-block bg-flag-blue hover:bg-flag-blue-mid text-white font-display font-bold uppercase tracking-wider py-3 px-6 rounded transition-colors"
+                className="inline-block bg-flag-blue hover:bg-flag-blue-mid text-white font-display font-bold uppercase tracking-wider py-3 px-6 rounded-full transition-colors"
               >
                 Go to Sign In
               </Link>
@@ -391,7 +391,7 @@ export default function InviteSignupPage({
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-2 mb-4">
               <span className="text-star-gold-bright text-lg">&#9733;</span>
-              <h1 className="font-display text-3xl font-bold text-flag-blue uppercase tracking-wider">
+              <h1 className="font-hero text-3xl font-bold text-flag-blue uppercase tracking-wider">
                 Set Up Your Account
               </h1>
               <span className="text-star-gold-bright text-lg">&#9733;</span>
@@ -414,13 +414,13 @@ export default function InviteSignupPage({
 
           {/* Success State */}
           {success ? (
-            <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+            <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
               <div className="text-star-gold-bright text-4xl mb-4">&#9733;</div>
-              <h2 className="font-display text-xl font-bold text-flag-blue uppercase tracking-wider mb-3">
+              <h2 className="font-hero text-xl font-bold text-flag-blue uppercase tracking-wider mb-3">
                 Account Created!
               </h2>
               {registeredChildren.length > 0 && (
-                <div className="bg-star-gold-bright/10 border border-star-gold-bright/30 rounded-lg p-4 mb-4">
+                <div className="bg-star-gold-bright/10 border border-star-gold-bright/30 rounded-2xl p-4 mb-4">
                   <p className="text-charcoal text-sm leading-relaxed">
                     {registeredChildren.length === 1 ? (
                       <>We&apos;ve set up a tryout registration for <strong>{registeredChildren[0]}</strong>.</>
@@ -434,7 +434,7 @@ export default function InviteSignupPage({
                   </p>
                 </div>
               )}
-              <div className="bg-flag-blue/5 border border-flag-blue/20 rounded-lg p-5 mb-4">
+              <div className="bg-flag-blue/5 border border-flag-blue/20 rounded-2xl p-5 mb-4">
                 <p className="text-flag-blue font-semibold text-sm mb-2">
                   Check Your Email
                 </p>
@@ -448,14 +448,14 @@ export default function InviteSignupPage({
               </p>
               <Link
                 href="/auth/login"
-                className="inline-block bg-flag-blue hover:bg-flag-blue-mid text-white font-display font-bold uppercase tracking-wider py-3 px-6 rounded transition-colors text-sm"
+                className="inline-block bg-flag-blue hover:bg-flag-blue-mid text-white font-display font-bold uppercase tracking-wider py-3 px-6 rounded-full transition-colors text-sm"
               >
                 Go to Sign In
               </Link>
             </div>
           ) : (
             /* Form Card */
-            <div className="bg-white border border-gray-200 rounded-lg p-8">
+            <div className="bg-white border border-gray-200 rounded-2xl p-8">
               <form onSubmit={handleSubmit} className="space-y-5">
                 {error && (
                   <div className="bg-flag-red/10 border border-flag-red/30 text-flag-red rounded px-4 py-3 text-sm">
@@ -475,7 +475,7 @@ export default function InviteSignupPage({
                     type="email"
                     value={inviteState.invite.email}
                     disabled
-                    className="w-full border border-gray-200 rounded px-4 py-3 text-gray-500 bg-gray-50 cursor-not-allowed"
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-gray-500 bg-gray-50 cursor-not-allowed"
                   />
                 </div>
 
@@ -492,7 +492,7 @@ export default function InviteSignupPage({
                     required
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full border border-gray-200 rounded px-4 py-3 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
                     placeholder="Your full name"
                   />
                 </div>
@@ -510,7 +510,7 @@ export default function InviteSignupPage({
                     required
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
-                    className="w-full border border-gray-200 rounded px-4 py-3 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
                     placeholder="At least 8 characters"
                   />
                 </div>
@@ -528,7 +528,7 @@ export default function InviteSignupPage({
                     required
                     value={confirmPassword}
                     onChange={(e) => setConfirmPassword(e.target.value)}
-                    className="w-full border border-gray-200 rounded px-4 py-3 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+                    className="w-full border border-gray-200 rounded-xl px-4 py-3 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
                     placeholder="Re-enter your password"
                   />
                 </div>
@@ -536,7 +536,7 @@ export default function InviteSignupPage({
                 <button
                   type="submit"
                   disabled={submitting}
-                  className="w-full bg-flag-red hover:bg-flag-red-dark text-white font-display font-bold uppercase tracking-wider py-3 rounded transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="w-full bg-flag-red hover:bg-flag-red-dark text-white font-display font-bold uppercase tracking-wider py-3 rounded-full transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   {submitting ? "Creating account..." : "Create Account"}
                 </button>

@@ -75,7 +75,7 @@ export default function LoginPage() {
           <div className="text-center mb-8">
             <div className="flex items-center justify-center gap-2 mb-4">
               <span className="text-star-gold-bright text-lg">&#9733;</span>
-              <h1 className="font-display text-3xl font-bold text-flag-blue uppercase tracking-wider">
+              <h1 className="font-hero text-3xl font-bold text-flag-blue uppercase tracking-wider">
                 Sign In
               </h1>
               <span className="text-star-gold-bright text-lg">&#9733;</span>
@@ -86,7 +86,7 @@ export default function LoginPage() {
           </div>
 
           {/* Form Card */}
-          <div className="bg-white border border-gray-200 rounded-lg p-8">
+          <div className="bg-white border border-gray-200 rounded-2xl p-8">
             <form onSubmit={handleSubmit} className="space-y-5">
               {error && (
                 <div className="bg-flag-red/10 border border-flag-red/30 text-flag-red rounded px-4 py-3 text-sm">
@@ -107,7 +107,7 @@ export default function LoginPage() {
                   required
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full border border-gray-200 rounded px-4 py-3 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
                   placeholder="you@example.com"
                 />
               </div>
@@ -125,7 +125,7 @@ export default function LoginPage() {
                   required
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full border border-gray-200 rounded px-4 py-3 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-3 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
                   placeholder="Your password"
                 />
               </div>
@@ -133,7 +133,7 @@ export default function LoginPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full bg-flag-blue hover:bg-flag-blue-mid text-white font-display font-bold uppercase tracking-wider py-3 rounded transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
+                className="w-full bg-flag-blue hover:bg-flag-blue-mid text-white font-display font-bold uppercase tracking-wider py-3 rounded-full transition-colors disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 {submitting ? "Signing in..." : "Sign In"}
               </button>

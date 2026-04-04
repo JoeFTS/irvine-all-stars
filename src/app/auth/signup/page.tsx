@@ -11,12 +11,12 @@ export default function SignupPage() {
         <div className="w-full max-w-md text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
             <span className="text-star-gold-bright text-lg">&#9733;</span>
-            <h1 className="font-display text-3xl font-bold text-flag-blue uppercase tracking-wider">
+            <h1 className="font-hero text-3xl font-bold text-flag-blue uppercase tracking-wider">
               Invite Only
             </h1>
             <span className="text-star-gold-bright text-lg">&#9733;</span>
           </div>
-          <div className="bg-white border border-gray-200 rounded-lg p-8">
+          <div className="bg-white border border-gray-200 rounded-2xl p-8">
             <p className="text-gray-600 mb-4">
               Account creation for Irvine All-Stars is by invitation only.
               If you&apos;ve been selected as a coach or your player is participating
@@ -28,7 +28,7 @@ export default function SignupPage() {
             </p>
             <Link
               href="/auth/login"
-              className="inline-block bg-flag-blue hover:bg-flag-blue-mid text-white font-display font-bold uppercase tracking-wider py-3 px-6 rounded transition-colors"
+              className="inline-block bg-flag-blue hover:bg-flag-blue-mid text-white font-display font-bold uppercase tracking-wider py-3 px-6 rounded-full transition-colors"
             >
               Sign In
             </Link>
