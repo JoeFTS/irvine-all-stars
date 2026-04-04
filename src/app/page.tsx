@@ -12,11 +12,13 @@ import {
   HeroItem,
 } from "@/components/motion";
 
+const cardTints = ["bg-tint-cream", "bg-tint-green", "bg-tint-leather"] as const;
+
 export default function Home() {
   return (
     <>
       {/* ===== HERO ===== */}
-      <section className="relative min-h-screen flex items-center pt-[98px] pb-20 overflow-hidden">
+      <section className="grain-overlay relative min-h-screen flex items-center pt-[98px] pb-20 overflow-hidden">
         {/* Background image */}
         <Image
           src="/images/hero-aerial.webp"
@@ -27,25 +29,29 @@ export default function Home() {
           unoptimized
         />
         {/* Navy overlay */}
-        <div className="absolute inset-0 bg-[#0A2342]/75" />
+        <div className="absolute inset-0 bg-flag-blue/75" />
+
+        {/* Baseball stitch circle decorations */}
+        <div className="baseball-stitch-circle -top-20 -right-20 w-[400px] h-[400px] opacity-10" />
+        <div className="baseball-stitch-circle bottom-10 -left-32 w-[250px] h-[250px] opacity-[0.07]" />
 
         <div className="relative z-10 w-full max-w-6xl mx-auto px-6 md:px-10 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
           {/* Left - headline */}
           <HeroReveal className="text-center lg:text-left">
             <HeroItem>
               <div className="inline-flex items-center gap-2 border border-white/20 rounded px-4 py-1.5 mb-6">
-                <span className="text-[#F4B400] font-bold text-xs uppercase tracking-widest font-display">
+                <span className="text-star-gold font-bold text-xs uppercase tracking-widest font-display">
                   &#9733; 2026 All-Stars Season &#9733;
                 </span>
               </div>
             </HeroItem>
             <HeroItem>
-              <h1 className="font-display text-5xl md:text-7xl font-bold text-white uppercase leading-[0.95] tracking-wider mb-6">
+              <h1 className="font-hero text-5xl md:text-7xl font-bold text-white uppercase leading-[0.95] tracking-wider mb-6">
                 EARN
                 <br />
                 YOUR
                 <br />
-                <span className="text-[#C1121F]">STARS.</span>
+                <span className="text-flag-red">STARS.</span>
               </h1>
             </HeroItem>
             <HeroItem>
@@ -59,13 +65,13 @@ export default function Home() {
               <div className="flex gap-3 flex-wrap justify-center lg:justify-start">
                 <Link
                   href="/apply/player"
-                  className="bg-[#C1121F] hover:bg-[#a00f1a] text-white px-7 py-3.5 rounded-md font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.97]"
+                  className="bg-flag-red hover:bg-flag-red-dark text-white px-7 py-3.5 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.97]"
                 >
                   Register for Tryouts
                 </Link>
                 <Link
                   href="/apply/coach"
-                  className="border-2 border-white/30 hover:border-white text-white px-7 py-3.5 rounded-md font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5 active:scale-[0.97]"
+                  className="border-2 border-white/30 hover:border-white text-white px-7 py-3.5 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5 active:scale-[0.97]"
                 >
                   Apply to Coach
                 </Link>
@@ -78,10 +84,10 @@ export default function Home() {
             <StaggerItem>
               <Link
                 href="/apply/coach"
-                className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-lg p-5 flex items-center gap-4 hover:-translate-y-0.5 hover:bg-white/15 transition-all group active:scale-[0.98]"
+                className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl p-5 flex items-center gap-4 hover:-translate-y-0.5 hover:bg-white/15 transition-all group active:scale-[0.98]"
               >
-                <div className="w-12 h-12 rounded-lg bg-[#C1121F]/20 flex items-center justify-center shrink-0">
-                  <svg className="w-5 h-5 text-[#C1121F]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <div className="w-12 h-12 rounded-lg bg-flag-red/20 flex items-center justify-center shrink-0">
+                  <svg className="w-5 h-5 text-flag-red" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                     <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /><rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
                   </svg>
                 </div>
@@ -93,7 +99,7 @@ export default function Home() {
                     Apply to lead an All-Stars division this summer
                   </p>
                 </div>
-                <span className="text-white/30 group-hover:text-[#F4B400] text-xl transition-colors">
+                <span className="text-white/30 group-hover:text-star-gold text-xl transition-colors">
                   &rarr;
                 </span>
               </Link>
@@ -101,9 +107,9 @@ export default function Home() {
             <StaggerItem>
               <Link
                 href="/apply/player"
-                className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-lg p-5 flex items-center gap-4 hover:-translate-y-0.5 hover:bg-white/15 transition-all group active:scale-[0.98]"
+                className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl p-5 flex items-center gap-4 hover:-translate-y-0.5 hover:bg-white/15 transition-all group active:scale-[0.98]"
               >
-                <div className="w-12 h-12 rounded-lg bg-[#1D4ED8]/20 flex items-center justify-center text-xl shrink-0">
+                <div className="w-12 h-12 rounded-lg bg-flag-blue-mid/20 flex items-center justify-center text-xl shrink-0">
                   &#9918;
                 </div>
                 <div className="flex-1">
@@ -114,7 +120,7 @@ export default function Home() {
                     Register your player for 2026 tryouts
                   </p>
                 </div>
-                <span className="text-white/30 group-hover:text-[#F4B400] text-xl transition-colors">
+                <span className="text-white/30 group-hover:text-star-gold text-xl transition-colors">
                   &rarr;
                 </span>
               </Link>
@@ -122,10 +128,10 @@ export default function Home() {
             <StaggerItem>
               <Link
                 href="/auth/login"
-                className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-lg p-5 flex items-center gap-4 hover:-translate-y-0.5 hover:bg-white/15 transition-all group active:scale-[0.98]"
+                className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl p-5 flex items-center gap-4 hover:-translate-y-0.5 hover:bg-white/15 transition-all group active:scale-[0.98]"
               >
-                <div className="w-12 h-12 rounded-lg bg-[#F4B400]/20 flex items-center justify-center shrink-0">
-                  <svg className="w-5 h-5 text-[#F4B400]" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
+                <div className="w-12 h-12 rounded-lg bg-star-gold/20 flex items-center justify-center shrink-0">
+                  <svg className="w-5 h-5 text-star-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                     <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
                   </svg>
                 </div>
@@ -137,7 +143,7 @@ export default function Home() {
                     Coach dashboard, parent portal & more
                   </p>
                 </div>
-                <span className="text-white/30 group-hover:text-[#F4B400] text-xl transition-colors">
+                <span className="text-white/30 group-hover:text-star-gold text-xl transition-colors">
                   &rarr;
                 </span>
               </Link>
@@ -149,13 +155,13 @@ export default function Home() {
       <StripeDivider />
 
       {/* ===== DIVISIONS ===== */}
-      <section className="bg-[#F9FAFB] py-20 px-6 md:px-10">
+      <section className="bg-cream py-20 px-6 md:px-10">
         <div className="max-w-6xl mx-auto">
           <RevealOnScroll>
-            <p className="font-display text-sm font-semibold text-[#C1121F] uppercase tracking-[3px] mb-2">
-              &#9733; 2026 Divisions
+            <p className="font-display text-sm font-semibold text-flag-red uppercase tracking-[3px] mb-2">
+              <span className="text-star-gold">&#9733;</span> 2026 Divisions
             </p>
-            <h2 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide text-[#0A2342] mb-3">
+            <h2 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide text-flag-blue mb-3">
               Twelve Divisions of All-Stars
             </h2>
             <p className="text-gray-600 text-lg max-w-xl mb-10 leading-relaxed">
@@ -166,17 +172,17 @@ export default function Home() {
           <StaggerReveal className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
             {divisions.map((div, i) => (
               <StaggerItem key={div.id}>
-                <div className="bg-white rounded-lg p-6 border border-[#E5E7EB] relative overflow-hidden hover:-translate-y-1 hover:shadow-lg transition-all cursor-pointer group active:scale-[0.98]">
+                <div className={`${cardTints[i % 3]} rounded-2xl p-6 border border-gray-200 relative overflow-hidden hover:-translate-y-1 hover:shadow-lg transition-all cursor-pointer group active:scale-[0.98]`}>
                   <div
                     className={`absolute top-0 left-0 right-0 h-1 transition-all group-hover:h-1.5 ${
-                      i % 2 === 0 ? "bg-[#0A2342]" : "bg-[#C1121F]"
+                      i % 2 === 0 ? "bg-flag-blue" : "bg-flag-red"
                     }`}
                   />
                   <div className="flex justify-between items-start mb-2">
-                    <span className="font-display text-3xl font-bold uppercase text-[#0A2342]">
+                    <span className="font-display text-3xl font-bold uppercase text-flag-blue">
                       {div.name}
                     </span>
-                    <span className="text-[#F4B400] text-2xl">&#9733;</span>
+                    <span className="text-star-gold text-2xl">&#9733;</span>
                   </div>
                   <p className="text-gray-600 text-sm mb-3">
                     {div.ageGroup}
@@ -194,7 +200,7 @@ export default function Home() {
       </section>
 
       {/* ===== STATS BAR ===== */}
-      <section className="bg-[#0A2342] py-10 px-6 md:px-10">
+      <section className="bg-flag-blue py-10 px-6 md:px-10">
         <StaggerReveal className="max-w-6xl mx-auto grid grid-cols-2 md:grid-cols-4 gap-8 text-center">
           {[
             { number: "12", label: "Divisions" },
@@ -203,7 +209,7 @@ export default function Home() {
             { number: "Fair", label: "& Transparent" },
           ].map((stat) => (
             <StaggerItem key={stat.label}>
-              <p className="font-display text-3xl md:text-5xl font-bold text-[#F4B400]">
+              <p className="font-hero text-3xl md:text-5xl font-bold text-star-gold">
                 {stat.number}
               </p>
               <p className="text-white/60 text-sm uppercase tracking-wider mt-1">
@@ -218,10 +224,10 @@ export default function Home() {
       <section className="bg-white py-20 px-6 md:px-10">
         <div className="max-w-6xl mx-auto">
           <RevealOnScroll>
-            <p className="font-display text-sm font-semibold text-[#C1121F] uppercase tracking-[3px] mb-2">
-              &#9733; The Process
+            <p className="font-display text-sm font-semibold text-flag-red uppercase tracking-[3px] mb-2">
+              <span className="text-star-gold">&#9733;</span> The Process
             </p>
-            <h2 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide text-[#0A2342] mb-3">
+            <h2 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide text-flag-blue mb-3">
               How All-Stars Works
             </h2>
             <p className="text-gray-600 text-lg max-w-xl mb-10">
@@ -234,35 +240,35 @@ export default function Home() {
                 num: 1,
                 title: "Apply",
                 desc: "Coaches submit applications. Parents register players. All online, all documented.",
-                color: "bg-[#0A2342]",
+                color: "bg-flag-blue",
               },
               {
                 num: 2,
                 title: "Evaluate",
                 desc: "Independent evaluators score every player on a 54-point rubric across 6 categories. Fair and consistent.",
-                color: "bg-[#C1121F]",
+                color: "bg-flag-red",
               },
               {
                 num: 3,
                 title: "Select",
                 desc: "Scores combined with season data. Rosters built for balance and competitiveness.",
-                color: "bg-[#0A2342]",
+                color: "bg-flag-blue",
               },
               {
                 num: 4,
                 title: "Compete",
                 desc: "Practices start. Tournaments begin. An unforgettable summer of All-Stars baseball.",
-                color: "bg-[#C1121F]",
+                color: "bg-flag-red",
               },
             ].map((step) => (
               <StaggerItem key={step.num}>
-                <div className="bg-white rounded-lg p-7 border border-[#E5E7EB] text-center hover:-translate-y-1 hover:shadow-md transition-all active:scale-[0.98] h-full">
+                <div className="bg-white rounded-2xl p-7 border border-gray-200 text-center hover:-translate-y-1 hover:shadow-md transition-all active:scale-[0.98] h-full">
                   <div
                     className={`w-13 h-13 rounded-full ${step.color} text-white font-display text-xl font-bold flex items-center justify-center mx-auto mb-4`}
                   >
                     {step.num}
                   </div>
-                  <h3 className="font-display text-lg font-semibold uppercase tracking-wider mb-2 text-[#0A2342]">
+                  <h3 className="font-display text-lg font-semibold uppercase tracking-wider mb-2 text-flag-blue">
                     {step.title}
                   </h3>
                   <p className="text-gray-600 text-sm leading-relaxed">
@@ -286,12 +292,12 @@ export default function Home() {
           className="object-cover"
           unoptimized
         />
-        <div className="absolute inset-0 bg-[#0A2342]/85" />
+        <div className="absolute inset-0 bg-flag-blue/85" />
         <RevealOnScroll className="relative z-10 max-w-2xl mx-auto">
-          <p className="text-[#F4B400] font-display text-sm font-semibold uppercase tracking-[3px] mb-4">
+          <p className="text-star-gold font-display text-sm font-semibold uppercase tracking-[3px] mb-4">
             &#9733; Get Started &#9733;
           </p>
-          <h2 className="font-display text-3xl md:text-5xl font-bold text-white uppercase tracking-wide mb-4">
+          <h2 className="font-hero text-3xl md:text-5xl font-bold text-white uppercase tracking-wide mb-4">
             Ready to Play Ball?
           </h2>
           <p className="text-white/60 text-lg mb-8 leading-relaxed">
@@ -301,13 +307,13 @@ export default function Home() {
           <div className="flex gap-3 justify-center flex-wrap">
             <Link
               href="/apply/coach"
-              className="bg-[#C1121F] hover:bg-[#a00f1a] text-white px-8 py-3.5 rounded-md font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.97]"
+              className="bg-flag-red hover:bg-flag-red-dark text-white px-8 py-3.5 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.97]"
             >
               Apply to Coach
             </Link>
             <Link
               href="/apply/player"
-              className="bg-white hover:bg-[#F9FAFB] text-[#0A2342] px-8 py-3.5 rounded-md font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5 active:scale-[0.97]"
+              className="bg-white hover:bg-off-white text-flag-blue px-8 py-3.5 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5 active:scale-[0.97]"
             >
               Register for Tryouts
             </Link>
