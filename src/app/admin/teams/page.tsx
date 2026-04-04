@@ -248,7 +248,7 @@ export default function TeamsPage() {
   if (!supabase) {
     return (
       <div className="p-6 md:p-10">
-        <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
           <p className="font-display text-xl font-bold uppercase tracking-wide text-flag-blue mb-2">
             Connect Supabase to View Data
           </p>
@@ -268,7 +268,7 @@ export default function TeamsPage() {
           <div className="h-8 bg-gray-200 rounded w-56" />
           <div className="h-10 bg-gray-200 rounded w-72" />
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-20 bg-gray-200 rounded-lg" />
+            <div key={i} className="h-20 bg-gray-200 rounded-2xl" />
           ))}
         </div>
       </div>
@@ -291,7 +291,7 @@ export default function TeamsPage() {
       </div>
 
       {/* Create Team Form */}
-      <div className="bg-white border border-gray-200 rounded-lg p-5 mb-6">
+      <div className="bg-white border border-gray-200 rounded-2xl p-5 mb-6">
         <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-gray-400 mb-4">
           Create New Team
         </h2>
@@ -303,7 +303,7 @@ export default function TeamsPage() {
             <select
               value={formDivision}
               onChange={(e) => setFormDivision(e.target.value)}
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
             >
               {DIVISIONS.map((d) => (
                 <option key={d} value={d}>
@@ -322,7 +322,7 @@ export default function TeamsPage() {
               onChange={(e) => setFormTeamName(e.target.value)}
               placeholder="e.g. 11U-White"
               required
-              className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-charcoal placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
             />
           </div>
           <div className="flex-1 min-w-[200px]">
@@ -352,7 +352,7 @@ export default function TeamsPage() {
                     setFormDivision(coach.division_preference);
                   }
                 }}
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
               >
                 <option value="">Select accepted coach...</option>
                 {allCoachApps.filter((c) => c.status === "accepted").map((c) => (
@@ -367,14 +367,14 @@ export default function TeamsPage() {
                 value={formCoachEmail}
                 onChange={(e) => setFormCoachEmail(e.target.value)}
                 placeholder="coach@example.com"
-                className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-charcoal placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
               />
             )}
           </div>
           <button
             type="submit"
             disabled={creating || !formTeamName.trim()}
-            className="inline-flex items-center gap-2 bg-flag-blue text-white px-5 py-2 rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors disabled:opacity-50"
+            className="inline-flex items-center gap-2 bg-flag-blue text-white px-5 py-2 rounded-full text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors disabled:opacity-50"
           >
             <Plus size={16} />
             {creating ? "Creating..." : "Create Team"}
@@ -424,7 +424,7 @@ export default function TeamsPage() {
 
       {/* Teams List */}
       {filtered.length === 0 ? (
-        <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
           <p className="text-gray-400 text-sm">
             No teams found. Create one above to get started.
           </p>
@@ -443,7 +443,7 @@ export default function TeamsPage() {
             return (
               <div
                 key={team.id}
-                className="bg-white border border-gray-200 rounded-lg overflow-hidden"
+                className="bg-white border border-gray-200 rounded-2xl overflow-hidden"
               >
                 {/* Team Header */}
                 <div className="p-4 md:p-5">
@@ -461,18 +461,18 @@ export default function TeamsPage() {
                                 if (e.key === "Escape") setEditingTeamId(null);
                               }}
                               autoFocus
-                              className="font-display text-lg font-bold uppercase tracking-wide text-charcoal border border-flag-blue/30 rounded px-2 py-0.5 focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                              className="font-display text-lg font-bold uppercase tracking-wide text-charcoal border border-flag-blue/30 rounded-xl px-2 py-0.5 focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
                             />
                             <button
                               onClick={() => handleRenameTeam(team.id)}
-                              className="p-1 rounded text-green-600 hover:bg-green-50 transition-colors"
+                              className="p-1 rounded-full text-green-600 hover:bg-green-50 transition-colors"
                               title="Save"
                             >
                               <Check size={16} />
                             </button>
                             <button
                               onClick={() => setEditingTeamId(null)}
-                              className="p-1 rounded text-gray-400 hover:bg-gray-100 transition-colors"
+                              className="p-1 rounded-full text-gray-400 hover:bg-gray-100 transition-colors"
                               title="Cancel"
                             >
                               <X size={16} />
@@ -519,7 +519,7 @@ export default function TeamsPage() {
                           setEditingTeamId(team.id);
                           setEditingTeamName(team.team_name);
                         }}
-                        className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-gray-300 hover:text-flag-blue hover:bg-flag-blue/5 transition-colors"
+                        className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full text-gray-300 hover:text-flag-blue hover:bg-flag-blue/5 transition-colors"
                         title="Rename team"
                       >
                         <Pencil size={16} />
@@ -529,13 +529,13 @@ export default function TeamsPage() {
                           <span className="text-xs text-flag-red font-semibold">Delete?</span>
                           <button
                             onClick={() => handleDelete(team.id)}
-                            className="px-2.5 py-1 rounded text-xs font-semibold uppercase bg-flag-red text-white hover:bg-flag-red/90 transition-colors"
+                            className="px-2.5 py-1 rounded-full text-xs font-semibold uppercase bg-flag-red text-white hover:bg-flag-red/90 transition-colors"
                           >
                             Yes
                           </button>
                           <button
                             onClick={() => setDeletingId(null)}
-                            className="px-2.5 py-1 rounded text-xs font-semibold uppercase bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                            className="px-2.5 py-1 rounded-full text-xs font-semibold uppercase bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
                           >
                             No
                           </button>
@@ -543,7 +543,7 @@ export default function TeamsPage() {
                       ) : (
                         <button
                           onClick={() => setDeletingId(team.id)}
-                          className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg text-gray-300 hover:text-flag-red hover:bg-flag-red/5 transition-colors"
+                          className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-full text-gray-300 hover:text-flag-red hover:bg-flag-red/5 transition-colors"
                           title="Delete team"
                         >
                           <Trash2 size={16} />
@@ -590,7 +590,7 @@ export default function TeamsPage() {
 
                         {/* Stats Grid */}
                         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                          <div className="text-center p-2 bg-gray-50 rounded-lg">
+                          <div className="text-center p-2 bg-gray-50 rounded-2xl">
                             <p className="text-lg font-bold text-charcoal">
                               {compliance.totalPlayers}
                             </p>
@@ -598,7 +598,7 @@ export default function TeamsPage() {
                               Registered
                             </p>
                           </div>
-                          <div className="text-center p-2 bg-gray-50 rounded-lg">
+                          <div className="text-center p-2 bg-gray-50 rounded-2xl">
                             <p className="text-lg font-bold text-charcoal">
                               {compliance.birthCert}
                               <span className="text-xs text-gray-400 font-normal">
@@ -609,7 +609,7 @@ export default function TeamsPage() {
                               Birth Cert
                             </p>
                           </div>
-                          <div className="text-center p-2 bg-gray-50 rounded-lg">
+                          <div className="text-center p-2 bg-gray-50 rounded-2xl">
                             <p className="text-lg font-bold text-charcoal">
                               {compliance.contractSigned}
                               <span className="text-xs text-gray-400 font-normal">
@@ -620,7 +620,7 @@ export default function TeamsPage() {
                               Contract
                             </p>
                           </div>
-                          <div className="text-center p-2 bg-gray-50 rounded-lg">
+                          <div className="text-center p-2 bg-gray-50 rounded-2xl">
                             <p className="text-lg font-bold text-charcoal">
                               {compliance.photoUploaded}
                               <span className="text-xs text-gray-400 font-normal">
@@ -638,7 +638,7 @@ export default function TeamsPage() {
                           <div className="mt-3 pt-3 border-t border-gray-100">
                             <Link
                               href={`/coach/contracts?division=${encodeURIComponent(team.division)}`}
-                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wide bg-flag-blue/10 text-flag-blue hover:bg-flag-blue/20 transition-colors"
+                              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide bg-flag-blue/10 text-flag-blue hover:bg-flag-blue/20 transition-colors"
                             >
                               <FileText size={14} />
                               View Contracts ({compliance.contractSigned})

@@ -176,7 +176,7 @@ export default function AnnouncementsPage() {
   if (!supabase) {
     return (
       <div className="p-6 md:p-10">
-        <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
           <p className="font-display text-xl font-bold uppercase tracking-wide text-flag-blue mb-2">
             Connect Supabase to View Data
           </p>
@@ -194,9 +194,9 @@ export default function AnnouncementsPage() {
       <div className="p-6 md:p-10">
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-gray-200 rounded w-56" />
-          <div className="h-48 bg-gray-200 rounded-lg" />
+          <div className="h-48 bg-gray-200 rounded-2xl" />
           {[1, 2].map((i) => (
-            <div key={i} className="h-24 bg-gray-200 rounded-lg" />
+            <div key={i} className="h-24 bg-gray-200 rounded-2xl" />
           ))}
         </div>
       </div>
@@ -216,7 +216,7 @@ export default function AnnouncementsPage() {
       </div>
 
       {/* Create / Edit Form */}
-      <div className="bg-white border border-gray-200 rounded-lg p-5 md:p-6 mb-8">
+      <div className="bg-white border border-gray-200 rounded-2xl p-5 md:p-6 mb-8">
         <div className="flex justify-between items-center mb-4">
           <h2 className="font-display text-lg font-bold uppercase tracking-wide">
             {editingId ? "Edit Announcement" : "New Announcement"}
@@ -245,7 +245,7 @@ export default function AnnouncementsPage() {
               value={title}
               onChange={(e) => setTitle(e.target.value)}
               placeholder="e.g. Tryout Schedule Updated"
-              className="w-full min-h-[44px] px-4 py-3 bg-white border border-gray-200 rounded-lg text-charcoal placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+              className="w-full min-h-[44px] px-4 py-3 bg-white border border-gray-200 rounded-xl text-charcoal placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
             />
           </div>
 
@@ -262,7 +262,7 @@ export default function AnnouncementsPage() {
               onChange={(e) => setBody(e.target.value)}
               rows={4}
               placeholder="Write the announcement details here..."
-              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-lg text-charcoal placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors resize-y"
+              className="w-full px-4 py-3 bg-white border border-gray-200 rounded-xl text-charcoal placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors resize-y"
             />
           </div>
 
@@ -277,7 +277,7 @@ export default function AnnouncementsPage() {
               id="ann-division"
               value={division}
               onChange={(e) => setDivision(e.target.value)}
-              className="w-full min-h-[44px] px-4 py-3 bg-white border border-gray-200 rounded-lg text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cpath%20fill%3D%22%234B5563%22%20d%3D%22M6%208L1%203h10z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:12px] bg-[right_16px_center] bg-no-repeat"
+              className="w-full min-h-[44px] px-4 py-3 bg-white border border-gray-200 rounded-xl text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors appearance-none bg-[url('data:image/svg+xml;charset=UTF-8,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%2212%22%20height%3D%2212%22%20viewBox%3D%220%200%2012%2012%22%3E%3Cpath%20fill%3D%22%234B5563%22%20d%3D%22M6%208L1%203h10z%22%2F%3E%3C%2Fsvg%3E')] bg-[length:12px] bg-[right_16px_center] bg-no-repeat"
             >
               <option value="">All Divisions</option>
               {DIVISIONS.map((d) => (
@@ -289,7 +289,7 @@ export default function AnnouncementsPage() {
           </div>
 
           {formError && (
-            <div className="bg-flag-red/10 border border-flag-red/30 rounded-lg p-3">
+            <div className="bg-flag-red/10 border border-flag-red/30 rounded-2xl p-3">
               <p className="text-flag-red text-sm">{formError}</p>
             </div>
           )}
@@ -297,7 +297,7 @@ export default function AnnouncementsPage() {
           <button
             type="submit"
             disabled={submitting}
-            className="min-h-[44px] px-6 py-3 bg-flag-blue hover:bg-flag-blue-mid text-white rounded-lg font-display text-sm font-semibold uppercase tracking-wider transition-colors disabled:opacity-50"
+            className="min-h-[44px] px-6 py-3 bg-flag-blue hover:bg-flag-blue-mid text-white rounded-full font-display text-sm font-semibold uppercase tracking-wider transition-colors disabled:opacity-50"
           >
             {submitting
               ? "Saving..."
@@ -310,7 +310,7 @@ export default function AnnouncementsPage() {
 
       {/* Success Banner */}
       {successMessage && (
-        <div className="mb-4 bg-green-50 border border-green-200 rounded-lg p-4 flex items-center gap-3">
+        <div className="mb-4 bg-green-50 border border-green-200 rounded-2xl p-4 flex items-center gap-3">
           <CheckCircle2 size={20} className="text-green-600 shrink-0" />
           <p className="text-sm font-semibold text-green-700">{successMessage}</p>
         </div>
@@ -322,7 +322,7 @@ export default function AnnouncementsPage() {
       </h2>
 
       {announcements.length === 0 ? (
-        <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
           <p className="text-gray-400 text-sm">No announcements yet.</p>
         </div>
       ) : (
@@ -330,7 +330,7 @@ export default function AnnouncementsPage() {
           {announcements.map((ann) => (
             <div
               key={ann.id}
-              className="bg-white border border-gray-200 rounded-lg p-5"
+              className="bg-white border border-gray-200 rounded-2xl p-5"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex-1 min-w-0">
@@ -357,7 +357,7 @@ export default function AnnouncementsPage() {
                 <div className="flex items-center gap-1 shrink-0">
                   <button
                     onClick={() => startEdit(ann)}
-                    className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-400 hover:text-flag-blue transition-colors rounded-lg hover:bg-gray-100"
+                    className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-400 hover:text-flag-blue transition-colors rounded-full hover:bg-gray-100"
                     title="Edit"
                   >
                     <Pencil size={16} />
@@ -367,13 +367,13 @@ export default function AnnouncementsPage() {
                     <div className="flex items-center gap-1">
                       <button
                         onClick={() => handleDelete(ann.id)}
-                        className="px-2 py-1 bg-flag-red text-white text-xs font-semibold rounded"
+                        className="px-2 py-1 bg-flag-red text-white text-xs font-semibold rounded-full"
                       >
                         Confirm
                       </button>
                       <button
                         onClick={() => setDeletingId(null)}
-                        className="px-2 py-1 bg-gray-100 text-gray-600 text-xs font-semibold rounded"
+                        className="px-2 py-1 bg-gray-100 text-gray-600 text-xs font-semibold rounded-full"
                       >
                         Cancel
                       </button>
@@ -381,7 +381,7 @@ export default function AnnouncementsPage() {
                   ) : (
                     <button
                       onClick={() => setDeletingId(ann.id)}
-                      className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-400 hover:text-flag-red transition-colors rounded-lg hover:bg-gray-100"
+                      className="p-2.5 min-w-[44px] min-h-[44px] flex items-center justify-center text-gray-400 hover:text-flag-red transition-colors rounded-full hover:bg-gray-100"
                       title="Delete"
                     >
                       <Trash2 size={16} />

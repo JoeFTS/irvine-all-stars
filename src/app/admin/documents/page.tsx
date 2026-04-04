@@ -113,7 +113,7 @@ export default function AdminDocumentsPage() {
   if (!supabase) {
     return (
       <div className="p-6 md:p-10">
-        <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
           <p className="font-display text-xl font-bold uppercase tracking-wide text-flag-blue mb-2">
             Connect Supabase to View Data
           </p>
@@ -127,8 +127,8 @@ export default function AdminDocumentsPage() {
       <div className="p-6 md:p-10">
         <div className="animate-pulse space-y-4">
           <div className="h-8 bg-gray-200 rounded w-56" />
-          <div className="h-40 bg-gray-200 rounded-lg" />
-          <div className="h-40 bg-gray-200 rounded-lg" />
+          <div className="h-40 bg-gray-200 rounded-2xl" />
+          <div className="h-40 bg-gray-200 rounded-2xl" />
         </div>
       </div>
     );
@@ -150,7 +150,7 @@ export default function AdminDocumentsPage() {
       </div>
 
       {/* Shared Team Documents */}
-      <div className="bg-white border border-gray-200 rounded-lg p-5">
+      <div className="bg-white border border-gray-200 rounded-2xl p-5">
         <div className="flex items-center gap-2 mb-1">
           <ShieldCheck size={20} className="text-flag-blue" />
           <h2 className="font-display text-lg font-bold uppercase tracking-wide text-charcoal">
@@ -163,7 +163,7 @@ export default function AdminDocumentsPage() {
         </p>
 
         {/* Insurance Certificate — global */}
-        <div className="border border-gray-200 rounded-lg p-4 mb-5">
+        <div className="border border-gray-200 rounded-2xl p-4 mb-5">
           <p className="text-sm font-semibold text-charcoal mb-2">
             Certificate of Liability Insurance
           </p>
@@ -189,7 +189,7 @@ export default function AdminDocumentsPage() {
                   onClick={() =>
                     handleViewTeamDoc(doc.file_path, doc.file_name)
                   }
-                  className="px-3 py-2 min-h-[44px] rounded-lg text-xs font-semibold text-flag-blue bg-flag-blue/5 hover:bg-flag-blue/10 transition-colors"
+                  className="px-3 py-2 min-h-[44px] rounded-full text-xs font-semibold text-flag-blue bg-flag-blue/5 hover:bg-flag-blue/10 transition-colors"
                 >
                   View
                 </button>
@@ -231,7 +231,7 @@ export default function AdminDocumentsPage() {
         </div>
 
         {/* Tournament Rules — per division */}
-        <div className="border border-gray-200 rounded-lg p-4">
+        <div className="border border-gray-200 rounded-2xl p-4">
           <p className="text-sm font-semibold text-charcoal mb-1">
             Pre-Tournament Rules / Coach&apos;s Agreement
           </p>
@@ -275,7 +275,7 @@ export default function AdminDocumentsPage() {
               (d) => d.document_type === "tournament_rules" && d.division === selectedRulesDivision
             );
             return (
-              <div className="border border-flag-blue/20 bg-flag-blue/5 rounded-lg p-4">
+              <div className="border border-flag-blue/20 bg-flag-blue/5 rounded-2xl p-4">
                 <p className="text-sm font-semibold text-charcoal mb-3">
                   {selectedRulesDivision}
                 </p>
@@ -289,7 +289,7 @@ export default function AdminDocumentsPage() {
                     </div>
                     <button
                       onClick={() => handleViewTeamDoc(doc.file_path, doc.file_name)}
-                      className="px-3 py-2 min-h-[44px] rounded-lg text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors shrink-0"
+                      className="px-3 py-2 min-h-[44px] rounded-full text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors shrink-0"
                     >
                       View
                     </button>

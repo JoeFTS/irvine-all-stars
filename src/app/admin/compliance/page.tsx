@@ -241,7 +241,7 @@ export default function CompliancePage() {
   if (!supabase) {
     return (
       <div className="p-6 md:p-10">
-        <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
           <p className="font-display text-xl font-bold uppercase tracking-wide text-flag-blue mb-2">
             Connect Supabase to View Data
           </p>
@@ -257,7 +257,7 @@ export default function CompliancePage() {
           <div className="h-8 bg-gray-200 rounded w-56" />
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-24 bg-gray-200 rounded-lg" />
+              <div key={i} className="h-24 bg-gray-200 rounded-2xl" />
             ))}
           </div>
         </div>
@@ -283,7 +283,7 @@ export default function CompliancePage() {
 
       {/* Overall Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-        <div className="bg-white border border-gray-200 rounded-lg p-5 text-center">
+        <div className="bg-white border border-gray-200 rounded-2xl p-5 text-center">
           <p className="text-4xl font-bold font-display text-flag-blue">
             {overallTotal > 0
               ? Math.round((overallReady / overallTotal) * 100)
@@ -297,7 +297,7 @@ export default function CompliancePage() {
             {overallReady} of {overallTotal} players ready
           </p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-lg p-5 text-center">
+        <div className="bg-white border border-gray-200 rounded-2xl p-5 text-center">
           <p className="text-4xl font-bold font-display text-green-600">
             {tournamentReadyDivisions}
           </p>
@@ -308,7 +308,7 @@ export default function CompliancePage() {
             of {divisionData.length} with players
           </p>
         </div>
-        <div className="bg-white border border-gray-200 rounded-lg p-5 text-center">
+        <div className="bg-white border border-gray-200 rounded-2xl p-5 text-center">
           <p className="text-4xl font-bold font-display text-amber-500">
             {overallTotal - overallReady}
           </p>
@@ -320,7 +320,7 @@ export default function CompliancePage() {
 
       {/* Division Breakdown */}
       {divisionData.length === 0 ? (
-        <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
           <p className="text-gray-400 text-sm">
             No selected players yet. Select players from the Tryouts page first.
           </p>
@@ -339,7 +339,7 @@ export default function CompliancePage() {
             return (
               <div
                 key={div.division}
-                className="bg-white border border-gray-200 rounded-lg overflow-hidden"
+                className="bg-white border border-gray-200 rounded-2xl overflow-hidden"
               >
                 {/* Division header */}
                 <button
@@ -537,11 +537,11 @@ export default function CompliancePage() {
         </div>
 
         {profiles.length === 0 ? (
-          <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+          <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
             <p className="text-gray-400 text-sm">No coaches registered yet.</p>
           </div>
         ) : (
-          <div className="bg-white border border-gray-200 rounded-lg overflow-hidden">
+          <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
             {/* Header */}
             <div className="hidden sm:grid grid-cols-[1fr_150px_150px_180px] gap-2 px-5 py-3 bg-gray-50 text-[10px] font-semibold text-gray-400 uppercase tracking-wider border-b border-gray-100">
               <span>Coach</span>
@@ -591,7 +591,7 @@ export default function CompliancePage() {
                         </span>
                         <button
                           onClick={() => setViewingAgreement({ coach, agreement })}
-                          className="inline-flex items-center gap-1 px-2 py-1 rounded text-[10px] font-semibold uppercase tracking-wide bg-flag-blue/10 text-flag-blue hover:bg-flag-blue/20 transition-colors"
+                          className="inline-flex items-center gap-1 px-2 py-1 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-flag-blue/10 text-flag-blue hover:bg-flag-blue/20 transition-colors"
                         >
                           <Eye size={10} />
                           View
@@ -618,7 +618,7 @@ export default function CompliancePage() {
       {/* Printable Agreement Modal */}
       {viewingAgreement && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center p-4 print:p-0 print:bg-white print:items-start">
-          <div className="bg-white rounded-lg max-w-2xl w-full max-h-[90vh] overflow-y-auto print:max-h-none print:overflow-visible print:rounded-none print:shadow-none">
+          <div className="bg-white rounded-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto print:max-h-none print:overflow-visible print:rounded-none print:shadow-none">
             {/* Modal header — hidden on print */}
             <div className="flex items-center justify-between px-6 py-4 border-b border-gray-200 print:hidden">
               <h3 className="font-display text-lg font-bold uppercase tracking-wide text-charcoal">
@@ -627,7 +627,7 @@ export default function CompliancePage() {
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => window.print()}
-                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wide bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
                 >
                   <Printer size={12} />
                   Print
@@ -655,7 +655,7 @@ export default function CompliancePage() {
               </div>
 
               {/* Coach Info */}
-              <div className="border border-gray-200 rounded-lg p-5 mb-6 print:border-gray-400">
+              <div className="border border-gray-200 rounded-2xl p-5 mb-6 print:border-gray-400">
                 <div className="grid grid-cols-2 gap-4 text-sm">
                   <div>
                     <p className="text-xs text-gray-400 uppercase tracking-wide font-semibold mb-0.5">Coach Name</p>

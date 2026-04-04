@@ -107,7 +107,7 @@ export default function ScoresPage() {
   if (!supabase) {
     return (
       <div className="p-6 md:p-10">
-        <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
           <p className="font-display text-xl font-bold uppercase tracking-wide text-flag-blue mb-2">
             Connect Supabase to View Data
           </p>
@@ -127,7 +127,7 @@ export default function ScoresPage() {
           <div className="h-8 bg-gray-200 rounded w-56" />
           <div className="h-10 bg-gray-200 rounded w-72" />
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-20 bg-gray-200 rounded-lg" />
+            <div key={i} className="h-20 bg-gray-200 rounded-2xl" />
           ))}
         </div>
       </div>
@@ -150,7 +150,7 @@ export default function ScoresPage() {
       </div>
 
       {/* Score Sheet Downloads */}
-      <div className="bg-white border border-gray-200 rounded-lg p-5 mb-6">
+      <div className="bg-white border border-gray-200 rounded-2xl p-5 mb-6">
         <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
           <div>
             <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-gray-400">
@@ -176,7 +176,7 @@ export default function ScoresPage() {
               a.click();
               URL.revokeObjectURL(url);
             }}
-            className="inline-flex items-center gap-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wide hover:bg-gray-200 transition-colors shrink-0"
+            className="inline-flex items-center gap-2 bg-gray-100 text-gray-700 px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wide hover:bg-gray-200 transition-colors shrink-0"
           >
             <Download size={14} />
             Blank Template
@@ -204,7 +204,7 @@ export default function ScoresPage() {
                   a.click();
                   URL.revokeObjectURL(url);
                 }}
-                className={`flex items-center gap-3 p-3 rounded-lg border transition-colors text-left ${
+                className={`flex items-center gap-3 p-3 rounded-2xl border transition-colors text-left ${
                   count > 0
                     ? "border-flag-blue/20 bg-flag-blue/5 hover:bg-flag-blue/10 cursor-pointer"
                     : "border-gray-100 bg-gray-50 opacity-50 cursor-not-allowed"
@@ -257,7 +257,7 @@ export default function ScoresPage() {
 
       {/* Scores by Division */}
       {Object.keys(grouped).length === 0 ? (
-        <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
           <p className="text-gray-400 text-sm">No scores found.</p>
         </div>
       ) : (
@@ -283,7 +283,7 @@ export default function ScoresPage() {
                       return (
                         <div
                           key={score.id}
-                          className="bg-white border border-gray-200 rounded-lg overflow-hidden"
+                          className="bg-white border border-gray-200 rounded-2xl overflow-hidden"
                         >
                           {/* Summary Row */}
                           <button
@@ -385,7 +385,7 @@ export default function ScoresPage() {
                                   <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-gray-400 mb-1">
                                     Evaluator Notes
                                   </h3>
-                                  <p className="text-charcoal text-sm whitespace-pre-wrap bg-cream border border-sand rounded-lg p-3">
+                                  <p className="text-charcoal text-sm whitespace-pre-wrap bg-cream border border-sand rounded-2xl p-3">
                                     {score.notes}
                                   </p>
                                 </div>

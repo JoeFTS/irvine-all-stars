@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
-import { StripeDivider } from "@/components/stripe-divider";
 import Link from "next/link";
 
 interface Stats {
@@ -119,7 +118,7 @@ export default function AdminDashboard() {
   if (!supabase) {
     return (
       <div className="p-6 md:p-10">
-        <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
           <p className="font-display text-xl font-bold uppercase tracking-wide text-flag-blue mb-2">
             Connect Supabase to View Data
           </p>
@@ -139,10 +138,10 @@ export default function AdminDashboard() {
           <div className="h-8 bg-gray-200 rounded w-48" />
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
             {[1, 2].map((i) => (
-              <div key={i} className="h-28 bg-gray-200 rounded-lg" />
+              <div key={i} className="h-28 bg-gray-200 rounded-2xl" />
             ))}
           </div>
-          <div className="h-64 bg-gray-200 rounded-lg" />
+          <div className="h-64 bg-gray-200 rounded-2xl" />
         </div>
       </div>
     );
@@ -182,7 +181,7 @@ export default function AdminDashboard() {
 
       {/* Coach Recommendations Banner */}
       {stats?.coachPickDivisions && stats.coachPickDivisions.length > 0 && (
-        <div className="bg-amber-50 border border-amber-200 rounded-lg p-5 mb-6">
+        <div className="bg-amber-50 border border-amber-200 rounded-2xl p-5 mb-6">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center shrink-0">
               <svg className="w-5 h-5 text-amber-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -208,7 +207,7 @@ export default function AdminDashboard() {
               </div>
               <Link
                 href="/admin/tryouts"
-                className="inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wider transition-colors"
+                className="inline-flex items-center gap-2 bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wider transition-colors"
               >
                 Review Selections
               </Link>
@@ -221,7 +220,7 @@ export default function AdminDashboard() {
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
         <Link
           href="/admin/applications"
-          className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
+          className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-md transition-shadow"
         >
           <p className="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-1">
             Coach Applications
@@ -233,7 +232,7 @@ export default function AdminDashboard() {
 
         <Link
           href="/admin/tryouts"
-          className="bg-white border border-gray-200 rounded-lg p-6 hover:shadow-md transition-shadow"
+          className="bg-white border border-gray-200 rounded-2xl p-6 hover:shadow-md transition-shadow"
         >
           <p className="text-gray-400 text-xs font-semibold uppercase tracking-wider mb-1">
             Player Registrations
@@ -245,7 +244,7 @@ export default function AdminDashboard() {
       </div>
 
       {/* Division Breakdown */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8">
+      <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-8">
         <h2 className="font-display text-lg font-bold uppercase tracking-wide mb-5">
           Registrations by Division
         </h2>
@@ -275,12 +274,10 @@ export default function AdminDashboard() {
         </div>
       </div>
 
-      <StripeDivider />
-
       {/* Recent Submissions */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-8">
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
         {/* Recent Applications */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="bg-white border border-gray-200 rounded-2xl p-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="font-display text-lg font-bold uppercase tracking-wide">
               Recent Applications
@@ -319,7 +316,7 @@ export default function AdminDashboard() {
         </div>
 
         {/* Recent Registrations */}
-        <div className="bg-white border border-gray-200 rounded-lg p-6">
+        <div className="bg-white border border-gray-200 rounded-2xl p-6">
           <div className="flex justify-between items-center mb-4">
             <h2 className="font-display text-lg font-bold uppercase tracking-wide">
               Recent Registrations

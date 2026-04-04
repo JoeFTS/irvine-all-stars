@@ -790,7 +790,7 @@ export default function TryoutsPage() {
   if (!supabase) {
     return (
       <div className="p-6 md:p-10">
-        <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
           <p className="font-display text-xl font-bold uppercase tracking-wide text-flag-blue mb-2">
             Connect Supabase to View Data
           </p>
@@ -810,7 +810,7 @@ export default function TryoutsPage() {
           <div className="h-8 bg-gray-200 rounded w-56" />
           <div className="h-10 bg-gray-200 rounded w-72" />
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-20 bg-gray-200 rounded-lg" />
+            <div key={i} className="h-20 bg-gray-200 rounded-2xl" />
           ))}
         </div>
       </div>
@@ -1000,7 +1000,7 @@ export default function TryoutsPage() {
           {/* Bulk Result Message */}
           {bulkResultMessage && (
             <div
-              className={`mb-3 rounded-lg px-4 py-3 text-sm font-semibold flex items-center justify-between ${
+              className={`mb-3 rounded-2xl px-4 py-3 text-sm font-semibold flex items-center justify-between ${
                 bulkResultMessage.type === "success"
                   ? "bg-green-50 border border-green-200 text-green-800"
                   : "bg-flag-red/10 border border-flag-red/30 text-flag-red"
@@ -1020,7 +1020,7 @@ export default function TryoutsPage() {
           <div className="flex flex-wrap items-center gap-2 sm:gap-3 mb-3">
             <button
               onClick={toggleSelectAllFiltered}
-              className="flex items-center gap-1.5 px-3 py-2 min-h-[44px] rounded text-xs font-semibold uppercase tracking-wide border border-gray-200 text-gray-600 hover:bg-gray-100 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 min-h-[44px] rounded-full text-xs font-semibold uppercase tracking-wide border border-gray-200 text-gray-600 hover:bg-gray-100 transition-colors"
             >
               {filteredPlayers.length > 0 && filteredPlayers.every((r) => bulkSelectedIds.has(r.id))
                 ? <><CheckSquare size={14} /> Deselect All</>
@@ -1050,7 +1050,7 @@ export default function TryoutsPage() {
                           bulkUpdateStatus(s);
                         }
                       }}
-                      className={`px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wide transition-colors border border-gray-200 hover:bg-gray-100 ${opt.color}`}
+                      className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide transition-colors border border-gray-200 hover:bg-gray-100 ${opt.color}`}
                     >
                       {opt.label}
                     </button>
@@ -1108,7 +1108,7 @@ export default function TryoutsPage() {
                       alert("Email sending cancelled. You must type SEND to confirm.");
                     }
                   }}
-                  className="px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wide transition-colors border border-flag-blue bg-flag-blue text-white hover:bg-flag-blue/90"
+                  className="px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide transition-colors border border-flag-blue bg-flag-blue text-white hover:bg-flag-blue/90"
                 >
                   <span className="flex items-center gap-1.5">
                     <Mail size={12} />
@@ -1117,7 +1117,7 @@ export default function TryoutsPage() {
                 </button>
                 <button
                   onClick={() => setBulkSelectedIds(new Set())}
-                  className="px-2 py-1.5 rounded text-xs text-gray-400 hover:text-gray-600 transition-colors"
+                  className="px-2 py-1.5 rounded-full text-xs text-gray-400 hover:text-gray-600 transition-colors"
                 >
                   <X size={14} />
                 </button>
@@ -1145,7 +1145,7 @@ export default function TryoutsPage() {
 
           {/* Player List */}
           {filteredPlayers.length === 0 ? (
-            <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+            <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
               <p className="text-gray-400 text-sm">No players found.</p>
             </div>
           ) : (
@@ -1158,7 +1158,7 @@ export default function TryoutsPage() {
                 return (
                   <div
                     key={reg.id}
-                    className={`bg-white border rounded-lg overflow-hidden ${bulkSelectedIds.has(reg.id) ? "border-flag-blue ring-1 ring-flag-blue/30" : "border-gray-200"}`}
+                    className={`bg-white border rounded-2xl overflow-hidden ${bulkSelectedIds.has(reg.id) ? "border-flag-blue ring-1 ring-flag-blue/30" : "border-gray-200"}`}
                   >
                     {/* Summary Row */}
                     <div className="flex items-center">
@@ -1254,7 +1254,7 @@ export default function TryoutsPage() {
                                 updatingId === reg.id ||
                                 (reg.status ?? "registered") === opt.value
                               }
-                              className={`px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wide transition-colors disabled:opacity-40 ${
+                              className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide transition-colors disabled:opacity-40 ${
                                 (reg.status ?? "registered") === opt.value
                                   ? "bg-flag-blue text-white"
                                   : "border border-gray-200 text-gray-600 hover:bg-gray-100"
@@ -1267,7 +1267,7 @@ export default function TryoutsPage() {
 
                         {/* Send Email — only for selected/alternate/not_selected */}
                         {(reg.status === "selected" || reg.status === "not_selected" || reg.status === "alternate") && (
-                          <div className="flex flex-col sm:flex-row sm:items-center gap-3 bg-flag-blue/5 border border-flag-blue/10 rounded-lg p-3">
+                          <div className="flex flex-col sm:flex-row sm:items-center gap-3 bg-flag-blue/5 border border-flag-blue/10 rounded-2xl p-3">
                             <div className="flex-1">
                               <p className="text-sm font-semibold text-charcoal">
                                 Notify Parent
@@ -1288,7 +1288,7 @@ export default function TryoutsPage() {
                                 }
                               }}
                               disabled={updatingId === reg.id}
-                              className="inline-flex items-center gap-1.5 bg-flag-blue text-white px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors disabled:opacity-50 shrink-0"
+                              className="inline-flex items-center gap-1.5 bg-flag-blue text-white px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors disabled:opacity-50 shrink-0"
                             >
                               <Mail size={14} />
                               {emailSentIds.has(reg.id) ? "Resend Email" : "Send Email"}
@@ -1422,7 +1422,7 @@ export default function TryoutsPage() {
                           </h3>
                           <div className="flex flex-wrap gap-3 text-xs">
                             <span
-                              className={`px-2 py-1 rounded ${
+                              className={`px-2 py-1 rounded-full ${
                                 reg.photo_release_consent
                                   ? "bg-green-100 text-green-700"
                                   : "bg-gray-100 text-gray-400"
@@ -1431,7 +1431,7 @@ export default function TryoutsPage() {
                               Photo Release: {reg.photo_release_consent ? "Yes" : "No"}
                             </span>
                             <span
-                              className={`px-2 py-1 rounded ${
+                              className={`px-2 py-1 rounded-full ${
                                 reg.liability_waiver_consent
                                   ? "bg-green-100 text-green-700"
                                   : "bg-gray-100 text-gray-400"
@@ -1440,7 +1440,7 @@ export default function TryoutsPage() {
                               Liability: {reg.liability_waiver_consent ? "Yes" : "No"}
                             </span>
                             <span
-                              className={`px-2 py-1 rounded ${
+                              className={`px-2 py-1 rounded-full ${
                                 reg.parent_code_of_conduct
                                   ? "bg-green-100 text-green-700"
                                   : "bg-gray-100 text-gray-400"
@@ -1456,7 +1456,7 @@ export default function TryoutsPage() {
                           const selection = coachSelections.find((cs) => cs.registration_id === reg.id);
                           if (!selection) return null;
                           return (
-                            <div className="bg-star-gold/10 border border-star-gold/20 rounded-lg p-4">
+                            <div className="bg-star-gold/10 border border-star-gold/20 rounded-2xl p-4">
                               <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-star-gold mb-2 flex items-center gap-1.5">
                                 <Star size={14} />
                                 Coach Recommendation
@@ -1505,7 +1505,7 @@ export default function TryoutsPage() {
             <button
               onClick={handleAutoAssign}
               disabled={autoAssigning || sessions.length === 0}
-              className="inline-flex items-center gap-2 bg-star-gold text-white px-5 py-2.5 rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-star-gold/90 transition-colors disabled:opacity-50"
+              className="inline-flex items-center gap-2 bg-star-gold text-white px-5 py-2.5 rounded-full text-sm font-semibold uppercase tracking-wide hover:bg-star-gold/90 transition-colors disabled:opacity-50"
             >
               <Zap size={16} />
               {autoAssigning ? "Assigning..." : "Auto-Assign All Players by Division"}
@@ -1516,7 +1516,7 @@ export default function TryoutsPage() {
           </div>
 
           {/* Create Session Form */}
-          <div className="bg-white border border-gray-200 rounded-lg p-5 mb-6">
+          <div className="bg-white border border-gray-200 rounded-2xl p-5 mb-6">
             <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-gray-400 mb-4">
               Create New Session
             </h2>
@@ -1531,7 +1531,7 @@ export default function TryoutsPage() {
                     value={formDivision}
                     onChange={(e) => setFormDivision(e.target.value)}
                     required
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
                   >
                     {DIVISIONS.map((d) => (
                       <option key={d} value={d}>
@@ -1551,7 +1551,7 @@ export default function TryoutsPage() {
                     value={formDate}
                     onChange={(e) => setFormDate(e.target.value)}
                     required
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
                   />
                 </div>
 
@@ -1565,7 +1565,7 @@ export default function TryoutsPage() {
                     value={formStartTime}
                     onChange={(e) => setFormStartTime(e.target.value)}
                     required
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
                   />
                 </div>
 
@@ -1578,7 +1578,7 @@ export default function TryoutsPage() {
                     type="time"
                     value={formEndTime}
                     onChange={(e) => setFormEndTime(e.target.value)}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
                   />
                 </div>
               </div>
@@ -1595,7 +1595,7 @@ export default function TryoutsPage() {
                     onChange={(e) => setFormLocation(e.target.value)}
                     placeholder="e.g. Deerfield Community Park"
                     required
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-charcoal placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
                   />
                 </div>
 
@@ -1609,7 +1609,7 @@ export default function TryoutsPage() {
                     value={formField}
                     onChange={(e) => setFormField(e.target.value)}
                     placeholder="e.g. Field 3"
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-charcoal placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
                   />
                 </div>
 
@@ -1623,7 +1623,7 @@ export default function TryoutsPage() {
                     value={formMaxPlayers}
                     onChange={(e) => setFormMaxPlayers(parseInt(e.target.value, 10) || 30)}
                     min={1}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
                   />
                 </div>
               </div>
@@ -1638,7 +1638,7 @@ export default function TryoutsPage() {
                   onChange={(e) => setFormNotes(e.target.value)}
                   rows={2}
                   placeholder="Optional notes..."
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-flag-blue/30 resize-none"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-charcoal placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-flag-blue/30 resize-none"
                 />
               </div>
 
@@ -1646,7 +1646,7 @@ export default function TryoutsPage() {
                 <button
                   type="submit"
                   disabled={creating || !formDate || !formStartTime || !formLocation.trim()}
-                  className="inline-flex items-center gap-2 bg-flag-blue text-white px-5 py-2.5 rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors disabled:opacity-50"
+                  className="inline-flex items-center gap-2 bg-flag-blue text-white px-5 py-2.5 rounded-full text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors disabled:opacity-50"
                 >
                   <Plus size={16} />
                   {creating ? "Creating..." : "Create Session"}
@@ -1697,7 +1697,7 @@ export default function TryoutsPage() {
 
           {/* Sessions List */}
           {filteredSessions.length === 0 ? (
-            <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+            <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
               <p className="text-gray-400 text-sm">
                 No tryout sessions found. Create one above to get started.
               </p>
@@ -1714,7 +1714,7 @@ export default function TryoutsPage() {
                 return (
                   <div
                     key={session.id}
-                    className="bg-white border border-gray-200 rounded-lg overflow-hidden"
+                    className="bg-white border border-gray-200 rounded-2xl overflow-hidden"
                   >
                     {/* Division Color Bar */}
                     <div className={`h-1.5 ${barColor}`} />
@@ -1780,7 +1780,7 @@ export default function TryoutsPage() {
                               setAssigningSessionId(session.id);
                               setSelectedPlayerIds(new Set());
                             }}
-                            className="inline-flex items-center gap-2 bg-flag-blue text-white px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors"
+                            className="inline-flex items-center gap-2 bg-flag-blue text-white px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors"
                           >
                             <UserPlus size={14} />
                             Assign Players
@@ -1790,7 +1790,7 @@ export default function TryoutsPage() {
                               e.stopPropagation();
                               handleAssignAll(session);
                             }}
-                            className="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wide hover:bg-green-700 transition-colors"
+                            className="inline-flex items-center gap-2 bg-green-600 text-white px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wide hover:bg-green-700 transition-colors"
                           >
                             <Users size={14} />
                             Assign All in Division
@@ -1803,7 +1803,7 @@ export default function TryoutsPage() {
                                 sendAllInvites(session);
                               }}
                               disabled={sendingSessionInvites === session.id || uninvitedCount === 0}
-                              className="inline-flex items-center gap-2 bg-star-gold text-white px-4 py-2 rounded-lg text-xs font-semibold uppercase tracking-wide hover:bg-star-gold/90 transition-colors disabled:opacity-50"
+                              className="inline-flex items-center gap-2 bg-star-gold text-white px-4 py-2 rounded-full text-xs font-semibold uppercase tracking-wide hover:bg-star-gold/90 transition-colors disabled:opacity-50"
                             >
                               <Mail size={14} />
                               {sendingSessionInvites === session.id
@@ -1822,13 +1822,13 @@ export default function TryoutsPage() {
                               </span>
                               <button
                                 onClick={() => handleDelete(session.id)}
-                                className="px-2.5 py-1 rounded text-xs font-semibold uppercase bg-flag-red text-white hover:bg-flag-red/90 transition-colors"
+                                className="px-2.5 py-1 rounded-full text-xs font-semibold uppercase bg-flag-red text-white hover:bg-flag-red/90 transition-colors"
                               >
                                 Yes
                               </button>
                               <button
                                 onClick={() => setDeletingId(null)}
-                                className="px-2.5 py-1 rounded text-xs font-semibold uppercase bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
+                                className="px-2.5 py-1 rounded-full text-xs font-semibold uppercase bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors"
                               >
                                 No
                               </button>
@@ -1840,7 +1840,7 @@ export default function TryoutsPage() {
                                   e.stopPropagation();
                                   startEditing(session);
                                 }}
-                                className="p-2 rounded-lg text-gray-300 hover:text-flag-blue hover:bg-flag-blue/5 transition-colors"
+                                className="p-2 rounded-full text-gray-300 hover:text-flag-blue hover:bg-flag-blue/5 transition-colors"
                                 title="Edit session"
                               >
                                 <Pencil size={16} />
@@ -1850,7 +1850,7 @@ export default function TryoutsPage() {
                                   e.stopPropagation();
                                   setDeletingId(session.id);
                                 }}
-                                className="p-2 rounded-lg text-gray-300 hover:text-flag-red hover:bg-flag-red/5 transition-colors"
+                                className="p-2 rounded-full text-gray-300 hover:text-flag-red hover:bg-flag-red/5 transition-colors"
                                 title="Delete session"
                               >
                                 <Trash2 size={16} />
@@ -1881,7 +1881,7 @@ export default function TryoutsPage() {
                                 return (
                                   <div
                                     key={assignment.id}
-                                    className={`flex items-center gap-3 p-3 rounded-lg transition-colors ${
+                                    className={`flex items-center gap-3 p-3 rounded-2xl transition-colors ${
                                       isInvited
                                         ? "bg-green-50 border border-green-200"
                                         : "bg-gray-50 border border-gray-100"
@@ -1907,7 +1907,7 @@ export default function TryoutsPage() {
                                       <button
                                         onClick={() => sendInvite(assignment, session)}
                                         disabled={isSending}
-                                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wide bg-star-gold/10 text-star-gold hover:bg-star-gold/20 transition-colors disabled:opacity-50 shrink-0"
+                                        className="inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide bg-star-gold/10 text-star-gold hover:bg-star-gold/20 transition-colors disabled:opacity-50 shrink-0"
                                       >
                                         <Send size={12} />
                                         {isSending ? "Sending..." : "Send Invite"}
@@ -1953,7 +1953,7 @@ export default function TryoutsPage() {
                   setAssigningSessionId(null);
                   setSelectedPlayerIds(new Set());
                 }}
-                className="p-2 rounded-lg text-gray-400 hover:text-charcoal hover:bg-gray-100 transition-colors"
+                className="p-2 rounded-full text-gray-400 hover:text-charcoal hover:bg-gray-100 transition-colors"
               >
                 <X size={20} />
               </button>
@@ -1977,7 +1977,7 @@ export default function TryoutsPage() {
                 return (
                   <div className="space-y-1.5">
                     {/* Select All */}
-                    <label className="flex items-center gap-3 p-3 rounded-lg cursor-pointer bg-flag-blue/5 border border-flag-blue/10 hover:bg-flag-blue/10 transition-colors mb-3">
+                    <label className="flex items-center gap-3 p-3 rounded-2xl cursor-pointer bg-flag-blue/5 border border-flag-blue/10 hover:bg-flag-blue/10 transition-colors mb-3">
                       <input
                         type="checkbox"
                         checked={selectedPlayerIds.size === unassigned.length}
@@ -1998,7 +1998,7 @@ export default function TryoutsPage() {
                     {unassigned.map((player) => (
                       <label
                         key={player.id}
-                        className={`flex items-center gap-3 p-3 rounded-lg cursor-pointer transition-colors ${
+                        className={`flex items-center gap-3 p-3 rounded-2xl cursor-pointer transition-colors ${
                           selectedPlayerIds.has(player.id)
                             ? "bg-flag-blue/5 border border-flag-blue/20"
                             : "bg-gray-50 border border-gray-100 hover:bg-gray-100"
@@ -2042,14 +2042,14 @@ export default function TryoutsPage() {
                   setAssigningSessionId(null);
                   setSelectedPlayerIds(new Set());
                 }}
-                className="px-4 py-2 rounded-lg text-sm font-semibold text-gray-600 hover:bg-gray-100 transition-colors"
+                className="px-4 py-2 rounded-full text-sm font-semibold text-gray-600 hover:bg-gray-100 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleAssignSelected}
                 disabled={selectedPlayerIds.size === 0}
-                className="inline-flex items-center gap-2 bg-flag-blue text-white px-5 py-2 rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors disabled:opacity-50"
+                className="inline-flex items-center gap-2 bg-flag-blue text-white px-5 py-2 rounded-full text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors disabled:opacity-50"
               >
                 <UserPlus size={14} />
                 Assign Selected ({selectedPlayerIds.size})
@@ -2069,7 +2069,7 @@ export default function TryoutsPage() {
               </h2>
               <button
                 onClick={() => setEditingSession(null)}
-                className="p-2 rounded-lg text-gray-400 hover:text-charcoal hover:bg-gray-100 transition-colors"
+                className="p-2 rounded-full text-gray-400 hover:text-charcoal hover:bg-gray-100 transition-colors"
               >
                 <X size={20} />
               </button>
@@ -2083,7 +2083,7 @@ export default function TryoutsPage() {
                   <select
                     value={editDivision}
                     onChange={(e) => setEditDivision(e.target.value)}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
                   >
                     {DIVISIONS.map((d) => (
                       <option key={d} value={d}>{d}</option>
@@ -2099,7 +2099,7 @@ export default function TryoutsPage() {
                     value={editDate}
                     onChange={(e) => setEditDate(e.target.value)}
                     required
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
                   />
                 </div>
                 <div>
@@ -2111,7 +2111,7 @@ export default function TryoutsPage() {
                     value={editStartTime}
                     onChange={(e) => setEditStartTime(e.target.value)}
                     required
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
                   />
                 </div>
                 <div>
@@ -2122,7 +2122,7 @@ export default function TryoutsPage() {
                     type="time"
                     value={editEndTime}
                     onChange={(e) => setEditEndTime(e.target.value)}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
                   />
                 </div>
               </div>
@@ -2136,7 +2136,7 @@ export default function TryoutsPage() {
                     value={editLocation}
                     onChange={(e) => setEditLocation(e.target.value)}
                     required
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
                   />
                 </div>
                 <div>
@@ -2147,7 +2147,7 @@ export default function TryoutsPage() {
                     type="text"
                     value={editField}
                     onChange={(e) => setEditField(e.target.value)}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
                   />
                 </div>
                 <div>
@@ -2159,7 +2159,7 @@ export default function TryoutsPage() {
                     value={editMaxPlayers}
                     onChange={(e) => setEditMaxPlayers(parseInt(e.target.value, 10) || 30)}
                     min={1}
-                    className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+                    className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
                   />
                 </div>
               </div>
@@ -2171,13 +2171,13 @@ export default function TryoutsPage() {
                   value={editNotes}
                   onChange={(e) => setEditNotes(e.target.value)}
                   rows={2}
-                  className="w-full border border-gray-200 rounded-lg px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 resize-none"
+                  className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 resize-none"
                 />
               </div>
 
               {/* Info about update emails */}
               {assignments.filter((a) => a.session_id === editingSession.id && a.invited_at).length > 0 && (
-                <div className="bg-star-gold/10 border border-star-gold/20 rounded-lg p-3">
+                <div className="bg-star-gold/10 border border-star-gold/20 rounded-2xl p-3">
                   <p className="text-xs text-star-gold font-semibold">
                     <Mail size={12} className="inline mr-1" />
                     {assignments.filter((a) => a.session_id === editingSession.id && a.invited_at).length} player(s) have already been invited. Saving will automatically send them an update email with the new details.
@@ -2188,14 +2188,14 @@ export default function TryoutsPage() {
             <div className="p-5 border-t border-gray-200 flex items-center justify-end gap-3">
               <button
                 onClick={() => setEditingSession(null)}
-                className="px-4 py-2 rounded-lg text-sm font-semibold text-gray-600 hover:bg-gray-100 transition-colors"
+                className="px-4 py-2 rounded-full text-sm font-semibold text-gray-600 hover:bg-gray-100 transition-colors"
               >
                 Cancel
               </button>
               <button
                 onClick={handleSaveEdit}
                 disabled={saving || !editDate || !editStartTime || !editLocation.trim()}
-                className="inline-flex items-center gap-2 bg-flag-blue text-white px-5 py-2 rounded-lg text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors disabled:opacity-50"
+                className="inline-flex items-center gap-2 bg-flag-blue text-white px-5 py-2 rounded-full text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors disabled:opacity-50"
               >
                 {saving ? "Saving & Notifying..." : "Save Changes"}
               </button>

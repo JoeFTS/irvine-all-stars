@@ -99,7 +99,7 @@ export default function ApplicationsPage() {
   if (!supabase) {
     return (
       <div className="p-6 md:p-10">
-        <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
           <p className="font-display text-xl font-bold uppercase tracking-wide text-flag-blue mb-2">
             Connect Supabase to View Data
           </p>
@@ -119,7 +119,7 @@ export default function ApplicationsPage() {
           <div className="h-8 bg-gray-200 rounded w-56" />
           <div className="h-10 bg-gray-200 rounded w-72" />
           {[1, 2, 3].map((i) => (
-            <div key={i} className="h-20 bg-gray-200 rounded-lg" />
+            <div key={i} className="h-20 bg-gray-200 rounded-2xl" />
           ))}
         </div>
       </div>
@@ -173,7 +173,7 @@ export default function ApplicationsPage() {
 
       {/* List */}
       {filtered.length === 0 ? (
-        <div className="bg-white border border-gray-200 rounded-lg p-8 text-center">
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
           <p className="text-gray-400 text-sm">No applications found.</p>
         </div>
       ) : (
@@ -183,7 +183,7 @@ export default function ApplicationsPage() {
             return (
               <div
                 key={app.id}
-                className="bg-white border border-gray-200 rounded-lg overflow-hidden"
+                className="bg-white border border-gray-200 rounded-2xl overflow-hidden"
               >
                 {/* Summary Row */}
                 <button
@@ -227,7 +227,7 @@ export default function ApplicationsPage() {
                           disabled={
                             updatingId === app.id || app.status === opt.value
                           }
-                          className={`px-3 py-1.5 rounded text-xs font-semibold uppercase tracking-wide transition-colors disabled:opacity-40 ${
+                          className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide transition-colors disabled:opacity-40 ${
                             app.status === opt.value
                               ? "bg-flag-blue text-white"
                               : "border border-gray-200 text-gray-600 hover:bg-gray-100"

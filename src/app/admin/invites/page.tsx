@@ -393,7 +393,7 @@ export default function AdminInvitesPage() {
       {/* Message */}
       {message && (
         <div
-          className={`mb-6 rounded px-4 py-3 text-sm ${
+          className={`mb-6 rounded-2xl px-4 py-3 text-sm ${
             message.type === "success"
               ? "bg-green-50 border border-green-200 text-green-800"
               : "bg-flag-red/10 border border-flag-red/30 text-flag-red"
@@ -404,7 +404,7 @@ export default function AdminInvitesPage() {
       )}
 
       {/* Send Invite Form */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8">
+      <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-8">
         <h2 className="font-display text-lg font-bold text-charcoal uppercase tracking-wider mb-4">
           New Invite
         </h2>
@@ -423,7 +423,7 @@ export default function AdminInvitesPage() {
                 required
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                className="w-full border border-gray-200 rounded px-4 py-2.5 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
                 placeholder="coach@example.com"
               />
             </div>
@@ -446,7 +446,7 @@ export default function AdminInvitesPage() {
                     setCoachIsParent(false);
                   }
                 }}
-                className="w-full border border-gray-200 rounded px-4 py-2.5 text-charcoal bg-white focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-charcoal bg-white focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
               >
                 <option value="coach">Coach</option>
                 <option value="parent">Parent</option>
@@ -465,7 +465,7 @@ export default function AdminInvitesPage() {
                   required
                   value={division}
                   onChange={(e) => setDivision(e.target.value)}
-                  className="w-full border border-gray-200 rounded px-4 py-2.5 text-charcoal bg-white focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+                  className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-charcoal bg-white focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
                 >
                   <option value="">Select division...</option>
                   {DIVISION_OPTIONS.map((d) => (
@@ -497,7 +497,7 @@ export default function AdminInvitesPage() {
               </label>
 
               {coachIsParent && (
-                <div className="border border-gray-200 rounded-lg p-4 space-y-3">
+                <div className="border border-gray-200 rounded-2xl p-4 space-y-3">
                   <p className="text-sm font-semibold text-charcoal uppercase tracking-wide font-display">
                     Children
                   </p>
@@ -521,7 +521,7 @@ export default function AdminInvitesPage() {
                             updated[idx] = { ...updated[idx], firstName: e.target.value };
                             setChildren(updated);
                           }}
-                          className="w-full border border-gray-200 rounded px-4 py-2.5 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+                          className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
                           placeholder="Tommy"
                         />
                       </div>
@@ -540,7 +540,7 @@ export default function AdminInvitesPage() {
                             updated[idx] = { ...updated[idx], lastName: e.target.value };
                             setChildren(updated);
                           }}
-                          className="w-full border border-gray-200 rounded px-4 py-2.5 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+                          className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
                           placeholder="Smith"
                         />
                       </div>
@@ -558,7 +558,7 @@ export default function AdminInvitesPage() {
                             updated[idx] = { ...updated[idx], division: e.target.value };
                             setChildren(updated);
                           }}
-                          className="w-full border border-gray-200 rounded px-4 py-2.5 text-charcoal bg-white focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+                          className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-charcoal bg-white focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
                         >
                           <option value="">Select division...</option>
                           {DIVISION_OPTIONS.map((d) => (
@@ -609,12 +609,12 @@ export default function AdminInvitesPage() {
                   required
                   value={parentName}
                   onChange={(e) => setParentName(e.target.value)}
-                  className="w-full sm:w-1/2 border border-gray-200 rounded px-4 py-2.5 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+                  className="w-full sm:w-1/2 border border-gray-200 rounded-xl px-4 py-2.5 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
                   placeholder="Jane Smith"
                 />
               </div>
 
-              <div className="border border-gray-200 rounded-lg p-4 space-y-3">
+              <div className="border border-gray-200 rounded-2xl p-4 space-y-3">
                 <p className="text-sm font-semibold text-charcoal uppercase tracking-wide font-display">
                   Children
                 </p>
@@ -638,7 +638,7 @@ export default function AdminInvitesPage() {
                           updated[idx] = { ...updated[idx], firstName: e.target.value };
                           setChildren(updated);
                         }}
-                        className="w-full border border-gray-200 rounded px-4 py-2.5 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+                        className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
                         placeholder="Tommy"
                       />
                     </div>
@@ -657,7 +657,7 @@ export default function AdminInvitesPage() {
                           updated[idx] = { ...updated[idx], lastName: e.target.value };
                           setChildren(updated);
                         }}
-                        className="w-full border border-gray-200 rounded px-4 py-2.5 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+                        className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
                         placeholder="Smith"
                       />
                     </div>
@@ -675,7 +675,7 @@ export default function AdminInvitesPage() {
                           updated[idx] = { ...updated[idx], division: e.target.value };
                           setChildren(updated);
                         }}
-                        className="w-full border border-gray-200 rounded px-4 py-2.5 text-charcoal bg-white focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+                        className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-charcoal bg-white focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
                       >
                         <option value="">Select division...</option>
                         {DIVISION_OPTIONS.map((d) => (
@@ -713,7 +713,7 @@ export default function AdminInvitesPage() {
             <button
               type="submit"
               disabled={sending}
-              className="w-full sm:w-auto bg-flag-red hover:bg-flag-red-dark text-white font-display font-bold uppercase tracking-wider py-2.5 px-6 rounded transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+              className="w-full sm:w-auto bg-flag-red hover:bg-flag-red-dark text-white font-display font-bold uppercase tracking-wider py-2.5 px-6 rounded-full transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
             >
               <Mail size={16} />
               {sending ? "Sending..." : "Send Invite"}
@@ -723,7 +723,7 @@ export default function AdminInvitesPage() {
       </div>
 
       {/* CSV Bulk Upload */}
-      <div className="bg-white border border-gray-200 rounded-lg p-6 mb-8">
+      <div className="bg-white border border-gray-200 rounded-2xl p-6 mb-8">
         <p className="text-flag-red font-display text-xs font-bold uppercase tracking-widest mb-1">
           Bulk Import
         </p>
@@ -744,14 +744,14 @@ export default function AdminInvitesPage() {
           </button>
         </div>
 
-        <div className="border-2 border-dashed border-gray-300 rounded-lg p-6 text-center mb-4">
+        <div className="border-2 border-dashed border-gray-300 rounded-2xl p-6 text-center mb-4">
           <Upload size={24} className="mx-auto text-gray-400 mb-2" />
           <p className="text-sm text-gray-500 mb-2">Choose a CSV file or drag and drop</p>
           <input
             type="file"
             accept=".csv,.xlsx,.xls"
             onChange={handleFileUpload}
-            className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded file:border-0 file:text-sm file:font-semibold file:bg-flag-blue/10 file:text-flag-blue hover:file:bg-flag-blue/20 file:cursor-pointer"
+            className="text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-flag-blue/10 file:text-flag-blue hover:file:bg-flag-blue/20 file:cursor-pointer"
           />
         </div>
 
@@ -827,7 +827,7 @@ export default function AdminInvitesPage() {
 
             {/* Results summary */}
             {csvResults && (
-              <div className="mb-4 rounded px-4 py-3 text-sm bg-gray-50 border border-gray-200">
+              <div className="mb-4 rounded-2xl px-4 py-3 text-sm bg-gray-50 border border-gray-200">
                 <span className="text-green-700 font-semibold">{csvResults.sent} sent</span>
                 {csvResults.duplicates > 0 && (
                   <span className="text-yellow-700 font-semibold ml-3">
@@ -845,7 +845,7 @@ export default function AdminInvitesPage() {
             <button
               onClick={sendAll}
               disabled={csvSending}
-              className="bg-flag-red hover:bg-flag-red-dark text-white font-display font-bold uppercase tracking-wider py-2.5 px-6 rounded transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
+              className="bg-flag-red hover:bg-flag-red-dark text-white font-display font-bold uppercase tracking-wider py-2.5 px-6 rounded-full transition-colors disabled:opacity-60 disabled:cursor-not-allowed flex items-center gap-2"
             >
               <Mail size={16} />
               {csvSending
@@ -857,7 +857,7 @@ export default function AdminInvitesPage() {
       </div>
 
       {/* Sent Invites List */}
-      <div className="bg-white border border-gray-200 rounded-lg">
+      <div className="bg-white border border-gray-200 rounded-2xl">
         <div className="p-6 border-b border-gray-200">
           <h2 className="font-display text-lg font-bold text-charcoal uppercase tracking-wider">
             Sent Invites
