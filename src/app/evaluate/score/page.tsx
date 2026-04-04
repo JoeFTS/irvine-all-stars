@@ -323,7 +323,7 @@ export default function ScoringPage() {
               )}
               <button
                 onClick={goToSummary}
-                className="flex items-center gap-1 text-xs bg-white/10 rounded px-2 py-1 active:bg-white/20"
+                className="flex items-center gap-1 text-xs bg-white/10 rounded-full px-2 py-1 active:bg-white/20"
               >
                 <ClipboardList size={14} />
                 Summary
@@ -341,7 +341,7 @@ export default function ScoringPage() {
               value={player.playerName}
               onChange={(e) => updatePlayer({ playerName: e.target.value })}
               placeholder="Player name (optional)"
-              className="flex-1 bg-white/10 border border-white/20 rounded-lg px-3 py-2 text-white placeholder:text-white/40 focus:outline-none focus:bg-white/15 text-base"
+              className="flex-1 bg-white/10 border border-white/20 rounded-xl px-3 py-2 text-white placeholder:text-white/40 focus:outline-none focus:bg-white/15 text-base"
             />
             <div className="text-right shrink-0">
               <div className="font-display text-2xl font-bold leading-none">
@@ -374,7 +374,7 @@ export default function ScoringPage() {
           return (
             <div
               key={cat.key}
-              className="bg-white rounded-xl border border-gray-200 px-4 py-3"
+              className="bg-white rounded-2xl border border-gray-200 px-4 py-3"
             >
               <div className="flex items-center justify-between">
                 <span className="font-display text-sm font-semibold text-charcoal uppercase tracking-wide">
@@ -436,7 +436,7 @@ export default function ScoringPage() {
         />
 
         {/* Score progress bar */}
-        <div className="bg-white rounded-xl border border-gray-200 px-4 py-3">
+        <div className="bg-white rounded-2xl border border-gray-200 px-4 py-3">
           <div className="flex items-center justify-between mb-1">
             <span className="text-xs text-gray-400 uppercase tracking-wide font-display">
               Completion
@@ -460,7 +460,7 @@ export default function ScoringPage() {
           <button
             onClick={goPrev}
             disabled={currentIdx === 0}
-            className={`flex items-center justify-center gap-1 px-4 py-3.5 rounded-xl font-display text-sm font-bold uppercase tracking-wide transition-colors ${
+            className={`flex items-center justify-center gap-1 px-4 py-3.5 rounded-full font-display text-sm font-bold uppercase tracking-wide transition-colors ${
               currentIdx === 0
                 ? "bg-gray-100 text-gray-300 cursor-not-allowed"
                 : "bg-gray-100 text-charcoal active:bg-gray-200"
@@ -471,7 +471,7 @@ export default function ScoringPage() {
           </button>
           <button
             onClick={goNext}
-            className="flex-1 flex items-center justify-center gap-1 py-3.5 rounded-xl bg-flag-blue text-white font-display text-sm font-bold uppercase tracking-wide active:bg-flag-blue-mid transition-colors"
+            className="flex-1 flex items-center justify-center gap-1 py-3.5 rounded-full bg-flag-blue text-white font-display text-sm font-bold uppercase tracking-wide active:bg-flag-blue-mid transition-colors"
           >
             Save & Next
             <ChevronRight size={18} />
@@ -500,7 +500,7 @@ function CollapsibleField({
   placeholder: string;
 }) {
   return (
-    <div className="bg-white rounded-xl border border-gray-200 overflow-hidden">
+    <div className="bg-white rounded-2xl border border-gray-200 overflow-hidden">
       <button
         onClick={onToggle}
         className="w-full flex items-center justify-between px-4 py-3 active:bg-gray-50"
@@ -526,7 +526,7 @@ function CollapsibleField({
             onChange={(e) => onChange(e.target.value)}
             placeholder={placeholder}
             rows={3}
-            className="w-full border border-gray-200 rounded-lg px-3 py-2 text-charcoal text-sm focus:outline-none focus:ring-2 focus:ring-flag-blue focus:border-transparent resize-none"
+            className="w-full border border-gray-200 rounded-xl px-3 py-2 text-charcoal text-sm focus:outline-none focus:ring-2 focus:ring-flag-blue focus:border-transparent resize-none"
           />
         </div>
       )}

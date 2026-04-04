@@ -131,7 +131,7 @@ export default function SummaryPage() {
 
         {/* Stats Row */}
         <div className="grid grid-cols-3 gap-3 mb-6">
-          <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
+          <div className="bg-white rounded-2xl border border-gray-200 p-3 text-center">
             <div className="font-display text-2xl font-bold text-flag-blue">
               {sorted.length}
             </div>
@@ -139,7 +139,7 @@ export default function SummaryPage() {
               Players
             </div>
           </div>
-          <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
+          <div className="bg-white rounded-2xl border border-gray-200 p-3 text-center">
             <div className="font-display text-2xl font-bold text-star-gold">
               {avgScore}
             </div>
@@ -147,7 +147,7 @@ export default function SummaryPage() {
               Avg Score
             </div>
           </div>
-          <div className="bg-white rounded-xl border border-gray-200 p-3 text-center">
+          <div className="bg-white rounded-2xl border border-gray-200 p-3 text-center">
             <div
               className={`font-display text-2xl font-bold ${
                 unsyncedCount > 0 ? "text-flag-red" : "text-green-600"
@@ -163,7 +163,7 @@ export default function SummaryPage() {
 
         {/* Unsynced warning */}
         {unsyncedCount > 0 && (
-          <div className="bg-star-gold-bright/10 border border-star-gold-bright/30 rounded-xl px-4 py-3 mb-4 flex items-start gap-2">
+          <div className="bg-star-gold-bright/10 border border-star-gold-bright/30 rounded-2xl px-4 py-3 mb-4 flex items-start gap-2">
             <AlertTriangle
               size={18}
               className="text-star-gold-bright shrink-0 mt-0.5"
@@ -189,7 +189,7 @@ export default function SummaryPage() {
               return (
                 <div
                   key={player.playerNumber + i}
-                  className="bg-white rounded-xl border border-gray-200 px-4 py-3"
+                  className="bg-white rounded-2xl border border-gray-200 px-4 py-3"
                 >
                   <div className="flex items-center justify-between mb-2">
                     <div className="flex items-center gap-3">
@@ -271,13 +271,13 @@ export default function SummaryPage() {
           {!showConfirm ? (
             <button
               onClick={() => setShowConfirm(true)}
-              className="w-full py-3.5 border-2 border-flag-red text-flag-red font-display text-sm font-bold uppercase tracking-wider rounded-xl active:bg-flag-red/5 transition-colors flex items-center justify-center gap-2"
+              className="w-full py-3.5 border-2 border-flag-red text-flag-red font-display text-sm font-bold uppercase tracking-wider rounded-full active:bg-flag-red/5 transition-colors flex items-center justify-center gap-2"
             >
               <LogOut size={16} />
               End Session
             </button>
           ) : (
-            <div className="bg-flag-red/5 border-2 border-flag-red rounded-xl p-4">
+            <div className="bg-flag-red/5 border-2 border-flag-red rounded-2xl p-4">
               <p className="text-sm text-charcoal text-center mb-3">
                 This will clear local data. Synced scores are safe in the
                 database.
@@ -291,13 +291,13 @@ export default function SummaryPage() {
               <div className="flex gap-2">
                 <button
                   onClick={() => setShowConfirm(false)}
-                  className="flex-1 py-2.5 bg-gray-100 text-charcoal font-display text-sm font-bold uppercase tracking-wide rounded-lg active:bg-gray-200"
+                  className="flex-1 py-2.5 bg-gray-100 text-charcoal font-display text-sm font-bold uppercase tracking-wide rounded-full active:bg-gray-200"
                 >
                   Cancel
                 </button>
                 <button
                   onClick={endSession}
-                  className="flex-1 py-2.5 bg-flag-red text-white font-display text-sm font-bold uppercase tracking-wide rounded-lg active:bg-flag-red-dark"
+                  className="flex-1 py-2.5 bg-flag-red text-white font-display text-sm font-bold uppercase tracking-wide rounded-full active:bg-flag-red-dark"
                 >
                   Confirm End
                 </button>

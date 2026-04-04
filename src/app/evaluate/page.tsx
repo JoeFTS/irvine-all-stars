@@ -70,7 +70,7 @@ export default function EvaluateSetupPage() {
         </div>
 
         {/* Form */}
-        <div className="bg-white rounded-xl border border-gray-200 p-6 space-y-5">
+        <div className="bg-white rounded-2xl border border-gray-200 p-6 space-y-5">
           {/* Evaluator Name */}
           <div>
             <label className="block font-display text-sm font-semibold text-charcoal uppercase tracking-wide mb-1.5">
@@ -84,7 +84,7 @@ export default function EvaluateSetupPage() {
                 setError("");
               }}
               placeholder="e.g. Coach Smith"
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-charcoal text-lg focus:outline-none focus:ring-2 focus:ring-flag-blue focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl text-charcoal text-lg focus:outline-none focus:ring-2 focus:ring-flag-blue focus:border-transparent"
             />
           </div>
 
@@ -99,7 +99,7 @@ export default function EvaluateSetupPage() {
                 setDivision(e.target.value);
                 setError("");
               }}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-charcoal text-lg focus:outline-none focus:ring-2 focus:ring-flag-blue focus:border-transparent bg-white"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl text-charcoal text-lg focus:outline-none focus:ring-2 focus:ring-flag-blue focus:border-transparent bg-white"
             >
               <option value="">Select division...</option>
               {DIVISIONS.map((d) => (
@@ -122,7 +122,7 @@ export default function EvaluateSetupPage() {
                 setSessionId(e.target.value);
                 setError("");
               }}
-              className="w-full px-4 py-3 border border-gray-200 rounded-lg text-charcoal text-lg focus:outline-none focus:ring-2 focus:ring-flag-blue focus:border-transparent"
+              className="w-full px-4 py-3 border border-gray-200 rounded-xl text-charcoal text-lg focus:outline-none focus:ring-2 focus:ring-flag-blue focus:border-transparent"
             />
             <p className="text-gray-400 text-xs mt-1">
               Auto-generated. Share with other evaluators to group scores.
@@ -137,7 +137,7 @@ export default function EvaluateSetupPage() {
           {/* Start Button */}
           <button
             onClick={handleStart}
-            className="w-full py-4 bg-flag-blue text-white font-display text-lg font-bold uppercase tracking-wider rounded-lg active:bg-flag-blue-mid transition-colors"
+            className="w-full py-4 bg-flag-blue text-white font-display text-lg font-bold uppercase tracking-wider rounded-full active:bg-flag-blue-mid transition-colors"
           >
             Start Scoring
           </button>
