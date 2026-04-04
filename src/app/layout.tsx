@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Oswald, Barlow } from "next/font/google";
+import { Oswald, Rubik, Dela_Gothic_One } from "next/font/google";
 import "./globals.css";
 import { Navbar } from "@/components/navbar";
 import { Footer } from "@/components/footer";
@@ -11,10 +11,16 @@ const oswald = Oswald({
   weight: ["400", "500", "600", "700"],
 });
 
-const barlow = Barlow({
-  variable: "--font-barlow",
+const rubik = Rubik({
+  variable: "--font-rubik",
   subsets: ["latin"],
-  weight: ["300", "400", "500", "600", "700", "800"],
+  weight: ["400", "500", "600", "700"],
+});
+
+const delaGothicOne = Dela_Gothic_One({
+  variable: "--font-dela",
+  subsets: ["latin"],
+  weight: "400",
 });
 
 export const viewport: Viewport = {
@@ -53,7 +59,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body className={`${oswald.variable} ${barlow.variable} antialiased`}>
+      <body className={`${oswald.variable} ${rubik.variable} ${delaGothicOne.variable} antialiased`}>
         <AuthProvider>
           <Navbar />
           <main>{children}</main>
