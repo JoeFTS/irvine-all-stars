@@ -61,7 +61,7 @@ export default function UpdatesPage() {
           <p className="text-star-gold-bright font-display text-sm font-semibold uppercase tracking-[3px] mb-4">
             &#9733; Stay Informed
           </p>
-          <h1 className="font-display text-4xl md:text-5xl font-bold text-white uppercase tracking-wide mb-4">
+          <h1 className="font-hero text-4xl md:text-5xl font-bold text-white uppercase tracking-wide mb-4">
             Updates & Announcements
           </h1>
           <p className="text-white/60 text-lg max-w-2xl mx-auto leading-relaxed">
@@ -77,15 +77,17 @@ export default function UpdatesPage() {
       <section className="bg-off-white py-16 px-6 md:px-10">
         <div className="max-w-3xl mx-auto">
           <div className="space-y-6">
-            {announcements.map((item) => (
+            {announcements.map((item, i) => {
+              const tint = ["bg-tint-cream", "bg-tint-green", "bg-tint-leather"][i % 3];
+              return (
               <article
                 key={item.title}
-                className="bg-white rounded-lg border border-gray-200 overflow-hidden hover:shadow-md transition-shadow"
+                className={`${tint} rounded-2xl border border-gray-200 overflow-hidden hover:shadow-md transition-shadow`}
               >
                 <div className="p-6 md:p-8">
                   <div className="flex flex-wrap items-center gap-3 mb-4">
                     <span
-                      className={`inline-block px-3 py-1 rounded text-xs font-display font-semibold uppercase tracking-widest ${tagColor(item.tag)}`}
+                      className={`inline-block px-3 py-1 rounded-full text-xs font-display font-semibold uppercase tracking-widest ${tagColor(item.tag)}`}
                     >
                       {item.tag}
                     </span>
@@ -97,7 +99,8 @@ export default function UpdatesPage() {
                   <p className="text-gray-600 leading-relaxed">{item.body}</p>
                 </div>
               </article>
-            ))}
+              );
+            })}
           </div>
 
           {/* Bottom note */}
@@ -109,6 +112,8 @@ export default function UpdatesPage() {
           </div>
         </div>
       </section>
+
+      <div className="baseball-stitch relative py-4" />
 
       <StripeDivider />
     </>

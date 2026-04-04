@@ -121,7 +121,7 @@ export default function TryoutsPage() {
           <p className="font-display text-sm font-semibold text-star-gold-bright uppercase tracking-[3px] mb-3">
             &#9733; Show What You&apos;ve Got
           </p>
-          <h1 className="font-display text-4xl md:text-6xl font-bold text-white uppercase tracking-wide mb-4">
+          <h1 className="font-hero text-4xl md:text-6xl font-bold text-white uppercase tracking-wide mb-4">
             All-Stars Tryouts
           </h1>
           <p className="text-white/60 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
@@ -149,10 +149,12 @@ export default function TryoutsPage() {
           </p>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {divisions.map((div, i) => (
+            {divisions.map((div, i) => {
+              const tint = ["bg-tint-cream", "bg-tint-green", "bg-tint-leather"][i % 3];
+              return (
               <div
                 key={div.id}
-                className="bg-white rounded-lg p-6 border border-gray-200 relative overflow-hidden"
+                className={`${tint} rounded-2xl p-6 border border-gray-200 relative overflow-hidden`}
               >
                 <div
                   className={`absolute top-0 left-0 right-0 h-1 ${
@@ -181,10 +183,13 @@ export default function TryoutsPage() {
                   {div.rosterSize} roster spots available
                 </p>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
+
+      <div className="baseball-stitch relative py-4" />
 
       {/* ===== WHAT TO EXPECT ===== */}
       <section className="bg-white py-16 md:py-20 px-6 md:px-10">
@@ -204,7 +209,7 @@ export default function TryoutsPage() {
             {whatToExpect.map((item, i) => (
               <div
                 key={item.title}
-                className="bg-off-white rounded-lg p-6 border border-gray-200 flex gap-4"
+                className="bg-off-white rounded-2xl p-6 border border-gray-200 flex gap-4"
               >
                 <div
                   className={`w-9 h-9 rounded-full ${
@@ -245,7 +250,7 @@ export default function TryoutsPage() {
             {rubricItems.map((item) => (
               <div
                 key={item.category}
-                className="bg-white rounded-lg border border-gray-200 overflow-hidden"
+                className="bg-white rounded-2xl border border-gray-200 overflow-hidden"
               >
                 <div className="flex flex-col sm:flex-row">
                   <div
@@ -267,7 +272,7 @@ export default function TryoutsPage() {
           </div>
 
           {/* Total */}
-          <div className="mt-6 bg-flag-blue rounded-lg p-5 flex items-center justify-between">
+          <div className="mt-6 bg-flag-blue rounded-2xl p-5 flex items-center justify-between">
             <span className="font-display text-lg font-semibold text-white uppercase tracking-wide">
               Total Points
             </span>
@@ -294,10 +299,12 @@ export default function TryoutsPage() {
           </p>
 
           <div className="grid grid-cols-2 sm:grid-cols-3 gap-3 sm:gap-4">
-            {whatToBring.map((item) => (
+            {whatToBring.map((item, i) => {
+              const tint = ["bg-tint-cream", "bg-tint-green", "bg-tint-leather"][i % 3];
+              return (
               <div
                 key={item.item}
-                className="bg-white rounded-lg p-4 sm:p-5 border border-gray-200 text-center flex flex-col items-center"
+                className={`${tint} rounded-2xl p-4 sm:p-5 border border-gray-200 text-center flex flex-col items-center`}
               >
                 <div className="w-8 h-8 rounded-full bg-flag-blue/10 flex items-center justify-center shrink-0 mb-2">
                   <svg className="w-4 h-4 text-flag-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
@@ -308,10 +315,13 @@ export default function TryoutsPage() {
                   {item.item}
                 </p>
               </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       </section>
+
+      <div className="baseball-stitch relative py-4" />
 
       {/* ===== FOR PARENTS ===== */}
       <section className="bg-white py-16 md:py-20 px-6 md:px-10">
@@ -328,7 +338,7 @@ export default function TryoutsPage() {
           </p>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            <div className="bg-off-white rounded-lg p-6 md:p-7 border border-gray-200">
+            <div className="bg-off-white rounded-2xl p-6 md:p-7 border border-gray-200">
               <div className="w-10 h-10 rounded-full bg-flag-blue/10 flex items-center justify-center mb-4">
                 <svg className="w-5 h-5 text-flag-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                   <circle cx="12" cy="12" r="10" /><path d="M12 6v6l4 2" />
@@ -345,7 +355,7 @@ export default function TryoutsPage() {
               </p>
             </div>
 
-            <div className="bg-off-white rounded-lg p-6 md:p-7 border border-gray-200">
+            <div className="bg-off-white rounded-2xl p-6 md:p-7 border border-gray-200">
               <div className="w-10 h-10 rounded-full bg-flag-red/10 flex items-center justify-center mb-4">
                 <svg className="w-5 h-5 text-flag-red" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                   <line x1="12" y1="1" x2="12" y2="23" /><path d="M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6" />
@@ -362,7 +372,7 @@ export default function TryoutsPage() {
               </p>
             </div>
 
-            <div className="bg-off-white rounded-lg p-6 md:p-7 border border-gray-200">
+            <div className="bg-off-white rounded-2xl p-6 md:p-7 border border-gray-200">
               <div className="w-10 h-10 rounded-full bg-flag-blue/10 flex items-center justify-center mb-4">
                 <svg className="w-5 h-5 text-flag-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                   <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" />
@@ -378,7 +388,7 @@ export default function TryoutsPage() {
               </p>
             </div>
 
-            <div className="bg-off-white rounded-lg p-6 md:p-7 border border-gray-200">
+            <div className="bg-off-white rounded-2xl p-6 md:p-7 border border-gray-200">
               <div className="w-10 h-10 rounded-full bg-flag-red/10 flex items-center justify-center mb-4">
                 <svg className="w-5 h-5 text-flag-red" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
                   <path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z" />
@@ -415,7 +425,7 @@ export default function TryoutsPage() {
           </p>
           <Link
             href="/apply/player"
-            className="inline-block bg-flag-red hover:bg-flag-red-dark text-white px-8 py-3.5 rounded font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5 hover:shadow-lg"
+            className="inline-block bg-flag-red hover:bg-flag-red-dark text-white px-8 py-3.5 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5 hover:shadow-lg"
           >
             Register for Tryouts &#9733;
           </Link>

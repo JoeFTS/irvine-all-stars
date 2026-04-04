@@ -231,7 +231,7 @@ export default function FaqPage() {
           <p className="text-star-gold-bright font-display text-sm font-semibold uppercase tracking-[3px] mb-3">
             &#9733; Questions & Answers
           </p>
-          <h1 className="font-display text-4xl md:text-5xl font-bold text-white uppercase tracking-wide mb-4">
+          <h1 className="font-hero text-4xl md:text-5xl font-bold text-white uppercase tracking-wide mb-4">
             Frequently Asked Questions
           </h1>
           <p className="text-white/60 text-lg leading-relaxed max-w-xl mx-auto">
@@ -250,6 +250,8 @@ export default function FaqPage() {
         </div>
       </section>
 
+      <div className="baseball-stitch relative py-4" />
+
       <StripeDivider />
 
       {/* ===== CTA ===== */}
@@ -265,13 +267,13 @@ export default function FaqPage() {
           <div className="flex gap-3 justify-center flex-wrap">
             <a
               href="mailto:allstars@irvinepony.com"
-              className="bg-flag-red hover:bg-flag-red-dark text-white px-7 py-3 rounded font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5 hover:shadow-lg"
+              className="bg-flag-red hover:bg-flag-red-dark text-white px-7 py-3 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5 hover:shadow-lg"
             >
               Email the Coordinator
             </a>
             <a
               href="/timeline"
-              className="bg-white hover:bg-cream text-flag-blue px-7 py-3 rounded font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5"
+              className="bg-white hover:bg-cream text-flag-blue px-7 py-3 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5"
             >
               View Timeline
             </a>

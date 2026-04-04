@@ -34,9 +34,9 @@ function DocumentCard({ slug, title, description }: { slug: string; title: strin
   return (
     <Link
       href={`/documents/${slug}`}
-      className="group bg-white rounded-lg p-6 border border-gray-200 flex flex-col sm:flex-row sm:items-center gap-4 hover:-translate-y-0.5 hover:shadow-md transition-all"
+      className="group bg-white rounded-2xl p-6 border border-gray-200 flex flex-col sm:flex-row sm:items-center gap-4 hover:-translate-y-0.5 hover:shadow-md transition-all"
     >
-      <div className="w-12 h-12 rounded-lg bg-flag-blue/10 flex items-center justify-center shrink-0">
+      <div className="w-12 h-12 rounded-2xl bg-flag-blue/10 flex items-center justify-center shrink-0">
         {iconMap[slug] || <FileText className="w-6 h-6 text-flag-blue" />}
       </div>
       <div className="flex-1 min-w-0">
@@ -68,7 +68,7 @@ export default function DocumentsPage() {
           <p className="text-star-gold-bright font-display text-sm font-semibold uppercase tracking-[3px] mb-4">
             &#9733; Resources
           </p>
-          <h1 className="font-display text-4xl md:text-5xl font-bold text-white uppercase tracking-wide mb-4">
+          <h1 className="font-hero text-4xl md:text-5xl font-bold text-white uppercase tracking-wide mb-4">
             Documents & Resources
           </h1>
           <p className="text-white/60 text-lg max-w-2xl mx-auto leading-relaxed">
@@ -105,6 +105,8 @@ export default function DocumentsPage() {
           </div>
         </div>
       </section>
+
+      <div className="baseball-stitch relative py-4" />
 
       {/* For Coaches & Volunteers */}
       <section className="bg-cream py-16 px-6 md:px-10">
@@ -147,13 +149,13 @@ export default function DocumentsPage() {
           <div className="flex gap-3 justify-center flex-wrap">
             <a
               href="mailto:allstars@irvinepony.com"
-              className="bg-flag-red hover:bg-flag-red-dark text-white px-7 py-3 rounded font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5 hover:shadow-lg"
+              className="bg-flag-red hover:bg-flag-red-dark text-white px-7 py-3 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5 hover:shadow-lg"
             >
               Email the Coordinator
             </a>
             <a
               href="/faq"
-              className="bg-white hover:bg-cream text-flag-blue px-7 py-3 rounded font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5"
+              className="bg-white hover:bg-cream text-flag-blue px-7 py-3 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5"
             >
               View FAQ
             </a>

@@ -94,7 +94,7 @@ export default function CoachesPage() {
           <p className="font-display text-sm font-semibold text-star-gold-bright uppercase tracking-[3px] mb-3">
             &#9733; Lead the Team
           </p>
-          <h1 className="font-display text-4xl md:text-6xl font-bold text-white uppercase tracking-wide mb-4">
+          <h1 className="font-hero text-4xl md:text-6xl font-bold text-white uppercase tracking-wide mb-4">
             Coach Selection
           </h1>
           <p className="text-white/60 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
@@ -118,7 +118,7 @@ export default function CoachesPage() {
             All head coach candidates must meet the following requirements
             before submitting an application.
           </p>
-          <div className="bg-white rounded-lg p-6 md:p-8 border border-gray-200">
+          <div className="bg-white rounded-2xl p-6 md:p-8 border border-gray-200">
             <ul className="space-y-4">
               {[
                 {
@@ -165,6 +165,8 @@ export default function CoachesPage() {
         </div>
       </section>
 
+      <div className="baseball-stitch relative py-4" />
+
       {/* ===== 100-POINT RUBRIC ===== */}
       <section className="bg-cream py-16 md:py-20 px-6 md:px-10">
         <div className="max-w-4xl mx-auto">
@@ -183,7 +185,7 @@ export default function CoachesPage() {
             {rubricItems.map((item) => (
               <div
                 key={item.category}
-                className="bg-white rounded-lg border border-gray-200 overflow-hidden"
+                className="bg-white rounded-2xl border border-gray-200 overflow-hidden"
               >
                 <div className="flex flex-col sm:flex-row">
                   <div
@@ -205,7 +207,7 @@ export default function CoachesPage() {
           </div>
 
           {/* Total */}
-          <div className="mt-6 bg-flag-blue rounded-lg p-5 flex items-center justify-between">
+          <div className="mt-6 bg-flag-blue rounded-2xl p-5 flex items-center justify-between">
             <span className="font-display text-lg font-semibold text-white uppercase tracking-wide">
               Total Points
             </span>
@@ -251,7 +253,7 @@ export default function CoachesPage() {
 
                 {/* Content */}
                 <div className="pb-8 md:pb-10 flex-1">
-                  <div className="bg-white rounded-lg p-5 md:p-6 border border-gray-200">
+                  <div className="bg-white rounded-2xl p-5 md:p-6 border border-gray-200">
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-1 mb-2">
                       <h3 className="font-display text-lg font-semibold uppercase tracking-wide">
                         {step.title}
@@ -270,6 +272,8 @@ export default function CoachesPage() {
           </div>
         </div>
       </section>
+
+      <div className="baseball-stitch relative py-4" />
 
       {/* ===== WHAT WE LOOK FOR ===== */}
       <section className="bg-white py-16 md:py-20 px-6 md:px-10">
@@ -308,7 +312,7 @@ export default function CoachesPage() {
             ].map((item) => (
               <div
                 key={item.title}
-                className="bg-off-white rounded-lg p-6 md:p-7 border border-gray-200 text-center"
+                className="bg-off-white rounded-2xl p-6 md:p-7 border border-gray-200 text-center"
               >
                 <div className="w-12 h-12 rounded-full bg-flag-blue/10 flex items-center justify-center mx-auto mb-4">
                   <svg className="w-6 h-6 text-flag-blue" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
@@ -344,7 +348,7 @@ export default function CoachesPage() {
           </p>
           <Link
             href="/apply/coach"
-            className="inline-block bg-flag-red hover:bg-flag-red-dark text-white px-8 py-3.5 rounded font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5 hover:shadow-lg"
+            className="inline-block bg-flag-red hover:bg-flag-red-dark text-white px-8 py-3.5 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5 hover:shadow-lg"
           >
             Apply to Coach &#9733;
           </Link>

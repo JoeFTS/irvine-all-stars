@@ -102,7 +102,7 @@ export default function TimelinePage() {
           <p className="text-star-gold-bright font-display text-sm font-semibold uppercase tracking-[3px] mb-3">
             &#9733; Season Roadmap
           </p>
-          <h1 className="font-display text-4xl md:text-5xl font-bold text-white uppercase tracking-wide mb-4">
+          <h1 className="font-hero text-4xl md:text-5xl font-bold text-white uppercase tracking-wide mb-4">
             2026 Season Timeline
           </h1>
           <p className="text-white/60 text-lg leading-relaxed max-w-xl mx-auto">
@@ -113,6 +113,8 @@ export default function TimelinePage() {
       </section>
 
       <StripeDivider />
+
+      <div className="baseball-stitch relative py-4" />
 
       {/* ===== TIMELINE ===== */}
       <section className="bg-off-white py-20 px-6 md:px-10">
@@ -147,7 +149,7 @@ export default function TimelinePage() {
                     }`}
                   >
                     <div
-                      className={`bg-white rounded-lg p-6 border ${
+                      className={`bg-white rounded-2xl p-6 border ${
                         phase.current
                           ? "border-star-gold-bright shadow-md ring-2 ring-star-gold-bright/20"
                           : "border-gray-200"
@@ -155,7 +157,7 @@ export default function TimelinePage() {
                     >
                       {/* Color bar top */}
                       <div
-                        className={`absolute top-0 left-0 right-0 h-1 rounded-t-lg ${
+                        className={`absolute top-0 left-0 right-0 h-1 rounded-t-2xl ${
                           phase.current
                             ? "bg-star-gold-bright"
                             : phase.bg
@@ -175,7 +177,7 @@ export default function TimelinePage() {
                           Phase {phase.num}
                         </span>
                         {phase.current && (
-                          <span className="text-[10px] font-semibold uppercase tracking-wider bg-star-gold-bright/15 text-star-gold px-2 py-0.5 rounded">
+                          <span className="text-[10px] font-semibold uppercase tracking-wider bg-star-gold-bright/15 text-star-gold px-2 py-0.5 rounded-full">
                             Current
                           </span>
                         )}
@@ -187,7 +189,7 @@ export default function TimelinePage() {
                           Phase {phase.num}
                         </span>
                         {phase.current && (
-                          <span className="text-[10px] font-semibold uppercase tracking-wider bg-star-gold-bright/15 text-star-gold px-2 py-0.5 rounded">
+                          <span className="text-[10px] font-semibold uppercase tracking-wider bg-star-gold-bright/15 text-star-gold px-2 py-0.5 rounded-full">
                             Current
                           </span>
                         )}
@@ -252,13 +254,13 @@ export default function TimelinePage() {
           <div className="flex gap-3 justify-center flex-wrap">
             <a
               href="/apply/coach"
-              className="bg-flag-red hover:bg-flag-red-dark text-white px-7 py-3 rounded font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5 hover:shadow-lg"
+              className="bg-flag-red hover:bg-flag-red-dark text-white px-7 py-3 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5 hover:shadow-lg"
             >
               Apply to Coach
             </a>
             <a
               href="/apply/player"
-              className="bg-white hover:bg-cream text-flag-blue px-7 py-3 rounded font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5"
+              className="bg-white hover:bg-cream text-flag-blue px-7 py-3 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5"
             >
               Register for Tryouts
             </a>
