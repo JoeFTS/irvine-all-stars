@@ -56,7 +56,7 @@ export default function FileUploadPreview({
   const statusConfig = status ? STATUS_CONFIG[status] : null;
 
   return (
-    <div className="flex items-center gap-3 rounded-lg border border-gray-200 bg-white p-3">
+    <div className="flex items-center gap-3 rounded-2xl border border-gray-200 bg-white p-3">
       {/* Thumbnail / Icon */}
       {isImage && url ? (
         <img

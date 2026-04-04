@@ -168,7 +168,7 @@ export default function FileUpload({
         <label className="block text-sm font-semibold text-charcoal font-display uppercase tracking-wide">
           {label}
         </label>
-        <div className="rounded-lg border-2 border-dashed border-gray-200 bg-gray-100 p-6 text-center">
+        <div className="rounded-2xl border-2 border-dashed border-gray-200 bg-gray-100 p-6 text-center">
           <p className="text-sm text-gray-400">Upload unavailable</p>
           <p className="text-xs text-gray-400 mt-1">
             Storage is not configured.
@@ -189,7 +189,7 @@ export default function FileUpload({
         <label className="block text-sm font-semibold text-charcoal font-display uppercase tracking-wide">
           {label}
         </label>
-        <div className="rounded-lg border-2 border-green-500 bg-green-50 p-4">
+        <div className="rounded-2xl border-2 border-green-500 bg-green-50 p-4">
           <div className="flex items-center gap-3">
             {/* Preview or icon */}
             {isImage && preview?.url ? (
@@ -246,7 +246,7 @@ export default function FileUpload({
               <button
                 type="button"
                 onClick={handleReplace}
-                className="shrink-0 rounded-md border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-charcoal hover:bg-gray-50 transition-colors"
+                className="shrink-0 rounded-full border border-gray-300 bg-white px-3 py-1.5 text-xs font-semibold text-charcoal hover:bg-gray-50 transition-colors"
               >
                 Replace
               </button>
@@ -293,7 +293,7 @@ export default function FileUpload({
           }
         }}
         className={`
-          relative rounded-lg border-2 border-dashed p-6 text-center transition-all cursor-pointer
+          relative rounded-2xl border-2 border-dashed p-6 text-center transition-all cursor-pointer
           ${
             disabled
               ? "border-gray-200 bg-gray-50 cursor-not-allowed opacity-60"

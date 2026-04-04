@@ -140,7 +140,7 @@ export default function MedicalViewPage() {
         </h1>
         <button
           onClick={() => window.print()}
-          className="flex items-center gap-2 px-4 py-2 bg-flag-blue text-white rounded-lg text-sm font-semibold hover:bg-flag-blue/90 transition-colors shrink-0 min-h-[44px]"
+          className="flex items-center gap-2 px-4 py-2 bg-flag-blue text-white rounded-full text-sm font-semibold hover:bg-flag-blue/90 transition-colors shrink-0 min-h-[44px]"
         >
           <Printer size={16} />
           <span className="hidden sm:inline">Print / Save as PDF</span>
@@ -149,7 +149,7 @@ export default function MedicalViewPage() {
       </div>
 
       {/* Document */}
-      <div className="max-w-[800px] mx-2 sm:mx-auto my-4 sm:my-6 print:my-0 bg-white shadow-lg print:shadow-none">
+      <div className="max-w-[800px] mx-2 sm:mx-auto my-4 sm:my-6 print:my-0 bg-white shadow-lg print:shadow-none rounded-2xl overflow-hidden">
         {/* Header */}
         <div className="bg-flag-blue text-white px-4 sm:px-8 py-6 print:py-5">
           <h1 className="font-display text-2xl font-bold uppercase tracking-wider text-center">
@@ -224,7 +224,7 @@ export default function MedicalViewPage() {
           </div>
 
           {/* Authorization */}
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg print:bg-white print:border-green-300">
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-2xl print:bg-white print:border-green-300">
             <div className="flex items-start gap-2.5">
               <CheckCircle2 size={18} className="text-green-600 shrink-0 mt-0.5" />
               <div>
@@ -289,7 +289,7 @@ export default function MedicalViewPage() {
 
 function InfoRow({ label, value }: { label: string; value: string }) {
   return (
-    <div className="p-3 bg-gray-50 rounded-lg print:bg-white print:border print:border-gray-200">
+    <div className="p-3 bg-gray-50 rounded-2xl print:bg-white print:border print:border-gray-200">
       <span className="text-[10px] font-semibold uppercase tracking-wider text-gray-400 block mb-0.5">
         {label}
       </span>

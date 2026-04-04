@@ -17,7 +17,7 @@ function AccordionItem({ item }: { item: FaqItem }) {
   const [open, setOpen] = useState(false);
 
   return (
-    <div className="border border-gray-200 rounded-lg bg-white overflow-hidden">
+    <div className="border border-gray-200 rounded-2xl bg-white overflow-hidden">
       <button
         onClick={() => setOpen(!open)}
         className="w-full flex items-center justify-between gap-4 px-5 py-4 text-left hover:bg-gray-50 transition-colors"

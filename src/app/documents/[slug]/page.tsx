@@ -74,7 +74,7 @@ export default async function DocumentDetailPage({ params }: Props) {
           {/* Sections */}
           <div className="space-y-10">
             {doc.sections.map((section, i) => (
-              <div key={i} className="bg-white rounded-lg border border-gray-200 p-6 md:p-8 print:border-0 print:p-0 print:shadow-none">
+              <div key={i} className="bg-white rounded-2xl border border-gray-200 p-6 md:p-8 print:border-0 print:p-0 print:shadow-none">
                 <h2 className="font-display text-xl md:text-2xl font-bold uppercase tracking-wide text-flag-blue mb-4">
                   {section.heading}
                 </h2>

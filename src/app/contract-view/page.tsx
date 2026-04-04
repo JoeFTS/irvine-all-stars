@@ -128,7 +128,7 @@ export default function ContractViewPage() {
         </h1>
         <button
           onClick={() => window.print()}
-          className="flex items-center gap-2 px-4 py-2 bg-flag-blue text-white rounded-lg text-sm font-semibold hover:bg-flag-blue/90 transition-colors shrink-0 min-h-[44px]"
+          className="flex items-center gap-2 px-4 py-2 bg-flag-blue text-white rounded-full text-sm font-semibold hover:bg-flag-blue/90 transition-colors shrink-0 min-h-[44px]"
         >
           <Printer size={16} />
           <span className="hidden sm:inline">Print / Save as PDF</span>
@@ -137,7 +137,7 @@ export default function ContractViewPage() {
       </div>
 
       {/* Contract Document */}
-      <div className="max-w-[800px] mx-auto my-4 sm:my-6 mx-2 sm:mx-auto print:my-0 bg-white shadow-lg print:shadow-none">
+      <div className="max-w-[800px] mx-auto my-4 sm:my-6 mx-2 sm:mx-auto print:my-0 bg-white shadow-lg print:shadow-none rounded-2xl overflow-hidden">
         {/* Header */}
         <div className="bg-flag-blue text-white px-4 sm:px-8 py-6 print:py-5">
           <h1 className="font-display text-2xl font-bold uppercase tracking-wider text-center">
@@ -190,7 +190,7 @@ export default function ContractViewPage() {
           </div>
 
           {/* Acknowledgments */}
-          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-lg print:bg-white print:border-green-300">
+          <div className="mb-6 p-4 bg-green-50 border border-green-200 rounded-2xl print:bg-white print:border-green-300">
             <h2 className="font-display text-sm font-bold uppercase tracking-wider text-green-800 mb-3">
               Acknowledgments
             </h2>
@@ -208,7 +208,7 @@ export default function ContractViewPage() {
           </div>
 
           {/* Planned Vacations */}
-          <div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-lg print:bg-white">
+          <div className="mb-6 p-4 bg-gray-50 border border-gray-200 rounded-2xl print:bg-white">
             <div className="flex items-center gap-2 mb-2">
               <Palmtree size={16} className="text-star-gold" />
               <h2 className="font-display text-sm font-bold uppercase tracking-wider text-charcoal">
