@@ -98,14 +98,14 @@ const faqSections: FaqSection[] = [
         question: "How do I apply to coach?",
         answer: (
           <>
-            Head coach applications are submitted online through our{" "}
+            Coach applications are handled by invitation. To get started,{" "}
             <a
-              href="/apply/coach"
+              href="/auth/login"
               className="text-flag-blue underline underline-offset-2 hover:text-flag-red transition-colors"
             >
-              coach application page
-            </a>
-            . Applications are open now for the 2026 season. You&apos;ll need to
+              sign in
+            </a>{" "}
+            to your account. You&apos;ll need to
             provide your coaching background, division preference, and
             availability.
           </>
@@ -199,22 +199,14 @@ const faqSections: FaqSection[] = [
         question: "When do applications open?",
         answer: (
           <>
-            Applications for the 2026 season are open now. Coach applications
-            and player registration can both be completed online. Visit the{" "}
+            Registration for the 2026 season is by invitation.{" "}
             <a
-              href="/apply/coach"
+              href="/auth/login"
               className="text-flag-blue underline underline-offset-2 hover:text-flag-red transition-colors"
             >
-              coach application
+              Sign in
             </a>{" "}
-            or{" "}
-            <a
-              href="/apply/player"
-              className="text-flag-blue underline underline-offset-2 hover:text-flag-red transition-colors"
-            >
-              player registration
-            </a>{" "}
-            pages to get started.
+            to your account to get started.
           </>
         ),
       },

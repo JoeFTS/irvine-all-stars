@@ -253,16 +253,10 @@ export default function TimelinePage() {
           </p>
           <div className="flex gap-3 justify-center flex-wrap">
             <a
-              href="/apply/coach"
+              href="/auth/login"
               className="bg-flag-red hover:bg-flag-red-dark text-white px-7 py-3 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5 hover:shadow-lg"
             >
-              Apply to Coach
-            </a>
-            <a
-              href="/apply/player"
-              className="bg-white hover:bg-cream text-flag-blue px-7 py-3 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5"
-            >
-              Register for Tryouts
+              Sign In
             </a>
           </div>
         </div>

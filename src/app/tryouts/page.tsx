@@ -424,10 +424,10 @@ export default function TryoutsPage() {
             evaluation.
           </p>
           <Link
-            href="/apply/player"
+            href="/auth/login"
             className="inline-block bg-flag-red hover:bg-flag-red-dark text-white px-8 py-3.5 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5 hover:shadow-lg"
           >
-            Register for Tryouts &#9733;
+            Sign In to Register &#9733;
           </Link>
         </div>
       </section>

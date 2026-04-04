@@ -64,16 +64,16 @@ export default function Home() {
             <HeroItem>
               <div className="flex gap-3 flex-wrap justify-center lg:justify-start">
                 <Link
-                  href="/apply/player"
+                  href="/auth/login"
                   className="bg-flag-red hover:bg-flag-red-dark text-white px-7 py-3.5 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.97]"
                 >
-                  Register for Tryouts
+                  Sign In
                 </Link>
                 <Link
-                  href="/apply/coach"
+                  href="/tryouts"
                   className="border-2 border-white/30 hover:border-white text-white px-7 py-3.5 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5 active:scale-[0.97]"
                 >
-                  Apply to Coach
+                  Learn More
                 </Link>
               </div>
             </HeroItem>
@@ -81,50 +81,6 @@ export default function Home() {
 
           {/* Right - quick link cards */}
           <StaggerReveal className="hidden lg:flex flex-col gap-3" delay={0.5}>
-            <StaggerItem>
-              <Link
-                href="/apply/coach"
-                className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl p-5 flex items-center gap-4 hover:-translate-y-0.5 hover:bg-white/15 transition-all group active:scale-[0.98]"
-              >
-                <div className="w-12 h-12 rounded-lg bg-flag-red/20 flex items-center justify-center shrink-0">
-                  <svg className="w-5 h-5 text-flag-red" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2" /><rect x="8" y="2" width="8" height="4" rx="1" ry="1" />
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-display text-lg font-semibold uppercase tracking-wide text-white">
-                    Coach Applications
-                  </h3>
-                  <p className="text-white/50 text-sm">
-                    Apply to lead an All-Stars division this summer
-                  </p>
-                </div>
-                <span className="text-white/30 group-hover:text-star-gold text-xl transition-colors">
-                  &rarr;
-                </span>
-              </Link>
-            </StaggerItem>
-            <StaggerItem>
-              <Link
-                href="/apply/player"
-                className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl p-5 flex items-center gap-4 hover:-translate-y-0.5 hover:bg-white/15 transition-all group active:scale-[0.98]"
-              >
-                <div className="w-12 h-12 rounded-lg bg-flag-blue-mid/20 flex items-center justify-center text-xl shrink-0">
-                  &#9918;
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-display text-lg font-semibold uppercase tracking-wide text-white">
-                    Tryout Registration
-                  </h3>
-                  <p className="text-white/50 text-sm">
-                    Register your player for 2026 tryouts
-                  </p>
-                </div>
-                <span className="text-white/30 group-hover:text-star-gold text-xl transition-colors">
-                  &rarr;
-                </span>
-              </Link>
-            </StaggerItem>
             <StaggerItem>
               <Link
                 href="/auth/login"
@@ -306,16 +262,16 @@ export default function Home() {
           </p>
           <div className="flex gap-3 justify-center flex-wrap">
             <Link
-              href="/apply/coach"
+              href="/auth/login"
               className="bg-flag-red hover:bg-flag-red-dark text-white px-8 py-3.5 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.97]"
             >
-              Apply to Coach
+              Sign In
             </Link>
             <Link
-              href="/apply/player"
+              href="/tryouts"
               className="bg-white hover:bg-off-white text-flag-blue px-8 py-3.5 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5 active:scale-[0.97]"
             >
-              Register for Tryouts
+              View Tryout Info
             </Link>
           </div>
         </RevealOnScroll>
