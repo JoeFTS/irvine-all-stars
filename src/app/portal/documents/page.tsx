@@ -212,11 +212,11 @@ function DocumentsPage() {
       <section className="bg-off-white py-12 md:py-16 px-6 md:px-10">
         <div className="max-w-3xl mx-auto">
           {dataLoading ? (
-            <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
+            <div className="bg-white rounded-2xl border border-gray-200 p-8 text-center">
               <p className="text-gray-400 text-sm">Loading your players...</p>
             </div>
           ) : registrations.length === 0 ? (
-            <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
+            <div className="bg-white rounded-2xl border border-gray-200 p-8 text-center">
               <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
                 <svg className="h-7 w-7 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
@@ -231,7 +231,7 @@ function DocumentsPage() {
               </p>
               <Link
                 href="/portal"
-                className="inline-block bg-flag-blue hover:bg-flag-blue-mid text-white px-6 py-3 rounded font-display text-sm font-semibold uppercase tracking-widest transition-colors"
+                className="inline-block bg-flag-blue hover:bg-flag-blue-mid text-white px-6 py-3 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-colors"
               >
                 Back to Portal
               </Link>
@@ -245,7 +245,7 @@ function DocumentsPage() {
                 return (
                   <div
                     key={reg.id}
-                    className="bg-white rounded-lg border border-gray-200 p-6 md:p-8"
+                    className="bg-white rounded-2xl border border-gray-200 p-6 md:p-8"
                   >
                     {/* Player header */}
                     <div className="flex items-center gap-3 mb-6">

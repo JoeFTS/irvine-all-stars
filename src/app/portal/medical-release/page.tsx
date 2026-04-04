@@ -182,7 +182,7 @@ export default function MedicalReleasePage() {
   if (!playerId || !registration) {
     return (
       <div className="min-h-screen bg-off-white pt-[120px] px-6">
-        <div className="max-w-xl mx-auto bg-white rounded-lg border border-gray-200 p-8 text-center">
+        <div className="max-w-xl mx-auto bg-white rounded-2xl border border-gray-200 p-8 text-center">
           <p className="text-gray-500 mb-4">
             No player selected. Go back to the Parent Portal.
           </p>
@@ -200,7 +200,7 @@ export default function MedicalReleasePage() {
   if (submitted || alreadyCompleted) {
     return (
       <div className="min-h-screen bg-off-white pt-[120px] px-6">
-        <div className="max-w-xl mx-auto bg-white rounded-lg border border-gray-200 p-8 text-center">
+        <div className="max-w-xl mx-auto bg-white rounded-2xl border border-gray-200 p-8 text-center">
           <div className="w-14 h-14 rounded-full bg-green-100 text-green-600 flex items-center justify-center mx-auto mb-4">
             <svg
               className="w-7 h-7"
@@ -228,7 +228,7 @@ export default function MedicalReleasePage() {
           </p>
           <Link
             href="/portal"
-            className="inline-block bg-flag-blue hover:bg-flag-blue-mid text-white px-6 py-3 rounded font-display text-sm font-semibold uppercase tracking-widest transition-colors"
+            className="inline-block bg-flag-blue hover:bg-flag-blue-mid text-white px-6 py-3 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-colors"
           >
             Back to Portal
           </Link>
@@ -249,7 +249,7 @@ export default function MedicalReleasePage() {
           &larr; Back to Portal
         </Link>
 
-        <div className="bg-white rounded-lg border border-gray-200 p-6 md:p-8">
+        <div className="bg-white rounded-2xl border border-gray-200 p-6 md:p-8">
           <h1 className="font-display text-2xl md:text-3xl font-bold uppercase tracking-wide mb-1">
             Medical Release
           </h1>
@@ -259,7 +259,7 @@ export default function MedicalReleasePage() {
           </p>
 
           {error && (
-            <div className="bg-red-50 border border-red-200 text-flag-red text-sm p-4 rounded-lg mb-6">
+            <div className="bg-red-50 border border-red-200 text-flag-red text-sm p-4 rounded-xl mb-6">
               {error}
             </div>
           )}
@@ -281,7 +281,7 @@ export default function MedicalReleasePage() {
                       setForm((f) => ({ ...f, allergies: e.target.value }))
                     }
                     placeholder="List any allergies (food, medication, environmental) or type 'None'"
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue"
+                    className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue"
                     rows={2}
                   />
                 </div>
@@ -295,7 +295,7 @@ export default function MedicalReleasePage() {
                       setForm((f) => ({ ...f, medications: e.target.value }))
                     }
                     placeholder="List any current medications or type 'None'"
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue"
+                    className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue"
                     rows={2}
                   />
                 </div>
@@ -312,7 +312,7 @@ export default function MedicalReleasePage() {
                       }))
                     }
                     placeholder="List any conditions coaches should be aware of (asthma, diabetes, etc.) or type 'None'"
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue"
+                    className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue"
                     rows={2}
                   />
                 </div>
@@ -339,7 +339,7 @@ export default function MedicalReleasePage() {
                       }))
                     }
                     placeholder="e.g. Blue Cross, Kaiser"
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue"
+                    className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue"
                   />
                 </div>
                 <div>
@@ -355,7 +355,7 @@ export default function MedicalReleasePage() {
                         insurance_policy_number: e.target.value,
                       }))
                     }
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue"
+                    className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue"
                   />
                 </div>
               </div>
@@ -380,7 +380,7 @@ export default function MedicalReleasePage() {
                         physician_name: e.target.value,
                       }))
                     }
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue"
+                    className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue"
                   />
                 </div>
                 <div>
@@ -396,14 +396,14 @@ export default function MedicalReleasePage() {
                         physician_phone: e.target.value,
                       }))
                     }
-                    className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue"
+                    className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue"
                   />
                 </div>
               </div>
             </div>
 
             {/* Authorization */}
-            <div className="bg-flag-blue/5 border border-flag-blue/15 rounded-lg p-5 space-y-4">
+            <div className="bg-flag-blue/5 border border-flag-blue/15 rounded-2xl p-5 space-y-4">
               <h3 className="font-display text-sm font-semibold uppercase tracking-wider text-flag-blue">
                 Authorization for Emergency Medical Treatment
               </h3>
@@ -450,7 +450,7 @@ export default function MedicalReleasePage() {
                   }))
                 }
                 placeholder="Type your full legal name"
-                className="w-full border border-gray-300 rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue"
+                className="w-full border border-gray-300 rounded-xl px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue"
                 required
               />
               <p className="text-xs text-gray-400 mt-1">
@@ -462,7 +462,7 @@ export default function MedicalReleasePage() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full bg-flag-red hover:bg-flag-red-dark disabled:opacity-50 text-white px-6 py-3.5 rounded font-display text-sm font-semibold uppercase tracking-widest transition-colors"
+              className="w-full bg-flag-red hover:bg-flag-red-dark disabled:opacity-50 text-white px-6 py-3.5 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-colors"
             >
               {submitting ? "Submitting..." : "Submit Medical Release"}
             </button>

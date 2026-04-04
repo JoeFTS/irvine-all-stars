@@ -216,11 +216,11 @@ function ContractPage() {
       <section className="bg-off-white py-12 md:py-16 px-6 md:px-10">
         <div className="max-w-3xl mx-auto">
           {dataLoading ? (
-            <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
+            <div className="bg-white rounded-2xl border border-gray-200 p-8 text-center">
               <p className="text-gray-400 text-sm">Loading...</p>
             </div>
           ) : registrations.length === 0 ? (
-            <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
+            <div className="bg-white rounded-2xl border border-gray-200 p-8 text-center">
               <div className="w-14 h-14 rounded-full bg-gray-100 flex items-center justify-center mx-auto mb-4">
                 <svg className="h-7 w-7 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                   <path strokeLinecap="round" strokeLinejoin="round" d="M16.5 10.5V6.75a4.5 4.5 0 10-9 0v3.75m-.75 11.25h10.5a2.25 2.25 0 002.25-2.25v-6.75a2.25 2.25 0 00-2.25-2.25H6.75a2.25 2.25 0 00-2.25 2.25v6.75a2.25 2.25 0 002.25 2.25z" />
@@ -235,7 +235,7 @@ function ContractPage() {
               </p>
               <Link
                 href="/portal"
-                className="inline-block bg-flag-blue hover:bg-flag-blue-mid text-white px-6 py-3 rounded font-display text-sm font-semibold uppercase tracking-widest transition-colors"
+                className="inline-block bg-flag-blue hover:bg-flag-blue-mid text-white px-6 py-3 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-colors"
               >
                 Back to Portal
               </Link>
@@ -258,7 +258,7 @@ function ContractPage() {
                       setSubmitted(false);
                       setError(null);
                     }}
-                    className="w-full md:w-auto rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-charcoal focus:border-flag-blue focus:ring-1 focus:ring-flag-blue outline-none"
+                    className="w-full md:w-auto rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-charcoal focus:border-flag-blue focus:ring-1 focus:ring-flag-blue outline-none"
                   >
                     {registrations.map((reg) => (
                       <option key={reg.id} value={reg.id}>
@@ -271,7 +271,7 @@ function ContractPage() {
 
               {/* Already signed state */}
               {alreadySigned && !submitted ? (
-                <div className="bg-white rounded-lg border-2 border-green-500 p-8 text-center">
+                <div className="bg-white rounded-2xl border-2 border-green-500 p-8 text-center">
                   <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
                     <svg
                       className="h-8 w-8 text-green-600"
@@ -303,7 +303,7 @@ function ContractPage() {
                 </div>
               ) : submitted ? (
                 /* Just-submitted success */
-                <div className="bg-white rounded-lg border-2 border-green-500 p-8 text-center">
+                <div className="bg-white rounded-2xl border-2 border-green-500 p-8 text-center">
                   <div className="w-16 h-16 rounded-full bg-green-100 flex items-center justify-center mx-auto mb-4">
                     <svg
                       className="h-8 w-8 text-green-600"
@@ -337,7 +337,7 @@ function ContractPage() {
                 /* Contract form */
                 <form onSubmit={handleSubmit}>
                   {/* Congratulations header */}
-                  <div className="bg-white rounded-lg border border-gray-200 p-6 md:p-8 mb-6">
+                  <div className="bg-white rounded-2xl border border-gray-200 p-6 md:p-8 mb-6">
                     <div className="flex items-center gap-3 mb-4">
                       <h2 className="font-display text-xl font-bold uppercase tracking-wide">
                         {selectedReg ? playerFullName(selectedReg) : ""}
@@ -366,7 +366,7 @@ function ContractPage() {
                     {contractSections.map((section, i) => (
                       <div
                         key={section.title}
-                        className="bg-white rounded-lg border border-gray-200 p-5 md:p-6"
+                        className="bg-white rounded-2xl border border-gray-200 p-5 md:p-6"
                       >
                         <h3 className="font-display text-sm font-bold uppercase tracking-wide text-flag-blue mb-2">
                           {i + 1}. {section.title}
@@ -379,7 +379,7 @@ function ContractPage() {
                   </div>
 
                   {/* Acknowledgment checkboxes */}
-                  <div className="bg-white rounded-lg border border-gray-200 p-6 md:p-8 mb-6">
+                  <div className="bg-white rounded-2xl border border-gray-200 p-6 md:p-8 mb-6">
                     <h3 className="font-display text-base font-bold uppercase tracking-wide mb-4">
                       Acknowledgments
                     </h3>
@@ -407,7 +407,7 @@ function ContractPage() {
                   </div>
 
                   {/* Planned Vacations */}
-                  <div className="bg-white rounded-lg border border-gray-200 p-6 md:p-8 mb-6">
+                  <div className="bg-white rounded-2xl border border-gray-200 p-6 md:p-8 mb-6">
                     <label className="block text-sm font-semibold text-charcoal font-display uppercase tracking-wide mb-2">
                       Planned Vacations
                     </label>
@@ -420,12 +420,12 @@ function ContractPage() {
                       onChange={(e) => setVacations(e.target.value)}
                       rows={3}
                       placeholder="e.g., June 15-20 family trip to Lake Tahoe"
-                      className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-charcoal placeholder:text-gray-400 focus:border-flag-blue focus:ring-1 focus:ring-flag-blue outline-none resize-none"
+                      className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-charcoal placeholder:text-gray-400 focus:border-flag-blue focus:ring-1 focus:ring-flag-blue outline-none resize-none"
                     />
                   </div>
 
                   {/* Parent Signature */}
-                  <div className="bg-white rounded-lg border border-gray-200 p-6 md:p-8 mb-6">
+                  <div className="bg-white rounded-2xl border border-gray-200 p-6 md:p-8 mb-6">
                     <label className="block text-sm font-semibold text-charcoal font-display uppercase tracking-wide mb-2">
                       Parent/Guardian Signature{" "}
                       <span className="text-flag-red">*</span>
@@ -440,7 +440,7 @@ function ContractPage() {
                       onChange={(e) => setSignature(e.target.value)}
                       placeholder="Full Name"
                       required
-                      className="w-full rounded-lg border border-gray-300 bg-white px-4 py-2.5 text-sm text-charcoal placeholder:text-gray-400 focus:border-flag-blue focus:ring-1 focus:ring-flag-blue outline-none"
+                      className="w-full rounded-xl border border-gray-300 bg-white px-4 py-2.5 text-sm text-charcoal placeholder:text-gray-400 focus:border-flag-blue focus:ring-1 focus:ring-flag-blue outline-none"
                     />
                     {signature.trim() && (
                       <p className="mt-2 text-lg italic text-charcoal font-serif">
@@ -451,7 +451,7 @@ function ContractPage() {
 
                   {/* Error */}
                   {error && (
-                    <div className="bg-red-50 border border-red-200 rounded-lg p-4 mb-6">
+                    <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
                       <p className="text-sm text-red-700">{error}</p>
                     </div>
                   )}
@@ -460,7 +460,7 @@ function ContractPage() {
                   <button
                     type="submit"
                     disabled={!canSubmit}
-                    className={`w-full py-3.5 rounded-lg font-display text-sm font-semibold uppercase tracking-widest transition-colors ${
+                    className={`w-full py-3.5 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-colors ${
                       canSubmit
                         ? "bg-flag-red hover:bg-flag-red-dark text-white cursor-pointer"
                         : "bg-gray-200 text-gray-400 cursor-not-allowed"

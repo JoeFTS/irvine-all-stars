@@ -325,7 +325,7 @@ export default function PortalPage() {
         <StripeDivider />
 
         <section className="bg-off-white py-16 px-6 md:px-10">
-          <div className="max-w-md mx-auto bg-white rounded-lg border border-gray-200 p-6 md:p-8 text-center">
+          <div className="max-w-md mx-auto bg-white rounded-2xl border border-gray-200 p-6 md:p-8 text-center">
             <div className="w-14 h-14 rounded-full bg-flag-blue/10 text-flag-blue font-display text-2xl font-bold flex items-center justify-center mx-auto mb-4">
               &#9733;
             </div>
@@ -339,13 +339,13 @@ export default function PortalPage() {
             <div className="flex flex-col sm:flex-row gap-3 justify-center">
               <Link
                 href="/auth/login"
-                className="bg-flag-blue hover:bg-flag-blue-mid text-white px-6 py-3 rounded font-display text-sm font-semibold uppercase tracking-widest transition-colors"
+                className="bg-flag-blue hover:bg-flag-blue-mid text-white px-6 py-3 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-colors"
               >
                 Sign In
               </Link>
               <Link
                 href="/auth/signup"
-                className="border-2 border-gray-200 hover:border-gray-400 text-charcoal px-6 py-3 rounded font-display text-sm font-semibold uppercase tracking-widest transition-colors"
+                className="border-2 border-gray-200 hover:border-gray-400 text-charcoal px-6 py-3 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-colors"
               >
                 Create Account
               </Link>
@@ -391,17 +391,17 @@ export default function PortalPage() {
           </h2>
 
           {dataLoading ? (
-            <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
+            <div className="bg-white rounded-2xl border border-gray-200 p-8 text-center">
               <p className="text-gray-400 text-sm">Loading registrations...</p>
             </div>
           ) : registrations.length === 0 ? (
-            <div className="bg-white rounded-lg border border-gray-200 p-8 text-center">
+            <div className="bg-white rounded-2xl border border-gray-200 p-8 text-center">
               <p className="text-gray-500 mb-4">
                 No tryout registrations found for your account.
               </p>
               <Link
                 href={`/apply/player?parent_name=${encodeURIComponent(user?.user_metadata?.full_name || "")}&parent_email=${encodeURIComponent(user?.email || "")}`}
-                className="inline-block bg-flag-red hover:bg-flag-red-dark text-white px-6 py-3 rounded font-display text-sm font-semibold uppercase tracking-widest transition-colors"
+                className="inline-block bg-flag-red hover:bg-flag-red-dark text-white px-6 py-3 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-colors"
               >
                 Register for Tryouts
               </Link>
@@ -416,7 +416,7 @@ export default function PortalPage() {
                 return (
                   <div
                     key={reg.id}
-                    className={`bg-white rounded-lg border p-5 md:p-6 ${isIncomplete ? "border-flag-red/30 border-l-4 border-l-flag-red" : "border-gray-200"}`}
+                    className={`bg-white rounded-2xl border p-5 md:p-6 ${isIncomplete ? "border-flag-red/30 border-l-4 border-l-flag-red" : "border-gray-200"}`}
                   >
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-3">
                       <h3 className="font-display text-xl font-bold uppercase tracking-wide">
@@ -454,7 +454,7 @@ export default function PortalPage() {
                       <div className="mt-4">
                         <Link
                           href={completeUrl}
-                          className="inline-block bg-flag-red hover:bg-flag-red-dark text-white px-5 py-2.5 rounded font-display text-xs font-semibold uppercase tracking-widest transition-colors"
+                          className="inline-block bg-flag-red hover:bg-flag-red-dark text-white px-5 py-2.5 rounded-full font-display text-xs font-semibold uppercase tracking-widest transition-colors"
                         >
                           Complete Registration
                         </Link>
@@ -469,7 +469,7 @@ export default function PortalPage() {
                       return (
                         <>
                           {session && (
-                            <div className="mt-4 bg-flag-blue/5 border border-flag-blue/15 rounded-lg p-4">
+                            <div className="mt-4 bg-flag-blue/5 border border-flag-blue/15 rounded-2xl p-4">
                               <p className="font-display text-xs font-semibold text-flag-blue uppercase tracking-widest mb-2">
                                 &#9733; Your Tryout Time
                               </p>
@@ -516,7 +516,7 @@ export default function PortalPage() {
                                       alert("Network error. Please check your connection and try again.");
                                     }
                                   }}
-                                  className="mt-3 inline-block bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded font-display text-xs font-semibold uppercase tracking-widest transition-colors"
+                                  className="mt-3 inline-block bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-full font-display text-xs font-semibold uppercase tracking-widest transition-colors"
                                 >
                                   Confirm Attendance
                                 </button>
@@ -634,7 +634,7 @@ export default function PortalPage() {
                 return (
                   <div
                     key={reg.id}
-                    className="bg-white rounded-lg border border-gray-200 p-5 md:p-6"
+                    className="bg-white rounded-2xl border border-gray-200 p-5 md:p-6"
                   >
                     {/* Player header */}
                     <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 mb-4">
@@ -712,7 +712,7 @@ export default function PortalPage() {
                               </span>
                             </div>
                           ) : item.acceptAction ? (
-                            <div className="bg-flag-blue/5 border-2 border-flag-blue/20 rounded-lg p-4 space-y-3">
+                            <div className="bg-flag-blue/5 border-2 border-flag-blue/20 rounded-2xl p-4 space-y-3">
                               <div className="flex items-start gap-3">
                                 <div className="w-8 h-8 rounded-full bg-star-gold-bright/20 flex items-center justify-center shrink-0 mt-0.5">
                                   <svg className="w-4 h-4 text-star-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
@@ -732,7 +732,7 @@ export default function PortalPage() {
                                 <button
                                   onClick={() => acceptSelection(item.acceptAction!)}
                                   disabled={acceptingId === item.acceptAction}
-                                  className="w-full sm:w-auto bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white px-5 py-3 sm:py-2.5 rounded font-display text-xs font-semibold uppercase tracking-widest transition-colors min-h-[44px]"
+                                  className="w-full sm:w-auto bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white px-5 py-3 sm:py-2.5 rounded-full font-display text-xs font-semibold uppercase tracking-widest transition-colors min-h-[44px]"
                                 >
                                   {acceptingId === item.acceptAction ? "Accepting..." : "Accept Spot"}
                                 </button>
@@ -742,7 +742,7 @@ export default function PortalPage() {
                                       alert("Please contact AllStars@irvinepony.com to formally decline the selection.");
                                     }
                                   }}
-                                  className="w-full sm:w-auto border border-gray-300 hover:border-gray-400 text-gray-600 px-5 py-3 sm:py-2.5 rounded font-display text-xs font-semibold uppercase tracking-widest transition-colors min-h-[44px]"
+                                  className="w-full sm:w-auto border border-gray-300 hover:border-gray-400 text-gray-600 px-5 py-3 sm:py-2.5 rounded-full font-display text-xs font-semibold uppercase tracking-widest transition-colors min-h-[44px]"
                                 >
                                   Decline
                                 </button>
@@ -828,13 +828,13 @@ export default function PortalPage() {
           </h2>
 
           {dataLoading ? (
-            <div className="bg-off-white rounded-lg border border-gray-200 p-8 text-center">
+            <div className="bg-off-white rounded-2xl border border-gray-200 p-8 text-center">
               <p className="text-gray-400 text-sm">
                 Loading announcements...
               </p>
             </div>
           ) : announcements.length === 0 ? (
-            <div className="bg-off-white rounded-lg border border-gray-200 p-8 text-center">
+            <div className="bg-off-white rounded-2xl border border-gray-200 p-8 text-center">
               <p className="text-gray-500">
                 No announcements yet. Check back soon.
               </p>
@@ -844,7 +844,7 @@ export default function PortalPage() {
               {announcements.map((ann) => (
                 <div
                   key={ann.id}
-                  className="bg-off-white rounded-lg border border-gray-200 p-5 md:p-6"
+                  className="bg-off-white rounded-2xl border border-gray-200 p-5 md:p-6"
                 >
                   <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-2">
                     <h3 className="font-display text-base font-semibold uppercase tracking-wide">
@@ -889,7 +889,7 @@ export default function PortalPage() {
               <Link
                 key={link.label}
                 href={link.href}
-                className="bg-white rounded-lg border border-gray-200 p-4 text-center hover:border-flag-blue hover:shadow-sm transition-all group"
+                className="bg-white rounded-2xl border border-gray-200 p-4 text-center hover:border-flag-blue hover:shadow-sm transition-all group"
               >
                 <div className="text-2xl mb-2 text-flag-blue group-hover:text-flag-red transition-colors">
                   {link.icon}
@@ -913,7 +913,7 @@ export default function PortalPage() {
             Key Dates
           </h2>
 
-          <div className="bg-white rounded-lg border border-gray-200 divide-y divide-gray-100">
+          <div className="bg-white rounded-2xl border border-gray-200 divide-y divide-gray-100">
             {keyDates.map((item, i) => (
               <div
                 key={item.label}

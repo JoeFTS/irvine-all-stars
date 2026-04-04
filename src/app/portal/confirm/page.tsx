@@ -51,7 +51,7 @@ function ConfirmContent() {
         )}
 
         {status === "success" && (
-          <div className="bg-white rounded-xl border border-green-200 p-8">
+          <div className="bg-white rounded-2xl border border-green-200 p-8">
             <div className="text-5xl mb-4">&#9733;</div>
             <h1 className="font-display text-2xl font-bold uppercase tracking-wide text-flag-blue mb-3">
               You&apos;re Confirmed!
@@ -62,7 +62,7 @@ function ConfirmContent() {
             </p>
             <Link
               href="/portal"
-              className="inline-block bg-flag-red hover:bg-flag-red-dark text-white px-6 py-3 rounded font-display text-sm font-semibold uppercase tracking-widest transition-colors"
+              className="inline-block bg-flag-red hover:bg-flag-red-dark text-white px-6 py-3 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-colors"
             >
               Go to Parent Portal
             </Link>
@@ -70,7 +70,7 @@ function ConfirmContent() {
         )}
 
         {status === "already" && (
-          <div className="bg-white rounded-xl border border-blue-200 p-8">
+          <div className="bg-white rounded-2xl border border-blue-200 p-8">
             <div className="text-5xl mb-4">&#10003;</div>
             <h1 className="font-display text-2xl font-bold uppercase tracking-wide text-flag-blue mb-3">
               Already Confirmed
@@ -80,7 +80,7 @@ function ConfirmContent() {
             </p>
             <Link
               href="/portal"
-              className="inline-block bg-flag-red hover:bg-flag-red-dark text-white px-6 py-3 rounded font-display text-sm font-semibold uppercase tracking-widest transition-colors"
+              className="inline-block bg-flag-red hover:bg-flag-red-dark text-white px-6 py-3 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-colors"
             >
               Go to Parent Portal
             </Link>
@@ -88,7 +88,7 @@ function ConfirmContent() {
         )}
 
         {status === "error" && (
-          <div className="bg-white rounded-xl border border-red-200 p-8">
+          <div className="bg-white rounded-2xl border border-red-200 p-8">
             <h1 className="font-display text-2xl font-bold uppercase tracking-wide text-flag-red mb-3">
               Something Went Wrong
             </h1>
@@ -98,7 +98,7 @@ function ConfirmContent() {
             </p>
             <Link
               href="/portal"
-              className="inline-block bg-flag-red hover:bg-flag-red-dark text-white px-6 py-3 rounded font-display text-sm font-semibold uppercase tracking-widest transition-colors"
+              className="inline-block bg-flag-red hover:bg-flag-red-dark text-white px-6 py-3 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-colors"
             >
               Go to Parent Portal
             </Link>
