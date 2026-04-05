@@ -94,7 +94,7 @@ export async function notifyAdmin(insertedTournaments) {
     const resend = new Resend(RESEND_API_KEY);
 
     await resend.emails.send({
-      from: 'Irvine All-Stars <noreply@irvineallstars.com>',
+      from: 'Irvine All-Stars <AllStars@irvineallstars.com>',
       to: ADMIN_EMAIL,
       subject: `${count} New Tournament${plural} Discovered \u2014 Review Needed`,
       html,
