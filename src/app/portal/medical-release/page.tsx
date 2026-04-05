@@ -159,7 +159,7 @@ export default function MedicalReleasePage() {
       });
 
     if (insertError) {
-      console.error("Medical release error:", insertError);
+      // Medical release insert failed
       setError("Something went wrong. Please try again.");
       setSubmitting(false);
       return;

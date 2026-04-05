@@ -31,7 +31,7 @@ const phases = [
     title: "Coach Selection",
     dates: "March 22 \u2013 March 27",
     bg: "bg-flag-red",
-    current: true,
+    current: false,
     items: [
       "Coach candidacy deadline (March 23)",
       "Peer coach voting & player nominations (March 24\u201326)",
@@ -44,7 +44,7 @@ const phases = [
     title: "Scouting & Player Nominations",
     dates: "March 28 \u2013 April 11",
     bg: "bg-flag-blue",
-    current: false,
+    current: true,
     items: [
       "Coaches scout players during regular-season games",
       "Each team nominates 3\u20134 players for All-Star tryouts",

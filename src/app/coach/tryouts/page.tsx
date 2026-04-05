@@ -240,11 +240,7 @@ export default function CoachTryoutsPage() {
 
   // Derived data
   const players = computePlayerData(registrations, scores).sort(
-    (a, b) => {
-      const aTotal = a.scores.length > 0 ? (computeTotal(a.scores[0]) ?? 0) : 0;
-      const bTotal = b.scores.length > 0 ? (computeTotal(b.scores[0]) ?? 0) : 0;
-      return bTotal - aTotal;
-    }
+    (a, b) => b.avgTotal - a.avgTotal
   );
 
   const selectedCount = localSelected.size;

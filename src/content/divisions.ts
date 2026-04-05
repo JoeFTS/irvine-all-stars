@@ -14,7 +14,7 @@ export const divisions: Division[] = [
     ageGroup: "Ages 4-5",
     ponyName: "Shetland",
     rosterSize: 12,
-    tryoutDate: "May 10",
+    tryoutDate: "April 12",
   },
   {
     id: "6u",
@@ -22,7 +22,7 @@ export const divisions: Division[] = [
     ageGroup: "Ages 5-6",
     ponyName: "Shetland",
     rosterSize: 12,
-    tryoutDate: "May 10",
+    tryoutDate: "April 12",
   },
   {
     id: "7u-mp",
@@ -30,7 +30,7 @@ export const divisions: Division[] = [
     ageGroup: "Ages 6-7",
     ponyName: "Pinto Machine Pitch",
     rosterSize: 12,
-    tryoutDate: "May 10",
+    tryoutDate: "April 12",
   },
   {
     id: "7u-kp",
@@ -38,7 +38,7 @@ export const divisions: Division[] = [
     ageGroup: "Ages 6-7",
     ponyName: "Pinto Kid Pitch",
     rosterSize: 12,
-    tryoutDate: "May 10",
+    tryoutDate: "April 12",
   },
   {
     id: "8u-mp",
@@ -46,7 +46,7 @@ export const divisions: Division[] = [
     ageGroup: "Ages 7-8",
     ponyName: "Pinto Machine Pitch",
     rosterSize: 12,
-    tryoutDate: "May 10",
+    tryoutDate: "April 12",
   },
   {
     id: "8u-kp",
@@ -54,7 +54,7 @@ export const divisions: Division[] = [
     ageGroup: "Ages 7-8",
     ponyName: "Pinto Kid Pitch",
     rosterSize: 12,
-    tryoutDate: "May 10",
+    tryoutDate: "April 12",
   },
   {
     id: "9u",
@@ -62,7 +62,7 @@ export const divisions: Division[] = [
     ageGroup: "Ages 8-9",
     ponyName: "Mustang",
     rosterSize: 12,
-    tryoutDate: "May 11",
+    tryoutDate: "April 12",
   },
   {
     id: "10u",
@@ -70,7 +70,7 @@ export const divisions: Division[] = [
     ageGroup: "Ages 9-10",
     ponyName: "Mustang",
     rosterSize: 12,
-    tryoutDate: "May 11",
+    tryoutDate: "April 12",
   },
   {
     id: "11u",

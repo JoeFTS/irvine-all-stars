@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { ExternalLink, Calendar, Shirt, AlertTriangle, Info } from "lucide-react";
 import { supabase } from "@/lib/supabase";
+import { useAuth } from "@/contexts/auth-context";
 
 interface Announcement {
   id: string;
@@ -13,22 +14,44 @@ interface Announcement {
 }
 
 export default function CoachUpdatesPage() {
+  const { user, role } = useAuth();
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loadingAnnouncements, setLoadingAnnouncements] = useState(true);
   const [tournamentFlyers, setTournamentFlyers] = useState<Record<string, string>>({});
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
+  const [coachDivision, setCoachDivision] = useState<string | null>(null);
 
   useEffect(() => {
     async function fetchData() {
-      if (!supabase) {
+      if (!supabase || !user) {
         setLoadingAnnouncements(false);
         return;
       }
+
+      // Get coach's division
+      let division: string | null = null;
+      if (role !== "admin") {
+        const { data: profile } = await supabase
+          .from("profiles")
+          .select("division")
+          .eq("id", user.id)
+          .single();
+        division = profile?.division ?? null;
+        setCoachDivision(division);
+      }
+
       try {
-        const { data, error } = await supabase
+        let query = supabase
           .from("announcements")
           .select("id, title, body, division, created_at")
           .order("created_at", { ascending: false });
+
+        // Filter: show global (null division) + coach's division announcements
+        if (division) {
+          query = query.or(`division.is.null,division.eq.${division}`);
+        }
+
+        const { data, error } = await query;
 
         if (!error && data) {
           setAnnouncements(data);
@@ -62,7 +85,7 @@ export default function CoachUpdatesPage() {
       }
     }
     fetchData();
-  }, []);
+  }, [user, role]);
 
   function formatDate(dateStr: string) {
     return new Date(dateStr).toLocaleDateString("en-US", {

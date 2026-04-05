@@ -189,6 +189,10 @@ export default function TournamentsPage() {
       setFormError("End date is required");
       return;
     }
+    if (endDate < startDate) {
+      setFormError("End date must be on or after start date");
+      return;
+    }
     if (!location.trim()) {
       setFormError("Location is required");
       return;
@@ -232,8 +236,9 @@ export default function TournamentsPage() {
         )
       );
 
-      // Auto-announce if publishing
-      if (status === "published" && autoAnnounce) {
+      // Auto-announce only when changing status TO published (not on subsequent edits)
+      const wasPublished = tournaments.find((t) => t.id === editingId)?.status === "published";
+      if (status === "published" && autoAnnounce && !wasPublished) {
         await handleAutoAnnounce(name.trim());
       }
     } else {

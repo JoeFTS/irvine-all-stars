@@ -134,7 +134,7 @@ const keyDates = [
 const quickLinks = [
   { label: "Tournaments", href: "/portal/tournaments", icon: "\uD83C\uDFC6" },
   { label: "FAQ", href: "/faq", icon: "?" },
-  { label: "Documents", href: "/documents", icon: "\u2193" },
+  { label: "Documents", href: "/portal/documents", icon: "\u2193" },
   {
     label: "Contact Coordinator",
     href: "mailto:AllStars@irvinepony.com",
@@ -996,7 +996,7 @@ export default function PortalPage() {
           className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
           onClick={() => setLightboxUrl(null)}
         >
-          <button className="absolute top-4 right-4 text-white" onClick={() => setLightboxUrl(null)}>
+          <button className="absolute top-4 right-4 text-white min-w-[44px] min-h-[44px] flex items-center justify-center" onClick={() => setLightboxUrl(null)}>
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
           </button>
           <img

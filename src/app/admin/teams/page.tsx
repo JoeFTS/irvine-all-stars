@@ -637,7 +637,7 @@ export default function TeamsPage() {
                         {compliance.contractSigned > 0 && (
                           <div className="mt-3 pt-3 border-t border-gray-100">
                             <Link
-                              href={`/coach/contracts?division=${encodeURIComponent(team.division)}`}
+                              href={`/admin/compliance?division=${encodeURIComponent(team.division)}`}
                               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide bg-flag-blue/10 text-flag-blue hover:bg-flag-blue/20 transition-colors"
                             >
                               <FileText size={14} />

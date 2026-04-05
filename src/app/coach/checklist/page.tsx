@@ -173,16 +173,16 @@ export default function BinderChecklistPage() {
     if (!supabase) return;
     setLoading(true);
 
-    // If user is a coach (not admin), find their division from the teams table
+    // If user is a coach (not admin), find their division from their profile
     let coachDivision: string | null = null;
     if (role !== "admin" && user) {
-      const { data: teamData } = await supabase
-        .from("teams")
+      const { data: profile } = await supabase
+        .from("profiles")
         .select("division")
-        .eq("coach_id", user.id)
+        .eq("id", user.id)
         .single();
-      if (teamData) {
-        coachDivision = teamData.division;
+      if (profile) {
+        coachDivision = profile.division;
       }
     }
 
