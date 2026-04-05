@@ -3,6 +3,30 @@
  * First module of the 10-module tournament discovery pipeline.
  */
 
+import { readFileSync } from 'node:fs';
+import { resolve, dirname } from 'node:path';
+import { fileURLToPath } from 'node:url';
+
+// ---------------------------------------------------------------------------
+// Load .env file if present (no dotenv dependency needed)
+// ---------------------------------------------------------------------------
+const __dirname = dirname(fileURLToPath(import.meta.url));
+try {
+  const envPath = resolve(__dirname, '.env');
+  const envContent = readFileSync(envPath, 'utf-8');
+  for (const line of envContent.split('\n')) {
+    const trimmed = line.trim();
+    if (!trimmed || trimmed.startsWith('#')) continue;
+    const eqIdx = trimmed.indexOf('=');
+    if (eqIdx === -1) continue;
+    const key = trimmed.slice(0, eqIdx).trim();
+    const val = trimmed.slice(eqIdx + 1).trim();
+    if (!process.env[key]) process.env[key] = val;
+  }
+} catch {
+  // No .env file — rely on process.env
+}
+
 // ---------------------------------------------------------------------------
 // Environment variables
 // ---------------------------------------------------------------------------
