@@ -83,18 +83,18 @@ export default function CoachTournamentsPage() {
 
       if (cancelled) return;
 
-      if (!profile?.division) {
-        setLoading(false);
-        return;
-      }
-
-      // 2. Fetch published tournaments containing coach's division
-      const { data: tournamentsData } = await supabase
+      // 2. Fetch published tournaments — admins see all, coaches see their division
+      let query = supabase
         .from("tournaments")
         .select("*")
         .eq("status", "published")
-        .contains("division_ids", [profile.division])
         .order("start_date", { ascending: true });
+
+      if (profile?.division) {
+        query = query.contains("division_ids", [profile.division]);
+      }
+
+      const { data: tournamentsData } = await query;
 
       if (cancelled) return;
       setTournaments((tournamentsData ?? []) as Tournament[]);

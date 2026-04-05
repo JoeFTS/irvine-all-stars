@@ -62,6 +62,55 @@ export default function CoachUpdatesPage() {
       </p>
 
       <div className="space-y-6">
+        {/* Announcements Feed — newest first */}
+        <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6">
+          <div className="flex items-center gap-2 mb-4">
+            <Info size={20} className="text-flag-blue" />
+            <h2 className="font-display text-xl font-bold uppercase tracking-wide text-charcoal">
+              Announcements
+            </h2>
+          </div>
+
+          {loadingAnnouncements ? (
+            <p className="text-gray-400 text-sm">Loading announcements...</p>
+          ) : announcements.length === 0 ? (
+            <p className="text-gray-400 text-sm">No announcements yet.</p>
+          ) : (
+            <div className="space-y-4">
+              {announcements.map((a) => (
+                <div
+                  key={a.id}
+                  className="border-b border-gray-100 pb-4 last:border-b-0 last:pb-0"
+                >
+                  <div className="flex items-center gap-3 mb-1">
+                    <h3 className="font-semibold text-charcoal">{a.title}</h3>
+                    {a.title.startsWith("Tournament:") && (
+                      <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-star-gold/20 text-amber-700">
+                        Tournament
+                      </span>
+                    )}
+                    {a.division && (
+                      <span className="text-xs font-semibold uppercase tracking-wide bg-flag-blue/10 text-flag-blue px-2 py-0.5 rounded">
+                        {a.division}
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-xs text-gray-400 mb-2">{formatDate(a.created_at)}</p>
+                  <p className="text-gray-600 text-sm whitespace-pre-line">
+                    {a.body.split(/(https?:\/\/[^\s]+)/g).map((part, i) =>
+                      /^https?:\/\//.test(part) ? (
+                        <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-flag-red hover:underline font-medium">
+                          {part}
+                        </a>
+                      ) : part
+                    )}
+                  </p>
+                </div>
+              ))}
+            </div>
+          )}
+        </div>
+
         {/* Important Links */}
         <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6">
           <h2 className="font-display text-xl font-bold uppercase tracking-wide text-charcoal mb-4">
@@ -182,54 +231,6 @@ export default function CoachUpdatesPage() {
           </ul>
         </div>
 
-        {/* Announcements Feed */}
-        <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6">
-          <div className="flex items-center gap-2 mb-4">
-            <Info size={20} className="text-flag-blue" />
-            <h2 className="font-display text-xl font-bold uppercase tracking-wide text-charcoal">
-              Announcements
-            </h2>
-          </div>
-
-          {loadingAnnouncements ? (
-            <p className="text-gray-400 text-sm">Loading announcements...</p>
-          ) : announcements.length === 0 ? (
-            <p className="text-gray-400 text-sm">No announcements yet.</p>
-          ) : (
-            <div className="space-y-4">
-              {announcements.map((a) => (
-                <div
-                  key={a.id}
-                  className="border-b border-gray-100 pb-4 last:border-b-0 last:pb-0"
-                >
-                  <div className="flex items-center gap-3 mb-1">
-                    <h3 className="font-semibold text-charcoal">{a.title}</h3>
-                    {a.title.startsWith("Tournament:") && (
-                      <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-star-gold/20 text-amber-700">
-                        Tournament
-                      </span>
-                    )}
-                    {a.division && (
-                      <span className="text-xs font-semibold uppercase tracking-wide bg-flag-blue/10 text-flag-blue px-2 py-0.5 rounded">
-                        {a.division}
-                      </span>
-                    )}
-                  </div>
-                  <p className="text-xs text-gray-400 mb-2">{formatDate(a.created_at)}</p>
-                  <p className="text-gray-600 text-sm whitespace-pre-line">
-                    {a.body.split(/(https?:\/\/[^\s]+)/g).map((part, i) =>
-                      /^https?:\/\//.test(part) ? (
-                        <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-flag-red hover:underline font-medium">
-                          {part}
-                        </a>
-                      ) : part
-                    )}
-                  </p>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
       </div>
     </div>
   );
