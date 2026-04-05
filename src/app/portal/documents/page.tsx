@@ -6,6 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { supabase } from "@/lib/supabase";
 import { StripeDivider } from "@/components/stripe-divider";
+import { HelpTooltip } from "@/components/help-tooltip";
 import FileUpload from "@/components/file-upload";
 
 /* ------------------------------------------------------------------ */
@@ -196,8 +197,12 @@ function DocumentsPage() {
           <p className="font-display text-sm font-semibold text-star-gold-bright uppercase tracking-[3px] mb-3">
             &#9733; Documents
           </p>
-          <h1 className="font-display text-4xl md:text-6xl font-bold text-white uppercase tracking-wide mb-4">
+          <h1 className="font-display text-4xl md:text-6xl font-bold text-white uppercase tracking-wide mb-4 flex items-center justify-center">
             Required Documents
+            <HelpTooltip
+              text="Download and review required documents and policies."
+              guideUrl="/portal/help"
+            />
           </h1>
           <p className="text-white/60 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
             Upload a birth certificate and player photo for each registered

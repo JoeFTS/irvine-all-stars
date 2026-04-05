@@ -4,6 +4,7 @@ import { useEffect, useState, useCallback } from "react";
 import { useAuth } from "@/contexts/auth-context";
 import { supabase } from "@/lib/supabase";
 import { CheckCircle2, AlertTriangle, BookOpen, ExternalLink } from "lucide-react";
+import { HelpTooltip } from "@/components/help-tooltip";
 
 interface AgreementRecord {
   id: string;
@@ -232,8 +233,12 @@ export default function TournamentRulesPage() {
       <p className="font-display text-sm font-semibold text-flag-red uppercase tracking-[3px] mb-1">
         Coach
       </p>
-      <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide mb-4">
+      <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide mb-4 flex items-center">
         Pre-Tournament Rules
+        <HelpTooltip
+          text="Review and acknowledge the official tournament rules."
+          guideUrl="/coach/help"
+        />
       </h1>
       <p className="text-gray-600 mb-6">
         Read and acknowledge the rules for your division before tournament play

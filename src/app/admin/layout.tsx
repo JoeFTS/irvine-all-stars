@@ -13,6 +13,7 @@ import {
   Calendar,
   FileText,
   ShieldCheck,
+  HelpCircle,
   UserCircle,
 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
@@ -28,6 +29,7 @@ const navItems = [
   { href: "/admin/invites", label: "Invites", icon: Mail },
   { href: "/admin/documents", label: "Documents", icon: FileText },
   { href: "/admin/compliance", label: "Compliance", icon: ShieldCheck },
+  { href: "/admin/help", label: "Help", icon: HelpCircle },
 ];
 
 export default function AdminLayout({

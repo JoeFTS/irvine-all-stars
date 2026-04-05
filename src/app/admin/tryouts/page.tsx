@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
+import { HelpTooltip } from "@/components/help-tooltip";
 import {
   Plus,
   Trash2,
@@ -824,8 +825,12 @@ export default function TryoutsPage() {
         <p className="font-display text-sm font-semibold text-flag-red uppercase tracking-[3px] mb-1">
           Admin
         </p>
-        <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide">
+        <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide flex items-center">
           Tryouts
+          <HelpTooltip
+            text="Manage tryout registrations, player selections, and coach recommendations."
+            guideUrl="/admin/help"
+          />
         </h1>
         <p className="text-gray-400 text-sm mt-1">
           {totalRegistered} registered &middot; {totalSessions} session{totalSessions !== 1 ? "s" : ""} &middot; {totalInvited} invited

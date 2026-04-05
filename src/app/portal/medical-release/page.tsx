@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import Link from "next/link";
 import { useAuth } from "@/contexts/auth-context";
 import { supabase } from "@/lib/supabase";
+import { HelpTooltip } from "@/components/help-tooltip";
 
 interface Registration {
   id: string;
@@ -250,8 +251,12 @@ export default function MedicalReleasePage() {
         </Link>
 
         <div className="bg-white rounded-2xl border border-gray-200 p-6 md:p-8">
-          <h1 className="font-display text-2xl md:text-3xl font-bold uppercase tracking-wide mb-1">
+          <h1 className="font-display text-2xl md:text-3xl font-bold uppercase tracking-wide mb-1 flex items-center">
             Medical Release
+            <HelpTooltip
+              text="Submit your player's medical release form."
+              guideUrl="/portal/help"
+            />
           </h1>
           <p className="text-gray-500 text-sm mb-6">
             For <strong>{playerName}</strong> &mdash;{" "}

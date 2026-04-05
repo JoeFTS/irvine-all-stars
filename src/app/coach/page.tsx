@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import { HelpTooltip } from "@/components/help-tooltip";
 import {
   ClipboardCheck,
   ClipboardList,
@@ -269,8 +270,12 @@ export default function CoachDashboardPage() {
         <p className="font-display text-sm font-semibold text-flag-red uppercase tracking-[3px] mb-1">
           Coach
         </p>
-        <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide">
+        <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide flex items-center">
           Dashboard
+          <HelpTooltip
+            text="Your home base with compliance progress, action items, and announcements."
+            guideUrl="/coach/help"
+          />
         </h1>
       </div>
 

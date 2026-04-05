@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import Link from "next/link";
 import { Suspense } from "react";
+import { HelpTooltip } from "@/components/help-tooltip";
 
 function ConfirmContent() {
   const searchParams = useSearchParams();
@@ -53,8 +54,12 @@ function ConfirmContent() {
         {status === "success" && (
           <div className="bg-white rounded-2xl border border-green-200 p-8">
             <div className="text-5xl mb-4">&#9733;</div>
-            <h1 className="font-display text-2xl font-bold uppercase tracking-wide text-flag-blue mb-3">
+            <h1 className="font-display text-2xl font-bold uppercase tracking-wide text-flag-blue mb-3 flex items-center justify-center">
               You&apos;re Confirmed!
+              <HelpTooltip
+                text="Confirm your player's selection and complete registration."
+                guideUrl="/portal/help"
+              />
             </h1>
             <p className="text-gray-600 text-sm leading-relaxed mb-6">
               Thank you for confirming attendance. We look forward to seeing your player at tryouts!

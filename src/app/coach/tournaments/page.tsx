@@ -5,6 +5,7 @@ import { Trophy, Calendar, MapPin, ExternalLink, X } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { supabase } from "@/lib/supabase";
 import { StripeDivider } from "@/components/stripe-divider";
+import { HelpTooltip } from "@/components/help-tooltip";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -126,8 +127,12 @@ export default function CoachTournamentsPage() {
       <div className="relative bg-flag-blue px-6 md:px-10 py-10 md:py-14 overflow-hidden">
         <div className="grain-overlay" />
         <div className="relative z-10">
-          <h1 className="font-hero text-4xl md:text-5xl text-white uppercase tracking-wide">
+          <h1 className="font-hero text-4xl md:text-5xl text-white uppercase tracking-wide flex items-center justify-center">
             Tournaments
+            <HelpTooltip
+              text="View upcoming tournament schedule, locations, and registration links."
+              guideUrl="/coach/help"
+            />
           </h1>
           <p className="text-white/70 mt-2 text-sm md:text-base">
             Upcoming tournaments for your division.

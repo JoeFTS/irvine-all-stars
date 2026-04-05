@@ -6,6 +6,7 @@ import { Trophy, Calendar, MapPin, ExternalLink, X } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { supabase } from "@/lib/supabase";
 import { StripeDivider } from "@/components/stripe-divider";
+import { HelpTooltip } from "@/components/help-tooltip";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -151,8 +152,12 @@ export default function ParentTournamentsPage() {
           <p className="font-display text-sm font-semibold text-star-gold-bright uppercase tracking-[3px] mb-3">
             &#9733; Tournaments
           </p>
-          <h1 className="font-display text-4xl md:text-6xl font-bold text-white uppercase tracking-wide mb-4">
+          <h1 className="font-display text-4xl md:text-6xl font-bold text-white uppercase tracking-wide mb-4 flex items-center justify-center">
             Tournaments
+            <HelpTooltip
+              text="View the tournament schedule for your player's division."
+              guideUrl="/portal/help"
+            />
           </h1>
           <p className="text-white/60 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
             Upcoming tournaments for your player&apos;s division.

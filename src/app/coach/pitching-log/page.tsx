@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Printer, AlertTriangle, FileDown } from "lucide-react";
+import { HelpTooltip } from "@/components/help-tooltip";
 import {
   pitchingRules,
   universalPitchingRules,
@@ -116,8 +117,12 @@ export default function PitchingLogPage() {
         <p className="font-display text-sm font-semibold text-flag-red uppercase tracking-[3px] mb-1">
           Coach
         </p>
-        <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide mb-4">
+        <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide mb-4 flex items-center">
           Tournament Pitching Log
+          <HelpTooltip
+            text="Log pitch counts after each game to stay compliant with PONY rules."
+            guideUrl="/coach/help"
+          />
         </h1>
         <p className="text-gray-600 mb-6">
           Track pitch counts and rest days during tournament play. Select your

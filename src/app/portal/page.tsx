@@ -6,6 +6,7 @@ import { useRouter } from "next/navigation";
 import { useAuth } from "@/contexts/auth-context";
 import { supabase } from "@/lib/supabase";
 import { StripeDivider } from "@/components/stripe-divider";
+import { HelpTooltip } from "@/components/help-tooltip";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -133,7 +134,7 @@ const keyDates = [
 
 const quickLinks = [
   { label: "Tournaments", href: "/portal/tournaments", icon: "\uD83C\uDFC6" },
-  { label: "FAQ", href: "/faq", icon: "?" },
+  { label: "Help", href: "/portal/help", icon: "?" },
   { label: "Documents", href: "/portal/documents", icon: "\u2193" },
   {
     label: "Contact Coordinator",
@@ -337,8 +338,12 @@ export default function PortalPage() {
             <p className="font-display text-sm font-semibold text-star-gold-bright uppercase tracking-[3px] mb-3">
               &#9733; Parent Access
             </p>
-            <h1 className="font-display text-4xl md:text-6xl font-bold text-white uppercase tracking-wide mb-4">
+            <h1 className="font-display text-4xl md:text-6xl font-bold text-white uppercase tracking-wide mb-4 flex items-center justify-center">
               Parent Portal
+              <HelpTooltip
+                text="Your player's registration status, tryout details, and announcements."
+                guideUrl="/portal/help"
+              />
             </h1>
             <p className="text-white/60 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
               Sign in to track your player&apos;s tryout status, view
@@ -393,8 +398,12 @@ export default function PortalPage() {
           <p className="font-display text-sm font-semibold text-star-gold-bright uppercase tracking-[3px] mb-3">
             &#9733; Parent Access
           </p>
-          <h1 className="font-display text-4xl md:text-6xl font-bold text-white uppercase tracking-wide mb-4">
+          <h1 className="font-display text-4xl md:text-6xl font-bold text-white uppercase tracking-wide mb-4 flex items-center justify-center">
             Parent Portal
+            <HelpTooltip
+              text="Your player's registration status, tryout details, and announcements."
+              guideUrl="/portal/help"
+            />
           </h1>
           <p className="text-white/60 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
             Welcome back. Here&apos;s what&apos;s happening with your

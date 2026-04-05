@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { Pencil, Trash2, X, CheckCircle2 } from "lucide-react";
+import { HelpTooltip } from "@/components/help-tooltip";
 
 interface Announcement {
   id: string;
@@ -210,8 +211,12 @@ export default function AnnouncementsPage() {
         <p className="font-display text-sm font-semibold text-flag-red uppercase tracking-[3px] mb-1">
           Admin
         </p>
-        <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide">
+        <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide flex items-center">
           Announcements
+          <HelpTooltip
+            text="Create and post announcements to coaches and parents."
+            guideUrl="/admin/help"
+          />
         </h1>
       </div>
 

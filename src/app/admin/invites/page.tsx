@@ -3,6 +3,7 @@
 import { useState, useEffect, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import { Mail, RefreshCw, Upload, Download, Plus, X } from "lucide-react";
+import { HelpTooltip } from "@/components/help-tooltip";
 
 const DIVISION_OPTIONS = [
   "5U-Shetland",
@@ -382,8 +383,12 @@ export default function AdminInvitesPage() {
         <p className="text-flag-red font-display text-xs font-bold uppercase tracking-widest mb-1">
           Admin
         </p>
-        <h1 className="font-display text-2xl font-bold text-flag-blue uppercase tracking-wider">
+        <h1 className="font-display text-2xl font-bold text-flag-blue uppercase tracking-wider flex items-center">
           Send Invites
+          <HelpTooltip
+            text="Send invite links to coaches and parents via email."
+            guideUrl="/admin/help"
+          />
         </h1>
         <p className="text-gray-500 text-sm mt-1">
           Invite coaches and parents to create their portal accounts.

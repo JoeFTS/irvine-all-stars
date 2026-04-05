@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/auth-context";
+import { HelpTooltip } from "@/components/help-tooltip";
 import {
   parseCSV,
   parseXLSX,
@@ -268,8 +269,12 @@ export default function CoachScoresPage() {
         <p className="font-display text-sm font-semibold text-flag-red uppercase tracking-[3px] mb-1">
           Coach
         </p>
-        <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide">
+        <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide flex items-center">
           Enter Scores
+          <HelpTooltip
+            text="Score players during tryout evaluations using the 54-point rubric."
+            guideUrl="/coach/help"
+          />
         </h1>
         <p className="text-gray-400 text-sm mt-1">
           {division} &middot; {playerCount} registered player

@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
 import { Plus, Trash2, Shield, ShieldCheck, FileText, Pencil, Check, X } from "lucide-react";
+import { HelpTooltip } from "@/components/help-tooltip";
 
 interface Team {
   id: string;
@@ -282,8 +283,12 @@ export default function TeamsPage() {
         <p className="font-display text-sm font-semibold text-flag-red uppercase tracking-[3px] mb-1">
           Admin
         </p>
-        <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide">
+        <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide flex items-center">
           Team Management
+          <HelpTooltip
+            text="Assign selected players to their teams after tryouts."
+            guideUrl="/admin/help"
+          />
         </h1>
         <p className="text-gray-400 text-sm mt-1">
           {teams.length} team{teams.length !== 1 ? "s" : ""} across {new Set(teams.map((t) => t.division)).size} division{new Set(teams.map((t) => t.division)).size !== 1 ? "s" : ""}

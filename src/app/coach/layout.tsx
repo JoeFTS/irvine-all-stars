@@ -15,6 +15,7 @@ import {
   UserCircle,
   ClipboardList,
   FileText,
+  HelpCircle,
 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 
@@ -30,6 +31,7 @@ const navItems = [
   { href: "/coach/tournament-rules", label: "Tournament Rules", icon: BookOpen },
   { href: "/coach/tournaments", label: "Tournaments", icon: Trophy },
   { href: "/coach/updates", label: "Updates", icon: Megaphone },
+  { href: "/coach/help", label: "Help", icon: HelpCircle },
 ];
 
 export default function CoachLayout({

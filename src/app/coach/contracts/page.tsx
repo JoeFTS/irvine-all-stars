@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/auth-context";
+import { HelpTooltip } from "@/components/help-tooltip";
 import {
   FileText,
   ExternalLink,
@@ -131,8 +132,12 @@ export default function CoachContractsPage() {
     <div className="p-6 md:p-8 max-w-5xl">
       {/* Header */}
       <div className="mb-6">
-        <h1 className="font-display text-2xl font-bold uppercase tracking-wider text-charcoal">
+        <h1 className="font-display text-2xl font-bold uppercase tracking-wider text-charcoal flex items-center">
           Player Contracts
+          <HelpTooltip
+            text="Track which players have signed their participation contracts."
+            guideUrl="/coach/help"
+          />
         </h1>
         <p className="text-sm text-gray-500 mt-1">
           {isAdmin

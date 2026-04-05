@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { ChevronDown, ChevronUp } from "lucide-react";
+import { HelpTooltip } from "@/components/help-tooltip";
 
 type Status = "submitted" | "under_review" | "accepted" | "rejected";
 
@@ -133,8 +134,12 @@ export default function ApplicationsPage() {
         <p className="font-display text-sm font-semibold text-flag-red uppercase tracking-[3px] mb-1">
           Admin
         </p>
-        <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide">
+        <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide flex items-center">
           Coach Applications
+          <HelpTooltip
+            text="Review, approve, or decline coach applications."
+            guideUrl="/admin/help"
+          />
         </h1>
         <p className="text-gray-400 text-sm mt-1">
           {applications.length} total application{applications.length !== 1 ? "s" : ""}

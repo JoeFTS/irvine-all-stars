@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
+import { HelpTooltip } from "@/components/help-tooltip";
 import {
   ShieldCheck,
   Shield,
@@ -272,8 +273,12 @@ export default function CompliancePage() {
         <p className="font-display text-sm font-semibold text-flag-red uppercase tracking-[3px] mb-1">
           Admin
         </p>
-        <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide">
+        <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide flex items-center">
           Tournament Compliance
+          <HelpTooltip
+            text="Track compliance requirements across all teams and coaches."
+            guideUrl="/admin/help"
+          />
         </h1>
         <p className="text-gray-400 text-sm mt-1">
           Which divisions are tournament-ready — all players have contracts,

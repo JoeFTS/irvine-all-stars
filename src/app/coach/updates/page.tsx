@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { ExternalLink, Calendar, Shirt, AlertTriangle, Info } from "lucide-react";
+import { HelpTooltip } from "@/components/help-tooltip";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/auth-context";
 
@@ -101,8 +102,12 @@ export default function CoachUpdatesPage() {
       <p className="font-display text-sm font-semibold text-flag-red uppercase tracking-[3px] mb-1">
         Coach
       </p>
-      <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide mb-2">
+      <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide mb-2 flex items-center">
         Updates
+        <HelpTooltip
+          text="Read the latest announcements and updates from the admin."
+          guideUrl="/coach/help"
+        />
       </h1>
       <p className="text-gray-600 mb-8">
         Important information, schedules, and announcements.

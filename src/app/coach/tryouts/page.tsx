@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/auth-context";
+import { HelpTooltip } from "@/components/help-tooltip";
 import {
   ChevronDown,
   ChevronUp,
@@ -378,8 +379,12 @@ export default function CoachTryoutsPage() {
         <p className="font-display text-sm font-semibold text-flag-red uppercase tracking-[3px] mb-1">
           Coach
         </p>
-        <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide text-flag-blue">
+        <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide text-flag-blue flex items-center">
           Tryout Players
+          <HelpTooltip
+            text="Scout players and submit nominations for your division."
+            guideUrl="/coach/help"
+          />
         </h1>
       </div>
 

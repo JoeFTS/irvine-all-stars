@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
+import { HelpTooltip } from "@/components/help-tooltip";
 
 interface Stats {
   totalApplications: number;
@@ -174,8 +175,12 @@ export default function AdminDashboard() {
         <p className="font-display text-sm font-semibold text-flag-red uppercase tracking-[3px] mb-1">
           Admin
         </p>
-        <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide">
+        <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide flex items-center">
           Dashboard
+          <HelpTooltip
+            text="Overview stats — coach applications, player registrations, and division breakdown."
+            guideUrl="/admin/help"
+          />
         </h1>
       </div>
 

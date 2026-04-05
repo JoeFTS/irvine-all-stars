@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/auth-context";
+import { HelpTooltip } from "@/components/help-tooltip";
 import { getPitchingRuleForDivision } from "@/content/pitching-rules";
 import {
   CheckCircle2,
@@ -413,8 +414,12 @@ export default function BinderChecklistPage() {
         <p className="font-display text-sm font-semibold text-flag-red uppercase tracking-[3px] mb-1">
           Coach
         </p>
-        <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide">
+        <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide flex items-center">
           Binder Checklist
+          <HelpTooltip
+            text="Track required documents like birth certificates, photos, and contracts for your team."
+            guideUrl="/coach/help"
+          />
         </h1>
         <p className="text-gray-500 text-sm mt-1 max-w-xl">
           8 sections matching your physical tournament binder. Green means ready,
