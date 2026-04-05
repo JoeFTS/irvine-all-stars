@@ -421,15 +421,9 @@ export default function PortalPage() {
             </div>
           ) : registrations.length === 0 ? (
             <div className="bg-white rounded-2xl border border-gray-200 p-8 text-center">
-              <p className="text-gray-500 mb-4">
-                No tryout registrations found for your account.
+              <p className="text-gray-500">
+                No tryout registrations found for your account. If you believe this is an error, please contact the coordinator.
               </p>
-              <Link
-                href={`/apply/player?parent_name=${encodeURIComponent(user?.user_metadata?.full_name || "")}&parent_email=${encodeURIComponent(user?.email || "")}`}
-                className="inline-block bg-flag-red hover:bg-flag-red-dark text-white px-6 py-3 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-colors"
-              >
-                Register for Tryouts
-              </Link>
             </div>
           ) : (
             <div className="space-y-4">
