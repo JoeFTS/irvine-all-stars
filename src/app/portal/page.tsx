@@ -297,8 +297,12 @@ export default function PortalPage() {
         const flyerMap: Record<string, string> = {};
         for (const t of tournamentsData) {
           if (t.flyer_url) {
-            const { data: urlData } = supabase!.storage.from("tournament-flyers").getPublicUrl(t.flyer_url);
-            flyerMap[t.name] = urlData.publicUrl;
+            if (t.flyer_url.startsWith("/")) {
+              flyerMap[t.name] = t.flyer_url;
+            } else {
+              const { data: urlData } = supabase!.storage.from("tournament-flyers").getPublicUrl(t.flyer_url);
+              flyerMap[t.name] = urlData.publicUrl;
+            }
           }
         }
         setTournamentFlyers(flyerMap);

@@ -43,6 +43,7 @@ function formatDateRange(start: string, end: string): string {
 }
 
 function getFlyerUrl(path: string): string {
+  if (path.startsWith("/")) return path;
   if (!supabase) return "";
   const { data } = supabase.storage.from("tournament-flyers").getPublicUrl(path);
   return data.publicUrl;
