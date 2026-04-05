@@ -10,6 +10,7 @@ import {
   Users,
   Award,
   BookOpen,
+  Trophy,
   Megaphone,
   UserCircle,
   ClipboardList,
@@ -27,6 +28,7 @@ const navItems = [
   { href: "/coach/contracts", label: "Contracts", icon: FileText },
   { href: "/coach/certifications", label: "Certifications", icon: Award },
   { href: "/coach/tournament-rules", label: "Tournament Rules", icon: BookOpen },
+  { href: "/coach/tournaments", label: "Tournaments", icon: Trophy },
   { href: "/coach/updates", label: "Updates", icon: Megaphone },
 ];
 

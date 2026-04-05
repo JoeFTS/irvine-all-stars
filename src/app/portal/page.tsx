@@ -132,6 +132,7 @@ const keyDates = [
 /* ------------------------------------------------------------------ */
 
 const quickLinks = [
+  { label: "Tournaments", href: "/portal/tournaments", icon: "\uD83C\uDFC6" },
   { label: "FAQ", href: "/faq", icon: "?" },
   { label: "Documents", href: "/documents", icon: "\u2193" },
   {
@@ -851,6 +852,11 @@ export default function PortalPage() {
                       {ann.title}
                     </h3>
                     <div className="flex items-center gap-2 shrink-0">
+                      {ann.title.startsWith("Tournament:") && (
+                        <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-star-gold/20 text-amber-700">
+                          Tournament
+                        </span>
+                      )}
                       {ann.division && (
                         <span className="text-[10px] font-display font-semibold uppercase tracking-wider bg-flag-blue/10 text-flag-blue px-2 py-0.5 rounded">
                           {ann.division}

@@ -421,7 +421,14 @@ export default function CoachDashboardPage() {
           <ul className="space-y-4">
             {announcements.map((a) => (
               <li key={a.id} className="border-b border-gray-100 pb-3 last:border-0 last:pb-0">
-                <p className="font-semibold text-gray-800">{a.title}</p>
+                <div className="flex items-center gap-2">
+                  <p className="font-semibold text-gray-800">{a.title}</p>
+                  {a.title.startsWith("Tournament:") && (
+                    <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-star-gold/20 text-amber-700">
+                      Tournament
+                    </span>
+                  )}
+                </div>
                 <p className="text-sm text-gray-500 line-clamp-2">{a.body}</p>
                 <p className="text-xs text-gray-400 mt-1">
                   {new Date(a.created_at).toLocaleDateString("en-US", {

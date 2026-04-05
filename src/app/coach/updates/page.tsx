@@ -204,6 +204,11 @@ export default function CoachUpdatesPage() {
                 >
                   <div className="flex items-center gap-3 mb-1">
                     <h3 className="font-semibold text-charcoal">{a.title}</h3>
+                    {a.title.startsWith("Tournament:") && (
+                      <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-star-gold/20 text-amber-700">
+                        Tournament
+                      </span>
+                    )}
                     {a.division && (
                       <span className="text-xs font-semibold uppercase tracking-wide bg-flag-blue/10 text-flag-blue px-2 py-0.5 rounded">
                         {a.division}
