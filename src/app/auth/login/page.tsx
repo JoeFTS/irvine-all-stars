@@ -67,7 +67,7 @@ export default function LoginPage() {
   }
 
   return (
-    <div className="min-h-screen bg-off-white pt-[98px]">
+    <div className="min-h-screen bg-off-white pt-16">
       <StripeDivider />
       <div className="flex items-center justify-center px-4 py-16">
         <div className="w-full max-w-md">

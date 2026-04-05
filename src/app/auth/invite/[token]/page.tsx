@@ -279,7 +279,7 @@ export default function InviteSignupPage({
   // Loading state
   if (inviteState.status === "loading") {
     return (
-      <div className="min-h-screen bg-off-white pt-[98px]">
+      <div className="min-h-screen bg-off-white pt-16">
         <StripeDivider />
         <div className="flex items-center justify-center px-4 py-16">
           <p className="text-gray-500">Verifying invite...</p>
@@ -291,7 +291,7 @@ export default function InviteSignupPage({
   // Invalid token
   if (inviteState.status === "invalid") {
     return (
-      <div className="min-h-screen bg-off-white pt-[98px]">
+      <div className="min-h-screen bg-off-white pt-16">
         <StripeDivider />
         <div className="flex items-center justify-center px-4 py-16">
           <div className="w-full max-w-md text-center">
@@ -322,7 +322,7 @@ export default function InviteSignupPage({
   // Already used
   if (inviteState.status === "used") {
     return (
-      <div className="min-h-screen bg-off-white pt-[98px]">
+      <div className="min-h-screen bg-off-white pt-16">
         <StripeDivider />
         <div className="flex items-center justify-center px-4 py-16">
           <div className="w-full max-w-md text-center">
@@ -353,7 +353,7 @@ export default function InviteSignupPage({
   // Expired
   if (inviteState.status === "expired") {
     return (
-      <div className="min-h-screen bg-off-white pt-[98px]">
+      <div className="min-h-screen bg-off-white pt-16">
         <StripeDivider />
         <div className="flex items-center justify-center px-4 py-16">
           <div className="w-full max-w-md text-center">
@@ -383,7 +383,7 @@ export default function InviteSignupPage({
 
   // Valid — show signup form
   return (
-    <div className="min-h-screen bg-off-white pt-[98px]">
+    <div className="min-h-screen bg-off-white pt-16">
       <StripeDivider />
       <div className="flex items-center justify-center px-4 py-16">
         <div className="w-full max-w-md">

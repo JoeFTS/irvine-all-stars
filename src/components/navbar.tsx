@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
@@ -22,9 +22,20 @@ const loggedInNavLinks = [
 
 export function Navbar() {
   const [mobileOpen, setMobileOpen] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
   const { user, role } = useAuth();
   const pathname = usePathname();
   const navLinks = user ? loggedInNavLinks : publicNavLinks;
+
+  // Track scroll for glassmorphism transition
+  useEffect(() => {
+    function handleScroll() {
+      setScrolled(window.scrollY > 40);
+    }
+    window.addEventListener("scroll", handleScroll, { passive: true });
+    handleScroll();
+    return () => window.removeEventListener("scroll", handleScroll);
+  }, []);
 
   function isActive(href: string) {
     if (href === "/") return pathname === "/";
@@ -33,12 +44,12 @@ export function Navbar() {
 
   const linkClass = (href: string) =>
     isActive(href)
-      ? "text-white text-sm font-semibold uppercase tracking-wide bg-white/15 px-3 py-1.5 rounded transition-colors"
-      : "text-white/65 hover:text-white text-sm font-semibold uppercase tracking-wide px-3 py-1.5 rounded transition-colors";
+      ? "text-white text-sm font-semibold uppercase tracking-wide bg-white/15 px-3 py-1.5 rounded-lg transition-all duration-300"
+      : "text-white/60 hover:text-white text-sm font-semibold uppercase tracking-wide px-3 py-1.5 rounded-lg transition-all duration-300 hover:bg-white/[0.08]";
 
   const mobileLinkClass = (href: string) =>
     isActive(href)
-      ? "block text-white font-display text-lg uppercase tracking-wider py-3 border-b border-white/10 bg-white/10 px-3 rounded"
+      ? "block text-white font-display text-lg uppercase tracking-wider py-3 border-b border-white/10 bg-white/10 px-3 rounded-lg"
       : "block text-white/80 hover:text-white font-display text-lg uppercase tracking-wider py-3 border-b border-white/10";
 
   async function handleSignOut() {
@@ -51,27 +62,31 @@ export function Navbar() {
 
   return (
     <>
-      {/* Announcement Bar — only for public visitors */}
-      {!user && (
-        <div className="fixed top-0 w-full z-[101] bg-cream border-b border-sand text-center py-1.5 px-4 overflow-hidden">
-          <p className="text-flag-blue text-xs font-bold tracking-wider uppercase font-display whitespace-nowrap text-ellipsis overflow-hidden">
-            <span className="text-star-gold">&#9733;</span> 2026 All-Stars
-            Season — Applications Now Open{" "}
-            <span className="text-star-gold">&#9733;</span>
-          </p>
-        </div>
-      )}
-
-      {/* Main Nav */}
-      <nav className={`fixed w-full z-100 bg-flag-blue px-4 md:px-8 h-16 flex items-center justify-between ${user ? "top-0" : "top-[34px]"}`}>
-        <Link href="/" className="flex items-center gap-2">
-          <span className="text-star-gold-bright text-sm tracking-widest">
+      {/* Main Nav — Glassmorphism */}
+      <nav
+        className="fixed top-0 w-full z-[100] h-16 flex items-center justify-between px-5 md:px-8 transition-all duration-500 ease-out"
+        style={{
+          backgroundColor: scrolled
+            ? "rgba(15, 27, 45, 0.75)"
+            : "transparent",
+          backdropFilter: scrolled ? "blur(16px) saturate(1.4)" : "none",
+          WebkitBackdropFilter: scrolled ? "blur(16px) saturate(1.4)" : "none",
+          borderBottom: scrolled
+            ? "1px solid rgba(255, 255, 255, 0.08)"
+            : "1px solid transparent",
+          boxShadow: scrolled
+            ? "inset 0 1px 0 rgba(255,255,255,0.06), 0 8px 32px rgba(0,0,0,0.2)"
+            : "none",
+        }}
+      >
+        <Link href="/" className="flex items-center gap-2 group">
+          <span className="text-star-gold-bright text-sm tracking-widest transition-transform duration-300 group-hover:scale-110">
             &#9733;&#9733;&#9733;
           </span>
           <span className="font-display text-xl font-bold text-white uppercase tracking-wider">
             Irvine All-Stars
           </span>
-          <span className="text-star-gold-bright text-sm tracking-widest">
+          <span className="text-star-gold-bright text-sm tracking-widest transition-transform duration-300 group-hover:scale-110">
             &#9733;&#9733;&#9733;
           </span>
         </Link>
@@ -108,20 +123,20 @@ export function Navbar() {
                   </Link>
                 </li>
               )}
-              <li className="ml-2">
+              <li className="ml-3">
                 <button
                   onClick={handleSignOut}
-                  className="bg-flag-red hover:bg-flag-red-dark text-white px-4 py-1.5 rounded text-sm font-bold uppercase tracking-wide transition-colors"
+                  className="bg-flag-red hover:bg-flag-red-dark text-white px-5 py-1.5 rounded-full text-sm font-bold uppercase tracking-wide transition-all duration-300 hover:-translate-y-[1px] hover:shadow-lg hover:shadow-flag-red/20 active:scale-[0.97]"
                 >
                   Sign Out
                 </button>
               </li>
             </>
           ) : (
-            <li className="ml-2">
+            <li className="ml-3">
               <Link
                 href="/auth/login"
-                className="bg-flag-red hover:bg-flag-red-dark text-white px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wide transition-colors"
+                className="bg-flag-red hover:bg-flag-red-dark text-white px-5 py-1.5 rounded-full text-sm font-bold uppercase tracking-wide transition-all duration-300 hover:-translate-y-[1px] hover:shadow-lg hover:shadow-flag-red/20 active:scale-[0.97]"
               >
                 Sign In
               </Link>
@@ -132,16 +147,23 @@ export function Navbar() {
         {/* Mobile Toggle */}
         <button
           onClick={() => setMobileOpen(!mobileOpen)}
-          className="lg:hidden text-white p-2 min-w-[44px] min-h-[44px] flex items-center justify-center"
+          className="lg:hidden text-white p-2 min-w-[44px] min-h-[44px] flex items-center justify-center rounded-lg hover:bg-white/10 transition-colors"
           aria-label="Toggle menu"
         >
           {mobileOpen ? <X size={24} /> : <Menu size={24} />}
         </button>
       </nav>
 
-      {/* Mobile Menu */}
+      {/* Mobile Menu — Frosted overlay */}
       {mobileOpen && (
-        <div className={`fixed inset-0 z-[99] bg-flag-blue lg:hidden ${user ? "top-16" : "top-[98px]"}`}>
+        <div
+          className="fixed inset-0 top-16 z-[99] lg:hidden"
+          style={{
+            backgroundColor: "rgba(15, 27, 45, 0.92)",
+            backdropFilter: "blur(20px) saturate(1.4)",
+            WebkitBackdropFilter: "blur(20px) saturate(1.4)",
+          }}
+        >
           <ul className="flex flex-col p-6 gap-1">
             {navLinks.map((link) => (
               <li key={link.href}>
@@ -192,7 +214,7 @@ export function Navbar() {
                 <li className="mt-4">
                   <button
                     onClick={() => { setMobileOpen(false); handleSignOut(); }}
-                    className="block w-full bg-flag-red text-white text-center py-3 rounded font-display text-lg uppercase tracking-wider font-bold"
+                    className="block w-full bg-flag-red text-white text-center py-3 rounded-full font-display text-lg uppercase tracking-wider font-bold transition-all active:scale-[0.97]"
                   >
                     Sign Out
                   </button>
@@ -203,7 +225,7 @@ export function Navbar() {
                 <Link
                   href="/auth/login"
                   onClick={() => setMobileOpen(false)}
-                  className="block bg-flag-red text-white text-center py-3 rounded-full font-display text-lg uppercase tracking-wider font-bold"
+                  className="block bg-flag-red text-white text-center py-3 rounded-full font-display text-lg uppercase tracking-wider font-bold transition-all active:scale-[0.97]"
                 >
                   Sign In
                 </Link>

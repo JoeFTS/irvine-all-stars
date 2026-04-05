@@ -12,7 +12,7 @@ export default function ApplyCoachPage() {
   return (
     <>
       {/* ===== HERO ===== */}
-      <section className="grain-overlay relative bg-flag-blue pt-[98px] pb-12 md:pb-16 px-6 md:px-10 overflow-hidden">
+      <section className="grain-overlay relative bg-flag-blue pt-16 pb-12 md:pb-16 px-6 md:px-10 overflow-hidden">
         <div className="absolute inset-0 text-white/[0.04] text-xl leading-[2.8rem] tracking-widest overflow-hidden pointer-events-none p-4">
           {"★ ".repeat(200)}
         </div>

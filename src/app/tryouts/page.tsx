@@ -113,7 +113,7 @@ export default function TryoutsPage() {
   return (
     <>
       {/* ===== HERO ===== */}
-      <section className="grain-overlay relative bg-flag-blue pt-[98px] pb-16 md:pb-20 px-6 md:px-10 overflow-hidden">
+      <section className="grain-overlay relative bg-flag-blue pt-16 pb-16 md:pb-20 px-6 md:px-10 overflow-hidden">
         <div className="absolute inset-0 text-white/[0.04] text-xl leading-[2.8rem] tracking-widest overflow-hidden pointer-events-none p-4">
           {"★ ".repeat(200)}
         </div>
@@ -408,29 +408,6 @@ export default function TryoutsPage() {
       </section>
 
       <StripeDivider />
-
-      {/* ===== CTA ===== */}
-      <section className="bg-flag-blue py-16 md:py-20 px-6 md:px-10 text-center">
-        <div className="max-w-2xl mx-auto">
-          <p className="text-star-gold-bright font-display text-sm font-semibold uppercase tracking-[3px] mb-4">
-            &#9733; Step Up to the Plate &#9733;
-          </p>
-          <h2 className="font-display text-3xl md:text-5xl font-bold text-white uppercase tracking-wide mb-4">
-            Register for Tryouts
-          </h2>
-          <p className="text-white/60 text-lg mb-8 leading-relaxed">
-            Sign your player up today. Tryout spots are first-come,
-            first-served, and every registered player is guaranteed an
-            evaluation.
-          </p>
-          <Link
-            href="/auth/login"
-            className="inline-block bg-flag-red hover:bg-flag-red-dark text-white px-8 py-3.5 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5 hover:shadow-lg"
-          >
-            Sign In to Register &#9733;
-          </Link>
-        </div>
-      </section>
     </>
   );
 }

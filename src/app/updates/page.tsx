@@ -56,7 +56,7 @@ export default function UpdatesPage() {
   return (
     <>
       {/* Hero */}
-      <section className="bg-flag-blue pt-[98px] pb-14 px-6 md:px-10">
+      <section className="bg-flag-blue pt-16 pb-14 px-6 md:px-10">
         <div className="max-w-6xl mx-auto text-center">
           <p className="text-star-gold-bright font-display text-sm font-semibold uppercase tracking-[3px] mb-4">
             &#9733; Stay Informed

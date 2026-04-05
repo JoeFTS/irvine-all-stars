@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import Image from "next/image";
+import { useEffect, useRef } from "react";
 import { divisions } from "@/content/divisions";
 import { StripeDivider } from "@/components/stripe-divider";
 import {
@@ -15,29 +16,101 @@ import {
 const cardTints = ["bg-tint-cream", "bg-tint-green", "bg-tint-leather"] as const;
 
 export default function Home() {
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  useEffect(() => {
+    const video = videoRef.current;
+    if (!video) return;
+
+    let targetTime = 0;
+    let currentTime = 0;
+    let rafId: number;
+
+    function lerp(a: number, b: number, t: number) {
+      return a + (b - a) * t;
+    }
+
+    // Smooth animation loop — eases toward target time
+    function animate() {
+      if (!video) return;
+      currentTime = lerp(currentTime, targetTime, 0.04);
+      // Avoid tiny updates
+      if (Math.abs(currentTime - video.currentTime) > 0.01) {
+        video.currentTime = currentTime;
+      }
+      rafId = requestAnimationFrame(animate);
+    }
+
+    function bindScroll() {
+      if (!video) return;
+      const duration = video.duration || 1;
+
+      function handleScroll() {
+        const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+        const progress = Math.min(window.scrollY / maxScroll, 1);
+        targetTime = progress * duration;
+      }
+
+      window.addEventListener("scroll", handleScroll, { passive: true });
+      handleScroll();
+      rafId = requestAnimationFrame(animate);
+
+      return () => {
+        window.removeEventListener("scroll", handleScroll);
+        cancelAnimationFrame(rafId);
+      };
+    }
+
+    // Set to first frame immediately
+    video.currentTime = 0;
+
+    if (video.readyState >= 1) {
+      const cleanup = bindScroll();
+      return cleanup;
+    } else {
+      let cleanup: (() => void) | undefined;
+      const onLoaded = () => {
+        video.currentTime = 0;
+        cleanup = bindScroll();
+      };
+      video.addEventListener("loadedmetadata", onLoaded);
+      return () => {
+        video.removeEventListener("loadedmetadata", onLoaded);
+        cleanup?.();
+      };
+    }
+  }, []);
+
   return (
     <>
       {/* ===== HERO ===== */}
-      <section className="grain-overlay relative min-h-screen flex items-center pt-[98px] pb-20 overflow-hidden">
-        {/* Background image */}
-        <Image
-          src="/images/hero-aerial.webp"
-          alt="Aerial view of a baseball diamond at golden hour"
-          fill
-          className="object-cover"
-          priority
-          unoptimized
-        />
-        {/* Navy overlay */}
-        <div className="absolute inset-0 bg-flag-blue/75" />
+      <section className="relative min-h-screen flex items-center justify-center pt-16 pb-20 overflow-hidden bg-flag-blue">
+        {/* Background video */}
+        <video
+          ref={videoRef}
+          muted
+          playsInline
+          preload="auto"
+          className="absolute inset-0 w-full h-full object-cover"
+        >
+          <source src="/videos/rotatingBaseball.mp4" type="video/mp4" />
+        </video>
+        {/* Dark overlay for readability */}
+        <div className="absolute inset-0 bg-flag-blue/70" />
+        {/* Inward gradient mask — fades edges to solid navy */}
+        <div className="absolute inset-0" style={{
+          background: `
+            radial-gradient(ellipse 70% 65% at center, transparent 30%, var(--flag-blue) 100%)
+          `,
+        }} />
+        {/* Center vignette — soft dark spotlight behind text */}
+        <div className="absolute inset-0" style={{
+          background: `radial-gradient(ellipse 50% 40% at center 45%, rgba(15,27,45,0.5) 0%, transparent 100%)`,
+        }} />
 
-        {/* Baseball stitch circle decorations */}
-        <div className="baseball-stitch-circle -top-20 -right-20 w-[400px] h-[400px] opacity-10" />
-        <div className="baseball-stitch-circle bottom-10 -left-32 w-[250px] h-[250px] opacity-[0.07]" />
-
-        <div className="relative z-10 w-full max-w-6xl mx-auto px-6 md:px-10 grid grid-cols-1 lg:grid-cols-2 gap-10 items-center">
-          {/* Left - headline */}
-          <HeroReveal className="text-center lg:text-left">
+        <div className="relative z-10 w-full max-w-3xl mx-auto px-6 md:px-10 text-center">
+          {/* Centered headline */}
+          <HeroReveal className="text-center">
             <HeroItem>
               <div className="inline-flex items-center gap-2 border border-white/20 rounded px-4 py-1.5 mb-6">
                 <span className="text-star-gold font-bold text-xs uppercase tracking-widest font-display">
@@ -46,7 +119,7 @@ export default function Home() {
               </div>
             </HeroItem>
             <HeroItem>
-              <h1 className="font-hero text-5xl md:text-7xl font-bold text-white uppercase leading-[0.95] tracking-wider mb-6">
+              <h1 className="font-hero text-5xl md:text-7xl font-bold text-white uppercase leading-[0.95] tracking-wider mb-6" style={{ textShadow: "0 2px 20px rgba(0,0,0,0.5), 0 4px 40px rgba(0,0,0,0.3)" }}>
                 EARN
                 <br />
                 YOUR
@@ -55,14 +128,14 @@ export default function Home() {
               </h1>
             </HeroItem>
             <HeroItem>
-              <p className="text-white/70 text-lg leading-relaxed max-w-md mx-auto lg:mx-0 mb-8">
+              <p className="text-white/80 text-lg leading-relaxed max-w-lg mx-auto mb-8" style={{ textShadow: "0 1px 10px rgba(0,0,0,0.4)" }}>
                 Irvine PONY All-Stars develops confident, competitive young
                 athletes through elite coaching, fair selection, and a
                 family-first community.
               </p>
             </HeroItem>
             <HeroItem>
-              <div className="flex gap-3 flex-wrap justify-center lg:justify-start">
+              <div className="flex gap-3 flex-wrap justify-center">
                 <Link
                   href="/auth/login"
                   className="bg-flag-red hover:bg-flag-red-dark text-white px-7 py-3.5 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-all hover:-translate-y-0.5 hover:shadow-lg active:scale-[0.97]"
@@ -78,33 +151,6 @@ export default function Home() {
               </div>
             </HeroItem>
           </HeroReveal>
-
-          {/* Right - quick link cards */}
-          <StaggerReveal className="hidden lg:flex flex-col gap-3" delay={0.5}>
-            <StaggerItem>
-              <Link
-                href="/auth/login"
-                className="bg-white/10 backdrop-blur-sm border border-white/15 rounded-2xl p-5 flex items-center gap-4 hover:-translate-y-0.5 hover:bg-white/15 transition-all group active:scale-[0.98]"
-              >
-                <div className="w-12 h-12 rounded-2xl bg-star-gold/20 flex items-center justify-center shrink-0">
-                  <svg className="w-5 h-5 text-star-gold" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2} strokeLinecap="round" strokeLinejoin="round">
-                    <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" /><circle cx="12" cy="7" r="4" />
-                  </svg>
-                </div>
-                <div className="flex-1">
-                  <h3 className="font-display text-lg font-semibold uppercase tracking-wide text-white">
-                    Sign In
-                  </h3>
-                  <p className="text-white/50 text-sm">
-                    Coach dashboard, parent portal & more
-                  </p>
-                </div>
-                <span className="text-white/30 group-hover:text-star-gold text-xl transition-colors">
-                  &rarr;
-                </span>
-              </Link>
-            </StaggerItem>
-          </StaggerReveal>
         </div>
       </section>
 

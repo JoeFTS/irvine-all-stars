@@ -218,7 +218,7 @@ export default function FaqPage() {
   return (
     <>
       {/* ===== HERO ===== */}
-      <section className="grain-overlay relative bg-flag-blue pt-[98px] pb-16 px-6 md:px-10 text-center overflow-hidden">
+      <section className="grain-overlay relative bg-flag-blue pt-16 pb-16 px-6 md:px-10 text-center overflow-hidden">
         <div className="max-w-3xl mx-auto">
           <p className="text-star-gold-bright font-display text-sm font-semibold uppercase tracking-[3px] mb-3">
             &#9733; Questions & Answers
