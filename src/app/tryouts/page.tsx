@@ -113,7 +113,7 @@ export default function TryoutsPage() {
   return (
     <>
       {/* ===== HERO ===== */}
-      <section className="relative bg-flag-blue pt-[98px] pb-16 md:pb-20 px-6 md:px-10 overflow-hidden">
+      <section className="grain-overlay relative bg-flag-blue pt-[98px] pb-16 md:pb-20 px-6 md:px-10 overflow-hidden">
         <div className="absolute inset-0 text-white/[0.04] text-xl leading-[2.8rem] tracking-widest overflow-hidden pointer-events-none p-4">
           {"★ ".repeat(200)}
         </div>
@@ -277,7 +277,7 @@ export default function TryoutsPage() {
               Total Points
             </span>
             <span className="font-display text-3xl md:text-4xl font-bold text-star-gold-bright">
-              100
+              54
             </span>
           </div>
         </div>

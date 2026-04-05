@@ -1,7 +1,14 @@
 "use client";
 
 import { motion, useInView, useReducedMotion } from "framer-motion";
-import { useRef, type ReactNode } from "react";
+import { useRef, useState, useEffect, type ReactNode } from "react";
+
+/** Returns false on SSR/first render, true after hydration. */
+function useHasMounted() {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  return mounted;
+}
 import {
   easing,
   duration,
@@ -38,11 +45,13 @@ export function RevealOnScroll({
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: margin as `${number}px` });
   const prefersReduced = useReducedMotion();
+  const mounted = useHasMounted();
 
   const variants = variant === "fadeIn" ? fadeIn : fadeUp;
 
-  if (prefersReduced) {
-    return <div className={className}>{children}</div>;
+  // SSR or reduced-motion: render visible immediately
+  if (prefersReduced || !mounted) {
+    return <div ref={ref} className={className}>{children}</div>;
   }
 
   return (
@@ -90,9 +99,11 @@ export function StaggerReveal({
   const ref = useRef<HTMLDivElement>(null);
   const isInView = useInView(ref, { once: true, margin: "-60px" as `${number}px` });
   const prefersReduced = useReducedMotion();
+  const mounted = useHasMounted();
 
-  if (prefersReduced) {
-    return <div className={className}>{children}</div>;
+  // SSR or reduced-motion: render visible immediately
+  if (prefersReduced || !mounted) {
+    return <div ref={ref} className={className}>{children}</div>;
   }
 
   return (
@@ -123,6 +134,13 @@ interface StaggerItemProps {
 }
 
 export function StaggerItem({ children, className }: StaggerItemProps) {
+  const mounted = useHasMounted();
+
+  // SSR: render as plain div so content is visible in server HTML
+  if (!mounted) {
+    return <div className={className}>{children}</div>;
+  }
+
   return (
     <motion.div
       className={className}
@@ -231,8 +249,10 @@ interface HeroRevealProps {
 
 export function HeroReveal({ children, className }: HeroRevealProps) {
   const prefersReduced = useReducedMotion();
+  const mounted = useHasMounted();
 
-  if (prefersReduced) {
+  // SSR or reduced-motion: render visible immediately (no opacity:0 in server HTML)
+  if (prefersReduced || !mounted) {
     return <div className={className}>{children}</div>;
   }
 
@@ -257,6 +277,13 @@ export function HeroReveal({ children, className }: HeroRevealProps) {
 }
 
 export function HeroItem({ children, className }: { children: ReactNode; className?: string }) {
+  const mounted = useHasMounted();
+
+  // SSR: render as plain div so content is visible in server HTML
+  if (!mounted) {
+    return <div className={className}>{children}</div>;
+  }
+
   return (
     <motion.div
       className={className}

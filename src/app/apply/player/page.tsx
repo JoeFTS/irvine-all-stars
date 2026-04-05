@@ -18,20 +18,35 @@ export default function ApplyPlayerPage() {
 
   if (!user) {
     return (
-      <div className="min-h-screen bg-off-white pt-[98px]">
+      <>
+        {/* ===== HERO ===== */}
+        <section className="grain-overlay relative bg-flag-blue pt-[98px] pb-12 md:pb-16 px-6 md:px-10 overflow-hidden">
+          <div className="absolute inset-0 text-white/[0.04] text-xl leading-[2.8rem] tracking-widest overflow-hidden pointer-events-none p-4">
+            {"★ ".repeat(200)}
+          </div>
+          <div className="relative z-10 max-w-4xl mx-auto text-center pt-10 md:pt-14">
+            <p className="font-display text-sm font-semibold text-star-gold-bright uppercase tracking-[3px] mb-3">
+              &#9733; Step Up to the Plate
+            </p>
+            <h1 className="font-hero text-4xl md:text-6xl font-bold text-white uppercase tracking-wide mb-4">
+              Invitation Required
+            </h1>
+            <p className="text-white/60 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
+              Tryout registration for Irvine All-Stars is by invitation only.
+            </p>
+          </div>
+        </section>
+
         <StripeDivider />
-        <div className="flex items-center justify-center px-4 py-16">
+
+        <div className="baseball-stitch relative py-4" />
+
+        {/* ===== CONTENT ===== */}
+        <div className="bg-off-white flex items-center justify-center px-4 py-16">
           <div className="w-full max-w-md text-center">
-            <div className="flex items-center justify-center gap-2 mb-4">
-              <span className="text-star-gold-bright text-lg">&#9733;</span>
-              <h1 className="font-hero text-3xl font-bold text-flag-blue uppercase tracking-wider">
-                Invitation Required
-              </h1>
-              <span className="text-star-gold-bright text-lg">&#9733;</span>
-            </div>
             <div className="bg-white border border-gray-200 rounded-2xl p-8">
               <p className="text-gray-600 mb-4">
-                Tryout registration for Irvine All-Stars is by invitation only. If your child has been selected for tryouts, you will receive an email invitation with a link to create your account and register.
+                If your child has been selected for tryouts, you will receive an email invitation with a link to create your account and register.
               </p>
               <p className="text-gray-600 mb-6">
                 Already have an account?
@@ -45,7 +60,7 @@ export default function ApplyPlayerPage() {
             </div>
           </div>
         </div>
-      </div>
+      </>
     );
   }
 

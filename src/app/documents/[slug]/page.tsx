@@ -45,7 +45,7 @@ export default async function DocumentDetailPage({ params }: Props) {
           <p className="text-star-gold-bright font-display text-sm font-semibold uppercase tracking-[3px] mb-4">
             &#9733; Document
           </p>
-          <h1 className="font-display text-3xl md:text-5xl font-bold text-white uppercase tracking-wide mb-4">
+          <h1 className="font-hero text-3xl md:text-5xl font-bold text-white uppercase tracking-wide mb-4">
             {doc.title}
           </h1>
           <p className="text-white/60 text-lg max-w-2xl mx-auto leading-relaxed">
@@ -55,6 +55,9 @@ export default async function DocumentDetailPage({ params }: Props) {
       </section>
 
       <StripeDivider />
+
+      {/* Baseball stitch accent */}
+      <div className="baseball-stitch relative py-4 no-print" />
 
       {/* Document Content */}
       <section className="bg-off-white py-16 px-6 md:px-10 print:py-8 print:px-4">

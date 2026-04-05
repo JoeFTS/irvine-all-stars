@@ -39,7 +39,7 @@ export const metadata: Metadata = {
   openGraph: {
     title: "Irvine All-Stars | Irvine Pony Baseball",
     description:
-      "Official home of Irvine Pony Baseball All-Stars. Coach applications, tryout registration, and parent portal for all twelve divisions.",
+      "Official home of Irvine Pony Baseball All-Stars. Fair selection, transparent process, unforgettable summer. Twelve divisions from Shetland to Pony.",
     siteName: "Irvine All-Stars",
     type: "website",
     url: "https://irvineallstars.com",
@@ -48,7 +48,7 @@ export const metadata: Metadata = {
     card: "summary",
     title: "Irvine All-Stars | Irvine Pony Baseball",
     description:
-      "Official home of Irvine Pony Baseball All-Stars. Coach applications, tryout registration, and parent portal.",
+      "Official home of Irvine Pony Baseball All-Stars. Fair selection, transparent process, unforgettable summer. Twelve divisions from Shetland to Pony.",
   },
 };
 

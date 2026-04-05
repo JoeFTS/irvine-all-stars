@@ -5,7 +5,7 @@ import { CoachApplicationForm } from "@/components/coach-application-form";
 export const metadata: Metadata = {
   title: "Apply to Coach",
   description:
-    "Submit your application to coach an Irvine Pony Baseball All-Stars team. Complete the 5-step form to be considered for the upcoming season.",
+    "Submit your application to coach an Irvine Pony Baseball All-Stars team. Complete the 4-step form to be considered for the upcoming season.",
 };
 
 export default function ApplyCoachPage() {

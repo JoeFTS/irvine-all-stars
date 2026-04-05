@@ -121,7 +121,7 @@ export function Navbar() {
             <li className="ml-2">
               <Link
                 href="/auth/login"
-                className="bg-flag-red hover:bg-flag-red-dark text-white px-4 py-1.5 rounded text-sm font-bold uppercase tracking-wide transition-colors"
+                className="bg-flag-red hover:bg-flag-red-dark text-white px-4 py-1.5 rounded-full text-sm font-bold uppercase tracking-wide transition-colors"
               >
                 Sign In
               </Link>
@@ -203,7 +203,7 @@ export function Navbar() {
                 <Link
                   href="/auth/login"
                   onClick={() => setMobileOpen(false)}
-                  className="block bg-flag-red text-white text-center py-3 rounded font-display text-lg uppercase tracking-wider font-bold"
+                  className="block bg-flag-red text-white text-center py-3 rounded-full font-display text-lg uppercase tracking-wider font-bold"
                 >
                   Sign In
                 </Link>
