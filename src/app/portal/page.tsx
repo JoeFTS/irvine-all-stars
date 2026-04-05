@@ -866,7 +866,12 @@ export default function PortalPage() {
             </div>
           ) : (
             <div className="space-y-4">
-              {announcements.map((ann) => (
+              {announcements.map((ann) => {
+                const isTournament = ann.title.startsWith("Tournament:");
+                const tournamentName = isTournament ? Object.keys(tournamentFlyers).find(name => ann.title.includes(name)) : null;
+                const flyerUrl = tournamentName ? tournamentFlyers[tournamentName] : null;
+
+                return (
                 <div
                   key={ann.id}
                   className="bg-off-white rounded-2xl border border-gray-200 p-5 md:p-6"
@@ -876,7 +881,7 @@ export default function PortalPage() {
                       {ann.title}
                     </h3>
                     <div className="flex items-center gap-2 shrink-0">
-                      {ann.title.startsWith("Tournament:") && (
+                      {isTournament && (
                         <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-star-gold/20 text-amber-700">
                           Tournament
                         </span>
@@ -894,30 +899,30 @@ export default function PortalPage() {
                       </span>
                     </div>
                   </div>
-                  <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-line">
-                    {ann.body.split(/(https?:\/\/[^\s]+)/g).map((part, i) =>
-                      /^https?:\/\//.test(part) ? (
-                        <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-flag-red hover:underline font-medium">
-                          {part}
-                        </a>
-                      ) : part
-                    )}
-                  </p>
-                  {/* Tournament flyer image */}
-                  {ann.title.startsWith("Tournament:") && (() => {
-                    const tournamentName = Object.keys(tournamentFlyers).find(name => ann.title.includes(name));
-                    const flyerUrl = tournamentName ? tournamentFlyers[tournamentName] : null;
-                    return flyerUrl ? (
+                  <div className={flyerUrl ? "flex gap-4" : ""}>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-line">
+                        {ann.body.split(/(https?:\/\/[^\s]+)/g).map((part, i) =>
+                          /^https?:\/\//.test(part) ? (
+                            <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-flag-red hover:underline font-medium break-all">
+                              {part}
+                            </a>
+                          ) : part
+                        )}
+                      </p>
+                    </div>
+                    {flyerUrl && (
                       <div
-                        className="mt-3 cursor-pointer rounded-xl overflow-hidden border border-gray-200"
+                        className="shrink-0 w-24 md:w-32 cursor-pointer rounded-lg overflow-hidden border border-gray-200 self-start hover:opacity-90 transition-opacity"
                         onClick={() => setLightboxUrl(flyerUrl)}
                       >
-                        <img src={flyerUrl} alt="Tournament flyer" className="w-full max-h-64 object-cover" />
+                        <img src={flyerUrl} alt="Tournament flyer" className="w-full h-auto object-contain" />
                       </div>
-                    ) : null;
-                  })()}
+                    )}
+                  </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
