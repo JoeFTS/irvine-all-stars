@@ -15,9 +15,11 @@ interface Announcement {
 export default function CoachUpdatesPage() {
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [loadingAnnouncements, setLoadingAnnouncements] = useState(true);
+  const [tournamentFlyers, setTournamentFlyers] = useState<Record<string, string>>({});
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
 
   useEffect(() => {
-    async function fetchAnnouncements() {
+    async function fetchData() {
       if (!supabase) {
         setLoadingAnnouncements(false);
         return;
@@ -31,13 +33,35 @@ export default function CoachUpdatesPage() {
         if (!error && data) {
           setAnnouncements(data);
         }
+
+        // Fetch tournament flyer URLs
+        const { data: tournamentsData } = await supabase
+          .from("tournaments")
+          .select("name, flyer_url")
+          .eq("status", "published")
+          .not("flyer_url", "is", null);
+
+        if (tournamentsData) {
+          const flyerMap: Record<string, string> = {};
+          for (const t of tournamentsData) {
+            if (t.flyer_url) {
+              if (t.flyer_url.startsWith("/")) {
+                flyerMap[t.name] = t.flyer_url;
+              } else {
+                const { data: urlData } = supabase.storage.from("tournament-flyers").getPublicUrl(t.flyer_url);
+                flyerMap[t.name] = urlData.publicUrl;
+              }
+            }
+          }
+          setTournamentFlyers(flyerMap);
+        }
       } catch {
         // silently fail
       } finally {
         setLoadingAnnouncements(false);
       }
     }
-    fetchAnnouncements();
+    fetchData();
   }, []);
 
   function formatDate(dateStr: string) {
@@ -77,14 +101,19 @@ export default function CoachUpdatesPage() {
             <p className="text-gray-400 text-sm">No announcements yet.</p>
           ) : (
             <div className="space-y-4">
-              {announcements.map((a) => (
+              {announcements.map((a) => {
+                const isTournament = a.title.startsWith("Tournament:");
+                const tournamentName = isTournament ? Object.keys(tournamentFlyers).find(name => a.title.includes(name)) : null;
+                const flyerUrl = tournamentName ? tournamentFlyers[tournamentName] : null;
+
+                return (
                 <div
                   key={a.id}
                   className="border-b border-gray-100 pb-4 last:border-b-0 last:pb-0"
                 >
                   <div className="flex items-center gap-3 mb-1">
                     <h3 className="font-semibold text-charcoal">{a.title}</h3>
-                    {a.title.startsWith("Tournament:") && (
+                    {isTournament && (
                       <span className="px-2 py-0.5 rounded-full text-xs font-bold bg-star-gold/20 text-amber-700">
                         Tournament
                       </span>
@@ -96,17 +125,30 @@ export default function CoachUpdatesPage() {
                     )}
                   </div>
                   <p className="text-xs text-gray-400 mb-2">{formatDate(a.created_at)}</p>
-                  <p className="text-gray-600 text-sm whitespace-pre-line">
-                    {a.body.split(/(https?:\/\/[^\s]+)/g).map((part, i) =>
-                      /^https?:\/\//.test(part) ? (
-                        <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-flag-red hover:underline font-medium">
-                          {part}
-                        </a>
-                      ) : part
+                  <div className={flyerUrl ? "flex gap-4" : ""}>
+                    <div className="flex-1 min-w-0">
+                      <p className="text-gray-600 text-sm whitespace-pre-line">
+                        {a.body.split(/(https?:\/\/[^\s]+)/g).map((part, i) =>
+                          /^https?:\/\//.test(part) ? (
+                            <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-flag-red hover:underline font-medium break-all">
+                              {part}
+                            </a>
+                          ) : part
+                        )}
+                      </p>
+                    </div>
+                    {flyerUrl && (
+                      <div
+                        className="shrink-0 w-24 md:w-32 cursor-pointer rounded-lg overflow-hidden border border-gray-200 self-start hover:opacity-90 transition-opacity"
+                        onClick={() => setLightboxUrl(flyerUrl)}
+                      >
+                        <img src={flyerUrl} alt="Tournament flyer" className="w-full h-auto object-contain" />
+                      </div>
                     )}
-                  </p>
+                  </div>
                 </div>
-              ))}
+                );
+              })}
             </div>
           )}
         </div>
@@ -232,6 +274,24 @@ export default function CoachUpdatesPage() {
         </div>
 
       </div>
+
+      {/* Lightbox modal for tournament flyers */}
+      {lightboxUrl && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
+          onClick={() => setLightboxUrl(null)}
+        >
+          <button className="absolute top-4 right-4 text-white" onClick={() => setLightboxUrl(null)}>
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+          <img
+            src={lightboxUrl}
+            alt="Tournament flyer"
+            className="max-w-full max-h-[90vh] rounded-xl"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </div>
   );
 }
