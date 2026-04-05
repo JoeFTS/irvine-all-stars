@@ -216,7 +216,15 @@ export default function CoachUpdatesPage() {
                     )}
                   </div>
                   <p className="text-xs text-gray-400 mb-2">{formatDate(a.created_at)}</p>
-                  <p className="text-gray-600 text-sm whitespace-pre-line">{a.body}</p>
+                  <p className="text-gray-600 text-sm whitespace-pre-line">
+                    {a.body.split(/(https?:\/\/[^\s]+)/g).map((part, i) =>
+                      /^https?:\/\//.test(part) ? (
+                        <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-flag-red hover:underline font-medium">
+                          {part}
+                        </a>
+                      ) : part
+                    )}
+                  </p>
                 </div>
               ))}
             </div>

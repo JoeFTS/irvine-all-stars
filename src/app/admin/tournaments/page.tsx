@@ -6,6 +6,11 @@ import { Plus, Pencil, Trash2, X, CheckCircle2 } from "lucide-react";
 import { divisions } from "@/content/divisions";
 import FileUpload from "@/components/file-upload";
 
+/** Convert division to the DB format used in profiles/registrations: "12U-Bronco", "7U MP-Pinto" */
+function divisionDbId(d: { name: string; ponyName: string }) {
+  return `${d.name}-${d.ponyName}`;
+}
+
 interface Tournament {
   id: string;
   name: string;
@@ -442,22 +447,25 @@ export default function TournamentsPage() {
                 Division IDs
               </label>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                {divisions.map((d) => (
+                {divisions.map((d) => {
+                  const dbId = divisionDbId(d);
+                  return (
                   <label
-                    key={d.id}
+                    key={dbId}
                     className="flex items-center gap-2 px-3 py-2 rounded-lg border border-gray-200 hover:bg-gray-50 cursor-pointer transition-colors"
                   >
                     <input
                       type="checkbox"
-                      checked={divisionIds.includes(d.id)}
-                      onChange={() => toggleDivision(d.id)}
+                      checked={divisionIds.includes(dbId)}
+                      onChange={() => toggleDivision(dbId)}
                       className="w-4 h-4 rounded border-gray-300 text-flag-blue focus:ring-flag-blue/30"
                     />
                     <span className="text-sm text-charcoal">
                       {d.name} {d.ponyName}
                     </span>
                   </label>
-                ))}
+                  );
+                })}
               </div>
             </div>
 

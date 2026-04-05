@@ -870,8 +870,14 @@ export default function PortalPage() {
                       </span>
                     </div>
                   </div>
-                  <p className="text-gray-600 text-sm leading-relaxed line-clamp-3">
-                    {ann.body}
+                  <p className="text-gray-600 text-sm leading-relaxed whitespace-pre-line">
+                    {ann.body.split(/(https?:\/\/[^\s]+)/g).map((part, i) =>
+                      /^https?:\/\//.test(part) ? (
+                        <a key={i} href={part} target="_blank" rel="noopener noreferrer" className="text-flag-red hover:underline font-medium">
+                          {part}
+                        </a>
+                      ) : part
+                    )}
                   </p>
                 </div>
               ))}
