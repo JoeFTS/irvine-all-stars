@@ -21,6 +21,10 @@ CREATE TABLE IF NOT EXISTS irvine_allstars.tournaments (
 -- Index for filtering by status and date
 CREATE INDEX idx_tournaments_status_date ON irvine_allstars.tournaments (status, start_date);
 
+-- Grant table permissions (required before RLS policies take effect)
+GRANT SELECT ON irvine_allstars.tournaments TO anon, authenticated;
+GRANT INSERT, UPDATE, DELETE ON irvine_allstars.tournaments TO authenticated;
+
 -- Enable RLS
 ALTER TABLE irvine_allstars.tournaments ENABLE ROW LEVEL SECURITY;
 
