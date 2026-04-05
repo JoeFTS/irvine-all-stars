@@ -68,7 +68,7 @@ export async function insertTournaments(tournaments) {
         name: t.name,
         start_date: t.startDate,
         end_date: t.endDate,
-        location: t.location,
+        location: t.location || 'TBD',
         divisions_display: t.divisionsDisplay || '',
         division_ids: t.divisionIds.length > 0 ? t.divisionIds : [],
         registration_url: t.registrationUrl || null,
