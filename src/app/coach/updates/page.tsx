@@ -79,10 +79,10 @@ export default function CoachUpdatesPage() {
         Coach
       </p>
       <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide mb-2">
-        Tournament Updates
+        Updates
       </h1>
       <p className="text-gray-600 mb-8">
-        Important information, schedules, and announcements for the tournament season.
+        Important information, schedules, and announcements.
       </p>
 
       <div className="space-y-6">
