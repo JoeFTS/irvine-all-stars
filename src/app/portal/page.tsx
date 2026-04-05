@@ -157,6 +157,8 @@ export default function PortalPage() {
   const [tryoutAssignments, setTryoutAssignments] = useState<TryoutAssignment[]>([]);
   const [dataLoading, setDataLoading] = useState(true);
   const [acceptingId, setAcceptingId] = useState<string | null>(null);
+  const [tournamentFlyers, setTournamentFlyers] = useState<Record<string, string>>({});
+  const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
 
   async function acceptSelection(regId: string) {
     if (!supabase || !user) return;
@@ -283,6 +285,24 @@ export default function PortalPage() {
 
       const { data: annData } = await announcementQuery;
       setAnnouncements((annData ?? []) as Announcement[]);
+
+      // Fetch tournament flyer URLs to display in announcement cards
+      const { data: tournamentsData } = await supabase!
+        .from("tournaments")
+        .select("name, flyer_url")
+        .eq("status", "published")
+        .not("flyer_url", "is", null);
+
+      if (tournamentsData) {
+        const flyerMap: Record<string, string> = {};
+        for (const t of tournamentsData) {
+          if (t.flyer_url) {
+            const { data: urlData } = supabase!.storage.from("tournament-flyers").getPublicUrl(t.flyer_url);
+            flyerMap[t.name] = urlData.publicUrl;
+          }
+        }
+        setTournamentFlyers(flyerMap);
+      }
 
       setDataLoading(false);
     }
@@ -879,6 +899,19 @@ export default function PortalPage() {
                       ) : part
                     )}
                   </p>
+                  {/* Tournament flyer image */}
+                  {ann.title.startsWith("Tournament:") && (() => {
+                    const tournamentName = Object.keys(tournamentFlyers).find(name => ann.title.includes(name));
+                    const flyerUrl = tournamentName ? tournamentFlyers[tournamentName] : null;
+                    return flyerUrl ? (
+                      <div
+                        className="mt-3 cursor-pointer rounded-xl overflow-hidden border border-gray-200"
+                        onClick={() => setLightboxUrl(flyerUrl)}
+                      >
+                        <img src={flyerUrl} alt="Tournament flyer" className="w-full max-h-64 object-cover" />
+                      </div>
+                    ) : null;
+                  })()}
                 </div>
               ))}
             </div>
@@ -947,6 +980,24 @@ export default function PortalPage() {
       </section>
 
       <StripeDivider />
+
+      {/* Lightbox modal for tournament flyers */}
+      {lightboxUrl && (
+        <div
+          className="fixed inset-0 z-50 bg-black/80 flex items-center justify-center p-4"
+          onClick={() => setLightboxUrl(null)}
+        >
+          <button className="absolute top-4 right-4 text-white" onClick={() => setLightboxUrl(null)}>
+            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
+          </button>
+          <img
+            src={lightboxUrl}
+            alt="Tournament flyer"
+            className="max-w-full max-h-[90vh] rounded-xl"
+            onClick={(e) => e.stopPropagation()}
+          />
+        </div>
+      )}
     </>
   );
 }
