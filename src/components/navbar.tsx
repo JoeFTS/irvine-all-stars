@@ -66,15 +66,15 @@ export function Navbar() {
       <nav
         className="fixed top-0 w-full z-[100] h-16 flex items-center justify-between px-5 md:px-8 transition-all duration-500 ease-out"
         style={{
-          backgroundColor: scrolled
-            ? "rgba(15, 27, 45, 0.75)"
+          backgroundColor: (scrolled || pathname !== "/")
+            ? "rgba(15, 27, 45, 0.85)"
             : "transparent",
-          backdropFilter: scrolled ? "blur(16px) saturate(1.4)" : "none",
-          WebkitBackdropFilter: scrolled ? "blur(16px) saturate(1.4)" : "none",
-          borderBottom: scrolled
+          backdropFilter: (scrolled || pathname !== "/") ? "blur(16px) saturate(1.4)" : "none",
+          WebkitBackdropFilter: (scrolled || pathname !== "/") ? "blur(16px) saturate(1.4)" : "none",
+          borderBottom: (scrolled || pathname !== "/")
             ? "1px solid rgba(255, 255, 255, 0.08)"
             : "1px solid transparent",
-          boxShadow: scrolled
+          boxShadow: (scrolled || pathname !== "/")
             ? "inset 0 1px 0 rgba(255,255,255,0.06), 0 8px 32px rgba(0,0,0,0.2)"
             : "none",
         }}
