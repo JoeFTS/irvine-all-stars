@@ -36,6 +36,9 @@ interface Registration {
   parent_phone: string;
   emergency_contact_name: string;
   emergency_contact_phone: string;
+  secondary_parent_name: string | null;
+  secondary_parent_email: string | null;
+  secondary_parent_phone: string | null;
 }
 
 interface PlayerDocument {
@@ -301,6 +304,40 @@ function PlayerCard({
             {reg.emergency_contact_phone}
           </a>
         </div>
+
+        {/* Second Parent/Guardian */}
+        {(reg.secondary_parent_name || reg.secondary_parent_email || reg.secondary_parent_phone) && (
+          <div>
+            <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-1.5">
+              Second Parent / Guardian
+            </p>
+            {reg.secondary_parent_name && (
+              <p className="text-sm font-medium text-charcoal mb-1">
+                {reg.secondary_parent_name}
+              </p>
+            )}
+            <div className="space-y-1">
+              {reg.secondary_parent_email && (
+                <a
+                  href={`mailto:${reg.secondary_parent_email}`}
+                  className="flex items-center gap-1.5 text-sm text-flag-blue hover:underline"
+                >
+                  <Mail size={14} className="shrink-0" />
+                  <span className="truncate">{reg.secondary_parent_email}</span>
+                </a>
+              )}
+              {reg.secondary_parent_phone && (
+                <a
+                  href={`tel:${reg.secondary_parent_phone}`}
+                  className="flex items-center gap-1.5 text-sm text-flag-blue hover:underline"
+                >
+                  <Phone size={14} className="shrink-0" />
+                  {reg.secondary_parent_phone}
+                </a>
+              )}
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Document Status Row */}
@@ -412,7 +449,7 @@ export default function CoachRosterPage() {
       supabase
         .from("tryout_registrations")
         .select(
-          "id, player_first_name, player_last_name, division, jersey_number, primary_position, secondary_position, bats, throws, parent_name, parent_email, parent_phone, emergency_contact_name, emergency_contact_phone, status"
+          "id, player_first_name, player_last_name, division, jersey_number, primary_position, secondary_position, bats, throws, parent_name, parent_email, parent_phone, emergency_contact_name, emergency_contact_phone, secondary_parent_name, secondary_parent_email, secondary_parent_phone, status"
         )
         .in("status", ["selected", "alternate"])
         .order("division")
