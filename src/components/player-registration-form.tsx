@@ -234,6 +234,7 @@ export function PlayerRegistrationForm() {
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [editId, setEditId] = useState<string | null>(null);
+  const [showSecondParent, setShowSecondParent] = useState(false);
 
   // Pre-populate from URL query params (from invite or portal link)
   useEffect(() => {
@@ -652,10 +653,10 @@ export function PlayerRegistrationForm() {
 
       {/* Second Parent / Guardian (optional, collapsible) */}
       <div className="border-t border-gray-100 pt-4 mt-1">
-        {form.secondary_parent_name.trim() === "" ? (
+        {!showSecondParent && !form.secondary_parent_name && !form.secondary_parent_email && !form.secondary_parent_phone ? (
           <button
             type="button"
-            onClick={() => update("secondary_parent_name", " ")}
+            onClick={() => setShowSecondParent(true)}
             className="text-flag-blue hover:text-flag-blue-mid text-sm font-semibold transition-colors"
           >
             + Add a second parent / guardian
@@ -672,6 +673,7 @@ export function PlayerRegistrationForm() {
                   update("secondary_parent_name", "");
                   update("secondary_parent_email", "");
                   update("secondary_parent_phone", "");
+                  setShowSecondParent(false);
                 }}
                 className="text-red-500 hover:text-red-700 text-xs font-semibold transition-colors"
               >
@@ -682,7 +684,7 @@ export function PlayerRegistrationForm() {
               <FieldLabel htmlFor="secondary_parent_name">Name</FieldLabel>
               <TextInput
                 id="secondary_parent_name"
-                value={form.secondary_parent_name.trim() === "" ? "" : form.secondary_parent_name}
+                value={form.secondary_parent_name}
                 onChange={(v) => update("secondary_parent_name", v)}
                 placeholder="John Smith"
                 autoComplete="name"
