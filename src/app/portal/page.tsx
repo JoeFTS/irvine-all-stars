@@ -24,6 +24,9 @@ interface Registration {
   primary_position: string;
   status: string;
   submitted_at: string;
+  secondary_parent_name: string | null;
+  secondary_parent_email: string | null;
+  secondary_parent_phone: string | null;
 }
 
 interface PlayerDocument {
@@ -160,6 +163,8 @@ export default function PortalPage() {
   const [acceptingId, setAcceptingId] = useState<string | null>(null);
   const [tournamentFlyers, setTournamentFlyers] = useState<Record<string, string>>({});
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
+  const [editingSecondParent, setEditingSecondParent] = useState<string | null>(null);
+  const [secondParentForm, setSecondParentForm] = useState({ name: "", email: "", phone: "" });
 
   async function acceptSelection(regId: string) {
     if (!supabase || !user) return;
@@ -199,6 +204,37 @@ export default function PortalPage() {
     setAcceptingId(null);
   }
 
+  async function saveSecondParent(regId: string) {
+    if (!supabase) return;
+    const { error } = await supabase
+      .from("tryout_registrations")
+      .update({
+        secondary_parent_name: secondParentForm.name.trim() || null,
+        secondary_parent_email: secondParentForm.email.trim().toLowerCase() || null,
+        secondary_parent_phone: secondParentForm.phone.trim() || null,
+      })
+      .eq("id", regId);
+
+    if (error) {
+      alert("Failed to save. Please try again.");
+      return;
+    }
+
+    setRegistrations((prev) =>
+      prev.map((r) =>
+        r.id === regId
+          ? {
+              ...r,
+              secondary_parent_name: secondParentForm.name.trim() || null,
+              secondary_parent_email: secondParentForm.email.trim().toLowerCase() || null,
+              secondary_parent_phone: secondParentForm.phone.trim() || null,
+            }
+          : r
+      )
+    );
+    setEditingSecondParent(null);
+  }
+
   // Client-side auth guard
   useEffect(() => {
     if (!authLoading && !user) {
@@ -219,7 +255,7 @@ export default function PortalPage() {
       const { data: regs } = await supabase!
         .from("tryout_registrations")
         .select(
-          "id, parent_name, parent_email, player_first_name, player_last_name, player_date_of_birth, division, primary_position, status, submitted_at"
+          "id, parent_name, parent_email, player_first_name, player_last_name, player_date_of_birth, division, primary_position, status, submitted_at, secondary_parent_name, secondary_parent_email, secondary_parent_phone"
         )
         .or(`parent_email.eq.${user!.email},secondary_parent_email.eq.${user!.email}`)
         .order("submitted_at", { ascending: false });
@@ -564,6 +600,122 @@ export default function PortalPage() {
                         </>
                       );
                     })()}
+
+                    {/* Second Parent / Guardian */}
+                    <div className="mt-4 border-t border-gray-100 pt-4">
+                      <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-2">
+                        Second Parent / Guardian
+                      </p>
+
+                      {editingSecondParent === reg.id ? (
+                        <div className="space-y-3">
+                          <div>
+                            <label className="block text-sm font-semibold text-charcoal mb-1">
+                              Name
+                            </label>
+                            <input
+                              type="text"
+                              placeholder="Full name"
+                              value={secondParentForm.name}
+                              onChange={(e) =>
+                                setSecondParentForm((f) => ({ ...f, name: e.target.value }))
+                              }
+                              className="w-full min-h-[44px] px-4 py-3 bg-white border border-gray-200 rounded-xl text-charcoal placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-star-gold/30 focus:border-star-gold transition-colors"
+                            />
+                          </div>
+                          <div>
+                            <label className="block text-sm font-semibold text-charcoal mb-1">
+                              Email
+                            </label>
+                            <input
+                              type="email"
+                              placeholder="email@example.com"
+                              value={secondParentForm.email}
+                              onChange={(e) =>
+                                setSecondParentForm((f) => ({ ...f, email: e.target.value }))
+                              }
+                              className="w-full min-h-[44px] px-4 py-3 bg-white border border-gray-200 rounded-xl text-charcoal placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-star-gold/30 focus:border-star-gold transition-colors"
+                            />
+                            <p className="text-gray-400 text-xs mt-1">
+                              This parent can sign in to the portal with this email.
+                            </p>
+                          </div>
+                          <div>
+                            <label className="block text-sm font-semibold text-charcoal mb-1">
+                              Phone
+                            </label>
+                            <input
+                              type="tel"
+                              placeholder="(555) 555-5555"
+                              value={secondParentForm.phone}
+                              onChange={(e) => {
+                                const digits = e.target.value.replace(/\D/g, "").slice(0, 10);
+                                let formatted = digits;
+                                if (digits.length > 6) {
+                                  formatted = `(${digits.slice(0, 3)}) ${digits.slice(3, 6)}-${digits.slice(6)}`;
+                                } else if (digits.length > 3) {
+                                  formatted = `(${digits.slice(0, 3)}) ${digits.slice(3)}`;
+                                } else if (digits.length > 0) {
+                                  formatted = `(${digits}`;
+                                }
+                                setSecondParentForm((f) => ({ ...f, phone: formatted }));
+                              }}
+                              className="w-full min-h-[44px] px-4 py-3 bg-white border border-gray-200 rounded-xl text-charcoal placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-star-gold/30 focus:border-star-gold transition-colors"
+                            />
+                          </div>
+                          <div className="flex gap-2 pt-1">
+                            <button
+                              onClick={() => saveSecondParent(reg.id)}
+                              className="min-h-[44px] bg-flag-blue hover:bg-flag-blue-mid text-white px-5 py-2.5 rounded-full font-display text-xs font-semibold uppercase tracking-widest transition-colors"
+                            >
+                              Save
+                            </button>
+                            <button
+                              onClick={() => setEditingSecondParent(null)}
+                              className="min-h-[44px] border border-gray-200 hover:border-gray-400 text-charcoal px-5 py-2.5 rounded-full font-display text-xs font-semibold uppercase tracking-widest transition-colors"
+                            >
+                              Cancel
+                            </button>
+                          </div>
+                        </div>
+                      ) : reg.secondary_parent_name || reg.secondary_parent_email || reg.secondary_parent_phone ? (
+                        <div className="flex items-start justify-between gap-2">
+                          <div className="text-sm text-gray-600 space-y-0.5">
+                            {reg.secondary_parent_name && (
+                              <p className="font-semibold text-charcoal">{reg.secondary_parent_name}</p>
+                            )}
+                            {reg.secondary_parent_email && <p>{reg.secondary_parent_email}</p>}
+                            {reg.secondary_parent_phone && <p>{reg.secondary_parent_phone}</p>}
+                          </div>
+                          <button
+                            onClick={() => {
+                              setSecondParentForm({
+                                name: reg.secondary_parent_name || "",
+                                email: reg.secondary_parent_email || "",
+                                phone: reg.secondary_parent_phone || "",
+                              });
+                              setEditingSecondParent(reg.id);
+                            }}
+                            className="min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-400 hover:text-flag-blue transition-colors"
+                            aria-label="Edit second parent"
+                          >
+                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                              <path d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a4 4 0 001.343-.885L17.5 5.5a2.121 2.121 0 00-3-3L3.58 13.42a4 4 0 00-.885 1.343z" />
+                            </svg>
+                          </button>
+                        </div>
+                      ) : (
+                        <button
+                          onClick={() => {
+                            setSecondParentForm({ name: "", email: "", phone: "" });
+                            setEditingSecondParent(reg.id);
+                          }}
+                          className="min-h-[44px] text-sm text-flag-blue hover:text-flag-blue-mid font-semibold transition-colors"
+                        >
+                          + Add a second parent / guardian
+                        </button>
+                      )}
+                    </div>
                   </div>
                 );
               })}
