@@ -50,6 +50,9 @@ interface FormData {
   parent_name: string;
   parent_email: string;
   parent_phone: string;
+  secondary_parent_name: string;
+  secondary_parent_email: string;
+  secondary_parent_phone: string;
   player_first_name: string;
   player_last_name: string;
   player_dob: string;
@@ -74,6 +77,9 @@ const INITIAL_DATA: FormData = {
   parent_name: "",
   parent_email: "",
   parent_phone: "",
+  secondary_parent_name: "",
+  secondary_parent_email: "",
+  secondary_parent_phone: "",
   player_first_name: "",
   player_last_name: "",
   player_dob: "",
@@ -293,7 +299,7 @@ export function PlayerRegistrationForm() {
   );
 
   const updatePhone = useCallback(
-    (key: "parent_phone" | "emergency_contact_phone", raw: string) => {
+    (key: "parent_phone" | "emergency_contact_phone" | "secondary_parent_phone", raw: string) => {
       update(key, formatPhone(raw));
     },
     [update],
@@ -379,6 +385,9 @@ export function PlayerRegistrationForm() {
       parent_name: form.parent_name.trim(),
       parent_email: form.parent_email.trim().toLowerCase(),
       parent_phone: form.parent_phone.trim(),
+      secondary_parent_name: form.secondary_parent_name.trim() || null,
+      secondary_parent_email: form.secondary_parent_email.trim().toLowerCase() || null,
+      secondary_parent_phone: form.secondary_parent_phone.trim() || null,
       player_first_name: form.player_first_name.trim(),
       player_last_name: form.player_last_name.trim(),
       player_date_of_birth: form.player_dob,
@@ -517,6 +526,9 @@ export function PlayerRegistrationForm() {
               parent_name: form.parent_name,
               parent_email: form.parent_email,
               parent_phone: form.parent_phone,
+              secondary_parent_name: form.secondary_parent_name,
+              secondary_parent_email: form.secondary_parent_email,
+              secondary_parent_phone: form.secondary_parent_phone,
               emergency_contact_name: form.emergency_contact_name,
               emergency_contact_phone: form.emergency_contact_phone,
             });
@@ -636,6 +648,77 @@ export function PlayerRegistrationForm() {
           />
           {fieldError("parent_phone")}
         </div>
+      </div>
+
+      {/* Second Parent / Guardian (optional, collapsible) */}
+      <div className="border-t border-gray-100 pt-4 mt-1">
+        {form.secondary_parent_name.trim() === "" ? (
+          <button
+            type="button"
+            onClick={() => update("secondary_parent_name", " ")}
+            className="text-flag-blue hover:text-flag-blue-mid text-sm font-semibold transition-colors"
+          >
+            + Add a second parent / guardian
+          </button>
+        ) : (
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <h3 className="text-sm font-semibold text-gray-700">
+                Second Parent / Guardian
+              </h3>
+              <button
+                type="button"
+                onClick={() => {
+                  update("secondary_parent_name", "");
+                  update("secondary_parent_email", "");
+                  update("secondary_parent_phone", "");
+                }}
+                className="text-red-500 hover:text-red-700 text-xs font-semibold transition-colors"
+              >
+                Remove
+              </button>
+            </div>
+            <div>
+              <FieldLabel htmlFor="secondary_parent_name">Name</FieldLabel>
+              <TextInput
+                id="secondary_parent_name"
+                value={form.secondary_parent_name.trim() === "" ? "" : form.secondary_parent_name}
+                onChange={(v) => update("secondary_parent_name", v)}
+                placeholder="John Smith"
+                autoComplete="name"
+              />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div>
+                <FieldLabel htmlFor="secondary_parent_email">Email</FieldLabel>
+                <TextInput
+                  id="secondary_parent_email"
+                  type="email"
+                  value={form.secondary_parent_email}
+                  onChange={(v) => update("secondary_parent_email", v)}
+                  placeholder="john@email.com"
+                  autoComplete="email"
+                  inputMode="email"
+                />
+                <p className="text-xs text-gray-400 mt-1">
+                  If provided, this parent can sign in to the portal.
+                </p>
+              </div>
+              <div>
+                <FieldLabel htmlFor="secondary_parent_phone">Phone</FieldLabel>
+                <TextInput
+                  id="secondary_parent_phone"
+                  type="tel"
+                  value={form.secondary_parent_phone}
+                  onChange={(v) => updatePhone("secondary_parent_phone", v)}
+                  placeholder="(949) 555-5678"
+                  autoComplete="tel"
+                  inputMode="tel"
+                />
+              </div>
+            </div>
+          </div>
+        )}
       </div>
 
       {/* Player first & last name */}
