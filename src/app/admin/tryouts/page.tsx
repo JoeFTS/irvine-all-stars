@@ -44,6 +44,9 @@ interface Registration {
   parent_name: string;
   parent_email: string;
   parent_phone: string;
+  secondary_parent_name: string | null;
+  secondary_parent_email: string | null;
+  secondary_parent_phone: string | null;
   player_first_name: string;
   player_last_name: string;
   player_date_of_birth: string;
@@ -1385,6 +1388,14 @@ export default function TryoutsPage() {
                               </span>
                             </div>
                           </div>
+                          {(reg.secondary_parent_name || reg.secondary_parent_email || reg.secondary_parent_phone) && (
+                            <div className="mt-2 pt-2 border-t border-gray-100">
+                              <p className="text-xs text-gray-400 mb-1">Second Parent</p>
+                              <p className="text-sm text-charcoal">
+                                {[reg.secondary_parent_name, reg.secondary_parent_email, reg.secondary_parent_phone].filter(Boolean).join(" · ")}
+                              </p>
+                            </div>
+                          )}
                         </div>
 
                         {/* Emergency */}
