@@ -99,28 +99,47 @@ export default function CornerTournamentsPage() {
 
   return (
     <>
-      <div className="flex items-center gap-4">
-        <div className="bg-flag-blue/10 text-flag-blue p-3 rounded-2xl">
-          <Trophy size={28} />
+      {/* ===== HERO HEADER ===== */}
+      <div className="relative overflow-hidden rounded-2xl bg-flag-blue p-6 sm:p-8">
+        <div
+          aria-hidden
+          className="absolute inset-0 text-white/[0.05] text-xl leading-[2.8rem] tracking-widest overflow-hidden pointer-events-none p-2"
+        >
+          {"\u2605 ".repeat(200)}
         </div>
-        <div>
-          <p className="font-display text-sm font-semibold text-flag-red uppercase tracking-[3px]">
-            Coach&apos;s Corner
-          </p>
-          <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide">
-            Tournaments
-          </h1>
-          <p className="text-gray-500 text-sm mt-1">
-            Everything you need to prep for tournament play.
-          </p>
+        <div aria-hidden className="absolute top-0 left-0 w-24 h-1 bg-flag-red" />
+        <div aria-hidden className="absolute top-0 left-0 w-1 h-24 bg-flag-red" />
+        <div className="relative z-10 flex items-center gap-4">
+          <div className="bg-white/10 text-star-gold-bright p-3 rounded-xl border border-white/10 backdrop-blur-sm shrink-0">
+            <Trophy size={28} />
+          </div>
+          <div>
+            <p className="font-display text-xs font-semibold text-star-gold-bright uppercase tracking-[3px] mb-1">
+              &#9733; Coach&apos;s Corner
+            </p>
+            <h1 className="font-display text-3xl md:text-4xl font-bold text-white uppercase tracking-wide leading-tight">
+              Tournaments
+            </h1>
+            <p className="text-white/70 text-sm mt-1">
+              Everything you need to prep for tournament play.
+            </p>
+          </div>
         </div>
       </div>
 
       {/* ===== YOUR DIVISION RULES ===== */}
-      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
-        <div className="bg-flag-blue p-5 sm:p-6 text-white">
-          <div className="flex items-start gap-4">
-            <div className="bg-white/15 p-3 rounded-lg shrink-0">
+      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden shadow-sm">
+        <div className="relative overflow-hidden bg-flag-blue p-5 sm:p-6 text-white">
+          <div
+            aria-hidden
+            className="absolute inset-0 text-white/[0.05] text-lg leading-[2.4rem] tracking-widest overflow-hidden pointer-events-none p-2"
+          >
+            {"\u2605 ".repeat(120)}
+          </div>
+          <div aria-hidden className="absolute top-0 left-0 w-20 h-1 bg-flag-red" />
+          <div aria-hidden className="absolute top-0 left-0 w-1 h-20 bg-flag-red" />
+          <div className="relative z-10 flex items-start gap-4">
+            <div className="bg-white/10 text-star-gold-bright p-3 rounded-xl shrink-0 border border-white/10 backdrop-blur-sm">
               <BookOpen size={24} />
             </div>
             <div className="flex-1 min-w-0">
@@ -144,7 +163,7 @@ export default function CornerTournamentsPage() {
                   </p>
                   <p className="text-white/70 text-sm mt-0.5">
                     {coachDivision
-                      ? "Division not recognized — showing the full rulebook."
+                      ? "Division not recognized - showing the full rulebook."
                       : "Assign a division to see your division-specific rules."}
                   </p>
                 </>
@@ -192,8 +211,11 @@ export default function CornerTournamentsPage() {
           </div>
         )}
 
-        <div className="border-t border-gray-100 p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div className="border-t border-gray-100 bg-gradient-to-r from-off-white to-gray-50 p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div>
+            <p className="font-display text-[11px] font-semibold uppercase tracking-[2px] text-flag-red mb-0.5">
+              Official Rulebook
+            </p>
             <p className="font-display text-sm font-bold uppercase tracking-wide text-charcoal">
               2026 PONY Baseball Rulebook
             </p>
@@ -204,10 +226,14 @@ export default function CornerTournamentsPage() {
           <a
             href={RULEBOOK_PATH}
             download={RULEBOOK_FILENAME}
-            className="inline-flex items-center gap-2 bg-flag-blue hover:bg-flag-blue-mid text-white px-5 py-2.5 rounded-full font-display text-xs font-semibold uppercase tracking-widest transition-colors min-h-[44px]"
+            className="relative inline-flex items-center gap-2.5 bg-flag-red text-white px-7 py-3.5 rounded-full font-display text-sm font-semibold uppercase tracking-[1.5px] transition-all hover:bg-flag-red-dark hover:-translate-y-0.5 hover:shadow-lg hover:shadow-flag-red/30 active:scale-[0.97] min-h-[48px] shrink-0 overflow-hidden group/btn"
           >
-            <Download size={14} />
-            Download PDF
+            <span
+              aria-hidden
+              className="absolute top-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-star-gold-bright transition-all duration-300 group-hover/btn:w-2/3"
+            />
+            <Download size={16} className="relative" />
+            <span className="relative">Download PDF</span>
           </a>
         </div>
 

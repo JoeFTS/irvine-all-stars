@@ -75,34 +75,40 @@ const quickLinks = [
   { href: "/portal", label: "Parent", icon: Home },
 ];
 
-const coachesCorner = [
+const coachesCorner: Array<{
+  href: string | null;
+  label: string;
+  tagline: string;
+  description: string;
+  icon: typeof Trophy;
+}> = [
   {
     href: "/coach/corner/tournaments",
     label: "Tournaments",
+    tagline: "Play Prepared",
     description: "MDT schedule, division rules, entry forms, hotel blocks.",
     icon: Trophy,
-    colorClasses: "bg-flag-blue/10 text-flag-blue",
   },
   {
     href: "/coach/corner/templates",
     label: "Templates",
+    tagline: "Run Your Team",
     description: "Snack schedule and team templates ready to download.",
     icon: FileSpreadsheet,
-    colorClasses: "bg-flag-blue/10 text-flag-blue",
   },
   {
     href: "/coach/corner/fundraising",
     label: "Fundraising",
+    tagline: "Fund The Season",
     description: "Six proven fundraising playbooks for your team.",
     icon: DollarSign,
-    colorClasses: "bg-flag-red/10 text-flag-red",
   },
   {
     href: null,
     label: "Coming Soon",
+    tagline: "More On Deck",
     description: "More coach resources dropping throughout the season.",
     icon: Sparkles,
-    colorClasses: "bg-gray-100 text-gray-400",
   },
 ];
 
@@ -506,69 +512,100 @@ export default function CoachDashboardPage() {
 
       {/* 6. Coach's Corner */}
       <div>
-        <h3 className="font-display text-lg font-bold uppercase tracking-wide text-flag-blue mb-1">
+        <p className="font-display text-xs font-semibold text-flag-red uppercase tracking-[3px] mb-1">
+          &#9733; Resources
+        </p>
+        <h3 className="font-display text-2xl md:text-3xl font-bold uppercase tracking-wide text-charcoal mb-1">
           Coach&apos;s Corner
         </h3>
-        <p className="text-sm text-gray-500 mb-4">
+        <p className="text-sm text-gray-500 mb-5">
           Resources, templates, and guides to help you run your team.
         </p>
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
           {coachesCorner.map((card) => {
             const Icon = card.icon;
             const isLive = !!card.href;
-            const baseClasses =
-              "bg-white border border-gray-200 rounded-2xl p-5 sm:p-6 flex items-start gap-4 min-h-[112px]";
-            const interactiveClasses =
-              "hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group";
-            const mutedClasses = "opacity-70 cursor-default";
 
-            const content = (
-              <>
-                <div className={`${card.colorClasses} p-3 rounded-lg shrink-0`}>
-                  <Icon size={24} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-2">
-                    <p
-                      className={`font-display text-lg font-bold uppercase tracking-wide ${
-                        isLive ? "text-charcoal" : "text-gray-400"
-                      }`}
-                    >
-                      {card.label}
-                    </p>
-                    {isLive && (
-                      <ChevronRight
-                        size={18}
-                        className="text-gray-300 group-hover:text-flag-blue transition-colors shrink-0"
-                      />
-                    )}
+            if (!isLive) {
+              return (
+                <div
+                  key={card.label}
+                  className="relative overflow-hidden rounded-2xl border-2 border-dashed border-gray-200 bg-gray-50 p-6 min-h-[172px] flex flex-col justify-between"
+                >
+                  <div className="flex items-start gap-3">
+                    <div className="bg-gray-200 text-gray-400 p-2.5 rounded-lg shrink-0">
+                      <Icon size={20} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-display text-[10px] font-semibold uppercase tracking-[2px] text-gray-400 mb-0.5">
+                        {card.tagline}
+                      </p>
+                      <p className="font-display text-xl font-bold uppercase tracking-wide text-gray-400">
+                        {card.label}
+                      </p>
+                    </div>
                   </div>
-                  <p
-                    className={`text-sm mt-1 leading-snug ${
-                      isLive ? "text-gray-600" : "text-gray-400"
-                    }`}
-                  >
+                  <p className="text-xs text-gray-400 leading-snug mt-4">
                     {card.description}
                   </p>
                 </div>
-              </>
-            );
-
-            if (isLive && card.href) {
-              return (
-                <Link
-                  key={card.label}
-                  href={card.href}
-                  className={`${baseClasses} ${interactiveClasses}`}
-                >
-                  {content}
-                </Link>
               );
             }
+
             return (
-              <div key={card.label} className={`${baseClasses} ${mutedClasses}`}>
-                {content}
-              </div>
+              <Link
+                key={card.label}
+                href={card.href!}
+                className="group relative overflow-hidden rounded-2xl bg-flag-blue p-6 min-h-[172px] flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-flag-blue/20"
+              >
+                {/* Star pattern overlay */}
+                <div
+                  aria-hidden
+                  className="absolute inset-0 text-white/[0.05] text-xl leading-[2.8rem] tracking-widest overflow-hidden pointer-events-none p-2"
+                >
+                  {"\u2605 ".repeat(80)}
+                </div>
+
+                {/* Red accent corner ribbon */}
+                <div
+                  aria-hidden
+                  className="absolute top-0 left-0 w-16 h-1 bg-flag-red"
+                />
+                <div
+                  aria-hidden
+                  className="absolute top-0 left-0 w-1 h-16 bg-flag-red"
+                />
+
+                {/* Gold top stripe (appears on hover) */}
+                <div
+                  aria-hidden
+                  className="absolute top-0 right-0 w-0 h-1 bg-star-gold-bright transition-all duration-500 group-hover:w-full"
+                />
+
+                <div className="relative z-10 flex items-start justify-between gap-3">
+                  <div className="flex items-start gap-3 flex-1 min-w-0">
+                    <div className="bg-white/10 text-star-gold-bright p-2.5 rounded-lg shrink-0 border border-white/10 backdrop-blur-sm">
+                      <Icon size={22} />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <p className="font-display text-[10px] font-semibold uppercase tracking-[2px] text-star-gold-bright mb-0.5">
+                        {card.tagline}
+                      </p>
+                      <p className="font-display text-xl md:text-2xl font-bold uppercase tracking-wide text-white leading-tight">
+                        {card.label}
+                      </p>
+                    </div>
+                  </div>
+                  <ChevronRight
+                    size={20}
+                    className="text-white/40 group-hover:text-star-gold-bright group-hover:translate-x-1 transition-all duration-300 shrink-0 mt-1"
+                  />
+                </div>
+
+                <p className="relative z-10 text-xs text-white/70 leading-snug mt-4 pl-[46px]">
+                  {card.description}
+                </p>
+              </Link>
             );
           })}
         </div>

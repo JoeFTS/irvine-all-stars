@@ -24,38 +24,49 @@ const iconBySlug: Record<string, typeof DollarSign> = {
 };
 
 const effortClasses: Record<EffortLevel, string> = {
-  Low: "bg-green-50 text-green-700 border-green-200",
-  "Low-Medium": "bg-lime-50 text-lime-700 border-lime-200",
-  Medium: "bg-amber-50 text-amber-700 border-amber-200",
-  High: "bg-flag-red/10 text-flag-red border-flag-red/30",
+  Low: "bg-green-400/20 text-green-300 border-green-400/30",
+  "Low-Medium": "bg-lime-400/20 text-lime-300 border-lime-400/30",
+  Medium: "bg-star-gold-bright/20 text-star-gold-bright border-star-gold-bright/30",
+  High: "bg-flag-red/20 text-flag-red border-flag-red/40",
 };
 
 export default function CornerFundraisingPage() {
   return (
     <>
-      <div className="flex items-center gap-4">
-        <div className="bg-flag-red/10 text-flag-red p-3 rounded-2xl">
-          <DollarSign size={28} />
+      {/* ===== HERO HEADER ===== */}
+      <div className="relative overflow-hidden rounded-2xl bg-flag-blue p-6 sm:p-8">
+        <div
+          aria-hidden
+          className="absolute inset-0 text-white/[0.05] text-xl leading-[2.8rem] tracking-widest overflow-hidden pointer-events-none p-2"
+        >
+          {"\u2605 ".repeat(200)}
         </div>
-        <div>
-          <p className="font-display text-sm font-semibold text-flag-red uppercase tracking-[3px]">
-            Coach&apos;s Corner
-          </p>
-          <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide">
-            Fundraising
-          </h1>
-          <p className="text-gray-500 text-sm mt-1">
-            Six proven ways to raise money for your team&apos;s season.
-          </p>
+        <div aria-hidden className="absolute top-0 left-0 w-24 h-1 bg-flag-red" />
+        <div aria-hidden className="absolute top-0 left-0 w-1 h-24 bg-flag-red" />
+        <div className="relative z-10 flex items-center gap-4">
+          <div className="bg-white/10 text-star-gold-bright p-3 rounded-xl border border-white/10 backdrop-blur-sm shrink-0">
+            <DollarSign size={28} />
+          </div>
+          <div>
+            <p className="font-display text-xs font-semibold text-star-gold-bright uppercase tracking-[3px] mb-1">
+              &#9733; Coach&apos;s Corner
+            </p>
+            <h1 className="font-display text-3xl md:text-4xl font-bold text-white uppercase tracking-wide leading-tight">
+              Fundraising
+            </h1>
+            <p className="text-white/70 text-sm mt-1">
+              Six proven ways to raise money for your team&apos;s season.
+            </p>
+          </div>
         </div>
       </div>
 
-      <div className="bg-flag-blue/5 border border-flag-blue/15 rounded-2xl p-5 sm:p-6 flex items-start gap-4">
+      <div className="bg-white border border-gray-200 rounded-2xl p-5 sm:p-6 flex items-start gap-4">
         <div className="bg-flag-blue/10 text-flag-blue p-2.5 rounded-lg shrink-0">
           <Info size={20} />
         </div>
         <div className="flex-1 min-w-0">
-          <p className="font-display text-sm font-bold uppercase tracking-wide text-flag-blue mb-1">
+          <p className="font-display text-xs font-bold uppercase tracking-[2px] text-flag-red mb-1">
             How to use these playbooks
           </p>
           <p className="text-sm text-charcoal leading-relaxed">
@@ -73,89 +84,99 @@ export default function CornerFundraisingPage() {
           return (
             <article
               key={idea.slug}
-              className="bg-white border border-gray-200 rounded-2xl overflow-hidden"
+              className="group relative overflow-hidden rounded-2xl bg-white border border-gray-200 shadow-sm hover:shadow-xl hover:shadow-flag-blue/10 transition-all duration-300"
             >
-              <div className="p-5 sm:p-6">
-                <div className="flex items-start gap-4">
-                  <div className="bg-flag-red/10 text-flag-red p-3 rounded-xl shrink-0">
+              {/* Navy header strip */}
+              <div className="relative overflow-hidden bg-flag-blue p-5 sm:p-6">
+                <div
+                  aria-hidden
+                  className="absolute inset-0 text-white/[0.05] text-lg leading-[2.4rem] tracking-widest overflow-hidden pointer-events-none p-2"
+                >
+                  {"\u2605 ".repeat(80)}
+                </div>
+                <div
+                  aria-hidden
+                  className="absolute top-0 left-0 w-20 h-1 bg-flag-red"
+                />
+                <div
+                  aria-hidden
+                  className="absolute top-0 left-0 w-1 h-20 bg-flag-red"
+                />
+                <div className="relative z-10 flex items-start gap-4">
+                  <div className="bg-white/10 text-star-gold-bright p-3 rounded-xl shrink-0 border border-white/10 backdrop-blur-sm">
                     <Icon size={24} />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="flex flex-wrap items-center gap-2 mb-1">
-                      <span className="inline-flex items-center justify-center shrink-0 w-5 h-5 rounded-full bg-flag-blue text-white text-[10px] font-bold">
+                    <div className="flex items-center gap-2 mb-1">
+                      <span className="inline-flex items-center justify-center shrink-0 w-6 h-6 rounded-full bg-star-gold-bright text-flag-blue text-xs font-display font-bold">
                         {index + 1}
                       </span>
-                      <h2 className="font-display text-xl md:text-2xl font-bold uppercase tracking-wide text-charcoal">
-                        {idea.name}
-                      </h2>
                       <span
-                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide border ${effortClasses[idea.effort]}`}
+                        className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-[10px] font-display font-semibold uppercase tracking-[1.5px] border ${effortClasses[idea.effort]}`}
                       >
                         {idea.effort} Effort
                       </span>
                     </div>
-                    <p className="text-sm text-gray-500 italic mb-3">
+                    <h2 className="font-display text-2xl md:text-3xl font-bold uppercase tracking-wide text-white leading-tight">
+                      {idea.name}
+                    </h2>
+                    <p className="text-star-gold-bright text-sm italic mt-1">
                       {idea.tagline}
                     </p>
-                    <div className="flex flex-wrap gap-x-6 gap-y-1 text-xs mb-4">
-                      <span>
-                        <span className="font-display font-semibold uppercase tracking-wider text-flag-red">
-                          Yield:
-                        </span>{" "}
-                        <span className="text-charcoal">
-                          {idea.typicalYield}
-                        </span>
-                      </span>
-                      <span>
-                        <span className="font-display font-semibold uppercase tracking-wider text-flag-red">
-                          Timeline:
-                        </span>{" "}
-                        <span className="text-charcoal">{idea.timeline}</span>
-                      </span>
-                      <span>
-                        <span className="font-display font-semibold uppercase tracking-wider text-flag-red">
-                          People:
-                        </span>{" "}
-                        <span className="text-charcoal">{idea.people}</span>
-                      </span>
-                    </div>
-                    <p className="text-sm text-gray-700 leading-relaxed mb-4">
-                      {idea.description}
-                    </p>
-                    <div className="bg-gray-50 border border-gray-100 rounded-xl p-4">
-                      <p className="font-display text-[11px] font-semibold uppercase tracking-[1.5px] text-flag-blue mb-2">
-                        Quick Steps
-                      </p>
-                      <ul className="space-y-1.5">
-                        {idea.quickSteps.map((step, i) => (
-                          <li
-                            key={i}
-                            className="flex items-start gap-2 text-sm text-charcoal"
-                          >
-                            <CheckCircle2
-                              size={14}
-                              className="text-flag-blue shrink-0 mt-0.5"
-                            />
-                            <span className="leading-snug">{step}</span>
-                          </li>
-                        ))}
-                      </ul>
-                    </div>
                   </div>
                 </div>
               </div>
-              <div className="border-t border-gray-100 p-4 sm:px-6 sm:py-4 bg-gray-50 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                <p className="text-xs text-gray-500">
-                  Complete 8-12 step playbook with scripts, timelines, and tips.
+
+              {/* Body */}
+              <div className="p-5 sm:p-6 space-y-5">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
+                  <StatChip label="Typical Yield" value={idea.typicalYield} />
+                  <StatChip label="Timeline" value={idea.timeline} />
+                  <StatChip label="People" value={idea.people} />
+                </div>
+
+                <p className="text-sm text-charcoal leading-relaxed">
+                  {idea.description}
                 </p>
-                <a
-                  href={`/fundraising/${idea.slug}-playbook.pdf`}
-                  download={`${idea.slug}-playbook.pdf`}
-                  className="inline-flex items-center gap-2 bg-flag-red hover:bg-flag-red-dark text-white px-5 py-2.5 rounded-full font-display text-xs font-semibold uppercase tracking-widest transition-colors min-h-[44px]"
-                >
-                  <Download size={14} />
-                  Download Full Playbook
-                </a>
+
+                <div className="bg-gray-50 border border-gray-100 rounded-xl p-4">
+                  <p className="font-display text-[11px] font-semibold uppercase tracking-[2px] text-flag-red mb-3">
+                    &#9733; Quick Steps
+                  </p>
+                  <ul className="space-y-2">
+                    {idea.quickSteps.map((step, i) => (
+                      <li
+                        key={i}
+                        className="flex items-start gap-2.5 text-sm text-charcoal"
+                      >
+                        <CheckCircle2
+                          size={16}
+                          className="text-flag-blue shrink-0 mt-0.5"
+                        />
+                        <span className="leading-snug">{step}</span>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              {/* Footer CTA bar */}
+              <div className="relative border-t border-gray-100 bg-gradient-to-r from-off-white to-gray-50 p-4 sm:px-6 sm:py-5">
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+                  <div>
+                    <p className="font-display text-[11px] font-semibold uppercase tracking-[2px] text-flag-blue mb-0.5">
+                      Full Printable Playbook
+                    </p>
+                    <p className="text-xs text-gray-500">
+                      Complete 8-12 step playbook with scripts, timelines, and
+                      tips.
+                    </p>
+                  </div>
+                  <PremiumDownloadButton
+                    href={`/fundraising/${idea.slug}-playbook.pdf`}
+                    filename={`${idea.slug}-playbook.pdf`}
+                  />
+                </div>
               </div>
             </article>
           );
@@ -177,5 +198,40 @@ export default function CornerFundraisingPage() {
         </p>
       </div>
     </>
+  );
+}
+
+function StatChip({ label, value }: { label: string; value: string }) {
+  return (
+    <div className="bg-flag-blue/[0.03] border border-flag-blue/10 rounded-xl p-3">
+      <p className="font-display text-[10px] font-semibold uppercase tracking-[2px] text-flag-red mb-0.5">
+        {label}
+      </p>
+      <p className="text-xs text-charcoal leading-snug">{value}</p>
+    </div>
+  );
+}
+
+function PremiumDownloadButton({
+  href,
+  filename,
+}: {
+  href: string;
+  filename: string;
+}) {
+  return (
+    <a
+      href={href}
+      download={filename}
+      className="relative inline-flex items-center gap-2.5 bg-flag-red text-white px-7 py-3.5 rounded-full font-display text-sm font-semibold uppercase tracking-[1.5px] transition-all hover:bg-flag-red-dark hover:-translate-y-0.5 hover:shadow-lg hover:shadow-flag-red/30 active:scale-[0.97] min-h-[48px] shrink-0 group/btn overflow-hidden"
+    >
+      {/* Gold top highlight line */}
+      <span
+        aria-hidden
+        className="absolute top-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-star-gold-bright transition-all duration-300 group-hover/btn:w-2/3"
+      />
+      <Download size={16} className="relative" />
+      <span className="relative">Download Playbook</span>
+    </a>
   );
 }
