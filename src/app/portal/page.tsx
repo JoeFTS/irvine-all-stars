@@ -27,6 +27,8 @@ interface Registration {
   secondary_parent_name: string | null;
   secondary_parent_email: string | null;
   secondary_parent_phone: string | null;
+  volunteer_acknowledged: boolean;
+  volunteer_acknowledged_at: string | null;
 }
 
 interface PlayerDocument {
@@ -165,6 +167,8 @@ export default function PortalPage() {
   const [lightboxUrl, setLightboxUrl] = useState<string | null>(null);
   const [editingSecondParent, setEditingSecondParent] = useState<string | null>(null);
   const [secondParentForm, setSecondParentForm] = useState({ name: "", email: "", phone: "" });
+  const [volunteerChecked, setVolunteerChecked] = useState(false);
+  const [acknowledgingVolunteer, setAcknowledgingVolunteer] = useState(false);
 
   async function acceptSelection(regId: string) {
     if (!supabase || !user) return;
@@ -202,6 +206,36 @@ export default function PortalPage() {
       alert("Network error. Please check your connection and try again.");
     }
     setAcceptingId(null);
+  }
+
+  async function acknowledgeVolunteer() {
+    if (!supabase || !user?.email || registrations.length === 0) return;
+    setAcknowledgingVolunteer(true);
+    const nowIso = new Date().toISOString();
+    const regIds = registrations.map((r) => r.id);
+
+    const { error } = await supabase
+      .from("tryout_registrations")
+      .update({
+        volunteer_acknowledged: true,
+        volunteer_acknowledged_at: nowIso,
+      })
+      .in("id", regIds);
+
+    if (error) {
+      alert("Failed to save acknowledgment. Please try again.");
+      setAcknowledgingVolunteer(false);
+      return;
+    }
+
+    setRegistrations((prev) =>
+      prev.map((r) => ({
+        ...r,
+        volunteer_acknowledged: true,
+        volunteer_acknowledged_at: nowIso,
+      }))
+    );
+    setAcknowledgingVolunteer(false);
   }
 
   async function saveSecondParent(regId: string) {
@@ -255,7 +289,7 @@ export default function PortalPage() {
       const { data: regs } = await supabase!
         .from("tryout_registrations")
         .select(
-          "id, parent_name, parent_email, player_first_name, player_last_name, player_date_of_birth, division, primary_position, status, submitted_at, secondary_parent_name, secondary_parent_email, secondary_parent_phone"
+          "id, parent_name, parent_email, player_first_name, player_last_name, player_date_of_birth, division, primary_position, status, submitted_at, secondary_parent_name, secondary_parent_email, secondary_parent_phone, volunteer_acknowledged, volunteer_acknowledged_at"
         )
         .or(`parent_email.eq.${user!.email},secondary_parent_email.eq.${user!.email}`)
         .order("submitted_at", { ascending: false });
@@ -422,6 +456,17 @@ export default function PortalPage() {
     );
   }
 
+  /* ---- Derived: volunteer acknowledgment state ---- */
+  const isAcknowledged = registrations.some((r) => r.volunteer_acknowledged);
+  const acknowledgedAt = registrations
+    .map((r) => r.volunteer_acknowledged_at)
+    .filter((t): t is string => !!t)
+    .sort()
+    .pop();
+  const volunteerLockTooltip = isAcknowledged
+    ? undefined
+    : "Please acknowledge the volunteer requirement at the top of this page first.";
+
   /* ---- Logged in — dashboard ---- */
   return (
     <>
@@ -459,6 +504,62 @@ export default function PortalPage() {
           <h2 className="font-display text-2xl md:text-3xl font-bold uppercase tracking-wide mb-6">
             My Player&apos;s Status
           </h2>
+
+          {/* ===== VOLUNTEER ACKNOWLEDGMENT BANNER ===== */}
+          {!dataLoading && registrations.length > 0 && !isAcknowledged && (
+            <div className="mb-6 bg-gradient-to-br from-flag-red/[0.06] to-star-gold-bright/[0.08] border-2 border-flag-red/30 rounded-2xl p-5 md:p-6">
+              <div className="flex items-start gap-4">
+                <div className="shrink-0 w-11 h-11 rounded-full bg-flag-red/15 text-flag-red flex items-center justify-center">
+                  <svg className="w-6 h-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                    <path strokeLinecap="round" strokeLinejoin="round" d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
+                  </svg>
+                </div>
+                <div className="flex-1 min-w-0">
+                  <p className="font-display text-xs font-bold uppercase tracking-[2px] text-flag-red mb-1">
+                    Volunteer Requirement
+                  </p>
+                  <p className="font-display text-lg md:text-xl font-bold uppercase tracking-wide text-charcoal mb-2 leading-tight">
+                    Action required before you can accept your spot
+                  </p>
+                  <p className="text-sm md:text-base text-gray-700 leading-relaxed mb-4">
+                    All-Star Parents will need to volunteer to help with MDT or any PONY events Irvine PONY hosts.
+                  </p>
+                  <label className="flex items-start gap-3 mb-4 cursor-pointer select-none">
+                    <input
+                      type="checkbox"
+                      checked={volunteerChecked}
+                      onChange={(e) => setVolunteerChecked(e.target.checked)}
+                      className="mt-1 h-5 w-5 rounded border-2 border-gray-300 text-flag-red focus:ring-flag-red focus:ring-offset-0 shrink-0"
+                    />
+                    <span className="text-sm text-charcoal">
+                      I understand and agree to volunteer to help with MDT and PONY events hosted by Irvine PONY this season.
+                    </span>
+                  </label>
+                  <button
+                    type="button"
+                    onClick={acknowledgeVolunteer}
+                    disabled={!volunteerChecked || acknowledgingVolunteer}
+                    className="inline-block bg-flag-red hover:bg-flag-red-dark disabled:opacity-40 disabled:cursor-not-allowed text-white px-6 py-3 rounded-full font-display text-xs font-semibold uppercase tracking-widest transition-colors min-h-[44px]"
+                  >
+                    {acknowledgingVolunteer ? "Saving..." : "I Acknowledge"}
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
+          {!dataLoading && registrations.length > 0 && isAcknowledged && acknowledgedAt && (
+            <div className="mb-6 inline-flex items-center gap-2 bg-green-50 border border-green-200 rounded-full px-4 py-2 text-xs font-semibold text-green-700">
+              <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+              </svg>
+              Volunteer requirement acknowledged on{" "}
+              {new Date(acknowledgedAt).toLocaleDateString("en-US", {
+                month: "short",
+                day: "numeric",
+                year: "numeric",
+              })}
+            </div>
+          )}
 
           {dataLoading ? (
             <div className="bg-white rounded-2xl border border-gray-200 p-8 text-center">
@@ -580,7 +681,9 @@ export default function PortalPage() {
                                       alert("Network error. Please check your connection and try again.");
                                     }
                                   }}
-                                  className="mt-3 inline-block bg-green-600 hover:bg-green-700 text-white px-5 py-2.5 rounded-full font-display text-xs font-semibold uppercase tracking-widest transition-colors"
+                                  disabled={!isAcknowledged}
+                                  title={volunteerLockTooltip}
+                                  className="mt-3 inline-block bg-green-600 hover:bg-green-700 disabled:bg-gray-300 disabled:cursor-not-allowed text-white px-5 py-2.5 rounded-full font-display text-xs font-semibold uppercase tracking-widest transition-colors"
                                 >
                                   Confirm Attendance
                                 </button>
@@ -911,8 +1014,9 @@ export default function PortalPage() {
                               <div className="flex flex-col sm:flex-row gap-3 pl-0 sm:pl-11">
                                 <button
                                   onClick={() => acceptSelection(item.acceptAction!)}
-                                  disabled={acceptingId === item.acceptAction}
-                                  className="w-full sm:w-auto bg-green-600 hover:bg-green-700 disabled:opacity-50 text-white px-5 py-3 sm:py-2.5 rounded-full font-display text-xs font-semibold uppercase tracking-widest transition-colors min-h-[44px]"
+                                  disabled={acceptingId === item.acceptAction || !isAcknowledged}
+                                  title={volunteerLockTooltip}
+                                  className="w-full sm:w-auto bg-green-600 hover:bg-green-700 disabled:opacity-50 disabled:cursor-not-allowed text-white px-5 py-3 sm:py-2.5 rounded-full font-display text-xs font-semibold uppercase tracking-widest transition-colors min-h-[44px]"
                                 >
                                   {acceptingId === item.acceptAction ? "Accepting..." : "Accept Spot"}
                                 </button>

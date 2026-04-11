@@ -66,6 +66,8 @@ interface Registration {
   status: Status;
   submitted_at: string;
   selection_email_sent_at: string | null;
+  volunteer_acknowledged: boolean;
+  volunteer_acknowledged_at: string | null;
 }
 
 interface TryoutSession {
@@ -193,6 +195,7 @@ export default function TryoutsPage() {
   const [showNewPicks, setShowNewPicks] = useState(false);
   const [showEmailSent, setShowEmailSent] = useState(false);
   const [showAccepted, setShowAccepted] = useState(false);
+  const [showUnacknowledged, setShowUnacknowledged] = useState(false);
   const [statusFilter, setStatusFilter] = useState<Status | "all">("all");
   const [expandedPlayerId, setExpandedPlayerId] = useState<string | null>(null);
   const [updatingId, setUpdatingId] = useState<string | null>(null);
@@ -781,8 +784,13 @@ export default function TryoutsPage() {
     if (showNewPicks && !(coachPickRegIds.has(r.id) && !emailSentIds.has(r.id))) return false;
     if (showEmailSent && !emailSentIds.has(r.id)) return false;
     if (showAccepted && !acceptedRegIds.has(r.id)) return false;
+    if (showUnacknowledged && r.volunteer_acknowledged) return false;
     return true;
   });
+
+  const unacknowledgedCount = registrations.filter(
+    (r) => !r.volunteer_acknowledged && (divisionFilter === "all" || r.division === divisionFilter)
+  ).length;
 
   const filteredSessions = sessions.filter((s) => {
     if (sessionDivisionFilter !== "all" && s.division !== sessionDivisionFilter) return false;
@@ -1002,6 +1010,19 @@ export default function TryoutsPage() {
                     : ""}
                 </button>
               )}
+              <button
+                onClick={() => setShowUnacknowledged(!showUnacknowledged)}
+                className={`px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide transition-colors ${
+                  showUnacknowledged
+                    ? "bg-flag-red text-white"
+                    : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                }`}
+                title="Parents who haven't acknowledged the volunteer requirement"
+              >
+                <AlertTriangle size={10} className="inline -mt-0.5 mr-1" />
+                Volunteer Ack Missing
+                {` (${unacknowledgedCount})`}
+              </button>
             </div>
           </div>
 
@@ -1217,6 +1238,27 @@ export default function TryoutsPage() {
                                 Awaiting Acceptance
                               </span>
                             )
+                          )}
+                          {reg.volunteer_acknowledged ? (
+                            <span
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-green-50 text-green-700 border border-green-200"
+                              title={
+                                reg.volunteer_acknowledged_at
+                                  ? `Acknowledged ${new Date(reg.volunteer_acknowledged_at).toLocaleDateString()}`
+                                  : "Acknowledged"
+                              }
+                            >
+                              <Check size={10} />
+                              Volunteer Ack
+                            </span>
+                          ) : (
+                            <span
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-flag-red/10 text-flag-red border border-flag-red/30"
+                              title="Parent has not acknowledged the volunteer requirement"
+                            >
+                              <AlertTriangle size={10} />
+                              Volunteer Ack Missing
+                            </span>
                           )}
                         </div>
                         <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-gray-400">
