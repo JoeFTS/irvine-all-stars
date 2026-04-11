@@ -42,3 +42,8 @@ next-env.d.ts
 
 # worktrees
 .worktrees/
+
+# python venvs (used by scripts/generate-fundraising-playbooks.py)
+/.venv*
+__pycache__/
+*.pyc
