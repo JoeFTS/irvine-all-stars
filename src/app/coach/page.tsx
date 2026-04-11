@@ -16,6 +16,10 @@ import {
   Calendar,
   ChevronRight,
   ExternalLink,
+  Trophy,
+  FileSpreadsheet,
+  DollarSign,
+  Sparkles,
 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { supabase } from "@/lib/supabase";
@@ -62,13 +66,44 @@ interface Announcement {
 /* ------------------------------------------------------------------ */
 
 const quickLinks = [
-  { href: "/coach/checklist", label: "Binder Checklist", icon: ClipboardCheck },
-  { href: "/coach/pitching-log", label: "Pitching Log", icon: ClipboardList },
-  { href: "/coach/roster", label: "Team Roster", icon: Users },
-  { href: "/coach/certifications", label: "Certifications", icon: Award },
-  { href: "/coach/tournament-rules", label: "Tournament Rules", icon: BookOpen },
+  { href: "/coach/checklist", label: "Checklist", icon: ClipboardCheck },
+  { href: "/coach/pitching-log", label: "Pitching", icon: ClipboardList },
+  { href: "/coach/roster", label: "Roster", icon: Users },
+  { href: "/coach/certifications", label: "Certs", icon: Award },
+  { href: "/coach/tournament-rules", label: "Rules", icon: BookOpen },
   { href: "/coach/updates", label: "Updates", icon: Megaphone },
-  { href: "/portal", label: "Parent Portal", icon: Home },
+  { href: "/portal", label: "Parent", icon: Home },
+];
+
+const coachesCorner = [
+  {
+    href: "/coach/corner/tournaments",
+    label: "Tournaments",
+    description: "MDT schedule, division rules, entry forms, hotel blocks.",
+    icon: Trophy,
+    colorClasses: "bg-flag-blue/10 text-flag-blue",
+  },
+  {
+    href: "/coach/corner/templates",
+    label: "Templates",
+    description: "Snack schedule and team templates ready to download.",
+    icon: FileSpreadsheet,
+    colorClasses: "bg-flag-blue/10 text-flag-blue",
+  },
+  {
+    href: "/coach/corner/fundraising",
+    label: "Fundraising",
+    description: "Six proven fundraising playbooks for your team.",
+    icon: DollarSign,
+    colorClasses: "bg-flag-red/10 text-flag-red",
+  },
+  {
+    href: null,
+    label: "Coming Soon",
+    description: "More coach resources dropping throughout the season.",
+    icon: Sparkles,
+    colorClasses: "bg-gray-100 text-gray-400",
+  },
 ];
 
 const upcomingDates = [
@@ -279,6 +314,27 @@ export default function CoachDashboardPage() {
         </h1>
       </div>
 
+      {/* Compact Quick Links strip */}
+      <div className="bg-white border border-gray-200 rounded-2xl p-2 sm:p-3">
+        <div className="grid grid-cols-4 sm:grid-cols-7 gap-1">
+          {quickLinks.map((link) => {
+            const Icon = link.icon;
+            return (
+              <Link
+                key={link.href}
+                href={link.href}
+                className="flex flex-col items-center justify-center gap-1 py-2 px-1 rounded-lg text-gray-600 hover:bg-flag-blue/5 hover:text-flag-blue transition-colors min-h-[56px]"
+              >
+                <Icon size={18} />
+                <span className="text-[10px] font-semibold uppercase tracking-wide leading-none">
+                  {link.label}
+                </span>
+              </Link>
+            );
+          })}
+        </div>
+      </div>
+
       {/* 1. Your Team Card */}
       <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6">
         <p className="text-xs font-bold text-flag-red uppercase tracking-[2px] mb-1">
@@ -448,25 +504,71 @@ export default function CoachDashboardPage() {
         </div>
       )}
 
-      {/* 6. Quick Links */}
+      {/* 6. Coach's Corner */}
       <div>
-        <h3 className="font-display text-lg font-bold uppercase tracking-wide text-flag-blue mb-3">
-          Quick Links
+        <h3 className="font-display text-lg font-bold uppercase tracking-wide text-flag-blue mb-1">
+          Coach&apos;s Corner
         </h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-          {quickLinks.map((link) => {
-            const Icon = link.icon;
-            return (
-              <Link
-                key={link.href}
-                href={link.href}
-                className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-5 flex items-center gap-4 min-h-[56px] hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
-              >
-                <div className="bg-flag-blue/10 text-flag-blue p-2.5 rounded-lg">
-                  <Icon size={22} />
+        <p className="text-sm text-gray-500 mb-4">
+          Resources, templates, and guides to help you run your team.
+        </p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+          {coachesCorner.map((card) => {
+            const Icon = card.icon;
+            const isLive = !!card.href;
+            const baseClasses =
+              "bg-white border border-gray-200 rounded-2xl p-5 sm:p-6 flex items-start gap-4 min-h-[112px]";
+            const interactiveClasses =
+              "hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 group";
+            const mutedClasses = "opacity-70 cursor-default";
+
+            const content = (
+              <>
+                <div className={`${card.colorClasses} p-3 rounded-lg shrink-0`}>
+                  <Icon size={24} />
                 </div>
-                <span className="font-semibold text-gray-800">{link.label}</span>
-              </Link>
+                <div className="flex-1 min-w-0">
+                  <div className="flex items-center justify-between gap-2">
+                    <p
+                      className={`font-display text-lg font-bold uppercase tracking-wide ${
+                        isLive ? "text-charcoal" : "text-gray-400"
+                      }`}
+                    >
+                      {card.label}
+                    </p>
+                    {isLive && (
+                      <ChevronRight
+                        size={18}
+                        className="text-gray-300 group-hover:text-flag-blue transition-colors shrink-0"
+                      />
+                    )}
+                  </div>
+                  <p
+                    className={`text-sm mt-1 leading-snug ${
+                      isLive ? "text-gray-600" : "text-gray-400"
+                    }`}
+                  >
+                    {card.description}
+                  </p>
+                </div>
+              </>
+            );
+
+            if (isLive && card.href) {
+              return (
+                <Link
+                  key={card.label}
+                  href={card.href}
+                  className={`${baseClasses} ${interactiveClasses}`}
+                >
+                  {content}
+                </Link>
+              );
+            }
+            return (
+              <div key={card.label} className={`${baseClasses} ${mutedClasses}`}>
+                {content}
+              </div>
             );
           })}
         </div>
