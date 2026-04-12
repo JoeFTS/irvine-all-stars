@@ -179,11 +179,11 @@ export async function GET(request: NextRequest) {
   const wb = new ExcelJS.Workbook();
   const ws = wb.addWorksheet("Score Sheet");
 
-  // Colors
-  const navy = "0A2342";
-  const red = "C1121F";
-  const gold = "F4B400";
-  const lightGray = "F5F5F5";
+  // Colors — B&W printer friendly
+  const navy = "000000";
+  const red = "000000";
+  const gold = "CCCCCC";
+  const lightGray = "F0F0F0";
   const white = "FFFFFF";
 
   // Column widths
@@ -324,9 +324,9 @@ export async function GET(request: NextRequest) {
       player.player_last_name,
       player.player_first_name,
       age,
-      position,
-      player.bats,
-      player.throws,
+      "",
+      "",
+      "",
       player.current_team || "",
     ];
 
