@@ -59,9 +59,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
-  const dbKey = supabaseServiceKey || supabaseAnonKey!;
-  console.log("[score-sheet] service key available:", !!supabaseServiceKey, "key starts with:", dbKey.substring(0, 20));
-  const db = createClient(supabaseUrl!, dbKey, {
+  const db = createClient(supabaseUrl!, supabaseServiceKey || supabaseAnonKey!, {
     db: { schema: "irvine_allstars" },
   });
 
@@ -123,7 +121,6 @@ export async function GET(request: NextRequest) {
         .order("player_last_name")
         .order("player_first_name");
 
-      console.log("[score-sheet] division query result:", data?.length ?? 0, "players, error:", !data ? "no data" : "ok");
       players = data || [];
     } else if (sessionId) {
       // Fetch players assigned to a specific tryout session
