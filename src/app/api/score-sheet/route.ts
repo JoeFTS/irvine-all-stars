@@ -99,6 +99,7 @@ export async function GET(request: NextRequest) {
   let players: {
     player_first_name: string;
     player_last_name: string;
+    player_date_of_birth: string | null;
     division: string;
     primary_position: string;
     secondary_position: string | null;
@@ -114,7 +115,7 @@ export async function GET(request: NextRequest) {
       const { data } = await db
         .from("tryout_registrations")
         .select(
-          "player_first_name, player_last_name, division, primary_position, secondary_position, bats, throws, current_team, jersey_number, tryout_order"
+          "player_first_name, player_last_name, player_date_of_birth, division, primary_position, secondary_position, bats, throws, current_team, jersey_number, tryout_order"
         )
         .eq("division", divisionParam)
         .order("tryout_order", { ascending: true, nullsFirst: false })
@@ -135,7 +136,7 @@ export async function GET(request: NextRequest) {
         const { data } = await db
           .from("tryout_registrations")
           .select(
-            "player_first_name, player_last_name, division, primary_position, secondary_position, bats, throws, current_team, jersey_number, tryout_order"
+            "player_first_name, player_last_name, player_date_of_birth, division, primary_position, secondary_position, bats, throws, current_team, jersey_number, tryout_order"
           )
           .in("id", regIds)
           .order("tryout_order", { ascending: true, nullsFirst: false })
@@ -190,22 +191,23 @@ export async function GET(request: NextRequest) {
     { width: 5 },   // A: #
     { width: 16 },  // B: Last Name
     { width: 14 },  // C: First Name
-    { width: 10 },  // D: Position (abbreviated)
-    { width: 8 },   // E: Bats
-    { width: 8 },   // F: Throws
-    { width: 14 },  // G: Team
-    { width: 10 },  // H: Hitting (9)
-    { width: 10 },  // I: Fielding (9)
-    { width: 10 },  // J: Throwing (9)
-    { width: 10 },  // K: Running/Speed (9)
-    { width: 10 },  // L: Effort (9)
-    { width: 10 },  // M: Attitude (9)
-    { width: 10 },  // N: TOTAL
-    { width: 20 },  // O: Notes
+    { width: 6 },   // D: Age
+    { width: 10 },  // E: Position (abbreviated)
+    { width: 8 },   // F: Bats
+    { width: 8 },   // G: Throws
+    { width: 14 },  // H: Team
+    { width: 10 },  // I: Hitting (9)
+    { width: 10 },  // J: Fielding (9)
+    { width: 10 },  // K: Throwing (9)
+    { width: 10 },  // L: Running/Speed (9)
+    { width: 10 },  // M: Effort (9)
+    { width: 10 },  // N: Attitude (9)
+    { width: 10 },  // O: TOTAL
+    { width: 20 },  // P: Notes
   ];
 
   // Row 1: Title
-  ws.mergeCells("A1:O1");
+  ws.mergeCells("A1:P1");
   const titleCell = ws.getCell("A1");
   const sheetDivision = session?.division || divisionParam || "";
   titleCell.value = isBlank
@@ -217,7 +219,7 @@ export async function GET(request: NextRequest) {
   ws.getRow(1).height = 36;
 
   // Row 2: Session info
-  ws.mergeCells("A2:O2");
+  ws.mergeCells("A2:P2");
   const infoCell = ws.getCell("A2");
   infoCell.value = isBlank
     ? "Division: _______________    Date: _______________    Location: _______________"
@@ -230,7 +232,7 @@ export async function GET(request: NextRequest) {
   ws.getRow(2).height = 24;
 
   // Row 3: Scoring guide
-  ws.mergeCells("A3:O3");
+  ws.mergeCells("A3:P3");
   const guideCell = ws.getCell("A3");
   guideCell.value = "SCORING:  Score each category 1, 3, 5, 7, or 9 (9 = highest).  Total = 54 points possible.";
   guideCell.font = { size: 10, italic: true, color: { argb: red } };
@@ -238,25 +240,25 @@ export async function GET(request: NextRequest) {
   ws.getRow(3).height = 22;
 
   // Row 4: Category group headers
-  ws.mergeCells("A4:G4");
+  ws.mergeCells("A4:H4");
   const playerHeaderCell = ws.getCell("A4");
   playerHeaderCell.value = "PLAYER INFO";
   playerHeaderCell.font = { bold: true, size: 10, color: { argb: white } };
   playerHeaderCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: navy } };
   playerHeaderCell.alignment = { horizontal: "center", vertical: "middle" };
 
-  ws.mergeCells("H4:M4");
-  const evalHeaderCell = ws.getCell("H4");
+  ws.mergeCells("I4:N4");
+  const evalHeaderCell = ws.getCell("I4");
   evalHeaderCell.value = "EVALUATION (fill in scores)";
   evalHeaderCell.font = { bold: true, size: 10, color: { argb: white } };
   evalHeaderCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: red } };
   evalHeaderCell.alignment = { horizontal: "center", vertical: "middle" };
 
-  const totalHeaderCell = ws.getCell("N4");
+  const totalHeaderCell = ws.getCell("O4");
   totalHeaderCell.value = "";
   totalHeaderCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: navy } };
 
-  const notesHeaderCell = ws.getCell("O4");
+  const notesHeaderCell = ws.getCell("P4");
   notesHeaderCell.value = "";
   notesHeaderCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: navy } };
 
@@ -267,6 +269,7 @@ export async function GET(request: NextRequest) {
     "#",
     "Last Name",
     "First Name",
+    "Age",
     "Pos",
     "Bats",
     "Throws",
@@ -283,7 +286,7 @@ export async function GET(request: NextRequest) {
     cell.fill = {
       type: "pattern",
       pattern: "solid",
-      fgColor: { argb: i >= 7 && i <= 12 ? red : navy },
+      fgColor: { argb: i >= 8 && i <= 13 ? red : navy },
     };
     cell.alignment = { horizontal: "center", vertical: "middle", wrapText: true };
     cell.border = {
@@ -296,6 +299,7 @@ export async function GET(request: NextRequest) {
   headerRow.height = 30;
 
   // Player rows
+  const now = new Date();
   players.forEach((player, idx) => {
     const rowNum = 6 + idx;
     const row = ws.getRow(rowNum);
@@ -305,22 +309,33 @@ export async function GET(request: NextRequest) {
       : null;
     const position = pos2 ? `${pos1} / ${pos2}` : pos1;
 
+    let age: number | string = "";
+    if (player.player_date_of_birth) {
+      const dob = new Date(player.player_date_of_birth);
+      age = now.getFullYear() - dob.getFullYear();
+      const monthDiff = now.getMonth() - dob.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && now.getDate() < dob.getDate())) {
+        age--;
+      }
+    }
+
     const values = [
       idx + 1,
       player.player_last_name,
       player.player_first_name,
+      age,
       position,
       player.bats,
       player.throws,
       player.current_team || "",
     ];
 
-    // Player info columns
+    // Player info columns (A-H, cols 1-8)
     values.forEach((v, i) => {
       const cell = row.getCell(i + 1);
       cell.value = v;
       cell.font = { size: 10 };
-      cell.alignment = { horizontal: i === 0 ? "center" : "left", vertical: "middle" };
+      cell.alignment = { horizontal: i === 0 || i === 3 ? "center" : "left", vertical: "middle" };
       cell.border = {
         bottom: { style: "thin", color: { argb: "DDDDDD" } },
         left: { style: "thin", color: { argb: "DDDDDD" } },
@@ -331,9 +346,9 @@ export async function GET(request: NextRequest) {
       }
     });
 
-    // Score columns (H-M) — yellow background, empty for coaches to fill
-    for (let i = 7; i <= 12; i++) {
-      const cell = row.getCell(i + 1);
+    // Score columns (I-N, cols 9-14) — yellow background, empty for coaches to fill
+    for (let c = 9; c <= 14; c++) {
+      const cell = row.getCell(c);
       cell.value = null;
       cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFDE7" } };
       cell.font = { size: 12, bold: true };
@@ -345,10 +360,10 @@ export async function GET(request: NextRequest) {
       };
     }
 
-    // Total column (N) — SUM formula
-    const totalCell = row.getCell(14);
+    // Total column (O, col 15) — SUM formula
+    const totalCell = row.getCell(15);
     totalCell.value = {
-      formula: `SUM(H${rowNum}:M${rowNum})`,
+      formula: `SUM(I${rowNum}:N${rowNum})`,
       result: 0,
     };
     totalCell.font = { size: 12, bold: true, color: { argb: navy } };
@@ -359,8 +374,8 @@ export async function GET(request: NextRequest) {
       right: { style: "thin", color: { argb: navy } },
     };
 
-    // Notes column (O) — empty
-    const notesCell = row.getCell(15);
+    // Notes column (P, col 16) — empty
+    const notesCell = row.getCell(16);
     notesCell.value = null;
     notesCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFDE7" } };
     notesCell.border = {
@@ -381,14 +396,14 @@ export async function GET(request: NextRequest) {
     row.getCell(1).font = { size: 10, color: { argb: "BBBBBB" } };
     row.getCell(1).alignment = { horizontal: "center", vertical: "middle" };
 
-    for (let c = 2; c <= 7; c++) {
+    for (let c = 2; c <= 8; c++) {
       const cell = row.getCell(c);
       cell.border = {
         bottom: { style: "thin", color: { argb: "EEEEEE" } },
       };
     }
 
-    for (let c = 8; c <= 13; c++) {
+    for (let c = 9; c <= 14; c++) {
       const cell = row.getCell(c);
       cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFDE7" } };
       cell.border = {
@@ -398,18 +413,18 @@ export async function GET(request: NextRequest) {
       };
     }
 
-    const totalCell = row.getCell(14);
-    totalCell.value = { formula: `SUM(H${rowNum}:M${rowNum})`, result: 0 };
+    const totalCell = row.getCell(15);
+    totalCell.value = { formula: `SUM(I${rowNum}:N${rowNum})`, result: 0 };
     totalCell.font = { size: 12, bold: true, color: { argb: navy } };
     totalCell.alignment = { horizontal: "center", vertical: "middle" };
 
-    row.getCell(15).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFDE7" } };
+    row.getCell(16).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFDE7" } };
     row.height = 22;
   }
 
   // Footer row
   const footerRowNum = 6 + players.length + blankRowCount + 1;
-  ws.mergeCells(`A${footerRowNum}:O${footerRowNum}`);
+  ws.mergeCells(`A${footerRowNum}:P${footerRowNum}`);
   const footerCell = ws.getCell(`A${footerRowNum}`);
   footerCell.value = `Coach Name: ___________________________    Signature: ___________________________    Date: ______________`;
   footerCell.font = { size: 10, color: { argb: "666666" } };
