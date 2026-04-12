@@ -350,7 +350,7 @@ export async function GET(request: NextRequest) {
     for (let c = 9; c <= 14; c++) {
       const cell = row.getCell(c);
       cell.value = null;
-      cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFDE7" } };
+      cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "F0F0F0" } };
       cell.font = { size: 12, bold: true };
       cell.alignment = { horizontal: "center", vertical: "middle" };
       cell.border = {
@@ -377,7 +377,7 @@ export async function GET(request: NextRequest) {
     // Notes column (P, col 16) — empty
     const notesCell = row.getCell(16);
     notesCell.value = null;
-    notesCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFDE7" } };
+    notesCell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "F0F0F0" } };
     notesCell.border = {
       bottom: { style: "thin", color: { argb: "DDDDDD" } },
       left: { style: "thin", color: { argb: "DDDDDD" } },
@@ -405,7 +405,7 @@ export async function GET(request: NextRequest) {
 
     for (let c = 9; c <= 14; c++) {
       const cell = row.getCell(c);
-      cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFDE7" } };
+      cell.fill = { type: "pattern", pattern: "solid", fgColor: { argb: "F0F0F0" } };
       cell.border = {
         bottom: { style: "thin", color: { argb: "EEEEEE" } },
         left: { style: "thin", color: { argb: gold } },
@@ -418,7 +418,7 @@ export async function GET(request: NextRequest) {
     totalCell.font = { size: 12, bold: true, color: { argb: navy } };
     totalCell.alignment = { horizontal: "center", vertical: "middle" };
 
-    row.getCell(16).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "FFFDE7" } };
+    row.getCell(16).fill = { type: "pattern", pattern: "solid", fgColor: { argb: "F0F0F0" } };
     row.height = 22;
   }
 
