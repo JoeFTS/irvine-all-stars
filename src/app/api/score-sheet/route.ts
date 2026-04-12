@@ -107,6 +107,7 @@ export async function GET(request: NextRequest) {
     throws: string;
     current_team: string | null;
     jersey_number: string | null;
+    tryout_order: number | null;
   }[] = [];
 
   if (!isBlank && (sessionId || divisionParam)) {
@@ -320,7 +321,7 @@ export async function GET(request: NextRequest) {
     }
 
     const values = [
-      idx + 1,
+      player.tryout_order ?? idx + 1,
       player.player_last_name,
       player.player_first_name,
       age,
