@@ -4,6 +4,7 @@ import ExcelJS from "exceljs";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
 const CATEGORIES = [
   { name: "Hitting", max: 9 },
@@ -58,6 +59,12 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: "Forbidden" }, { status: 403 });
   }
 
+  const dbKey = supabaseServiceKey || supabaseAnonKey!;
+  console.log("[score-sheet] service key available:", !!supabaseServiceKey, "key starts with:", dbKey.substring(0, 20));
+  const db = createClient(supabaseUrl!, dbKey, {
+    db: { schema: "irvine_allstars" },
+  });
+
   const sessionId = request.nextUrl.searchParams.get("session_id");
   const divisionParam = request.nextUrl.searchParams.get("division");
   const isBlank = request.nextUrl.searchParams.get("blank") === "true";
@@ -77,11 +84,7 @@ export async function GET(request: NextRequest) {
   } | null = null;
 
   if (!isBlank && !divisionParam && sessionId) {
-    const supabase = createClient(supabaseUrl!, supabaseAnonKey!, {
-      db: { schema: "irvine_allstars" },
-    });
-
-    const { data } = await supabase
+    const { data } = await db
       .from("tryout_sessions")
       .select("*")
       .eq("id", sessionId)
@@ -108,25 +111,23 @@ export async function GET(request: NextRequest) {
   }[] = [];
 
   if (!isBlank && (sessionId || divisionParam)) {
-    const supabase = createClient(supabaseUrl!, supabaseAnonKey!, {
-      db: { schema: "irvine_allstars" },
-    });
-
     if (divisionParam) {
       // Fetch all players in the division directly
-      const { data } = await supabase
+      const { data } = await db
         .from("tryout_registrations")
         .select(
-          "player_first_name, player_last_name, division, primary_position, secondary_position, bats, throws, current_team, jersey_number"
+          "player_first_name, player_last_name, division, primary_position, secondary_position, bats, throws, current_team, jersey_number, tryout_order"
         )
         .eq("division", divisionParam)
+        .order("tryout_order", { ascending: true, nullsFirst: false })
         .order("player_last_name")
         .order("player_first_name");
 
+      console.log("[score-sheet] division query result:", data?.length ?? 0, "players, error:", !data ? "no data" : "ok");
       players = data || [];
     } else if (sessionId) {
       // Fetch players assigned to a specific tryout session
-      const { data: assignments } = await supabase
+      const { data: assignments } = await db
         .from("tryout_assignments")
         .select("registration_id")
         .eq("session_id", sessionId);
@@ -134,12 +135,13 @@ export async function GET(request: NextRequest) {
       const regIds = (assignments || []).map((a: { registration_id: string }) => a.registration_id);
 
       if (regIds.length > 0) {
-        const { data } = await supabase
+        const { data } = await db
           .from("tryout_registrations")
           .select(
-            "player_first_name, player_last_name, division, primary_position, secondary_position, bats, throws, current_team, jersey_number"
+            "player_first_name, player_last_name, division, primary_position, secondary_position, bats, throws, current_team, jersey_number, tryout_order"
           )
           .in("id", regIds)
+          .order("tryout_order", { ascending: true, nullsFirst: false })
           .order("player_last_name")
           .order("player_first_name");
 
