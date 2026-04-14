@@ -1,0 +1,131 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - link "★★★ Irvine All-Stars ★★★" [ref=e3] [cursor=pointer]:
+      - /url: /
+      - generic [ref=e4]: ★★★
+      - generic [ref=e5]: Irvine All-Stars
+      - generic [ref=e6]: ★★★
+    - list [ref=e7]:
+      - listitem [ref=e8]:
+        - link "FAQ" [ref=e9] [cursor=pointer]:
+          - /url: /faq
+      - listitem [ref=e31]:
+        - link "Coach Portal" [ref=e32] [cursor=pointer]:
+          - /url: /coach
+      - listitem [ref=e33]:
+        - link "Admin" [ref=e34] [cursor=pointer]:
+          - /url: /admin
+      - listitem [ref=e10]:
+        - button "Sign Out" [ref=e11]
+  - main [ref=e12]:
+    - generic [ref=e35]:
+      - complementary [ref=e36]:
+        - heading "Admin Panel" [level=2] [ref=e38]
+        - navigation [ref=e39]:
+          - link "Dashboard" [ref=e40] [cursor=pointer]:
+            - /url: /admin
+            - img [ref=e41]
+            - text: Dashboard
+          - link "Coach Applications" [ref=e46] [cursor=pointer]:
+            - /url: /admin/applications
+            - img [ref=e47]
+            - text: Coach Applications
+          - link "Scores" [ref=e50] [cursor=pointer]:
+            - /url: /admin/scores
+            - img [ref=e51]
+            - text: Scores
+          - link "Announcements" [ref=e53] [cursor=pointer]:
+            - /url: /admin/announcements
+            - img [ref=e54]
+            - text: Announcements
+          - link "Tournaments" [ref=e57] [cursor=pointer]:
+            - /url: /admin/tournaments
+            - img [ref=e58]
+            - text: Tournaments
+          - link "Teams" [ref=e64] [cursor=pointer]:
+            - /url: /admin/teams
+            - img [ref=e65]
+            - text: Teams
+          - link "Tryouts" [ref=e69] [cursor=pointer]:
+            - /url: /admin/tryouts
+            - img [ref=e70]
+            - text: Tryouts
+          - link "Invites" [ref=e72] [cursor=pointer]:
+            - /url: /admin/invites
+            - img [ref=e73]
+            - text: Invites
+          - link "Documents" [ref=e76] [cursor=pointer]:
+            - /url: /admin/documents
+            - img [ref=e77]
+            - text: Documents
+          - link "Compliance" [ref=e80] [cursor=pointer]:
+            - /url: /admin/compliance
+            - img [ref=e81]
+            - text: Compliance
+          - link "Help" [ref=e84] [cursor=pointer]:
+            - /url: /admin/help
+            - img [ref=e85]
+            - text: Help
+        - generic [ref=e89]:
+          - img [ref=e90]
+          - generic [ref=e94]:
+            - paragraph [ref=e95]: Admin
+            - paragraph [ref=e96]: testadmin@irvineallstars.com
+      - generic [ref=e98]:
+        - generic [ref=e99]:
+          - generic [ref=e100]:
+            - paragraph [ref=e101]: Admin
+            - heading "Tournaments Help" [level=1] [ref=e102]:
+              - text: Tournaments
+              - button "Help" [ref=e104]:
+                - img [ref=e105]
+          - button "Add Tournament" [ref=e108]:
+            - img [ref=e109]
+            - text: Add Tournament
+        - heading "All Tournaments (2)" [level=2] [ref=e110]
+        - generic [ref=e111]:
+          - generic [ref=e113]:
+            - generic [ref=e114]:
+              - generic [ref=e115]:
+                - heading "South Bay Sunset Classic" [level=3] [ref=e116]
+                - generic [ref=e117]: Published
+              - paragraph [ref=e118]: June 6-7, 2026 — Manhattan Beach & Redondo Beach, CA
+              - paragraph [ref=e119]: Shetland 6, Pinto 8 PP, Mustang 9, Mustang 10, Bronco 11, Bronco 12
+            - generic [ref=e120]:
+              - button "Edit" [ref=e121]:
+                - img [ref=e122]
+              - button "Delete" [ref=e125]:
+                - img [ref=e126]
+          - generic [ref=e130]:
+            - generic [ref=e131]:
+              - generic [ref=e132]:
+                - heading "South Bay MP Classic" [level=3] [ref=e133]
+                - generic [ref=e134]: Published
+              - paragraph [ref=e135]: June 13-14, 2026 — Manhattan Beach, CA
+              - paragraph [ref=e136]: Pinto 7 Machine Pitch, Pinto 8 Machine Pitch
+            - generic [ref=e137]:
+              - button "Edit" [ref=e138]:
+                - img [ref=e139]
+              - button "Delete" [ref=e142]:
+                - img [ref=e143]
+  - contentinfo [ref=e15]:
+    - generic [ref=e16]:
+      - generic [ref=e17]:
+        - generic [ref=e18]: ★★★
+        - generic [ref=e19]: Irvine All-Stars
+        - generic [ref=e20]: ★★★
+      - generic [ref=e21]:
+        - link "Coaches" [ref=e22] [cursor=pointer]:
+          - /url: /coaches
+        - link "Tryouts" [ref=e23] [cursor=pointer]:
+          - /url: /tryouts
+        - link "Timeline" [ref=e24] [cursor=pointer]:
+          - /url: /timeline
+        - link "Documents" [ref=e25] [cursor=pointer]:
+          - /url: /documents
+        - link "FAQ" [ref=e26] [cursor=pointer]:
+          - /url: /faq
+      - generic [ref=e27]:
+        - paragraph [ref=e28]: Irvine Pony Baseball
+        - paragraph [ref=e29]: 2026 All-Stars Season
+  - alert [ref=e30]

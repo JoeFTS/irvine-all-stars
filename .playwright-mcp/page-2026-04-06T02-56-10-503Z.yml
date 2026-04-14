@@ -1,0 +1,256 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - link "★★★ Irvine All-Stars ★★★" [ref=e3] [cursor=pointer]:
+      - /url: /
+      - generic [ref=e4]: ★★★
+      - generic [ref=e5]: Irvine All-Stars
+      - generic [ref=e6]: ★★★
+    - list [ref=e7]:
+      - listitem [ref=e8]:
+        - link "FAQ" [ref=e9] [cursor=pointer]:
+          - /url: /faq
+      - listitem [ref=e31]:
+        - link "Coach Portal" [ref=e32] [cursor=pointer]:
+          - /url: /coach
+      - listitem [ref=e33]:
+        - link "Parent Portal" [ref=e34] [cursor=pointer]:
+          - /url: /portal
+      - listitem [ref=e10]:
+        - button "Sign Out" [ref=e11]
+  - main [ref=e12]:
+    - generic [ref=e35]:
+      - complementary [ref=e36]:
+        - heading "Coach Dashboard" [level=2] [ref=e38]
+        - navigation [ref=e39]:
+          - link "Dashboard" [ref=e40] [cursor=pointer]:
+            - /url: /coach
+            - img [ref=e41]
+            - text: Dashboard
+          - link "Tryouts" [ref=e46] [cursor=pointer]:
+            - /url: /coach/tryouts
+            - img [ref=e47]
+            - text: Tryouts
+          - link "Enter Scores" [ref=e51] [cursor=pointer]:
+            - /url: /coach/scores
+            - img [ref=e52]
+            - text: Enter Scores
+          - link "Binder Checklist" [ref=e55] [cursor=pointer]:
+            - /url: /coach/checklist
+            - img [ref=e56]
+            - text: Binder Checklist
+          - link "Pitching Log" [ref=e60] [cursor=pointer]:
+            - /url: /coach/pitching-log
+            - img [ref=e61]
+            - text: Pitching Log
+          - link "Roster" [ref=e64] [cursor=pointer]:
+            - /url: /coach/roster
+            - img [ref=e65]
+            - text: Roster
+          - link "Contracts" [ref=e70] [cursor=pointer]:
+            - /url: /coach/contracts
+            - img [ref=e71]
+            - text: Contracts
+          - link "Certifications" [ref=e74] [cursor=pointer]:
+            - /url: /coach/certifications
+            - img [ref=e75]
+            - text: Certifications
+          - link "Tournament Rules" [ref=e78] [cursor=pointer]:
+            - /url: /coach/tournament-rules
+            - img [ref=e79]
+            - text: Tournament Rules
+          - link "Tournaments" [ref=e81] [cursor=pointer]:
+            - /url: /coach/tournaments
+            - img [ref=e82]
+            - text: Tournaments
+          - link "Updates" [ref=e88] [cursor=pointer]:
+            - /url: /coach/updates
+            - img [ref=e89]
+            - text: Updates
+          - link "Help" [ref=e92] [cursor=pointer]:
+            - /url: /coach/help
+            - img [ref=e93]
+            - text: Help
+        - generic [ref=e97]:
+          - img [ref=e98]
+          - generic [ref=e102]:
+            - paragraph [ref=e103]: Coach
+            - paragraph [ref=e104]: thesupplycomp@gmail.com
+      - generic [ref=e106]:
+        - paragraph [ref=e107]: Coach
+        - heading "Help & Guides" [level=1] [ref=e108]
+        - generic [ref=e109]:
+          - generic [ref=e110]:
+            - heading "Getting Started" [level=2] [ref=e111]
+            - generic [ref=e113]:
+              - button "Dashboard" [ref=e114]:
+                - generic [ref=e115]: Dashboard
+                - img [ref=e116]
+              - generic [ref=e119]:
+                - paragraph [ref=e120]: Your home base with compliance progress, action items, and announcements. Everything you need to stay on track is right here.
+                - generic [ref=e121]:
+                  - paragraph [ref=e122]: "How to use it:"
+                  - list [ref=e123]:
+                    - listitem [ref=e124]: Check the compliance progress bar to see where your team stands
+                    - listitem [ref=e125]: Review action items that need your attention
+                    - listitem [ref=e126]: Use quick links to jump to common tasks
+                    - listitem [ref=e127]: Scroll down for the latest announcements
+                - paragraph [ref=e128]: "Good to know: Dashboard updates in real-time as parents upload documents."
+          - generic [ref=e129]:
+            - heading "Tryouts & Evaluation" [level=2] [ref=e130]
+            - generic [ref=e131]:
+              - generic [ref=e132]:
+                - button "Tryouts" [ref=e133]:
+                  - generic [ref=e134]: Tryouts
+                  - img [ref=e135]
+                - generic [ref=e138]:
+                  - paragraph [ref=e139]: Scout players and submit nominations for your division. Review who's registered and pick the players you want on your team.
+                  - generic [ref=e140]:
+                    - paragraph [ref=e141]: "How to use it:"
+                    - list [ref=e142]:
+                      - listitem [ref=e143]: View all registered players for your division
+                      - listitem [ref=e144]: Review player details including age, experience, and position
+                      - listitem [ref=e145]: Submit your nominations before the deadline
+              - generic [ref=e146]:
+                - button "Enter Scores" [ref=e147]:
+                  - generic [ref=e148]: Enter Scores
+                  - img [ref=e149]
+                - generic [ref=e152]:
+                  - paragraph [ref=e153]: Score players using the 54-point rubric during tryout sessions. Each player is evaluated across six categories worth up to 9 points each.
+                  - generic [ref=e154]:
+                    - paragraph [ref=e155]: "How to use it:"
+                    - list [ref=e156]:
+                      - listitem [ref=e157]: Select the tryout session you're evaluating
+                      - listitem [ref=e158]: Score each player on 6 categories (1–9 points each)
+                      - listitem [ref=e159]: Submit your scores when finished
+                  - paragraph [ref=e160]: "Good to know: Scores are locked after the tryout period ends."
+          - generic [ref=e161]:
+            - heading "Team Management" [level=2] [ref=e162]
+            - generic [ref=e163]:
+              - generic [ref=e164]:
+                - button "Binder Checklist" [ref=e165]:
+                  - generic [ref=e166]: Binder Checklist
+                  - img [ref=e167]
+                - generic [ref=e170]:
+                  - paragraph [ref=e171]: Track required documents for your roster — birth certificates, photos, contracts, and certifications. This is your compliance command center.
+                  - generic [ref=e172]:
+                    - paragraph [ref=e173]: "How to use it:"
+                    - list [ref=e174]:
+                      - listitem [ref=e175]: View all players and their document status at a glance
+                      - listitem [ref=e176]: Green = uploaded, Yellow = pending, Red = missing
+                      - listitem [ref=e177]: Click on any player to see detailed document info
+                  - paragraph [ref=e178]: "Good to know: Parents upload docs through their portal — you just track status."
+              - generic [ref=e179]:
+                - button "Pitching Log" [ref=e180]:
+                  - generic [ref=e181]: Pitching Log
+                  - img [ref=e182]
+                - generic [ref=e185]:
+                  - paragraph [ref=e186]: Log pitch counts after every game to stay compliant with PONY rules. The system automatically calculates required rest days.
+                  - generic [ref=e187]:
+                    - paragraph [ref=e188]: "How to use it:"
+                    - list [ref=e189]:
+                      - listitem [ref=e190]: After each game, open the pitching log
+                      - listitem [ref=e191]: Select the date and pitcher
+                      - listitem [ref=e192]: Enter the pitch count
+                      - listitem [ref=e193]: The system calculates rest days automatically
+                  - paragraph [ref=e194]: "Good to know: Rules vary by division — the log shows your division's specific limits."
+              - generic [ref=e195]:
+                - button "Roster" [ref=e196]:
+                  - generic [ref=e197]: Roster
+                  - img [ref=e198]
+                - generic [ref=e201]:
+                  - paragraph [ref=e202]: View your complete team roster with player details and parent contact information.
+                  - generic [ref=e203]:
+                    - paragraph [ref=e204]: "How to use it:"
+                    - list [ref=e205]:
+                      - listitem [ref=e206]: View all players assigned to your team
+                      - listitem [ref=e207]: See age, position, and parent contact info for each player
+                      - listitem [ref=e208]: Use as a quick reference during games and practices
+              - generic [ref=e209]:
+                - button "Contracts" [ref=e210]:
+                  - generic [ref=e211]: Contracts
+                  - img [ref=e212]
+                - generic [ref=e215]:
+                  - paragraph [ref=e216]: Track player contract signatures. Every player needs a signed contract before they can compete.
+                  - generic [ref=e217]:
+                    - paragraph [ref=e218]: "How to use it:"
+                    - list [ref=e219]:
+                      - listitem [ref=e220]: View contract status for each player on your roster
+                      - listitem [ref=e221]: Green = signed — you're good to go
+                      - listitem [ref=e222]: Follow up with parents of unsigned players
+          - generic [ref=e223]:
+            - heading "Compliance & Rules" [level=2] [ref=e224]
+            - generic [ref=e225]:
+              - generic [ref=e226]:
+                - button "Certifications" [ref=e227]:
+                  - generic [ref=e228]: Certifications
+                  - img [ref=e229]
+                - generic [ref=e232]:
+                  - paragraph [ref=e233]: Upload your concussion and cardiac arrest training certifications. Both are required before you can manage a team.
+                  - generic [ref=e234]:
+                    - paragraph [ref=e235]: "How to use it:"
+                    - list [ref=e236]:
+                      - listitem [ref=e237]: Upload your concussion training certificate
+                      - listitem [ref=e238]: Upload your cardiac arrest training certificate
+                      - listitem [ref=e239]: Both must be current and valid
+                  - paragraph [ref=e240]: "Good to know: You cannot manage a team until both certs are uploaded and verified."
+              - generic [ref=e241]:
+                - button "Tournament Rules" [ref=e242]:
+                  - generic [ref=e243]: Tournament Rules
+                  - img [ref=e244]
+                - generic [ref=e247]:
+                  - paragraph [ref=e248]: Review and acknowledge the official tournament rules. This is required before your team can participate in any tournament.
+                  - generic [ref=e249]:
+                    - paragraph [ref=e250]: "How to use it:"
+                    - list [ref=e251]:
+                      - listitem [ref=e252]: Read through the complete rules document
+                      - listitem [ref=e253]: Click "Acknowledge" at the bottom when finished
+                      - listitem [ref=e254]: Required before tournament participation
+          - generic [ref=e255]:
+            - heading "Tournaments & Updates" [level=2] [ref=e256]
+            - generic [ref=e257]:
+              - generic [ref=e258]:
+                - button "Tournaments" [ref=e259]:
+                  - generic [ref=e260]: Tournaments
+                  - img [ref=e261]
+                - generic [ref=e264]:
+                  - paragraph [ref=e265]: View the tournament schedule, locations, registration links, and flyers. Everything you need to get your team signed up and ready.
+                  - generic [ref=e266]:
+                    - paragraph [ref=e267]: "How to use it:"
+                    - list [ref=e268]:
+                      - listitem [ref=e269]: Browse tournaments by month
+                      - listitem [ref=e270]: Click on a tournament for full details
+                      - listitem [ref=e271]: Use the registration link to sign up your team
+                      - listitem [ref=e272]: Click any flyer to view it full-size
+              - generic [ref=e273]:
+                - button "Updates" [ref=e274]:
+                  - generic [ref=e275]: Updates
+                  - img [ref=e276]
+                - generic [ref=e279]:
+                  - paragraph [ref=e280]: Stay informed with the latest announcements from the league admin. Don't miss important deadlines or changes.
+                  - generic [ref=e281]:
+                    - paragraph [ref=e282]: "How to use it:"
+                    - list [ref=e283]:
+                      - listitem [ref=e284]: Announcements are shown newest first
+                      - listitem [ref=e285]: Look for both general and division-specific updates
+                      - listitem [ref=e286]: Check regularly so you don't miss anything
+  - contentinfo [ref=e15]:
+    - generic [ref=e16]:
+      - generic [ref=e17]:
+        - generic [ref=e18]: ★★★
+        - generic [ref=e19]: Irvine All-Stars
+        - generic [ref=e20]: ★★★
+      - generic [ref=e21]:
+        - link "Coaches" [ref=e22] [cursor=pointer]:
+          - /url: /coaches
+        - link "Tryouts" [ref=e23] [cursor=pointer]:
+          - /url: /tryouts
+        - link "Timeline" [ref=e24] [cursor=pointer]:
+          - /url: /timeline
+        - link "Documents" [ref=e25] [cursor=pointer]:
+          - /url: /documents
+        - link "FAQ" [ref=e26] [cursor=pointer]:
+          - /url: /faq
+      - generic [ref=e27]:
+        - paragraph [ref=e28]: Irvine Pony Baseball
+        - paragraph [ref=e29]: 2026 All-Stars Season
+  - alert [ref=e30]

@@ -1,0 +1,76 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - link "★★★ Irvine All-Stars ★★★" [ref=e3] [cursor=pointer]:
+      - /url: /
+      - generic [ref=e4]: ★★★
+      - generic [ref=e5]: Irvine All-Stars
+      - generic [ref=e6]: ★★★
+    - list [ref=e7]:
+      - listitem [ref=e8]:
+        - link "FAQ" [ref=e9] [cursor=pointer]:
+          - /url: /faq
+      - listitem [ref=e31]:
+        - link "Parent Portal" [ref=e32] [cursor=pointer]:
+          - /url: /portal
+      - listitem [ref=e10]:
+        - button "Sign Out" [ref=e11]
+  - main [ref=e12]:
+    - generic [ref=e33]:
+      - generic [ref=e34]: ✓
+      - heading "Registration Complete" [level=2] [ref=e158]
+      - paragraph [ref=e159]:
+        - text: Tommy has been registered for 11U-Bronco tryouts. You'll receive a confirmation email at
+        - strong [ref=e160]: testparent@irvineallstars.com
+        - text: .
+      - generic [ref=e161]:
+        - heading "What to Bring to Tryouts" [level=3] [ref=e162]
+        - list [ref=e163]:
+          - listitem [ref=e164]:
+            - generic [ref=e165]: •
+            - text: Glove, bat, helmet, and cleats
+          - listitem [ref=e166]:
+            - generic [ref=e167]: •
+            - text: Baseball pants and your regular-season jersey
+          - listitem [ref=e168]:
+            - generic [ref=e169]: •
+            - text: Water bottle (plenty of water!)
+          - listitem [ref=e170]:
+            - generic [ref=e171]: •
+            - text: Arrive 15 minutes early for check-in
+      - generic [ref=e172]:
+        - heading "Key Dates" [level=3] [ref=e173]
+        - generic [ref=e174]:
+          - paragraph [ref=e175]:
+            - strong [ref=e176]: "March 23:"
+            - text: Coach candidacy deadline
+          - paragraph [ref=e177]:
+            - strong [ref=e178]: "March 27:"
+            - text: All-Star coaches named
+          - paragraph [ref=e179]:
+            - strong [ref=e180]: "April 12:"
+            - text: All-Star tryouts (all Bronco & Pony divisions)
+          - paragraph [ref=e181]:
+            - strong [ref=e182]: "April 14:"
+            - text: All-Star players notified
+      - button "Register Another Child" [ref=e183]
+  - contentinfo [ref=e15]:
+    - generic [ref=e16]:
+      - generic [ref=e17]:
+        - generic [ref=e18]: ★★★
+        - generic [ref=e19]: Irvine All-Stars
+        - generic [ref=e20]: ★★★
+      - generic [ref=e21]:
+        - link "Coaches" [ref=e22] [cursor=pointer]:
+          - /url: /coaches
+        - link "Tryouts" [ref=e23] [cursor=pointer]:
+          - /url: /tryouts
+        - link "Timeline" [ref=e24] [cursor=pointer]:
+          - /url: /timeline
+        - link "Documents" [ref=e25] [cursor=pointer]:
+          - /url: /documents
+        - link "FAQ" [ref=e26] [cursor=pointer]:
+          - /url: /faq
+      - generic [ref=e27]:
+        - paragraph [ref=e28]: Irvine Pony Baseball
+        - paragraph [ref=e29]: 2026 All-Stars Season
+  - alert [ref=e30]

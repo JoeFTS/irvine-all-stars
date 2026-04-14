@@ -1,0 +1,241 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - link "★★★ Irvine All-Stars ★★★" [ref=e3] [cursor=pointer]:
+      - /url: /
+      - generic [ref=e4]: ★★★
+      - generic [ref=e5]: Irvine All-Stars
+      - generic [ref=e6]: ★★★
+    - list [ref=e7]:
+      - listitem [ref=e8]:
+        - link "FAQ" [ref=e9] [cursor=pointer]:
+          - /url: /faq
+      - listitem [ref=e31]:
+        - link "Coach Portal" [ref=e32] [cursor=pointer]:
+          - /url: /coach
+      - listitem [ref=e33]:
+        - link "Admin" [ref=e34] [cursor=pointer]:
+          - /url: /admin
+      - listitem [ref=e10]:
+        - button "Sign Out" [ref=e11]
+  - main [ref=e12]:
+    - generic [ref=e35]:
+      - complementary [ref=e36]:
+        - heading "Admin Panel" [level=2] [ref=e38]
+        - navigation [ref=e39]:
+          - link "Dashboard" [ref=e40] [cursor=pointer]:
+            - /url: /admin
+            - img [ref=e41]
+            - text: Dashboard
+          - link "Coach Applications" [ref=e46] [cursor=pointer]:
+            - /url: /admin/applications
+            - img [ref=e47]
+            - text: Coach Applications
+          - link "Scores" [ref=e50] [cursor=pointer]:
+            - /url: /admin/scores
+            - img [ref=e51]
+            - text: Scores
+          - link "Announcements" [ref=e53] [cursor=pointer]:
+            - /url: /admin/announcements
+            - img [ref=e54]
+            - text: Announcements
+          - link "Tournaments" [ref=e57] [cursor=pointer]:
+            - /url: /admin/tournaments
+            - img [ref=e58]
+            - text: Tournaments
+          - link "Teams" [ref=e64] [cursor=pointer]:
+            - /url: /admin/teams
+            - img [ref=e65]
+            - text: Teams
+          - link "Tryouts" [ref=e69] [cursor=pointer]:
+            - /url: /admin/tryouts
+            - img [ref=e70]
+            - text: Tryouts
+          - link "Invites" [ref=e72] [cursor=pointer]:
+            - /url: /admin/invites
+            - img [ref=e73]
+            - text: Invites
+          - link "Documents" [ref=e76] [cursor=pointer]:
+            - /url: /admin/documents
+            - img [ref=e77]
+            - text: Documents
+          - link "Compliance" [ref=e80] [cursor=pointer]:
+            - /url: /admin/compliance
+            - img [ref=e81]
+            - text: Compliance
+          - link "Help" [ref=e84] [cursor=pointer]:
+            - /url: /admin/help
+            - img [ref=e85]
+            - text: Help
+        - generic [ref=e89]:
+          - img [ref=e90]
+          - generic [ref=e94]:
+            - paragraph [ref=e95]: Admin
+            - paragraph [ref=e96]: testadmin@irvineallstars.com
+      - generic [ref=e98]:
+        - paragraph [ref=e99]: Admin
+        - heading "Help & Guides" [level=1] [ref=e100]
+        - generic [ref=e101]:
+          - generic [ref=e102]:
+            - heading "Overview" [level=2] [ref=e103]
+            - generic [ref=e105]:
+              - button "Dashboard" [ref=e106]:
+                - generic [ref=e107]: Dashboard
+                - img [ref=e108]
+              - generic [ref=e111]:
+                - paragraph [ref=e112]: "Overview stats at a glance: coach applications count, player registrations, division breakdown, and recent activity. Your command center for managing the league."
+                - generic [ref=e113]:
+                  - paragraph [ref=e114]: "How to use it:"
+                  - list [ref=e115]:
+                    - listitem [ref=e116]: Review stat cards at the top for a quick pulse check
+                    - listitem [ref=e117]: Click into sections that need attention
+                    - listitem [ref=e118]: Check the recent applications list for new submissions
+                - paragraph [ref=e119]: "Good to know: Numbers update in real-time as new applications and registrations come in."
+          - generic [ref=e120]:
+            - heading "People" [level=2] [ref=e121]
+            - generic [ref=e122]:
+              - generic [ref=e123]:
+                - button "Coach Applications" [ref=e124]:
+                  - generic [ref=e125]: Coach Applications
+                  - img [ref=e126]
+                - generic [ref=e129]:
+                  - paragraph [ref=e130]: Review, approve, or decline coach applications. Every application lands here first so you can vet coaches before granting access.
+                  - generic [ref=e131]:
+                    - paragraph [ref=e132]: "How to use it:"
+                    - list [ref=e133]:
+                      - listitem [ref=e134]: View pending applications at the top of the list
+                      - listitem [ref=e135]: Click on an application to read full details
+                      - listitem [ref=e136]: Approve or decline with optional notes
+              - generic [ref=e137]:
+                - button "Invites" [ref=e138]:
+                  - generic [ref=e139]: Invites
+                  - img [ref=e140]
+                - generic [ref=e143]:
+                  - paragraph [ref=e144]: Send invite links to coaches and parents via email. Invites grant access to the appropriate portal based on the selected role.
+                  - generic [ref=e145]:
+                    - paragraph [ref=e146]: "How to use it:"
+                    - list [ref=e147]:
+                      - listitem [ref=e148]: Enter the recipient's email address
+                      - listitem [ref=e149]: Select the role (coach or parent)
+                      - listitem [ref=e150]: Click send to deliver the invite
+                      - listitem [ref=e151]: Track who has accepted their invite
+                  - paragraph [ref=e152]: "Good to know: Invite links expire after 7 days — resend if needed."
+          - generic [ref=e153]:
+            - heading "Tryouts & Scores" [level=2] [ref=e154]
+            - generic [ref=e155]:
+              - generic [ref=e156]:
+                - button "Scores" [ref=e157]:
+                  - generic [ref=e158]: Scores
+                  - img [ref=e159]
+                - generic [ref=e162]:
+                  - paragraph [ref=e163]: View tryout evaluation scores across all players and divisions. Use this to compare players and inform draft decisions.
+                  - generic [ref=e164]:
+                    - paragraph [ref=e165]: "How to use it:"
+                    - list [ref=e166]:
+                      - listitem [ref=e167]: Select a division to filter results
+                      - listitem [ref=e168]: View scores sorted by total
+                      - listitem [ref=e169]: Compare players side by side
+              - generic [ref=e170]:
+                - button "Tryouts" [ref=e171]:
+                  - generic [ref=e172]: Tryouts
+                  - img [ref=e173]
+                - generic [ref=e176]:
+                  - paragraph [ref=e177]: Manage tryout registrations, player selections, and coach recommendations. This is where you finalize rosters after evaluations are complete.
+                  - generic [ref=e178]:
+                    - paragraph [ref=e179]: "How to use it:"
+                    - list [ref=e180]:
+                      - listitem [ref=e181]: View registered players by division
+                      - listitem [ref=e182]: Review evaluator scores and coach recommendations
+                      - listitem [ref=e183]: Make final player selections
+                      - listitem [ref=e184]: Notify families of results
+          - generic [ref=e185]:
+            - heading "Content & Communication" [level=2] [ref=e186]
+            - generic [ref=e187]:
+              - generic [ref=e188]:
+                - button "Announcements" [ref=e189]:
+                  - generic [ref=e190]: Announcements
+                  - img [ref=e191]
+                - generic [ref=e194]:
+                  - paragraph [ref=e195]: Create and post announcements to coaches and parents. Keep everyone informed about schedules, deadlines, and league updates.
+                  - generic [ref=e196]:
+                    - paragraph [ref=e197]: "How to use it:"
+                    - list [ref=e198]:
+                      - listitem [ref=e199]: Write a title and body for your announcement
+                      - listitem [ref=e200]: Optionally select a division, or leave blank for all
+                      - listitem [ref=e201]: Click Post to publish
+                  - paragraph [ref=e202]: "Good to know: Division-specific announcements only show to coaches and parents in that division."
+              - generic [ref=e203]:
+                - button "Documents" [ref=e204]:
+                  - generic [ref=e205]: Documents
+                  - img [ref=e206]
+                - generic [ref=e209]:
+                  - paragraph [ref=e210]: Manage policies and public-facing documents. Control what coaches and parents can see on the site.
+                  - generic [ref=e211]:
+                    - paragraph [ref=e212]: "How to use it:"
+                    - list [ref=e213]:
+                      - listitem [ref=e214]: View existing documents
+                      - listitem [ref=e215]: Edit content as needed
+                      - listitem [ref=e216]: Toggle visibility on the public site
+          - generic [ref=e217]:
+            - heading "Tournaments & Teams" [level=2] [ref=e218]
+            - generic [ref=e219]:
+              - generic [ref=e220]:
+                - button "Tournaments" [ref=e221]:
+                  - generic [ref=e222]: Tournaments
+                  - img [ref=e223]
+                - generic [ref=e226]:
+                  - paragraph [ref=e227]: Add tournaments, upload flyers, and publish to the coach and parent portals. Manage the full tournament lifecycle from draft to published.
+                  - generic [ref=e228]:
+                    - paragraph [ref=e229]: "How to use it:"
+                    - list [ref=e230]:
+                      - listitem [ref=e231]: Click Add Tournament
+                      - listitem [ref=e232]: Fill in name, dates, location, and divisions
+                      - listitem [ref=e233]: Upload a flyer image
+                      - listitem [ref=e234]: Save as draft, then publish when ready
+                  - paragraph [ref=e235]: "Good to know: Publishing a tournament with auto-announce enabled creates an announcement automatically."
+              - generic [ref=e236]:
+                - button "Teams" [ref=e237]:
+                  - generic [ref=e238]: Teams
+                  - img [ref=e239]
+                - generic [ref=e242]:
+                  - paragraph [ref=e243]: Assign selected players to their teams after tryouts. Build your division rosters from the player pool.
+                  - generic [ref=e244]:
+                    - paragraph [ref=e245]: "How to use it:"
+                    - list [ref=e246]:
+                      - listitem [ref=e247]: Select a division
+                      - listitem [ref=e248]: Assign players to team slots
+                      - listitem [ref=e249]: Save assignments
+          - generic [ref=e250]:
+            - heading "Compliance" [level=2] [ref=e251]
+            - generic [ref=e253]:
+              - button "Compliance" [ref=e254]:
+                - generic [ref=e255]: Compliance
+                - img [ref=e256]
+              - generic [ref=e259]:
+                - paragraph [ref=e260]: Track compliance requirements across all teams and coaches. Make sure every team is tournament-ready with all certifications and documents in order.
+                - generic [ref=e261]:
+                  - paragraph [ref=e262]: "How to use it:"
+                  - list [ref=e263]:
+                    - listitem [ref=e264]: View the compliance dashboard for an overview
+                    - listitem [ref=e265]: Check which coaches are missing certifications or documents
+                    - listitem [ref=e266]: Follow up as needed to close gaps
+  - contentinfo [ref=e15]:
+    - generic [ref=e16]:
+      - generic [ref=e17]:
+        - generic [ref=e18]: ★★★
+        - generic [ref=e19]: Irvine All-Stars
+        - generic [ref=e20]: ★★★
+      - generic [ref=e21]:
+        - link "Coaches" [ref=e22] [cursor=pointer]:
+          - /url: /coaches
+        - link "Tryouts" [ref=e23] [cursor=pointer]:
+          - /url: /tryouts
+        - link "Timeline" [ref=e24] [cursor=pointer]:
+          - /url: /timeline
+        - link "Documents" [ref=e25] [cursor=pointer]:
+          - /url: /documents
+        - link "FAQ" [ref=e26] [cursor=pointer]:
+          - /url: /faq
+      - generic [ref=e27]:
+        - paragraph [ref=e28]: Irvine Pony Baseball
+        - paragraph [ref=e29]: 2026 All-Stars Season
+  - alert [ref=e30]

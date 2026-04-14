@@ -1,0 +1,45 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - link "★★★ Irvine All-Stars ★★★" [ref=e3] [cursor=pointer]:
+      - /url: /
+      - generic [ref=e4]: ★★★
+      - generic [ref=e5]: Irvine All-Stars
+      - generic [ref=e6]: ★★★
+    - list [ref=e7]:
+      - listitem [ref=e8]:
+        - link "FAQ" [ref=e9] [cursor=pointer]:
+          - /url: /faq
+      - listitem [ref=e10]:
+        - button "Sign Out" [ref=e11]
+  - main [ref=e12]:
+    - generic [ref=e21]:
+      - generic [ref=e22]:
+        - generic [ref=e23]: ★
+        - heading "Invite Only" [level=1] [ref=e24]
+        - generic [ref=e25]: ★
+      - generic [ref=e26]:
+        - paragraph [ref=e27]: Account creation for Irvine All-Stars is by invitation only. If you've been selected as a coach or your player is participating in All-Stars, you'll receive an email invitation with a link to create your account.
+        - paragraph [ref=e28]: Already have an account?
+        - link "Sign In" [ref=e29] [cursor=pointer]:
+          - /url: /auth/login
+  - contentinfo [ref=e30]:
+    - generic [ref=e31]:
+      - generic [ref=e32]:
+        - generic [ref=e33]: ★★★
+        - generic [ref=e34]: Irvine All-Stars
+        - generic [ref=e35]: ★★★
+      - generic [ref=e36]:
+        - link "Coaches" [ref=e37] [cursor=pointer]:
+          - /url: /coaches
+        - link "Tryouts" [ref=e38] [cursor=pointer]:
+          - /url: /tryouts
+        - link "Timeline" [ref=e39] [cursor=pointer]:
+          - /url: /timeline
+        - link "Documents" [ref=e40] [cursor=pointer]:
+          - /url: /documents
+        - link "FAQ" [ref=e41] [cursor=pointer]:
+          - /url: /faq
+      - generic [ref=e42]:
+        - paragraph [ref=e43]: Irvine Pony Baseball
+        - paragraph [ref=e44]: 2026 All-Stars Season
+  - alert [ref=e45]

@@ -1,0 +1,439 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tournaments - Irvine All-Stars | Option A: Card Grid</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Dela+Gothic+One&family=DM+Sans:ital,opsz,wght@0,9..40,300..700;1,9..40,300..700&family=Oswald:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --navy: #0F1B2D;
+    --red: #C8364B;
+    --stitch-red: #E23D3D;
+    --gold: #E2B74F;
+    --leather: #C4956A;
+    --cream: #F3EDE4;
+    --off-white: #FAF9F6;
+    --shadow: 0 2px 12px rgba(15, 27, 45, 0.08);
+    --shadow-hover: 0 8px 28px rgba(15, 27, 45, 0.14);
+  }
+
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+
+  body {
+    font-family: 'DM Sans', sans-serif;
+    background: var(--off-white);
+    color: var(--navy);
+    line-height: 1.6;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* ── Option Label ── */
+  .option-label {
+    position: fixed;
+    top: 16px;
+    right: 16px;
+    z-index: 100;
+    background: var(--navy);
+    color: #fff;
+    font-family: 'Oswald', sans-serif;
+    font-size: 11px;
+    font-weight: 600;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    padding: 6px 14px;
+    border-radius: 999px;
+  }
+
+  /* ── Hero Section ── */
+  .hero {
+    background: var(--navy);
+    padding: 56px 24px 48px;
+    text-align: center;
+    position: relative;
+    overflow: hidden;
+  }
+  .hero::after {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 4px;
+    background: linear-gradient(90deg, var(--red) 0%, var(--gold) 50%, var(--red) 100%);
+  }
+  .hero h1 {
+    font-family: 'Dela Gothic One', sans-serif;
+    font-size: clamp(2rem, 5vw, 3.25rem);
+    color: #fff;
+    letter-spacing: 0.04em;
+    margin-bottom: 8px;
+  }
+  .hero h1 span {
+    color: var(--gold);
+  }
+  .hero p {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.05rem;
+    color: rgba(255,255,255,0.7);
+    max-width: 440px;
+    margin: 0 auto;
+  }
+
+  /* ── Stitch Divider ── */
+  .stitch-divider {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin: 40px auto 12px;
+    max-width: 960px;
+    padding: 0 24px;
+  }
+  .stitch-divider .line {
+    flex: 1;
+    height: 0;
+    border-top: 2px dashed var(--stitch-red);
+    opacity: 0.4;
+  }
+  .stitch-divider .month-label {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.85rem;
+    font-weight: 600;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--stitch-red);
+    white-space: nowrap;
+  }
+
+  /* ── Card Grid ── */
+  .container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 0 24px 80px;
+  }
+  .card-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 24px;
+  }
+  @media (max-width: 680px) {
+    .card-grid { grid-template-columns: 1fr; }
+  }
+
+  /* ── Tournament Card ── */
+  .card {
+    background: #fff;
+    border-radius: 16px;
+    box-shadow: var(--shadow);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    transition: box-shadow 0.25s ease, transform 0.25s ease;
+  }
+  .card:hover {
+    box-shadow: var(--shadow-hover);
+    transform: translateY(-3px);
+  }
+
+  /* Flyer placeholder */
+  .card-flyer {
+    position: relative;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    display: flex;
+    align-items: flex-end;
+    padding: 20px;
+    overflow: hidden;
+  }
+  .card-flyer .flyer-name {
+    position: relative;
+    z-index: 2;
+    font-family: 'Dela Gothic One', sans-serif;
+    font-size: 1.15rem;
+    color: #fff;
+    line-height: 1.25;
+    text-shadow: 0 2px 8px rgba(0,0,0,0.35);
+  }
+  .card-flyer::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(to top, rgba(15,27,45,0.7) 0%, transparent 60%);
+    z-index: 1;
+  }
+  /* Gradient variants */
+  .flyer-gradient-1 { background: linear-gradient(135deg, #1a3a5c 0%, var(--red) 60%, var(--gold) 100%); }
+  .flyer-gradient-2 { background: linear-gradient(135deg, var(--navy) 0%, #2c5282 60%, var(--leather) 100%); }
+  .flyer-gradient-3 { background: linear-gradient(135deg, #2d3748 0%, #4a5568 60%, var(--gold) 100%); }
+
+  /* Baseball stitch accent on flyer */
+  .card-flyer .stitch-accent {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 2;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: rgba(255,255,255,0.15);
+    border: 2px dashed rgba(226, 61, 61, 0.6);
+  }
+
+  /* Card body */
+  .card-body {
+    padding: 20px;
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  /* Status badge */
+  .status-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.72rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    padding: 4px 12px;
+    border-radius: 999px;
+    width: fit-content;
+  }
+  .status-badge .dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+  }
+  .status-open {
+    background: #e6f9ed;
+    color: #1a7a3a;
+  }
+  .status-open .dot { background: #22c55e; }
+  .status-coming {
+    background: #fef3e2;
+    color: #a16207;
+  }
+  .status-coming .dot { background: var(--gold); }
+
+  /* Meta lines */
+  .meta-line {
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    font-size: 0.9rem;
+    color: #4a5568;
+  }
+  .meta-line svg {
+    flex-shrink: 0;
+    margin-top: 2px;
+  }
+
+  /* Division pills */
+  .divisions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+  .division-pill {
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.68rem;
+    font-weight: 500;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    padding: 3px 10px;
+    border-radius: 999px;
+    background: var(--cream);
+    color: var(--navy);
+  }
+
+  /* Host */
+  .host-line {
+    font-size: 0.82rem;
+    color: #718096;
+  }
+  .host-line strong {
+    color: var(--navy);
+    font-weight: 600;
+  }
+
+  /* CTA Button */
+  .card-footer {
+    padding: 0 20px 20px;
+    margin-top: auto;
+  }
+  .btn-register {
+    display: block;
+    width: 100%;
+    padding: 13px 24px;
+    font-family: 'Oswald', sans-serif;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    text-align: center;
+    color: #fff;
+    background: var(--red);
+    border: none;
+    border-radius: 999px;
+    cursor: pointer;
+    text-decoration: none;
+    transition: background 0.2s ease, transform 0.15s ease;
+  }
+  .btn-register:hover {
+    background: #b02e42;
+    transform: scale(1.02);
+  }
+  .btn-coming-soon {
+    background: #a0aec0;
+    cursor: default;
+  }
+  .btn-coming-soon:hover {
+    background: #a0aec0;
+    transform: none;
+  }
+
+  /* ── Footer note ── */
+  .mockup-footer {
+    text-align: center;
+    padding: 24px;
+    font-size: 0.78rem;
+    color: #a0aec0;
+    border-top: 1px solid #e2e8f0;
+  }
+</style>
+</head>
+<body>
+
+<div class="option-label">Option A: Card Grid</div>
+
+<!-- Hero -->
+<section class="hero">
+  <h1>TOURNA<span>MENTS</span></h1>
+  <p>Upcoming tournaments for your division</p>
+</section>
+
+<!-- Main Content -->
+<div class="container">
+
+  <!-- June 2026 -->
+  <div class="stitch-divider">
+    <span class="line"></span>
+    <span class="month-label">June 2026</span>
+    <span class="line"></span>
+  </div>
+
+  <div class="card-grid">
+
+    <!-- Card 1: South Bay Sunset Classic -->
+    <div class="card">
+      <div class="card-flyer flyer-gradient-1">
+        <div class="stitch-accent"></div>
+        <span class="flyer-name">South Bay<br>Sunset Classic</span>
+      </div>
+      <div class="card-body">
+        <span class="status-badge status-open"><span class="dot"></span>Registration Open</span>
+        <div class="meta-line">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="#718096" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="#718096" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <span>June 6 &ndash; 7, 2026</span>
+        </div>
+        <div class="meta-line">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1.5C5.24 1.5 3 3.74 3 6.5 3 10.75 8 14.5 8 14.5s5-3.75 5-8c0-2.76-2.24-5-5-5Z" stroke="#718096" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.8" stroke="#718096" stroke-width="1.4"/></svg>
+          <span>Manhattan Beach & Redondo Beach, CA</span>
+        </div>
+        <div class="divisions">
+          <span class="division-pill">Shetland 6</span>
+          <span class="division-pill">Pinto 8 PP</span>
+          <span class="division-pill">Mustang 9</span>
+          <span class="division-pill">Mustang 10</span>
+          <span class="division-pill">Bronco 11</span>
+          <span class="division-pill">Bronco 12</span>
+        </div>
+        <div class="host-line">Host: <strong>South Bay PONY / Redondo Sunset</strong></div>
+      </div>
+      <div class="card-footer">
+        <a href="https://tourneymachine.com/R178982" target="_blank" rel="noopener" class="btn-register">Register</a>
+      </div>
+    </div>
+
+    <!-- Card 2: South Bay MP Classic -->
+    <div class="card">
+      <div class="card-flyer flyer-gradient-2">
+        <div class="stitch-accent"></div>
+        <span class="flyer-name">South Bay<br>MP Classic</span>
+      </div>
+      <div class="card-body">
+        <span class="status-badge status-open"><span class="dot"></span>Registration Open</span>
+        <div class="meta-line">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="#718096" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="#718096" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <span>June 13 &ndash; 14, 2026</span>
+        </div>
+        <div class="meta-line">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1.5C5.24 1.5 3 3.74 3 6.5 3 10.75 8 14.5 8 14.5s5-3.75 5-8c0-2.76-2.24-5-5-5Z" stroke="#718096" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.8" stroke="#718096" stroke-width="1.4"/></svg>
+          <span>Manhattan Beach, CA</span>
+        </div>
+        <div class="divisions">
+          <span class="division-pill">Pinto 7 MP</span>
+          <span class="division-pill">Pinto 8 MP</span>
+        </div>
+        <div class="host-line">Host: <strong>South Bay PONY</strong></div>
+      </div>
+      <div class="card-footer">
+        <a href="https://tourneymachine.com/R179145" target="_blank" rel="noopener" class="btn-register">Register</a>
+      </div>
+    </div>
+
+  </div><!-- /card-grid June -->
+
+  <!-- July 2026 -->
+  <div class="stitch-divider">
+    <span class="line"></span>
+    <span class="month-label">July 2026</span>
+    <span class="line"></span>
+  </div>
+
+  <div class="card-grid">
+
+    <!-- Card 3: East Kansas Summer Showdown -->
+    <div class="card">
+      <div class="card-flyer flyer-gradient-3">
+        <div class="stitch-accent"></div>
+        <span class="flyer-name">East Kansas<br>Summer Showdown</span>
+      </div>
+      <div class="card-body">
+        <span class="status-badge status-coming"><span class="dot"></span>Coming Soon</span>
+        <div class="meta-line">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><rect x="2" y="3" width="12" height="11" rx="2" stroke="#718096" stroke-width="1.4"/><path d="M5 1v3M11 1v3M2 7h12" stroke="#718096" stroke-width="1.4" stroke-linecap="round"/></svg>
+          <span>July 11 &ndash; 13, 2026</span>
+        </div>
+        <div class="meta-line">
+          <svg width="16" height="16" viewBox="0 0 16 16" fill="none"><path d="M8 1.5C5.24 1.5 3 3.74 3 6.5 3 10.75 8 14.5 8 14.5s5-3.75 5-8c0-2.76-2.24-5-5-5Z" stroke="#718096" stroke-width="1.4"/><circle cx="8" cy="6.5" r="1.8" stroke="#718096" stroke-width="1.4"/></svg>
+          <span>Overland Park, KS</span>
+        </div>
+        <div class="divisions">
+          <span class="division-pill">Mustang 9</span>
+          <span class="division-pill">Mustang 10</span>
+          <span class="division-pill">Bronco 11</span>
+          <span class="division-pill">Bronco 12</span>
+        </div>
+        <div class="host-line">Host: <strong>East Kansas PONY</strong></div>
+      </div>
+      <div class="card-footer">
+        <span class="btn-register btn-coming-soon">Registration Coming Soon</span>
+      </div>
+    </div>
+
+  </div><!-- /card-grid July -->
+
+</div><!-- /container -->
+
+<div class="mockup-footer">
+  Irvine All-Stars &mdash; Tournament Page Mockup &mdash; Option A: Card Grid
+</div>
+
+</body>
+</html>

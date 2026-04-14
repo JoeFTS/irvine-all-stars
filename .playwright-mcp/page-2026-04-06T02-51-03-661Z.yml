@@ -1,0 +1,76 @@
+- generic [ref=e1]:
+  - navigation [ref=e2]:
+    - link "★★★ Irvine All-Stars ★★★" [ref=e3] [cursor=pointer]:
+      - /url: /
+      - generic [ref=e4]: ★★★
+      - generic [ref=e5]: Irvine All-Stars
+      - generic [ref=e6]: ★★★
+    - list [ref=e7]:
+      - listitem [ref=e8]:
+        - link "FAQ" [ref=e9] [cursor=pointer]:
+          - /url: /faq
+      - listitem [ref=e31]:
+        - link "Parent Portal" [ref=e32] [cursor=pointer]:
+          - /url: /portal
+      - listitem [ref=e10]:
+        - button "Sign Out" [ref=e11]
+  - main [ref=e12]:
+    - generic [ref=e33]:
+      - generic [ref=e35]:
+        - generic [ref=e37]: 1. Player Info
+        - generic [ref=e39]: 2. Details
+        - generic [ref=e41]: 3. Submit
+      - generic [ref=e46]:
+        - generic [ref=e128]:
+          - heading "Consent & Submit" [level=2] [ref=e129]
+          - paragraph [ref=e130]: Please review and accept the following before submitting.
+          - paragraph [ref=e132]:
+            - strong [ref=e133]: "Commitment expectations:"
+            - text: "All-Stars requires significant commitment: practices 2-4x/week, games, and tournaments from mid-May through July. Please confirm your family can commit to this schedule."
+          - generic [ref=e134]:
+            - generic [ref=e135] [cursor=pointer]:
+              - checkbox "I consent to photos and videos of my child being used for Irvine Pony Baseball promotional materials, social media, and website content." [ref=e136]
+              - generic [ref=e137]: I consent to photos and videos of my child being used for Irvine Pony Baseball promotional materials, social media, and website content.
+            - generic [ref=e138] [cursor=pointer]:
+              - checkbox "I acknowledge and accept the inherent risks associated with baseball, and release Irvine Pony Baseball and its volunteers from liability for injuries sustained during All-Stars activities." [ref=e139]
+              - generic [ref=e140]: I acknowledge and accept the inherent risks associated with baseball, and release Irvine Pony Baseball and its volunteers from liability for injuries sustained during All-Stars activities.
+            - generic [ref=e141] [cursor=pointer]:
+              - checkbox "I agree to abide by the Irvine Pony Baseball Parent Code of Conduct, including demonstrating good sportsmanship, respecting coaches and umpires, and supporting all players." [ref=e142]
+              - generic [ref=e143]: I agree to abide by the Irvine Pony Baseball Parent Code of Conduct, including demonstrating good sportsmanship, respecting coaches and umpires, and supporting all players.
+          - generic [ref=e144]:
+            - heading "Registration Summary" [level=3] [ref=e145]
+            - generic [ref=e146]:
+              - generic [ref=e147]: Player
+              - generic [ref=e148]: Tommy Tester
+              - generic [ref=e149]: Division
+              - generic [ref=e150]: 11U-Bronco
+              - generic [ref=e151]: Position
+              - generic [ref=e152]: Shortstop
+              - generic [ref=e153]: Parent
+              - generic [ref=e154]: Test Mom
+              - generic [ref=e155]: Email
+              - generic [ref=e156]: testparent@irvineallstars.com
+        - generic [ref=e76]:
+          - button "Back" [ref=e127]
+          - button "Submit Registration" [active] [ref=e157]
+  - contentinfo [ref=e15]:
+    - generic [ref=e16]:
+      - generic [ref=e17]:
+        - generic [ref=e18]: ★★★
+        - generic [ref=e19]: Irvine All-Stars
+        - generic [ref=e20]: ★★★
+      - generic [ref=e21]:
+        - link "Coaches" [ref=e22] [cursor=pointer]:
+          - /url: /coaches
+        - link "Tryouts" [ref=e23] [cursor=pointer]:
+          - /url: /tryouts
+        - link "Timeline" [ref=e24] [cursor=pointer]:
+          - /url: /timeline
+        - link "Documents" [ref=e25] [cursor=pointer]:
+          - /url: /documents
+        - link "FAQ" [ref=e26] [cursor=pointer]:
+          - /url: /faq
+      - generic [ref=e27]:
+        - paragraph [ref=e28]: Irvine Pony Baseball
+        - paragraph [ref=e29]: 2026 All-Stars Season
+  - alert [ref=e30]

@@ -1,0 +1,189 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - link "★★★ Irvine All-Stars ★★★" [ref=e3] [cursor=pointer]:
+      - /url: /
+      - generic [ref=e4]: ★★★
+      - generic [ref=e5]: Irvine All-Stars
+      - generic [ref=e6]: ★★★
+    - button "Toggle menu" [ref=e7]:
+      - img [ref=e8]
+  - main [ref=e9]:
+    - generic [ref=e16]:
+      - generic [ref=e19]: ★ 2026 All-Stars Season ★
+      - heading "EARN YOUR STARS." [level=1] [ref=e21]:
+        - text: EARN
+        - text: YOUR
+        - text: STARS.
+      - paragraph [ref=e23]: Irvine PONY All-Stars develops confident, competitive young athletes through elite coaching, fair selection, and a family-first community.
+      - generic [ref=e25]:
+        - link "Sign In" [ref=e26] [cursor=pointer]:
+          - /url: /auth/login
+        - link "Learn More" [ref=e27] [cursor=pointer]:
+          - /url: /tryouts
+    - generic [ref=e35]:
+      - generic [ref=e36]:
+        - paragraph [ref=e37]: ★ 2026 Divisions
+        - heading "Twelve Divisions of All-Stars" [level=2] [ref=e38]
+        - paragraph [ref=e39]: From Shetland to Pony, every division gets its own tryout schedule, coaching staff, and summer of competition.
+      - generic [ref=e40]:
+        - generic [ref=e42] [cursor=pointer]:
+          - generic [ref=e44]:
+            - generic [ref=e45]: 5U
+            - generic [ref=e46]: ★
+          - paragraph [ref=e47]: Ages 4-5 • Shetland
+          - generic [ref=e48]:
+            - generic [ref=e49]: 12 roster spots
+            - generic [ref=e50]: "Tryouts: April 12"
+        - generic [ref=e52] [cursor=pointer]:
+          - generic [ref=e54]:
+            - generic [ref=e55]: 6U
+            - generic [ref=e56]: ★
+          - paragraph [ref=e57]: Ages 5-6 • Shetland
+          - generic [ref=e58]:
+            - generic [ref=e59]: 12 roster spots
+            - generic [ref=e60]: "Tryouts: April 12"
+        - generic [ref=e62] [cursor=pointer]:
+          - generic [ref=e64]:
+            - generic [ref=e65]: 7U MP
+            - generic [ref=e66]: ★
+          - paragraph [ref=e67]: Ages 6-7 • Pinto Machine Pitch
+          - generic [ref=e68]:
+            - generic [ref=e69]: 12 roster spots
+            - generic [ref=e70]: "Tryouts: April 12"
+        - generic [ref=e72] [cursor=pointer]:
+          - generic [ref=e74]:
+            - generic [ref=e75]: 7U KP
+            - generic [ref=e76]: ★
+          - paragraph [ref=e77]: Ages 6-7 • Pinto Kid Pitch
+          - generic [ref=e78]:
+            - generic [ref=e79]: 12 roster spots
+            - generic [ref=e80]: "Tryouts: April 12"
+        - generic [ref=e82] [cursor=pointer]:
+          - generic [ref=e84]:
+            - generic [ref=e85]: 8U MP
+            - generic [ref=e86]: ★
+          - paragraph [ref=e87]: Ages 7-8 • Pinto Machine Pitch
+          - generic [ref=e88]:
+            - generic [ref=e89]: 12 roster spots
+            - generic [ref=e90]: "Tryouts: April 12"
+        - generic [ref=e92] [cursor=pointer]:
+          - generic [ref=e94]:
+            - generic [ref=e95]: 8U KP
+            - generic [ref=e96]: ★
+          - paragraph [ref=e97]: Ages 7-8 • Pinto Kid Pitch
+          - generic [ref=e98]:
+            - generic [ref=e99]: 12 roster spots
+            - generic [ref=e100]: "Tryouts: April 12"
+        - generic [ref=e102] [cursor=pointer]:
+          - generic [ref=e104]:
+            - generic [ref=e105]: 9U
+            - generic [ref=e106]: ★
+          - paragraph [ref=e107]: Ages 8-9 • Mustang
+          - generic [ref=e108]:
+            - generic [ref=e109]: 12 roster spots
+            - generic [ref=e110]: "Tryouts: April 12"
+        - generic [ref=e112] [cursor=pointer]:
+          - generic [ref=e114]:
+            - generic [ref=e115]: 10U
+            - generic [ref=e116]: ★
+          - paragraph [ref=e117]: Ages 9-10 • Mustang
+          - generic [ref=e118]:
+            - generic [ref=e119]: 12 roster spots
+            - generic [ref=e120]: "Tryouts: April 12"
+        - generic [ref=e122] [cursor=pointer]:
+          - generic [ref=e124]:
+            - generic [ref=e125]: 11U
+            - generic [ref=e126]: ★
+          - paragraph [ref=e127]: Ages 10-11 • Bronco
+          - generic [ref=e128]:
+            - generic [ref=e129]: 12 roster spots
+            - generic [ref=e130]: "Tryouts: April 12"
+        - generic [ref=e132] [cursor=pointer]:
+          - generic [ref=e134]:
+            - generic [ref=e135]: 12U
+            - generic [ref=e136]: ★
+          - paragraph [ref=e137]: Ages 11-12 • Bronco
+          - generic [ref=e138]:
+            - generic [ref=e139]: 12 roster spots
+            - generic [ref=e140]: "Tryouts: April 12"
+        - generic [ref=e142] [cursor=pointer]:
+          - generic [ref=e144]:
+            - generic [ref=e145]: 13U
+            - generic [ref=e146]: ★
+          - paragraph [ref=e147]: Ages 12-13 • Pony
+          - generic [ref=e148]:
+            - generic [ref=e149]: 12 roster spots
+            - generic [ref=e150]: "Tryouts: April 12"
+        - generic [ref=e152] [cursor=pointer]:
+          - generic [ref=e154]:
+            - generic [ref=e155]: 14U
+            - generic [ref=e156]: ★
+          - paragraph [ref=e157]: Ages 13-14 • Pony
+          - generic [ref=e158]:
+            - generic [ref=e159]: 12 roster spots
+            - generic [ref=e160]: "Tryouts: April 12"
+    - generic [ref=e162]:
+      - generic [ref=e163]:
+        - paragraph [ref=e164]: "12"
+        - paragraph [ref=e165]: Divisions
+      - generic [ref=e166]:
+        - paragraph [ref=e167]: "144"
+        - paragraph [ref=e168]: Roster Spots
+      - generic [ref=e169]:
+        - paragraph [ref=e170]: "54"
+        - paragraph [ref=e171]: Point Rubric
+      - generic [ref=e172]:
+        - paragraph [ref=e173]: Fair
+        - paragraph [ref=e174]: "& Transparent"
+    - generic [ref=e176]:
+      - generic [ref=e177]:
+        - paragraph [ref=e178]: ★ The Process
+        - heading "How All-Stars Works" [level=2] [ref=e179]
+        - paragraph [ref=e180]: Four phases. Clear process from start to finish.
+      - generic [ref=e181]:
+        - generic [ref=e183]:
+          - generic [ref=e184]: "1"
+          - heading "Apply" [level=3] [ref=e185]
+          - paragraph [ref=e186]: Coaches submit applications. Parents register players. All online, all documented.
+        - generic [ref=e188]:
+          - generic [ref=e189]: "2"
+          - heading "Evaluate" [level=3] [ref=e190]
+          - paragraph [ref=e191]: Independent evaluators score every player on a 54-point rubric across 6 categories. Fair and consistent.
+        - generic [ref=e193]:
+          - generic [ref=e194]: "3"
+          - heading "Select" [level=3] [ref=e195]
+          - paragraph [ref=e196]: Scores combined with season data. Rosters built for balance and competitiveness.
+        - generic [ref=e198]:
+          - generic [ref=e199]: "4"
+          - heading "Compete" [level=3] [ref=e200]
+          - paragraph [ref=e201]: Practices start. Tournaments begin. An unforgettable summer of All-Stars baseball.
+    - generic [ref=e210]:
+      - paragraph [ref=e211]: ★ Get Started ★
+      - heading "Ready to Play Ball?" [level=2] [ref=e212]
+      - paragraph [ref=e213]: Whether you're a coach ready to lead or a family signing up for tryouts, everything starts here.
+      - generic [ref=e214]:
+        - link "Sign In" [ref=e215] [cursor=pointer]:
+          - /url: /auth/login
+        - link "View Tryout Info" [ref=e216] [cursor=pointer]:
+          - /url: /tryouts
+  - contentinfo [ref=e217]:
+    - generic [ref=e218]:
+      - generic [ref=e219]:
+        - generic [ref=e220]: ★★★
+        - generic [ref=e221]: Irvine All-Stars
+        - generic [ref=e222]: ★★★
+      - generic [ref=e223]:
+        - link "Coaches" [ref=e224] [cursor=pointer]:
+          - /url: /coaches
+        - link "Tryouts" [ref=e225] [cursor=pointer]:
+          - /url: /tryouts
+        - link "Timeline" [ref=e226] [cursor=pointer]:
+          - /url: /timeline
+        - link "Documents" [ref=e227] [cursor=pointer]:
+          - /url: /documents
+        - link "FAQ" [ref=e228] [cursor=pointer]:
+          - /url: /faq
+      - generic [ref=e229]:
+        - paragraph [ref=e230]: Irvine Pony Baseball
+        - paragraph [ref=e231]: 2026 All-Stars Season
+  - alert [ref=e232]

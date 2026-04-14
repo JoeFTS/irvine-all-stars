@@ -1,0 +1,188 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - link "★★★ Irvine All-Stars ★★★" [ref=e3] [cursor=pointer]:
+      - /url: /
+      - generic [ref=e4]: ★★★
+      - generic [ref=e5]: Irvine All-Stars
+      - generic [ref=e6]: ★★★
+    - list [ref=e7]:
+      - listitem [ref=e8]:
+        - link "FAQ" [ref=e9] [cursor=pointer]:
+          - /url: /faq
+      - listitem [ref=e31]:
+        - link "Coach Portal" [ref=e32] [cursor=pointer]:
+          - /url: /coach
+      - listitem [ref=e33]:
+        - link "Admin" [ref=e34] [cursor=pointer]:
+          - /url: /admin
+      - listitem [ref=e10]:
+        - button "Sign Out" [ref=e11]
+  - main [ref=e12]:
+    - generic [ref=e35]:
+      - complementary [ref=e36]:
+        - heading "Admin Panel" [level=2] [ref=e38]
+        - navigation [ref=e39]:
+          - link "Dashboard" [ref=e40] [cursor=pointer]:
+            - /url: /admin
+            - img [ref=e41]
+            - text: Dashboard
+          - link "Coach Applications" [ref=e46] [cursor=pointer]:
+            - /url: /admin/applications
+            - img [ref=e47]
+            - text: Coach Applications
+          - link "Scores" [ref=e50] [cursor=pointer]:
+            - /url: /admin/scores
+            - img [ref=e51]
+            - text: Scores
+          - link "Announcements" [ref=e53] [cursor=pointer]:
+            - /url: /admin/announcements
+            - img [ref=e54]
+            - text: Announcements
+          - link "Tournaments" [ref=e57] [cursor=pointer]:
+            - /url: /admin/tournaments
+            - img [ref=e58]
+            - text: Tournaments
+          - link "Teams" [ref=e64] [cursor=pointer]:
+            - /url: /admin/teams
+            - img [ref=e65]
+            - text: Teams
+          - link "Tryouts" [ref=e69] [cursor=pointer]:
+            - /url: /admin/tryouts
+            - img [ref=e70]
+            - text: Tryouts
+          - link "Invites" [ref=e72] [cursor=pointer]:
+            - /url: /admin/invites
+            - img [ref=e73]
+            - text: Invites
+          - link "Documents" [ref=e76] [cursor=pointer]:
+            - /url: /admin/documents
+            - img [ref=e77]
+            - text: Documents
+          - link "Compliance" [ref=e80] [cursor=pointer]:
+            - /url: /admin/compliance
+            - img [ref=e81]
+            - text: Compliance
+          - link "Help" [ref=e84] [cursor=pointer]:
+            - /url: /admin/help
+            - img [ref=e85]
+            - text: Help
+        - generic [ref=e89]:
+          - img [ref=e90]
+          - generic [ref=e94]:
+            - paragraph [ref=e95]: Admin
+            - paragraph [ref=e96]: testadmin@irvineallstars.com
+      - generic [ref=e98]:
+        - generic [ref=e99]:
+          - paragraph [ref=e100]: Admin
+          - heading "Evaluator Scores Help" [level=1] [ref=e101]:
+            - text: Evaluator Scores
+            - button "Help" [ref=e103]:
+              - img [ref=e104]
+          - paragraph [ref=e107]: 0 total scores
+        - generic [ref=e108]:
+          - generic [ref=e109]:
+            - generic [ref=e110]:
+              - heading "Download Score Sheets" [level=2] [ref=e111]
+              - paragraph [ref=e112]: Pre-filled Excel sheets with player names and scoring columns. Print for coaches or fill in digitally.
+            - button "Blank Template" [ref=e113]:
+              - img [ref=e114]
+              - text: Blank Template
+          - generic [ref=e117]:
+            - button "5U-Shetland 0 registered players" [disabled] [ref=e118]:
+              - img [ref=e119]
+              - generic [ref=e122]:
+                - paragraph [ref=e123]: 5U-Shetland
+                - paragraph [ref=e124]: 0 registered players
+            - button "6U-Shetland 0 registered players" [disabled] [ref=e125]:
+              - img [ref=e126]
+              - generic [ref=e129]:
+                - paragraph [ref=e130]: 6U-Shetland
+                - paragraph [ref=e131]: 0 registered players
+            - button "7U MP-Pinto 0 registered players" [disabled] [ref=e132]:
+              - img [ref=e133]
+              - generic [ref=e136]:
+                - paragraph [ref=e137]: 7U MP-Pinto
+                - paragraph [ref=e138]: 0 registered players
+            - button "7U KP-Pinto 0 registered players" [disabled] [ref=e139]:
+              - img [ref=e140]
+              - generic [ref=e143]:
+                - paragraph [ref=e144]: 7U KP-Pinto
+                - paragraph [ref=e145]: 0 registered players
+            - button "8U MP-Pinto 0 registered players" [disabled] [ref=e146]:
+              - img [ref=e147]
+              - generic [ref=e150]:
+                - paragraph [ref=e151]: 8U MP-Pinto
+                - paragraph [ref=e152]: 0 registered players
+            - button "8U KP-Pinto 0 registered players" [disabled] [ref=e153]:
+              - img [ref=e154]
+              - generic [ref=e157]:
+                - paragraph [ref=e158]: 8U KP-Pinto
+                - paragraph [ref=e159]: 0 registered players
+            - button "9U-Mustang 0 registered players" [disabled] [ref=e160]:
+              - img [ref=e161]
+              - generic [ref=e164]:
+                - paragraph [ref=e165]: 9U-Mustang
+                - paragraph [ref=e166]: 0 registered players
+            - button "10U-Mustang 0 registered players" [disabled] [ref=e167]:
+              - img [ref=e168]
+              - generic [ref=e171]:
+                - paragraph [ref=e172]: 10U-Mustang
+                - paragraph [ref=e173]: 0 registered players
+            - button "11U-Bronco 1 registered player" [ref=e174] [cursor=pointer]:
+              - img [ref=e175]
+              - generic [ref=e178]:
+                - paragraph [ref=e179]: 11U-Bronco
+                - paragraph [ref=e180]: 1 registered player
+            - button "12U-Bronco 1 registered player" [ref=e181] [cursor=pointer]:
+              - img [ref=e182]
+              - generic [ref=e185]:
+                - paragraph [ref=e186]: 12U-Bronco
+                - paragraph [ref=e187]: 1 registered player
+            - button "13U-Pony 0 registered players" [disabled] [ref=e188]:
+              - img [ref=e189]
+              - generic [ref=e192]:
+                - paragraph [ref=e193]: 13U-Pony
+                - paragraph [ref=e194]: 0 registered players
+            - button "14U-Pony 0 registered players" [disabled] [ref=e195]:
+              - img [ref=e196]
+              - generic [ref=e199]:
+                - paragraph [ref=e200]: 14U-Pony
+                - paragraph [ref=e201]: 0 registered players
+        - generic [ref=e202]:
+          - text: "Division:"
+          - generic [ref=e203]:
+            - button "All" [ref=e204]
+            - button "5U" [ref=e205]
+            - button "6U" [ref=e206]
+            - button "7U MP" [ref=e207]
+            - button "7U KP" [ref=e208]
+            - button "8U MP" [ref=e209]
+            - button "8U KP" [ref=e210]
+            - button "9U" [ref=e211]
+            - button "10U" [ref=e212]
+            - button "11U" [ref=e213]
+            - button "12U" [ref=e214]
+            - button "13U" [ref=e215]
+            - button "14U" [ref=e216]
+        - paragraph [ref=e218]: No scores found.
+  - contentinfo [ref=e15]:
+    - generic [ref=e16]:
+      - generic [ref=e17]:
+        - generic [ref=e18]: ★★★
+        - generic [ref=e19]: Irvine All-Stars
+        - generic [ref=e20]: ★★★
+      - generic [ref=e21]:
+        - link "Coaches" [ref=e22] [cursor=pointer]:
+          - /url: /coaches
+        - link "Tryouts" [ref=e23] [cursor=pointer]:
+          - /url: /tryouts
+        - link "Timeline" [ref=e24] [cursor=pointer]:
+          - /url: /timeline
+        - link "Documents" [ref=e25] [cursor=pointer]:
+          - /url: /documents
+        - link "FAQ" [ref=e26] [cursor=pointer]:
+          - /url: /faq
+      - generic [ref=e27]:
+        - paragraph [ref=e28]: Irvine Pony Baseball
+        - paragraph [ref=e29]: 2026 All-Stars Season
+  - alert [ref=e30]

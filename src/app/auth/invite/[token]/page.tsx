@@ -122,153 +122,22 @@ export default function InviteSignupPage({
         return;
       }
 
-      // 2. Create profile with the invite role
-      const { error: profileError } = await supabase
-        .from("profiles")
-        .insert({
-          id: userId,
-          email: inviteState.invite.email,
-          full_name: name,
-          role: inviteState.invite.role,
-          division: inviteState.invite.division || null,
-        });
-
-      if (profileError) {
-        console.error("Profile insert error:", profileError);
-        // Non-blocking — profile may be created by a trigger
+      // Server-side: create profile, mark invites used, create registrations.
+      // Must run server-side with service role because signUp with email
+      // confirmation returns no session, so RLS would block these writes.
+      const res = await fetch("/api/complete-signup", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ token, userId, name }),
+      });
+      const payload = await res.json();
+      if (!res.ok) {
+        setError(payload.error || "Failed to finish setup. Please contact support.");
+        setSubmitting(false);
+        return;
       }
 
-      // 3. Mark invite as used
-      await supabase
-        .from("invites")
-        .update({ used: true })
-        .eq("token", token);
-
-      // 4. Auto-create or link registration for the child
-      const childrenNames: string[] = [];
-
-      if (inviteState.invite.role === "parent" && inviteState.invite.child_first_name && inviteState.invite.child_last_name) {
-        // Check if registration already exists (case-insensitive)
-        const { data: existingReg } = await supabase
-          .from("tryout_registrations")
-          .select("id, secondary_parent_email")
-          .ilike("player_first_name", inviteState.invite.child_first_name.trim())
-          .ilike("player_last_name", inviteState.invite.child_last_name.trim())
-          .maybeSingle();
-
-        if (existingReg) {
-          // Second parent — add as secondary email if not already set
-          if (!existingReg.secondary_parent_email) {
-            await supabase
-              .from("tryout_registrations")
-              .update({ secondary_parent_email: inviteState.invite.email })
-              .eq("id", existingReg.id);
-          }
-        } else {
-          // First parent — create partial registration
-          const regData: Record<string, string> = {
-            parent_name: name,
-            parent_email: inviteState.invite.email.toLowerCase(),
-            player_first_name: inviteState.invite.child_first_name.trim(),
-            player_last_name: inviteState.invite.child_last_name.trim(),
-            division: inviteState.invite.division || "",
-            status: "registered",
-          };
-          if (inviteState.invite.current_team) regData.current_team = inviteState.invite.current_team;
-          await supabase.from("tryout_registrations").insert(regData);
-        }
-        childrenNames.push(inviteState.invite.child_first_name.trim());
-
-        // 4b. Process sibling invites for the same parent email
-        const { data: siblingInvites } = await supabase
-          .from("invites")
-          .select("id, child_first_name, child_last_name, division, current_team, token")
-          .eq("email", inviteState.invite.email)
-          .eq("role", "parent")
-          .eq("used", false)
-          .neq("id", inviteState.invite.id);
-
-        if (siblingInvites && siblingInvites.length > 0) {
-          for (const sibling of siblingInvites) {
-            if (sibling.child_first_name && sibling.child_last_name) {
-              const { data: existingSiblingReg } = await supabase
-                .from("tryout_registrations")
-                .select("id, secondary_parent_email")
-                .ilike("player_first_name", sibling.child_first_name.trim())
-                .ilike("player_last_name", sibling.child_last_name.trim())
-                .maybeSingle();
-
-              if (existingSiblingReg) {
-                if (!existingSiblingReg.secondary_parent_email) {
-                  await supabase
-                    .from("tryout_registrations")
-                    .update({ secondary_parent_email: inviteState.invite.email })
-                    .eq("id", existingSiblingReg.id);
-                }
-              } else {
-                const sibRegData: Record<string, string> = {
-                  parent_name: name,
-                  parent_email: inviteState.invite.email.toLowerCase(),
-                  player_first_name: sibling.child_first_name.trim(),
-                  player_last_name: sibling.child_last_name.trim(),
-                  division: sibling.division || "",
-                  status: "registered",
-                };
-                if (sibling.current_team) sibRegData.current_team = sibling.current_team;
-                await supabase.from("tryout_registrations").insert(sibRegData);
-              }
-              childrenNames.push(sibling.child_first_name.trim());
-            }
-
-            // Mark sibling invite as used
-            await supabase
-              .from("invites")
-              .update({ used: true })
-              .eq("id", sibling.id);
-          }
-        }
-      }
-
-      // 4c. If coach, also process any pending parent invites for the same email
-      if (inviteState.invite.role === "coach") {
-        const { data: parentInvites } = await supabase
-          .from("invites")
-          .select("id, child_first_name, child_last_name, division, current_team")
-          .eq("email", inviteState.invite.email)
-          .eq("role", "parent")
-          .eq("used", false);
-
-        if (parentInvites && parentInvites.length > 0) {
-          for (const pInvite of parentInvites) {
-            if (pInvite.child_first_name && pInvite.child_last_name) {
-              const { data: existingReg } = await supabase
-                .from("tryout_registrations")
-                .select("id")
-                .ilike("player_first_name", pInvite.child_first_name.trim())
-                .ilike("player_last_name", pInvite.child_last_name.trim())
-                .maybeSingle();
-
-              if (!existingReg) {
-                const pRegData: Record<string, string> = {
-                  parent_name: name,
-                  parent_email: inviteState.invite.email.toLowerCase(),
-                  player_first_name: pInvite.child_first_name.trim(),
-                  player_last_name: pInvite.child_last_name.trim(),
-                  division: pInvite.division || "",
-                  status: "registered",
-                };
-                if (pInvite.current_team) pRegData.current_team = pInvite.current_team;
-                await supabase.from("tryout_registrations").insert(pRegData);
-              }
-              childrenNames.push(pInvite.child_first_name.trim());
-            }
-            await supabase.from("invites").update({ used: true }).eq("id", pInvite.id);
-          }
-        }
-      }
-
-      // 5. Success — show email confirmation message
-      setRegisteredChildren(childrenNames);
+      setRegisteredChildren(payload.children || []);
       setSuccess(true);
     } catch (err) {
       setError(err instanceof Error ? err.message : "An unexpected error occurred.");

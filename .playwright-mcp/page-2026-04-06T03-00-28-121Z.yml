@@ -1,0 +1,85 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - link "★★★ Irvine All-Stars ★★★" [ref=e3] [cursor=pointer]:
+      - /url: /
+      - generic [ref=e4]: ★★★
+      - generic [ref=e5]: Irvine All-Stars
+      - generic [ref=e6]: ★★★
+    - list [ref=e7]:
+      - listitem [ref=e8]:
+        - link "FAQ" [ref=e9] [cursor=pointer]:
+          - /url: /faq
+      - listitem [ref=e10]:
+        - button "Sign Out" [ref=e11]
+  - main [ref=e12]:
+    - generic [ref=e14]:
+      - paragraph [ref=e15]: ★ Document
+      - heading "Parent Information Packet" [level=1] [ref=e16]
+      - paragraph [ref=e17]: Everything families need to know about All-Stars — what it is, how tryouts work, commitment expectations, and key contacts.
+    - generic [ref=e26]:
+      - generic [ref=e27]:
+        - link "Back to Documents" [ref=e28] [cursor=pointer]:
+          - /url: /documents
+          - img [ref=e29]
+          - text: Back to Documents
+        - button "Print" [ref=e31]:
+          - img [ref=e32]
+          - text: Print
+      - generic [ref=e36]:
+        - generic [ref=e37]:
+          - heading "What is All-Stars?" [level=2] [ref=e38]
+          - generic [ref=e39]: All-Stars are elite summer tournament teams that represent Irvine Pony Baseball in inter-league competition. These teams are separate from the regular season — players are selected through a tryout process to form the most competitive roster possible in each age division. All-Stars is a chance for standout players to test themselves against the best from other leagues across Southern California and beyond.
+        - generic [ref=e40]:
+          - heading "Divisions" [level=2] [ref=e41]
+          - generic [ref=e42]: "Irvine All-Stars fields 12 divisions: • 5U Shetland • 6U Shetland • 7U Pinto Machine Pitch • 7U Pinto Kid Pitch • 8U Pinto Machine Pitch • 8U Pinto Kid Pitch • 9U Mustang • 10U Mustang • 11U Bronco • 12U Bronco • 13U Pony • 14U Pony Each division has its own coaching staff, practice schedule, and tournament calendar."
+        - generic [ref=e43]:
+          - heading "Roster Size" [level=2] [ref=e44]
+          - generic [ref=e45]: Each All-Stars team carries a roster of 12 players. Rosters are built to be balanced and competitive, with selections based entirely on tryout evaluations and regular-season performance.
+        - generic [ref=e46]:
+          - heading "Tryout Process" [level=2] [ref=e47]
+          - generic [ref=e48]: "Every player who registers for tryouts is evaluated by independent evaluators using a standardized rubric. Evaluators score each player across 6 categories on a 1–9 scale: • Hitting — bat speed, contact, mechanics, plate discipline • Fielding — glove work, footwork, range, consistency • Throwing — arm strength, accuracy, mechanics, release • Running / Speed — base running, first-step quickness, overall athleticism • Effort — hustle, intensity, competing hard on every play • Attitude — sportsmanship, coachability, enthusiasm Multiple evaluators score each player independently, and scores are averaged for fairness. The maximum possible score is 54 points."
+        - generic [ref=e49]:
+          - heading "Commitment Expectations" [level=2] [ref=e50]
+          - generic [ref=e51]: "All-Stars is a significant commitment for the entire family. Expect: • Practices 2–3 times per week (weeknight evenings, 1.5–2 hours) • Tournaments most weekends from May through August • Travel to away tournaments within Southern California • Full attendance at all practices and games unless excused in advance Please discuss the time commitment as a family before registering for tryouts."
+        - generic [ref=e52]:
+          - heading "Equipment" [level=2] [ref=e53]
+          - generic [ref=e54]: "Players are responsible for providing their own: • Bat (must meet division-specific regulations) • Glove • Cleats • Batting gloves and protective gear The team provides the official uniform (jersey, pants, hat, socks). Uniform fees are included in the All-Stars participation cost."
+        - generic [ref=e55]:
+          - heading "Communication" [level=2] [ref=e56]
+          - generic [ref=e57]: All schedule updates, announcements, and team information will be communicated through the parent portal at irvineallstars.com/portal. Parents are expected to check the portal regularly and keep their contact information up to date.
+        - generic [ref=e58]:
+          - heading "Key Contacts" [level=2] [ref=e59]
+          - generic [ref=e60]: "For questions about All-Stars, reach out to the coordinator: • Email: allstars@irvinepony.com • Website: irvineallstars.com We do our best to respond within 24 hours during the season."
+      - generic [ref=e61]:
+        - link "Back to Documents" [ref=e62] [cursor=pointer]:
+          - /url: /documents
+          - img [ref=e63]
+          - text: Back to Documents
+        - button "Print" [ref=e65]:
+          - img [ref=e66]
+          - text: Print
+    - paragraph [ref=e78]:
+      - text: Questions about this document? Contact the All-Stars coordinator at
+      - link "allstars@irvinepony.com" [ref=e79] [cursor=pointer]:
+        - /url: mailto:allstars@irvinepony.com
+  - contentinfo [ref=e80]:
+    - generic [ref=e81]:
+      - generic [ref=e82]:
+        - generic [ref=e83]: ★★★
+        - generic [ref=e84]: Irvine All-Stars
+        - generic [ref=e85]: ★★★
+      - generic [ref=e86]:
+        - link "Coaches" [ref=e87] [cursor=pointer]:
+          - /url: /coaches
+        - link "Tryouts" [ref=e88] [cursor=pointer]:
+          - /url: /tryouts
+        - link "Timeline" [ref=e89] [cursor=pointer]:
+          - /url: /timeline
+        - link "Documents" [ref=e90] [cursor=pointer]:
+          - /url: /documents
+        - link "FAQ" [ref=e91] [cursor=pointer]:
+          - /url: /faq
+      - generic [ref=e92]:
+        - paragraph [ref=e93]: Irvine Pony Baseball
+        - paragraph [ref=e94]: 2026 All-Stars Season
+  - alert [ref=e95]

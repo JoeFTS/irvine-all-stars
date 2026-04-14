@@ -1,0 +1,240 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - link "★★★ Irvine All-Stars ★★★" [ref=e3] [cursor=pointer]:
+      - /url: /
+      - generic [ref=e4]: ★★★
+      - generic [ref=e5]: Irvine All-Stars
+      - generic [ref=e6]: ★★★
+    - list [ref=e7]:
+      - listitem [ref=e8]:
+        - link "FAQ" [ref=e9] [cursor=pointer]:
+          - /url: /faq
+      - listitem [ref=e10]:
+        - link "Coach Portal" [ref=e11] [cursor=pointer]:
+          - /url: /coach
+      - listitem [ref=e12]:
+        - link "Parent Portal" [ref=e13] [cursor=pointer]:
+          - /url: /portal
+      - listitem [ref=e14]:
+        - button "Sign Out" [ref=e15]
+  - main [ref=e16]:
+    - generic [ref=e18]:
+      - complementary [ref=e19]:
+        - heading "Coach Dashboard" [level=2] [ref=e21]
+        - navigation [ref=e22]:
+          - link "Dashboard" [ref=e23] [cursor=pointer]:
+            - /url: /coach
+            - img [ref=e24]
+            - text: Dashboard
+          - link "Tryouts" [ref=e29] [cursor=pointer]:
+            - /url: /coach/tryouts
+            - img [ref=e30]
+            - text: Tryouts
+          - link "Enter Scores" [ref=e34] [cursor=pointer]:
+            - /url: /coach/scores
+            - img [ref=e35]
+            - text: Enter Scores
+          - link "Binder Checklist" [ref=e38] [cursor=pointer]:
+            - /url: /coach/checklist
+            - img [ref=e39]
+            - text: Binder Checklist
+          - link "Pitching Log" [ref=e43] [cursor=pointer]:
+            - /url: /coach/pitching-log
+            - img [ref=e44]
+            - text: Pitching Log
+          - link "Roster" [ref=e47] [cursor=pointer]:
+            - /url: /coach/roster
+            - img [ref=e48]
+            - text: Roster
+          - link "Contracts" [ref=e53] [cursor=pointer]:
+            - /url: /coach/contracts
+            - img [ref=e54]
+            - text: Contracts
+          - link "Certifications" [ref=e57] [cursor=pointer]:
+            - /url: /coach/certifications
+            - img [ref=e58]
+            - text: Certifications
+          - link "Tournament Rules" [ref=e61] [cursor=pointer]:
+            - /url: /coach/tournament-rules
+            - img [ref=e62]
+            - text: Tournament Rules
+          - link "Tournaments" [ref=e64] [cursor=pointer]:
+            - /url: /coach/tournaments
+            - img [ref=e65]
+            - text: Tournaments
+          - link "Updates" [ref=e71] [cursor=pointer]:
+            - /url: /coach/updates
+            - img [ref=e72]
+            - text: Updates
+          - link "Help" [ref=e75] [cursor=pointer]:
+            - /url: /coach/help
+            - img [ref=e76]
+            - text: Help
+        - generic [ref=e80]:
+          - img [ref=e81]
+          - generic [ref=e85]:
+            - paragraph [ref=e86]: Coach
+            - paragraph [ref=e87]: thesupplycomp@gmail.com
+      - generic [ref=e89]:
+        - generic [ref=e90]:
+          - paragraph [ref=e91]: Coach
+          - heading "Dashboard Help" [level=1] [ref=e92]:
+            - text: Dashboard
+            - button "Help" [ref=e94]:
+              - img [ref=e95]
+        - generic [ref=e98]:
+          - paragraph [ref=e99]: Your Team
+          - heading "12U-Bronco" [level=2] [ref=e100]
+          - paragraph [ref=e101]: 0 players registered
+          - paragraph [ref=e102]: 2026 Tournament Season
+        - generic [ref=e103]:
+          - heading "Compliance Progress" [level=3] [ref=e104]
+          - paragraph [ref=e105]: 0 of 3 items complete
+          - paragraph [ref=e107]: Your binder must be 100% complete before the pre-tournament manager meeting.
+        - generic [ref=e108]:
+          - heading "Action Items" [level=3] [ref=e109]
+          - list [ref=e110]:
+            - listitem [ref=e111]:
+              - link "Concussion certification not uploaded" [ref=e112] [cursor=pointer]:
+                - /url: /coach/certifications
+                - generic [ref=e113]:
+                  - img [ref=e114]
+                  - text: Concussion certification not uploaded
+                - img [ref=e116]
+            - listitem [ref=e118]:
+              - link "Cardiac arrest certification not uploaded" [ref=e119] [cursor=pointer]:
+                - /url: /coach/certifications
+                - generic [ref=e120]:
+                  - img [ref=e121]
+                  - text: Cardiac arrest certification not uploaded
+                - img [ref=e123]
+            - listitem [ref=e125]:
+              - link "Tournament rules not acknowledged" [ref=e126] [cursor=pointer]:
+                - /url: /coach/tournament-rules
+                - generic [ref=e127]:
+                  - img [ref=e128]
+                  - text: Tournament rules not acknowledged
+                - img [ref=e130]
+        - generic [ref=e132]:
+          - heading "Upcoming" [level=3] [ref=e133]
+          - list [ref=e134]:
+            - listitem [ref=e135]:
+              - img [ref=e136]
+              - generic [ref=e138]:
+                - paragraph [ref=e139]: Coach Candidacy Deadline
+                - paragraph [ref=e140]: March 22
+            - listitem [ref=e141]:
+              - img [ref=e142]
+              - generic [ref=e144]:
+                - paragraph [ref=e145]: Peer Coach Voting
+                - paragraph [ref=e146]: March 24 - 26
+            - listitem [ref=e147]:
+              - img [ref=e148]
+              - generic [ref=e150]:
+                - paragraph [ref=e151]: All-Star Coaches Named
+                - paragraph [ref=e152]: March 27
+            - listitem [ref=e153]:
+              - img [ref=e154]
+              - generic [ref=e156]:
+                - paragraph [ref=e157]: Scouting Period
+                - paragraph [ref=e158]: March 28 - April 11
+            - listitem [ref=e159]:
+              - img [ref=e160]
+              - generic [ref=e162]:
+                - paragraph [ref=e163]: All-Star Tryouts
+                - paragraph [ref=e164]: April 12
+            - listitem [ref=e165]:
+              - img [ref=e166]
+              - generic [ref=e168]:
+                - paragraph [ref=e169]: Players Notified
+                - paragraph [ref=e170]: April 14
+            - listitem [ref=e171]:
+              - img [ref=e172]
+              - generic [ref=e174]:
+                - paragraph [ref=e175]: Memorial Day Tournament
+                - paragraph [ref=e176]: Late May (league-funded)
+            - listitem [ref=e177]:
+              - img [ref=e178]
+              - generic [ref=e180]:
+                - paragraph [ref=e181]: District Tournaments Begin
+                - paragraph [ref=e182]: June 11
+            - listitem [ref=e183]:
+              - img [ref=e184]
+              - generic [ref=e186]:
+                - paragraph [ref=e187]: Binder Sign-Off Deadline
+                - paragraph [ref=e188]: Before your first tournament game
+          - link "View Full Sanction Play Schedule" [ref=e189] [cursor=pointer]:
+            - /url: https://docs.google.com/spreadsheets/d/1Drx76VHKBQrb-dcL8nCfBUfxZio9pVXBVf01HHbcuh0/edit?gid=1045930144#gid=1045930144
+            - img [ref=e190]
+            - text: View Full Sanction Play Schedule
+        - generic [ref=e194]:
+          - heading "Latest Announcements" [level=3] [ref=e195]
+          - list [ref=e196]:
+            - listitem [ref=e197]:
+              - generic [ref=e198]:
+                - paragraph [ref=e199]: "Tournament: South Bay MP Classic — June 13-14, 2026"
+                - generic [ref=e200]: Tournament
+              - paragraph [ref=e201]: "📍 Manhattan Beach, CA 📅 June 13-14, 2026 🏟️ Hosted by South Bay PONY Divisions: Pinto 7 Machine Pitch, Pinto 8 Machine Pitch Register here: https://tourneymachine.com/R179145 Machine Pitch tournament for Pinto 7 and Pinto 8 teams."
+              - paragraph [ref=e202]: Apr 4, 2026
+            - listitem [ref=e203]:
+              - generic [ref=e204]:
+                - paragraph [ref=e205]: "Tournament: South Bay Sunset Classic — June 6-7, 2026"
+                - generic [ref=e206]: Tournament
+              - paragraph [ref=e207]: "📍 Manhattan Beach & Redondo Beach, CA 📅 June 6-7, 2026 🏟️ Hosted by South Bay PONY / Redondo Sunset Divisions: Shetland 6, Pinto 8 PP, Mustang 9, Mustang 10, Bronco 11, Bronco 12 Register here: https://tourneymachine.com/R178982 Co-hosting with Redondo Sunset this year. All Stars teams welcome to Manhattan Beach and Redondo Beach."
+              - paragraph [ref=e208]: Apr 4, 2026
+            - listitem [ref=e209]:
+              - paragraph [ref=e211]: Welcome to the 2026 All-Stars Season!
+              - paragraph [ref=e212]: "We're excited to kick off another season of Irvine Pony Baseball All-Stars! Here are the key dates to remember: • March 27 — All-Star coaches named • March 28 - April 11 — Scouting period • April 12 — All-Star tryouts (Bronco & Pony divisions) • April 14 — Players notified of selection Check back here for updates throughout the season. Go All-Stars! ⚾"
+              - paragraph [ref=e213]: Mar 22, 2026
+        - generic [ref=e214]:
+          - heading "Quick Links" [level=3] [ref=e215]
+          - generic [ref=e216]:
+            - link "Binder Checklist" [ref=e217] [cursor=pointer]:
+              - /url: /coach/checklist
+              - img [ref=e219]
+              - generic [ref=e223]: Binder Checklist
+            - link "Pitching Log" [ref=e224] [cursor=pointer]:
+              - /url: /coach/pitching-log
+              - img [ref=e226]
+              - generic [ref=e229]: Pitching Log
+            - link "Team Roster" [ref=e230] [cursor=pointer]:
+              - /url: /coach/roster
+              - img [ref=e232]
+              - generic [ref=e237]: Team Roster
+            - link "Certifications" [ref=e238] [cursor=pointer]:
+              - /url: /coach/certifications
+              - img [ref=e240]
+              - generic [ref=e243]: Certifications
+            - link "Tournament Rules" [ref=e244] [cursor=pointer]:
+              - /url: /coach/tournament-rules
+              - img [ref=e246]
+              - generic [ref=e248]: Tournament Rules
+            - link "Updates" [ref=e249] [cursor=pointer]:
+              - /url: /coach/updates
+              - img [ref=e251]
+              - generic [ref=e254]: Updates
+            - link "Parent Portal" [ref=e255] [cursor=pointer]:
+              - /url: /portal
+              - img [ref=e257]
+              - generic [ref=e260]: Parent Portal
+  - contentinfo [ref=e261]:
+    - generic [ref=e262]:
+      - generic [ref=e263]:
+        - generic [ref=e264]: ★★★
+        - generic [ref=e265]: Irvine All-Stars
+        - generic [ref=e266]: ★★★
+      - generic [ref=e267]:
+        - link "Coaches" [ref=e268] [cursor=pointer]:
+          - /url: /coaches
+        - link "Tryouts" [ref=e269] [cursor=pointer]:
+          - /url: /tryouts
+        - link "Timeline" [ref=e270] [cursor=pointer]:
+          - /url: /timeline
+        - link "Documents" [ref=e271] [cursor=pointer]:
+          - /url: /documents
+        - link "FAQ" [ref=e272] [cursor=pointer]:
+          - /url: /faq
+      - generic [ref=e273]:
+        - paragraph [ref=e274]: Irvine Pony Baseball
+        - paragraph [ref=e275]: 2026 All-Stars Season
+  - alert [ref=e276]

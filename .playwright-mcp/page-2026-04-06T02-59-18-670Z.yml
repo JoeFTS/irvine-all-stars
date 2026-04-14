@@ -1,0 +1,154 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - link "★★★ Irvine All-Stars ★★★" [ref=e3] [cursor=pointer]:
+      - /url: /
+      - generic [ref=e4]: ★★★
+      - generic [ref=e5]: Irvine All-Stars
+      - generic [ref=e6]: ★★★
+    - list [ref=e7]:
+      - listitem [ref=e8]:
+        - link "FAQ" [ref=e9] [cursor=pointer]:
+          - /url: /faq
+      - listitem [ref=e31]:
+        - link "Coach Portal" [ref=e32] [cursor=pointer]:
+          - /url: /coach
+      - listitem [ref=e33]:
+        - link "Admin" [ref=e34] [cursor=pointer]:
+          - /url: /admin
+      - listitem [ref=e10]:
+        - button "Sign Out" [ref=e11]
+  - main [ref=e12]:
+    - generic [ref=e35]:
+      - complementary [ref=e36]:
+        - heading "Admin Panel" [level=2] [ref=e38]
+        - navigation [ref=e39]:
+          - link "Dashboard" [ref=e40] [cursor=pointer]:
+            - /url: /admin
+            - img [ref=e41]
+            - text: Dashboard
+          - link "Coach Applications" [ref=e46] [cursor=pointer]:
+            - /url: /admin/applications
+            - img [ref=e47]
+            - text: Coach Applications
+          - link "Scores" [ref=e50] [cursor=pointer]:
+            - /url: /admin/scores
+            - img [ref=e51]
+            - text: Scores
+          - link "Announcements" [ref=e53] [cursor=pointer]:
+            - /url: /admin/announcements
+            - img [ref=e54]
+            - text: Announcements
+          - link "Tournaments" [ref=e57] [cursor=pointer]:
+            - /url: /admin/tournaments
+            - img [ref=e58]
+            - text: Tournaments
+          - link "Teams" [ref=e64] [cursor=pointer]:
+            - /url: /admin/teams
+            - img [ref=e65]
+            - text: Teams
+          - link "Tryouts" [ref=e69] [cursor=pointer]:
+            - /url: /admin/tryouts
+            - img [ref=e70]
+            - text: Tryouts
+          - link "Invites" [ref=e72] [cursor=pointer]:
+            - /url: /admin/invites
+            - img [ref=e73]
+            - text: Invites
+          - link "Documents" [ref=e76] [cursor=pointer]:
+            - /url: /admin/documents
+            - img [ref=e77]
+            - text: Documents
+          - link "Compliance" [ref=e80] [cursor=pointer]:
+            - /url: /admin/compliance
+            - img [ref=e81]
+            - text: Compliance
+          - link "Help" [ref=e84] [cursor=pointer]:
+            - /url: /admin/help
+            - img [ref=e85]
+            - text: Help
+        - generic [ref=e89]:
+          - img [ref=e90]
+          - generic [ref=e94]:
+            - paragraph [ref=e95]: Admin
+            - paragraph [ref=e96]: testadmin@irvineallstars.com
+      - generic [ref=e98]:
+        - generic [ref=e99]:
+          - paragraph [ref=e100]: Admin
+          - heading "Tournament Compliance Help" [level=1] [ref=e101]:
+            - text: Tournament Compliance
+            - button "Help" [ref=e103]:
+              - img [ref=e104]
+          - paragraph [ref=e107]: Which divisions are tournament-ready — all players have contracts, birth certs, and photos.
+        - generic [ref=e108]:
+          - generic [ref=e109]:
+            - paragraph [ref=e110]: 0%
+            - paragraph [ref=e111]: Overall Readiness
+            - paragraph [ref=e112]: 0 of 0 players ready
+          - generic [ref=e113]:
+            - paragraph [ref=e114]: "0"
+            - paragraph [ref=e115]: Divisions Ready
+            - paragraph [ref=e116]: of 1 with players
+          - generic [ref=e117]:
+            - paragraph [ref=e118]: "0"
+            - paragraph [ref=e119]: Players Missing Items
+        - 'button "12U-Bronco No Players Yet Team: 12U-Bronco White Coach: Joe Hernandez 0%" [ref=e122]':
+          - img [ref=e123]
+          - generic [ref=e125]:
+            - generic [ref=e126]:
+              - generic [ref=e127]: 12U-Bronco
+              - generic [ref=e128]: No Players Yet
+            - generic [ref=e129]:
+              - generic [ref=e130]: "Team: 12U-Bronco White"
+              - generic [ref=e131]: "Coach: Joe Hernandez"
+          - paragraph [ref=e134]: 0%
+          - img [ref=e135]
+        - generic [ref=e137]:
+          - generic [ref=e138]:
+            - heading "Pre-Tournament Coach Agreements" [level=2] [ref=e139]
+            - paragraph [ref=e140]: Coaches must acknowledge they have read and understand the tournament rules for their division.
+          - generic [ref=e141]:
+            - generic [ref=e142]:
+              - generic [ref=e143]: Coach
+              - generic [ref=e144]: Division
+              - generic [ref=e145]: Status
+              - generic [ref=e146]: Signed
+            - generic [ref=e147]:
+              - generic [ref=e148]:
+                - paragraph [ref=e149]: Joe Hernandez
+                - paragraph [ref=e150]: thesupplycomp@gmail.com
+              - generic [ref=e151]: 12U-Bronco
+              - generic [ref=e153]:
+                - img [ref=e154]
+                - text: Not Signed
+              - generic [ref=e159]: —
+            - generic [ref=e160]:
+              - generic [ref=e161]:
+                - paragraph [ref=e162]: Elvin Jaurigue
+                - paragraph [ref=e163]: elvinjaurigue@gmail.com
+              - generic [ref=e164]: 8U KP-Pinto
+              - generic [ref=e166]:
+                - img [ref=e167]
+                - text: Not Signed
+              - generic [ref=e172]: —
+            - generic [ref=e174]: 0 of 2 coaches signed
+  - contentinfo [ref=e15]:
+    - generic [ref=e16]:
+      - generic [ref=e17]:
+        - generic [ref=e18]: ★★★
+        - generic [ref=e19]: Irvine All-Stars
+        - generic [ref=e20]: ★★★
+      - generic [ref=e21]:
+        - link "Coaches" [ref=e22] [cursor=pointer]:
+          - /url: /coaches
+        - link "Tryouts" [ref=e23] [cursor=pointer]:
+          - /url: /tryouts
+        - link "Timeline" [ref=e24] [cursor=pointer]:
+          - /url: /timeline
+        - link "Documents" [ref=e25] [cursor=pointer]:
+          - /url: /documents
+        - link "FAQ" [ref=e26] [cursor=pointer]:
+          - /url: /faq
+      - generic [ref=e27]:
+        - paragraph [ref=e28]: Irvine Pony Baseball
+        - paragraph [ref=e29]: 2026 All-Stars Season
+  - alert [ref=e30]

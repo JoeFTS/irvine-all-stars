@@ -1,0 +1,171 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - link "★★★ Irvine All-Stars ★★★" [ref=e3] [cursor=pointer]:
+      - /url: /
+      - generic [ref=e4]: ★★★
+      - generic [ref=e5]: Irvine All-Stars
+      - generic [ref=e6]: ★★★
+    - list [ref=e7]:
+      - listitem [ref=e8]:
+        - link "FAQ" [ref=e9] [cursor=pointer]:
+          - /url: /faq
+      - listitem [ref=e199]:
+        - link "Coach Portal" [ref=e200] [cursor=pointer]:
+          - /url: /coach
+      - listitem [ref=e201]:
+        - link "Admin" [ref=e202] [cursor=pointer]:
+          - /url: /admin
+      - listitem [ref=e10]:
+        - button "Sign Out" [ref=e11]
+  - main [ref=e12]:
+    - generic [ref=e13]:
+      - generic: ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★
+      - generic [ref=e14]:
+        - paragraph [ref=e15]: ★ Lead the Team
+        - heading "Coach Selection" [level=1] [ref=e16]
+        - paragraph [ref=e17]: Every applicant is evaluated on the same 100-point rubric.
+    - generic [ref=e25]:
+      - paragraph [ref=e26]: ★ Before You Apply
+      - heading "Eligibility Requirements" [level=2] [ref=e27]
+      - paragraph [ref=e28]: All head coach candidates must meet the following requirements before submitting an application.
+      - list [ref=e30]:
+        - listitem [ref=e31]:
+          - generic [ref=e32]: ★
+          - generic [ref=e33]:
+            - text: Background Check
+            - paragraph [ref=e34]: Must pass a current background check through Irvine Pony Baseball. No exceptions.
+        - listitem [ref=e35]:
+          - generic [ref=e36]: ★
+          - generic [ref=e37]:
+            - text: Full Season Commitment
+            - paragraph [ref=e38]: Available for the entire All-Stars season — practices, games, and tournaments through July.
+        - listitem [ref=e39]:
+          - generic [ref=e40]: ★
+          - generic [ref=e41]:
+            - text: Good Standing with the League
+            - paragraph [ref=e42]: No disciplinary actions, unresolved complaints, or outstanding fees with Irvine Pony Baseball.
+        - listitem [ref=e43]:
+          - generic [ref=e44]: ★
+          - generic [ref=e45]:
+            - text: Coaching Experience
+            - paragraph [ref=e46]: Minimum one season of coaching experience within Irvine Pony Baseball or an equivalent youth baseball organization.
+        - listitem [ref=e47]:
+          - generic [ref=e48]: ★
+          - generic [ref=e49]:
+            - text: Complete Coaching Staff
+            - paragraph [ref=e50]: Must submit a proposed coaching staff (at least one assistant coach) with your application. All staff must also pass background checks.
+        - listitem [ref=e51]:
+          - generic [ref=e52]: ★
+          - generic [ref=e53]:
+            - text: Age-Appropriate Certification
+            - paragraph [ref=e54]: Completion of any required PONY-level coaching certifications or willingness to complete before the season starts.
+    - generic [ref=e57]:
+      - paragraph [ref=e58]: ★ The Rubric
+      - heading "How Coaches Are Selected" [level=2] [ref=e59]
+      - paragraph [ref=e60]: Every applicant is scored on the same 100-point rubric by the All-Stars Committee. Here's the breakdown.
+      - generic [ref=e61]:
+        - generic [ref=e63]:
+          - generic [ref=e64]: "30"
+          - generic [ref=e65]:
+            - heading "Player Development Track Record" [level=3] [ref=e66]
+            - paragraph [ref=e67]: Demonstrated history of improving players' skills, knowledge of the game at the age-appropriate level, and ability to create meaningful practice plans.
+        - generic [ref=e69]:
+          - generic [ref=e70]: "20"
+          - generic [ref=e71]:
+            - heading "Sportsmanship & Reputation" [level=3] [ref=e72]
+            - paragraph [ref=e73]: Standing within the league community, interactions with umpires, opposing coaches, and parents. No disciplinary history.
+        - generic [ref=e75]:
+          - generic [ref=e76]: "20"
+          - generic [ref=e77]:
+            - heading "Availability & Commitment" [level=3] [ref=e78]
+            - paragraph [ref=e79]: Full availability for the All-Stars season including practices, tournaments, and league events. No mid-season conflicts.
+        - generic [ref=e81]:
+          - generic [ref=e82]: "15"
+          - generic [ref=e83]:
+            - heading "Staff Quality & Readiness" [level=3] [ref=e84]
+            - paragraph [ref=e85]: Quality of proposed coaching staff, including assistant coaches and team parent. Background-checked and ready to go.
+        - generic [ref=e87]:
+          - generic [ref=e88]: "15"
+          - generic [ref=e89]:
+            - heading "Administrative Reliability" [level=3] [ref=e90]
+            - paragraph [ref=e91]: Track record of timely communication, completed paperwork, roster management, and financial accountability.
+      - generic [ref=e92]:
+        - generic [ref=e93]: Total Points
+        - generic [ref=e94]: "100"
+    - generic [ref=e102]:
+      - paragraph [ref=e103]: ★ The Timeline
+      - heading "Application Process" [level=2] [ref=e104]
+      - paragraph [ref=e105]: From candidacy to selection in about one week. Here's the process.
+      - generic [ref=e106]:
+        - generic [ref=e107]:
+          - generic [ref=e109]: "1"
+          - generic [ref=e112]:
+            - generic [ref=e113]:
+              - heading "Declare Candidacy" [level=3] [ref=e114]
+              - generic [ref=e115]: By March 22
+            - paragraph [ref=e116]: Email PonyBroncoVP@irvinepony.com with a paragraph or two about your qualifications, coaching philosophy, and goals for being an All-Star coach.
+        - generic [ref=e117]:
+          - generic [ref=e119]: "2"
+          - generic [ref=e122]:
+            - generic [ref=e123]:
+              - heading "Candidate Statements Distributed" [level=3] [ref=e124]
+              - generic [ref=e125]: March 23
+            - paragraph [ref=e126]: Your candidate statement is distributed to all coaches in your division. This is the deadline to formally declare candidacy.
+        - generic [ref=e127]:
+          - generic [ref=e129]: "3"
+          - generic [ref=e132]:
+            - generic [ref=e133]:
+              - heading "Peer Coach Voting & Nominations" [level=3] [ref=e134]
+              - generic [ref=e135]: March 24 - 26
+            - paragraph [ref=e136]: All coaches in your division vote on All-Star coach candidates. Player nominations are also collected during this period.
+        - generic [ref=e137]:
+          - generic [ref=e139]: "4"
+          - generic [ref=e141]:
+            - generic [ref=e142]:
+              - heading "Coaches Named" [level=3] [ref=e143]
+              - generic [ref=e144]: March 27
+            - paragraph [ref=e145]: All-Star head coaches are announced. Coaches with the highest vote are designated as the A team coach if multiple teams are formed.
+    - generic [ref=e148]:
+      - paragraph [ref=e149]: ★ Beyond the Numbers
+      - heading "What We Look For" [level=2] [ref=e150]
+      - paragraph [ref=e151]: Points tell part of the story. Here's what separates great All-Stars coaches from the rest.
+      - generic [ref=e152]:
+        - generic [ref=e153]:
+          - img [ref=e155]
+          - heading "Development Focus" [level=3] [ref=e157]
+          - paragraph [ref=e158]: The best All-Stars coaches prioritize player growth over wins. Teach fundamentals, build confidence, and make every kid better than when the season started.
+        - generic [ref=e159]:
+          - img [ref=e161]
+          - heading "Clear Communication" [level=3] [ref=e163]
+          - paragraph [ref=e164]: Parents need to know the plan. Players need to know expectations. Coaches who communicate proactively create the best team culture.
+        - generic [ref=e165]:
+          - img [ref=e167]
+          - heading "Coaching Philosophy" [level=3] [ref=e169]
+          - paragraph [ref=e170]: We look for coaches who believe in fair playing time, positive reinforcement, and competitive excellence — not at the expense of the kids' experience.
+    - generic [ref=e178]:
+      - paragraph [ref=e179]: ★ Take the Field ★
+      - heading "Ready to Apply?" [level=2] [ref=e180]
+      - paragraph [ref=e181]: If you've got the experience, the commitment, and the passion for player development, we want to hear from you.
+      - link "Sign In ★" [ref=e182] [cursor=pointer]:
+        - /url: /auth/login
+  - contentinfo [ref=e183]:
+    - generic [ref=e184]:
+      - generic [ref=e185]:
+        - generic [ref=e186]: ★★★
+        - generic [ref=e187]: Irvine All-Stars
+        - generic [ref=e188]: ★★★
+      - generic [ref=e189]:
+        - link "Coaches" [ref=e190] [cursor=pointer]:
+          - /url: /coaches
+        - link "Tryouts" [ref=e191] [cursor=pointer]:
+          - /url: /tryouts
+        - link "Timeline" [ref=e192] [cursor=pointer]:
+          - /url: /timeline
+        - link "Documents" [ref=e193] [cursor=pointer]:
+          - /url: /documents
+        - link "FAQ" [ref=e194] [cursor=pointer]:
+          - /url: /faq
+      - generic [ref=e195]:
+        - paragraph [ref=e196]: Irvine Pony Baseball
+        - paragraph [ref=e197]: 2026 All-Stars Season
+  - alert [ref=e198]

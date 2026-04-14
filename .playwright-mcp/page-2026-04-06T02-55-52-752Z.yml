@@ -1,0 +1,179 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - link "★★★ Irvine All-Stars ★★★" [ref=e3] [cursor=pointer]:
+      - /url: /
+      - generic [ref=e4]: ★★★
+      - generic [ref=e5]: Irvine All-Stars
+      - generic [ref=e6]: ★★★
+    - list [ref=e7]:
+      - listitem [ref=e8]:
+        - link "FAQ" [ref=e9] [cursor=pointer]:
+          - /url: /faq
+      - listitem [ref=e31]:
+        - link "Coach Portal" [ref=e32] [cursor=pointer]:
+          - /url: /coach
+      - listitem [ref=e33]:
+        - link "Parent Portal" [ref=e34] [cursor=pointer]:
+          - /url: /portal
+      - listitem [ref=e10]:
+        - button "Sign Out" [ref=e11]
+  - main [ref=e12]:
+    - generic [ref=e35]:
+      - complementary [ref=e36]:
+        - heading "Coach Dashboard" [level=2] [ref=e38]
+        - navigation [ref=e39]:
+          - link "Dashboard" [ref=e40] [cursor=pointer]:
+            - /url: /coach
+            - img [ref=e41]
+            - text: Dashboard
+          - link "Tryouts" [ref=e46] [cursor=pointer]:
+            - /url: /coach/tryouts
+            - img [ref=e47]
+            - text: Tryouts
+          - link "Enter Scores" [ref=e51] [cursor=pointer]:
+            - /url: /coach/scores
+            - img [ref=e52]
+            - text: Enter Scores
+          - link "Binder Checklist" [ref=e55] [cursor=pointer]:
+            - /url: /coach/checklist
+            - img [ref=e56]
+            - text: Binder Checklist
+          - link "Pitching Log" [ref=e60] [cursor=pointer]:
+            - /url: /coach/pitching-log
+            - img [ref=e61]
+            - text: Pitching Log
+          - link "Roster" [ref=e64] [cursor=pointer]:
+            - /url: /coach/roster
+            - img [ref=e65]
+            - text: Roster
+          - link "Contracts" [ref=e70] [cursor=pointer]:
+            - /url: /coach/contracts
+            - img [ref=e71]
+            - text: Contracts
+          - link "Certifications" [ref=e74] [cursor=pointer]:
+            - /url: /coach/certifications
+            - img [ref=e75]
+            - text: Certifications
+          - link "Tournament Rules" [ref=e78] [cursor=pointer]:
+            - /url: /coach/tournament-rules
+            - img [ref=e79]
+            - text: Tournament Rules
+          - link "Tournaments" [ref=e81] [cursor=pointer]:
+            - /url: /coach/tournaments
+            - img [ref=e82]
+            - text: Tournaments
+          - link "Updates" [ref=e88] [cursor=pointer]:
+            - /url: /coach/updates
+            - img [ref=e89]
+            - text: Updates
+          - link "Help" [ref=e92] [cursor=pointer]:
+            - /url: /coach/help
+            - img [ref=e93]
+            - text: Help
+        - generic [ref=e97]:
+          - img [ref=e98]
+          - generic [ref=e102]:
+            - paragraph [ref=e103]: Coach
+            - paragraph [ref=e104]: thesupplycomp@gmail.com
+      - generic [ref=e106]:
+        - paragraph [ref=e107]: Coach
+        - heading "Pre-Tournament Rules Help" [level=1] [ref=e108]:
+          - text: Pre-Tournament Rules
+          - button "Help" [ref=e110]:
+            - img [ref=e111]
+        - paragraph [ref=e114]: Read and acknowledge the rules for your division before tournament play begins.
+        - generic [ref=e115]:
+          - button "Shetland 5U, 6U" [ref=e116]:
+            - text: Shetland
+            - generic [ref=e117]: 5U, 6U
+          - button "Pinto Machine Pitch 7U MP, 8U MP" [ref=e118]:
+            - text: Pinto Machine Pitch
+            - generic [ref=e119]: 7U MP, 8U MP
+          - button "Pinto Kid Pitch 7U KP, 8U KP" [ref=e120]:
+            - text: Pinto Kid Pitch
+            - generic [ref=e121]: 7U KP, 8U KP
+          - button "Mustang / Bronco 9U-12U" [ref=e122]:
+            - text: Mustang / Bronco
+            - generic [ref=e123]: 9U-12U
+          - button "Pony 13U, 14U" [ref=e124]:
+            - text: Pony
+            - generic [ref=e125]: 13U, 14U
+        - generic [ref=e126]:
+          - generic [ref=e127]:
+            - 'heading "TOURNAMENT BASEBALL RULES: KNOW THE RULES!" [level=2] [ref=e129]'
+            - generic [ref=e130]:
+              - generic [ref=e131]:
+                - heading "Manager & Coaching Staff Responsibilities" [level=3] [ref=e132]
+                - paragraph [ref=e133]: Manager & Coaching staff's responsibility. We do not play by your League Rules. Study the rules thoroughly. If you have questions, ask your League President, Player Agent, Division Director, or a PONY Field Director PRIOR to stepping onto the field. Rules will NOT be answered during your game. Manager needs to have rules at all tournament games.
+              - generic [ref=e134]:
+                - heading "Manager & Coaching Staff Conduct" [level=3] [ref=e135]
+                - list [ref=e136]:
+                  - listitem [ref=e137]: Responsible for knowing the rules & controlling team & fans
+                  - listitem [ref=e139]: Be a good example — don't get ejected!
+                  - listitem [ref=e141]: Only coaches on the Affidavit are allowed on the playing field, in the dugout, or bullpen
+                  - listitem [ref=e143]: Coaching staff may NOT leave the dugout area during the game (no visiting fans, watching from backstop, going to snack bar)
+                  - listitem [ref=e145]: Managers and coaches ejected must leave the BallPark
+                  - listitem [ref=e147]: Must be in baseball pants, closed-toe shoes, and jersey/league shirt
+                  - listitem [ref=e149]: Meet with PONY Director 60 minutes prior to your first game at each level
+              - generic [ref=e151]:
+                - generic [ref=e152]:
+                  - img [ref=e153]
+                  - heading "Important Reminders" [level=3] [ref=e155]
+                - list [ref=e156]:
+                  - listitem [ref=e157]: This document does not replace meeting with the on-site PONY Director 60 minutes prior to your first game
+                  - listitem [ref=e158]: Know your pitching & batting rules thoroughly BEFORE tournament play
+                  - listitem [ref=e159]: NO CIF or Local League Rules apply
+          - generic [ref=e160]:
+            - heading "Mustang / Bronco Rules" [level=2] [ref=e162]
+            - generic [ref=e163]:
+              - paragraph [ref=e165]: PONY Baseball Rule Book (Blue Pages), PONY Baseball Rule (White Pages), Official MLB Baseball Rules apply.
+              - generic [ref=e166]:
+                - heading "Applicable Rule Books" [level=3] [ref=e167]
+                - list [ref=e168]:
+                  - listitem [ref=e169]:
+                    - link "2026 PONY Baseball Rule Book (Blue & White Pages)" [ref=e170] [cursor=pointer]:
+                      - /url: https://cdn3.sportngin.com/attachments/document/f8cc-2645833/2026_PONY_Baseball_Rule_Book_Final_Proof__1_.pdf
+                      - img [ref=e171]
+                      - generic [ref=e173]: 2026 PONY Baseball Rule Book (Blue & White Pages)
+                      - img [ref=e174]
+                  - listitem [ref=e178]:
+                    - link "Official MLB Baseball Rules (2025)" [ref=e179] [cursor=pointer]:
+                      - /url: https://mktg.mlbstatic.com/mlb/official-information/2025-official-baseball-rules.pdf
+                      - img [ref=e180]
+                      - generic [ref=e182]: Official MLB Baseball Rules (2025)
+                      - img [ref=e183]
+          - generic [ref=e187]:
+            - heading "Acknowledgment" [level=2] [ref=e189]
+            - generic [ref=e191]:
+              - generic [ref=e192] [cursor=pointer]:
+                - checkbox "I have read and understand the tournament rules for the Mustang / Bronco division." [ref=e193]
+                - generic [ref=e194]:
+                  - text: I have read and understand the tournament rules for the
+                  - strong [ref=e195]: Mustang / Bronco
+                  - text: division.
+              - generic [ref=e196]:
+                - generic [ref=e197]: Type your full name as digital signature
+                - textbox "Type your full name as digital signature" [ref=e198]:
+                  - /placeholder: e.g. John Smith
+              - button "Acknowledge Rules" [disabled] [ref=e199]
+  - contentinfo [ref=e15]:
+    - generic [ref=e16]:
+      - generic [ref=e17]:
+        - generic [ref=e18]: ★★★
+        - generic [ref=e19]: Irvine All-Stars
+        - generic [ref=e20]: ★★★
+      - generic [ref=e21]:
+        - link "Coaches" [ref=e22] [cursor=pointer]:
+          - /url: /coaches
+        - link "Tryouts" [ref=e23] [cursor=pointer]:
+          - /url: /tryouts
+        - link "Timeline" [ref=e24] [cursor=pointer]:
+          - /url: /timeline
+        - link "Documents" [ref=e25] [cursor=pointer]:
+          - /url: /documents
+        - link "FAQ" [ref=e26] [cursor=pointer]:
+          - /url: /faq
+      - generic [ref=e27]:
+        - paragraph [ref=e28]: Irvine Pony Baseball
+        - paragraph [ref=e29]: 2026 All-Stars Season
+  - alert [ref=e30]

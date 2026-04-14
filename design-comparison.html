@@ -1,0 +1,1922 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Irvine All-Stars — Design Comparison v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;700;800&family=Dela+Gothic+One&family=Oswald:wght@400;500;700&family=Bebas+Neue&family=Inter:wght@400;500;600&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ========== RESET & BASE ========== */
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    font-family: 'Rubik', sans-serif;
+    background: #F3EDE4;
+    color: #0F1B2D;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    overflow-x: hidden;
+  }
+
+  /* ========== SHARED PALETTE ========== */
+  :root {
+    --navy: #0F1B2D;
+    --stitch-red: #E23D3D;
+    --classic-red: #C8364B;
+    --gold: #E2B74F;
+    --leather: #C4956A;
+    --bat-wood: #8B6F47;
+    --grass: #4A7C59;
+    --chalk: #FAF9F6;
+    --cream: #F3EDE4;
+    --dirt: #A68B6B;
+    --grass-tint: #EFF5F0;
+    --leather-tint: #F5EDE5;
+  }
+
+  /* ========== TOGGLE BAR ========== */
+  .toggle-bar {
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+    background: var(--navy);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 24px rgba(15,27,45,0.4);
+  }
+  .toggle-bar__btn {
+    background: transparent;
+    border: 2px solid rgba(255,255,255,0.15);
+    color: rgba(255,255,255,0.5);
+    font-family: 'Rubik', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    padding: 10px 28px;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: all 0.25s ease-out;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    position: relative;
+  }
+  .toggle-bar__btn:hover {
+    color: rgba(255,255,255,0.8);
+    border-color: rgba(255,255,255,0.3);
+  }
+  .toggle-bar__btn.active {
+    background: var(--stitch-red);
+    border-color: var(--stitch-red);
+    color: #fff;
+    box-shadow: 0 2px 12px rgba(226,61,61,0.4);
+  }
+  .toggle-bar__btn .vibe {
+    display: block;
+    font-size: 10px;
+    font-weight: 400;
+    letter-spacing: 0.3px;
+    text-transform: none;
+    opacity: 0.7;
+    margin-top: 2px;
+  }
+  .toggle-bar__divider {
+    width: 1px;
+    height: 40px;
+    background: rgba(255,255,255,0.1);
+    margin: 0 8px;
+  }
+  .toggle-bar__title {
+    color: var(--gold);
+    font-family: 'Rubik', sans-serif;
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    margin-right: 16px;
+  }
+
+  /* ========== VERSION CONTAINER ========== */
+  .version { display: none; }
+  .version.active { display: block; }
+
+  /* ========== SCROLL ANIMATION ========== */
+  .fade-up {
+    opacity: 0;
+    transform: translateY(30px);
+    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
+  }
+  .fade-up.visible {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  /* ===================================================================
+     VERSION B: "CLEARLY PLAYFUL"
+     Premium kids' sports brand with genuine character
+     =================================================================== */
+
+  /* -- B Typography -- */
+  .vb .hero-title {
+    font-family: 'Dela Gothic One', cursive;
+    font-size: clamp(3rem, 8vw, 5.5rem);
+    line-height: 1.05;
+    color: var(--navy);
+    letter-spacing: -1px;
+  }
+  .vb h2 {
+    font-family: 'Rubik', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    color: var(--navy);
+    line-height: 1.2;
+  }
+  .vb h3 {
+    font-family: 'Rubik', sans-serif;
+    font-weight: 700;
+    font-size: 1.15rem;
+    color: var(--navy);
+  }
+  .vb p, .vb li {
+    font-family: 'Rubik', sans-serif;
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #3A3A3A;
+  }
+
+  /* -- B Hero -- */
+  .vb-hero {
+    position: relative;
+    background: var(--cream);
+    padding: 100px 24px 80px;
+    overflow: hidden;
+    min-height: 600px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  /* Subtle grain overlay */
+  .vb-hero::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+    pointer-events: none;
+    z-index: 1;
+  }
+  /* Baseball stitch decoration - left side */
+  .vb-hero__stitch-left {
+    position: absolute;
+    left: -30px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 120px;
+    height: 400px;
+    z-index: 2;
+  }
+  .vb-hero__stitch-left::before,
+  .vb-hero__stitch-left::after {
+    content: '';
+    position: absolute;
+    width: 80px;
+    height: 380px;
+    border: 3px dashed var(--stitch-red);
+    border-radius: 50%;
+    opacity: 0.2;
+  }
+  .vb-hero__stitch-left::before { left: 0; }
+  .vb-hero__stitch-left::after { left: 30px; }
+
+  /* Baseball stitch decoration - right side */
+  .vb-hero__stitch-right {
+    position: absolute;
+    right: -30px;
+    top: 50%;
+    transform: translateY(-50%);
+    width: 120px;
+    height: 400px;
+    z-index: 2;
+  }
+  .vb-hero__stitch-right::before,
+  .vb-hero__stitch-right::after {
+    content: '';
+    position: absolute;
+    width: 80px;
+    height: 380px;
+    border: 3px dashed var(--stitch-red);
+    border-radius: 50%;
+    opacity: 0.2;
+  }
+  .vb-hero__stitch-right::before { right: 0; }
+  .vb-hero__stitch-right::after { right: 30px; }
+
+  .vb-hero__inner {
+    max-width: 900px;
+    text-align: center;
+    position: relative;
+    z-index: 3;
+  }
+  .vb-hero__badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: var(--grass);
+    color: #fff;
+    font-family: 'Rubik', sans-serif;
+    font-weight: 700;
+    font-size: 12px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 8px 20px;
+    border-radius: 50px;
+    margin-bottom: 24px;
+  }
+  .vb-hero__badge::before {
+    content: '';
+    width: 8px;
+    height: 8px;
+    background: var(--gold);
+    border-radius: 50%;
+    animation: vb-pulse 2s ease-in-out infinite;
+  }
+  @keyframes vb-pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.5; transform: scale(1.3); }
+  }
+  .vb-hero__subtitle {
+    font-family: 'Rubik', sans-serif;
+    font-weight: 800;
+    font-size: clamp(1.1rem, 2.5vw, 1.5rem);
+    color: var(--stitch-red);
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    margin-bottom: 16px;
+  }
+  .vb-hero__text {
+    font-size: 1.15rem;
+    color: #555;
+    max-width: 600px;
+    margin: 20px auto 36px;
+    line-height: 1.8;
+  }
+
+  /* Baseball CSS shape behind title */
+  .vb-hero__baseball {
+    position: absolute;
+    width: 340px;
+    height: 340px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(255,255,255,0.6) 0%, rgba(243,237,228,0) 70%);
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 0;
+  }
+  .vb-hero__baseball::before,
+  .vb-hero__baseball::after {
+    content: '';
+    position: absolute;
+    width: 200px;
+    height: 300px;
+    border: 2.5px dashed var(--stitch-red);
+    border-radius: 50%;
+    opacity: 0.12;
+  }
+  .vb-hero__baseball::before {
+    left: -40px;
+    top: 20px;
+  }
+  .vb-hero__baseball::after {
+    right: -40px;
+    top: 20px;
+  }
+
+  /* Diamond shape accent */
+  .vb-diamond {
+    width: 40px;
+    height: 40px;
+    background: var(--gold);
+    transform: rotate(45deg);
+    opacity: 0.1;
+    position: absolute;
+  }
+  .vb-hero .vb-diamond:nth-child(1) { top: 20%; left: 10%; width: 24px; height: 24px; }
+  .vb-hero .vb-diamond:nth-child(2) { bottom: 15%; right: 8%; width: 32px; height: 32px; opacity: 0.08; }
+  .vb-hero .vb-diamond:nth-child(3) { top: 30%; right: 15%; width: 16px; height: 16px; opacity: 0.15; background: var(--stitch-red); }
+
+  /* -- B Buttons -- */
+  .vb-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Rubik', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    padding: 16px 36px;
+    border-radius: 12px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.25s ease-out;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .vb-btn--primary {
+    background: var(--classic-red);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(200,54,75,0.3);
+  }
+  .vb-btn--primary:hover {
+    transform: scale(1.04) rotate(-0.5deg);
+    box-shadow: 0 8px 28px rgba(200,54,75,0.4);
+    background: #d43d55;
+  }
+  .vb-btn--stitch {
+    background: transparent;
+    color: var(--classic-red);
+    border: 2.5px dashed var(--stitch-red);
+    padding: 14px 32px;
+  }
+  .vb-btn--stitch:hover {
+    background: rgba(226,61,61,0.06);
+    transform: scale(1.04) rotate(0.5deg);
+    border-color: var(--classic-red);
+  }
+  .vb-btn--grass {
+    background: var(--grass);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(74,124,89,0.3);
+  }
+  .vb-btn--grass:hover {
+    transform: scale(1.04) rotate(-0.5deg);
+    box-shadow: 0 8px 28px rgba(74,124,89,0.4);
+    background: #558c65;
+  }
+  .vb-btn--leather {
+    background: var(--leather);
+    color: #fff;
+  }
+  .vb-btn--leather:hover {
+    transform: scale(1.04);
+    background: #d4a57a;
+  }
+
+  /* -- B Stats Bar -- */
+  .vb-stats {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 0;
+    background: var(--navy);
+    position: relative;
+  }
+  .vb-stat {
+    padding: 40px 24px;
+    text-align: center;
+    position: relative;
+  }
+  .vb-stat:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 25%;
+    height: 50%;
+    width: 1px;
+    background: rgba(255,255,255,0.1);
+  }
+  .vb-stat__number {
+    font-family: 'Dela Gothic One', cursive;
+    font-size: clamp(2.2rem, 4vw, 3rem);
+    line-height: 1;
+    margin-bottom: 6px;
+  }
+  .vb-stat:nth-child(1) .vb-stat__number { color: var(--stitch-red); }
+  .vb-stat:nth-child(2) .vb-stat__number { color: var(--gold); }
+  .vb-stat:nth-child(3) .vb-stat__number { color: var(--grass); }
+  .vb-stat:nth-child(4) .vb-stat__number { color: var(--leather); }
+  .vb-stat__label {
+    font-family: 'Rubik', sans-serif;
+    font-weight: 500;
+    font-size: 13px;
+    color: rgba(255,255,255,0.5);
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+
+  /* -- B Cards -- */
+  .vb-cards {
+    padding: 80px 24px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .vb-cards__header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .vb-cards__header p {
+    color: #777;
+    margin-top: 12px;
+    font-size: 1.05rem;
+  }
+  .vb-cards__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .vb-card {
+    border-radius: 16px;
+    padding: 36px 28px;
+    position: relative;
+    transition: all 0.25s ease-out;
+    border: 1px solid rgba(0,0,0,0.04);
+    overflow: hidden;
+  }
+  .vb-card:nth-child(1) {
+    background: var(--chalk);
+    box-shadow: inset 0 2px 0 var(--stitch-red), 0 2px 12px rgba(0,0,0,0.04);
+  }
+  .vb-card:nth-child(2) {
+    background: var(--grass-tint);
+    box-shadow: inset 0 2px 0 var(--grass), 0 2px 12px rgba(0,0,0,0.04);
+  }
+  .vb-card:nth-child(3) {
+    background: var(--leather-tint);
+    box-shadow: inset 0 2px 0 var(--leather), 0 2px 12px rgba(0,0,0,0.04);
+  }
+  .vb-card:hover {
+    transform: translateY(-6px) rotate(-0.5deg);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.1);
+  }
+  /* Home plate shaped badge */
+  .vb-card__badge {
+    display: inline-block;
+    padding: 6px 16px 6px 16px;
+    font-family: 'Rubik', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+    border-radius: 4px;
+    margin-bottom: 16px;
+    position: relative;
+  }
+  .vb-card:nth-child(1) .vb-card__badge {
+    background: var(--stitch-red);
+    color: #fff;
+    clip-path: polygon(0 0, 100% 0, 100% 70%, 50% 100%, 0 70%);
+    padding-bottom: 14px;
+  }
+  .vb-card:nth-child(2) .vb-card__badge {
+    background: var(--grass);
+    color: #fff;
+    border-radius: 50px;
+  }
+  .vb-card:nth-child(3) .vb-card__badge {
+    background: var(--bat-wood);
+    color: #fff;
+    border-radius: 4px;
+  }
+  .vb-card__title {
+    font-family: 'Rubik', sans-serif;
+    font-weight: 800;
+    font-size: 1.3rem;
+    color: var(--navy);
+    margin-bottom: 12px;
+  }
+  .vb-card__text {
+    font-size: 0.95rem;
+    color: #555;
+    line-height: 1.7;
+    margin-bottom: 20px;
+  }
+  .vb-card__detail {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Rubik', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--navy);
+    padding: 10px 14px;
+    background: rgba(255,255,255,0.6);
+    border-radius: 8px;
+    margin-top: 8px;
+  }
+  .vb-card__detail-icon {
+    width: 20px;
+    height: 20px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    flex-shrink: 0;
+  }
+
+  /* -- B UI Samples -- */
+  .vb-ui {
+    padding: 60px 24px 80px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .vb-ui__header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .vb-ui__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+  }
+  .vb-ui__panel {
+    background: var(--chalk);
+    border-radius: 16px;
+    padding: 32px;
+    border: 1px solid rgba(0,0,0,0.04);
+  }
+  .vb-ui__panel h4 {
+    font-family: 'Rubik', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--dirt);
+    margin-bottom: 20px;
+  }
+  .vb-ui__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+  .vb-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: 50px;
+    font-family: 'Rubik', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 0.3px;
+  }
+  .vb-badge--red { background: rgba(226,61,61,0.1); color: var(--stitch-red); }
+  .vb-badge--green { background: rgba(74,124,89,0.1); color: var(--grass); }
+  .vb-badge--gold { background: rgba(226,183,79,0.12); color: var(--bat-wood); }
+  .vb-badge--leather { background: rgba(196,149,106,0.15); color: var(--bat-wood); }
+  .vb-badge--navy { background: var(--navy); color: #fff; }
+  .vb-badge__dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: currentColor;
+  }
+  .vb-input-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .vb-input {
+    flex: 1;
+    padding: 14px 18px;
+    border: 2px solid rgba(0,0,0,0.08);
+    border-radius: 10px;
+    font-family: 'Rubik', sans-serif;
+    font-size: 15px;
+    background: #fff;
+    color: var(--navy);
+    transition: border-color 0.2s ease-out;
+    outline: none;
+  }
+  .vb-input:focus {
+    border-color: var(--grass);
+    box-shadow: 0 0 0 4px rgba(74,124,89,0.1);
+  }
+  .vb-input::placeholder { color: #bbb; }
+  .vb-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+  }
+  .vb-table th {
+    font-family: 'Rubik', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    color: var(--dirt);
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 2px solid rgba(0,0,0,0.06);
+  }
+  .vb-table td {
+    font-family: 'Rubik', sans-serif;
+    font-size: 14px;
+    padding: 14px 12px;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+    color: var(--navy);
+  }
+  .vb-table tr:hover td {
+    background: rgba(74,124,89,0.03);
+  }
+
+  /* -- B Dark Section -- */
+  .vb-dark {
+    background: var(--navy);
+    padding: 80px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  .vb-dark::before {
+    content: '';
+    position: absolute;
+    top: -100px;
+    right: -100px;
+    width: 400px;
+    height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(226,61,61,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .vb-dark__inner {
+    max-width: 800px;
+    margin: 0 auto;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+  .vb-dark h2 {
+    color: var(--chalk);
+    margin-bottom: 16px;
+  }
+  .vb-dark p {
+    color: rgba(255,255,255,0.6);
+    font-size: 1.1rem;
+    max-width: 550px;
+    margin: 0 auto 36px;
+    line-height: 1.8;
+  }
+  .vb-dark__cards {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+    margin-top: 40px;
+  }
+  .vb-dark__card {
+    background: rgba(255,255,255,0.04);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 14px;
+    padding: 28px 20px;
+    text-align: center;
+    transition: all 0.25s ease-out;
+  }
+  .vb-dark__card:hover {
+    background: rgba(255,255,255,0.07);
+    transform: translateY(-4px);
+  }
+  .vb-dark__card-icon {
+    width: 48px;
+    height: 48px;
+    border-radius: 12px;
+    margin: 0 auto 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 22px;
+  }
+  .vb-dark__card:nth-child(1) .vb-dark__card-icon { background: rgba(226,61,61,0.15); }
+  .vb-dark__card:nth-child(2) .vb-dark__card-icon { background: rgba(226,183,79,0.15); }
+  .vb-dark__card:nth-child(3) .vb-dark__card-icon { background: rgba(74,124,89,0.15); }
+  .vb-dark__card h3 {
+    color: var(--chalk);
+    font-size: 1rem;
+    margin-bottom: 8px;
+  }
+  .vb-dark__card p {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.4);
+    margin: 0;
+  }
+
+  /* ===================================================================
+     VERSION C: "FULL ENERGY"
+     Game day excitement - bright, warm, celebratory
+     =================================================================== */
+
+  /* -- C Typography -- */
+  .vc .hero-title {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: clamp(3.2rem, 9vw, 6rem);
+    line-height: 0.95;
+    color: var(--navy);
+    text-transform: uppercase;
+    letter-spacing: -1px;
+  }
+  .vc h2 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: clamp(1.8rem, 4vw, 2.6rem);
+    color: var(--navy);
+    text-transform: uppercase;
+    line-height: 1.15;
+  }
+  .vc h3 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 1.2rem;
+    color: var(--navy);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .vc p, .vc li {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.7;
+    color: #3A3A3A;
+  }
+
+  /* -- C Hero -- */
+  .vc-hero {
+    position: relative;
+    background: var(--chalk);
+    padding: 80px 24px 60px;
+    overflow: hidden;
+    min-height: 620px;
+    display: flex;
+    align-items: center;
+  }
+  /* Diagonal stripe accent */
+  .vc-hero__stripe {
+    position: absolute;
+    top: 0;
+    right: -5%;
+    width: 45%;
+    height: 100%;
+    background: linear-gradient(
+      -68deg,
+      var(--stitch-red) 0%,
+      var(--stitch-red) 33%,
+      var(--navy) 33%,
+      var(--navy) 66%,
+      var(--gold) 66%,
+      var(--gold) 100%
+    );
+    clip-path: polygon(30% 0, 100% 0, 100% 100%, 0% 100%);
+    opacity: 0.07;
+  }
+  /* Diamond pattern */
+  .vc-hero__diamond-pattern {
+    position: absolute;
+    bottom: 30px;
+    left: 40px;
+    opacity: 0.06;
+    z-index: 1;
+  }
+  .vc-hero__diamond-pattern svg {
+    width: 200px;
+    height: 200px;
+  }
+  /* Chevron divider */
+  .vc-hero__chevron {
+    position: absolute;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    height: 40px;
+    overflow: hidden;
+    z-index: 2;
+  }
+  .vc-hero__chevron::before {
+    content: '';
+    position: absolute;
+    bottom: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 120%;
+    height: 80px;
+    background: var(--cream);
+    clip-path: polygon(0 100%, 50% 0, 100% 100%);
+  }
+
+  .vc-hero__inner {
+    max-width: 1100px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 60px;
+    align-items: center;
+    position: relative;
+    z-index: 3;
+  }
+  .vc-hero__content { position: relative; }
+  .vc-hero__tag {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 12px;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: var(--grass);
+    margin-bottom: 20px;
+  }
+  .vc-hero__tag::before {
+    content: '';
+    width: 30px;
+    height: 2px;
+    background: var(--grass);
+  }
+  .vc-hero__subtitle {
+    font-family: 'Bebas Neue', cursive;
+    font-size: clamp(1.5rem, 3vw, 2.2rem);
+    color: var(--stitch-red);
+    letter-spacing: 3px;
+    margin-top: 12px;
+    margin-bottom: 8px;
+  }
+  .vc-hero__text {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 1.1rem;
+    color: #555;
+    max-width: 460px;
+    line-height: 1.8;
+    margin: 16px 0 32px;
+  }
+  .vc-hero__cta-row {
+    display: flex;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  /* Right side: decorative baseball composition */
+  .vc-hero__visual {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 400px;
+  }
+  .vc-hero__circle {
+    width: 320px;
+    height: 320px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--cream) 0%, rgba(226,183,79,0.15) 100%);
+    border: 3px solid rgba(226,183,79,0.2);
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .vc-hero__circle::before {
+    content: '';
+    position: absolute;
+    inset: 15px;
+    border-radius: 50%;
+    border: 2px dashed var(--stitch-red);
+    opacity: 0.2;
+  }
+  .vc-hero__circle-text {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 6rem;
+    color: var(--navy);
+    opacity: 0.06;
+    letter-spacing: 4px;
+    line-height: 1;
+    text-align: center;
+  }
+  .vc-hero__floating-badge {
+    position: absolute;
+    background: var(--navy);
+    color: #fff;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    padding: 10px 20px;
+    border-radius: 8px;
+    letter-spacing: 1px;
+    box-shadow: 0 8px 24px rgba(15,27,45,0.2);
+  }
+  .vc-hero__floating-badge--top {
+    top: 20px;
+    right: -10px;
+    transform: rotate(3deg);
+  }
+  .vc-hero__floating-badge--bottom {
+    bottom: 30px;
+    left: -10px;
+    background: var(--grass);
+    transform: rotate(-2deg);
+  }
+  .vc-hero__floating-badge--gold {
+    top: 50%;
+    right: -30px;
+    background: var(--gold);
+    color: var(--navy);
+    transform: translateY(-50%) rotate(2deg);
+    font-family: 'Bebas Neue', cursive;
+    font-size: 18px;
+    letter-spacing: 2px;
+  }
+
+  /* -- C Buttons -- */
+  .vc-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    padding: 16px 36px;
+    border-radius: 6px;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease-out;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .vc-btn--primary {
+    background: var(--classic-red);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(200,54,75,0.3);
+  }
+  .vc-btn--primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(200,54,75,0.4);
+    background: #d43d55;
+  }
+  .vc-btn--outline {
+    background: transparent;
+    color: var(--navy);
+    border: 2px solid var(--navy);
+    padding: 14px 32px;
+  }
+  .vc-btn--outline:hover {
+    background: var(--navy);
+    color: #fff;
+    transform: translateY(-2px);
+  }
+  .vc-btn--grass {
+    background: var(--grass);
+    color: #fff;
+    box-shadow: 0 4px 16px rgba(74,124,89,0.3);
+  }
+  .vc-btn--grass:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 28px rgba(74,124,89,0.4);
+    background: #558c65;
+  }
+  .vc-btn--gold {
+    background: var(--gold);
+    color: var(--navy);
+  }
+  .vc-btn--gold:hover {
+    transform: translateY(-2px);
+    background: #e8c25f;
+  }
+  .vc-btn--leather {
+    background: var(--leather);
+    color: #fff;
+  }
+  .vc-btn--leather:hover {
+    transform: translateY(-2px);
+    background: #d4a57a;
+  }
+
+  /* -- C Stats (Scoreboard) -- */
+  .vc-stats {
+    background: var(--cream);
+    padding: 0 24px;
+    position: relative;
+    z-index: 3;
+  }
+  .vc-stats__inner {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    background: var(--navy);
+    border-radius: 16px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 8px 32px rgba(15,27,45,0.25);
+    transform: translateY(-30px);
+  }
+  .vc-stat {
+    padding: 36px 20px;
+    text-align: center;
+    position: relative;
+  }
+  .vc-stat:not(:last-child)::after {
+    content: '';
+    position: absolute;
+    right: 0;
+    top: 20%;
+    height: 60%;
+    width: 1px;
+    background: rgba(255,255,255,0.08);
+  }
+  .vc-stat__number {
+    font-family: 'Bebas Neue', cursive;
+    font-size: clamp(2.8rem, 5vw, 3.8rem);
+    line-height: 1;
+    margin-bottom: 4px;
+    /* LED-dot inspired glow */
+    text-shadow: 0 0 20px currentColor;
+  }
+  .vc-stat:nth-child(1) .vc-stat__number { color: var(--stitch-red); }
+  .vc-stat:nth-child(2) .vc-stat__number { color: var(--gold); }
+  .vc-stat:nth-child(3) .vc-stat__number { color: var(--grass); }
+  .vc-stat:nth-child(4) .vc-stat__number { color: var(--leather); }
+  .vc-stat__label {
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 500;
+    font-size: 12px;
+    color: rgba(255,255,255,0.45);
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+  }
+  /* Subtle scoreboard dots pattern */
+  .vc-stats__inner::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: radial-gradient(circle 1px, rgba(255,255,255,0.02) 1px, transparent 1px);
+    background-size: 12px 12px;
+    pointer-events: none;
+  }
+
+  /* -- C Cards -- */
+  .vc-cards {
+    padding: 60px 24px 80px;
+    max-width: 1100px;
+    margin: 0 auto;
+  }
+  .vc-cards__header {
+    text-align: center;
+    margin-bottom: 48px;
+  }
+  .vc-cards__header p {
+    font-family: 'DM Sans', sans-serif;
+    color: #777;
+    margin-top: 12px;
+    font-size: 1.05rem;
+  }
+  .vc-cards__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 24px;
+  }
+  .vc-card {
+    background: var(--chalk);
+    border-radius: 12px;
+    overflow: hidden;
+    position: relative;
+    transition: all 0.2s ease-out;
+    border: 1px solid rgba(0,0,0,0.04);
+  }
+  .vc-card:hover {
+    transform: translateY(-6px);
+    box-shadow: 0 16px 48px rgba(0,0,0,0.1);
+  }
+  /* Bold top stripe */
+  .vc-card__stripe {
+    height: 5px;
+    width: 100%;
+  }
+  .vc-card:nth-child(1) .vc-card__stripe { background: var(--stitch-red); }
+  .vc-card:nth-child(2) .vc-card__stripe { background: var(--grass); }
+  .vc-card:nth-child(3) .vc-card__stripe { background: var(--leather); }
+  .vc-card__body {
+    padding: 32px 28px;
+    position: relative;
+  }
+  /* Jersey number in background */
+  .vc-card__jersey {
+    position: absolute;
+    top: -10px;
+    right: 12px;
+    font-family: 'Bebas Neue', cursive;
+    font-size: 7rem;
+    line-height: 1;
+    opacity: 0.04;
+    color: var(--navy);
+    pointer-events: none;
+  }
+  .vc-card__tag {
+    display: inline-block;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 1.5px;
+    text-transform: uppercase;
+    padding: 5px 12px;
+    border-radius: 4px;
+    margin-bottom: 14px;
+  }
+  .vc-card:nth-child(1) .vc-card__tag { background: rgba(226,61,61,0.1); color: var(--stitch-red); }
+  .vc-card:nth-child(2) .vc-card__tag { background: rgba(74,124,89,0.1); color: var(--grass); }
+  .vc-card:nth-child(3) .vc-card__tag { background: rgba(196,149,106,0.15); color: var(--bat-wood); }
+  .vc-card__title {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 1.35rem;
+    text-transform: uppercase;
+    color: var(--navy);
+    margin-bottom: 10px;
+    letter-spacing: 0.3px;
+  }
+  .vc-card__text {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 0.95rem;
+    color: #555;
+    line-height: 1.7;
+    margin-bottom: 20px;
+  }
+  .vc-card__meta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-family: 'DM Sans', sans-serif;
+    font-weight: 600;
+    font-size: 13px;
+    color: var(--navy);
+    padding: 10px 14px;
+    background: var(--cream);
+    border-radius: 8px;
+  }
+
+  /* -- C Diagonal Section Divider -- */
+  .vc-divider {
+    height: 60px;
+    position: relative;
+    overflow: hidden;
+    background: var(--cream);
+  }
+  .vc-divider__stripes {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    gap: 8px;
+    transform: skewY(-2deg);
+    transform-origin: top left;
+  }
+  .vc-divider__stripe {
+    flex: 1;
+    height: 6px;
+    margin-top: 25px;
+    border-radius: 3px;
+  }
+  .vc-divider__stripe:nth-child(1) { background: var(--stitch-red); opacity: 0.15; }
+  .vc-divider__stripe:nth-child(2) { background: var(--navy); opacity: 0.08; }
+  .vc-divider__stripe:nth-child(3) { background: var(--gold); opacity: 0.15; }
+  .vc-divider__stripe:nth-child(4) { background: var(--grass); opacity: 0.12; }
+  .vc-divider__stripe:nth-child(5) { background: var(--leather); opacity: 0.1; }
+
+  /* -- C UI Samples -- */
+  .vc-ui {
+    padding: 60px 24px 80px;
+    max-width: 1100px;
+    margin: 0 auto;
+    background: var(--cream);
+  }
+  .vc-ui__header {
+    text-align: center;
+    margin-bottom: 40px;
+  }
+  .vc-ui__grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 32px;
+  }
+  .vc-ui__panel {
+    background: var(--chalk);
+    border-radius: 12px;
+    padding: 32px;
+    border: 1px solid rgba(0,0,0,0.04);
+  }
+  .vc-ui__panel h4 {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--dirt);
+    margin-bottom: 20px;
+  }
+  .vc-ui__buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items: center;
+  }
+  .vc-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 5px 14px;
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    letter-spacing: 1px;
+    text-transform: uppercase;
+  }
+  .vc-badge--red {
+    background: rgba(226,61,61,0.1);
+    color: var(--stitch-red);
+    border-radius: 4px;
+  }
+  .vc-badge--green {
+    background: rgba(74,124,89,0.1);
+    color: var(--grass);
+    border-radius: 4px;
+  }
+  .vc-badge--gold {
+    background: rgba(226,183,79,0.12);
+    color: var(--bat-wood);
+    border-radius: 4px;
+  }
+  .vc-badge--navy {
+    background: var(--navy);
+    color: #fff;
+    border-radius: 4px;
+  }
+  .vc-badge--leather {
+    background: var(--leather);
+    color: #fff;
+    border-radius: 4px;
+  }
+  .vc-input-group {
+    display: flex;
+    gap: 12px;
+    margin-top: 12px;
+  }
+  .vc-input {
+    flex: 1;
+    padding: 14px 18px;
+    border: 2px solid rgba(0,0,0,0.08);
+    border-radius: 6px;
+    font-family: 'DM Sans', sans-serif;
+    font-size: 15px;
+    background: #fff;
+    color: var(--navy);
+    transition: border-color 0.2s ease-out;
+    outline: none;
+  }
+  .vc-input:focus {
+    border-color: var(--stitch-red);
+    box-shadow: 0 0 0 3px rgba(226,61,61,0.08);
+  }
+  .vc-input::placeholder { color: #bbb; }
+  .vc-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+  }
+  .vc-table th {
+    font-family: 'Oswald', sans-serif;
+    font-weight: 700;
+    font-size: 11px;
+    text-transform: uppercase;
+    letter-spacing: 1.5px;
+    color: var(--dirt);
+    text-align: left;
+    padding: 10px 12px;
+    border-bottom: 2px solid rgba(0,0,0,0.06);
+  }
+  .vc-table td {
+    font-family: 'DM Sans', sans-serif;
+    font-size: 14px;
+    padding: 14px 12px;
+    border-bottom: 1px solid rgba(0,0,0,0.04);
+    color: var(--navy);
+  }
+  .vc-table tr:hover td {
+    background: rgba(226,61,61,0.02);
+  }
+
+  /* -- C Dark Section (Stadium at Night) -- */
+  .vc-dark {
+    background: var(--navy);
+    padding: 80px 24px;
+    position: relative;
+    overflow: hidden;
+  }
+  /* Warm stadium glow */
+  .vc-dark::before {
+    content: '';
+    position: absolute;
+    top: -150px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 600px;
+    height: 400px;
+    border-radius: 50%;
+    background: radial-gradient(ellipse, rgba(226,183,79,0.08) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .vc-dark::after {
+    content: '';
+    position: absolute;
+    bottom: -100px;
+    right: -50px;
+    width: 300px;
+    height: 300px;
+    border-radius: 50%;
+    background: radial-gradient(circle, rgba(74,124,89,0.06) 0%, transparent 70%);
+    pointer-events: none;
+  }
+  .vc-dark__inner {
+    max-width: 900px;
+    margin: 0 auto;
+    text-align: center;
+    position: relative;
+    z-index: 1;
+  }
+  .vc-dark__eyebrow {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 1rem;
+    color: var(--gold);
+    letter-spacing: 4px;
+    margin-bottom: 12px;
+  }
+  .vc-dark h2 {
+    color: var(--chalk);
+    margin-bottom: 16px;
+  }
+  .vc-dark p {
+    font-family: 'DM Sans', sans-serif;
+    color: rgba(255,255,255,0.55);
+    font-size: 1.1rem;
+    max-width: 550px;
+    margin: 0 auto 40px;
+    line-height: 1.8;
+  }
+  .vc-dark__grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 20px;
+  }
+  .vc-dark__card {
+    background: rgba(255,255,255,0.03);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 10px;
+    padding: 32px 20px;
+    text-align: center;
+    transition: all 0.2s ease-out;
+    position: relative;
+    overflow: hidden;
+  }
+  .vc-dark__card:hover {
+    background: rgba(255,255,255,0.06);
+    transform: translateY(-4px);
+    border-color: rgba(226,183,79,0.15);
+  }
+  /* Gold accent line at top of dark cards */
+  .vc-dark__card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 20%;
+    right: 20%;
+    height: 2px;
+    background: linear-gradient(90deg, transparent, var(--gold), transparent);
+    opacity: 0.3;
+  }
+  .vc-dark__card-number {
+    font-family: 'Bebas Neue', cursive;
+    font-size: 2.5rem;
+    color: var(--gold);
+    opacity: 0.2;
+    line-height: 1;
+    margin-bottom: 8px;
+  }
+  .vc-dark__card h3 {
+    color: var(--chalk);
+    font-size: 1rem;
+    margin-bottom: 8px;
+  }
+  .vc-dark__card p {
+    font-size: 0.85rem;
+    color: rgba(255,255,255,0.35);
+    margin: 0;
+  }
+
+  /* ========== RESPONSIVE ========== */
+  @media (max-width: 768px) {
+    .toggle-bar {
+      flex-wrap: wrap;
+      padding: 12px 16px;
+      gap: 6px;
+    }
+    .toggle-bar__title {
+      width: 100%;
+      text-align: center;
+      margin-right: 0;
+      margin-bottom: 6px;
+    }
+    .toggle-bar__divider { display: none; }
+    .toggle-bar__btn {
+      flex: 1;
+      min-width: 120px;
+      padding: 8px 16px;
+      font-size: 12px;
+    }
+
+    /* B responsive */
+    .vb-hero { padding: 70px 20px 60px; min-height: auto; }
+    .vb-hero__stitch-left, .vb-hero__stitch-right { display: none; }
+    .vb-stats { grid-template-columns: repeat(2, 1fr); }
+    .vb-stat:nth-child(2)::after { display: none; }
+    .vb-cards__grid { grid-template-columns: 1fr; }
+    .vb-ui__grid { grid-template-columns: 1fr; }
+    .vb-dark__cards { grid-template-columns: 1fr; }
+
+    /* C responsive */
+    .vc-hero { padding: 60px 20px 50px; min-height: auto; }
+    .vc-hero__inner { grid-template-columns: 1fr; gap: 30px; }
+    .vc-hero__visual { display: none; }
+    .vc-hero__stripe { width: 60%; right: -10%; }
+    .vc-stats__inner { grid-template-columns: repeat(2, 1fr); }
+    .vc-stat:nth-child(2)::after { display: none; }
+    .vc-cards__grid { grid-template-columns: 1fr; }
+    .vc-ui__grid { grid-template-columns: 1fr; }
+    .vc-dark__grid { grid-template-columns: 1fr; }
+    .vc-hero__cta-row { flex-direction: column; }
+    .vc-hero__cta-row .vc-btn { text-align: center; justify-content: center; }
+  }
+</style>
+</head>
+<body>
+
+<!-- ========== TOGGLE BAR ========== -->
+<div class="toggle-bar">
+  <span class="toggle-bar__title">Iteration 2</span>
+  <button class="toggle-bar__btn active" onclick="showVersion('b')">
+    Version B v2
+    <span class="vibe">Headspace meets baseball camp</span>
+  </button>
+  <div class="toggle-bar__divider"></div>
+  <button class="toggle-bar__btn" onclick="showVersion('c')">
+    Version C v2
+    <span class="vibe">Game day at the stadium</span>
+  </button>
+</div>
+
+<!-- ===================================================================
+     VERSION B: "CLEARLY PLAYFUL"
+     =================================================================== -->
+<div class="version vb active" id="version-b">
+
+  <!-- HERO -->
+  <section class="vb-hero">
+    <div class="vb-diamond"></div>
+    <div class="vb-diamond"></div>
+    <div class="vb-diamond"></div>
+    <div class="vb-hero__stitch-left"></div>
+    <div class="vb-hero__stitch-right"></div>
+    <div class="vb-hero__baseball"></div>
+    <div class="vb-hero__inner fade-up">
+      <div class="vb-hero__badge">Now Accepting Players</div>
+      <h1 class="hero-title">IRVINE<br>ALL-STARS</h1>
+      <div class="vb-hero__subtitle">2026 Tryouts</div>
+      <p class="vb-hero__text">
+        Building the next generation of Irvine baseball players. Competitive All-Stars teams for ages 7-14, where every kid gets a chance to shine.
+      </p>
+      <div style="display: flex; gap: 16px; justify-content: center; flex-wrap: wrap;">
+        <a href="#" class="vb-btn vb-btn--primary">Register for Tryouts</a>
+        <a href="#" class="vb-btn vb-btn--stitch">Learn More</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS BAR -->
+  <section class="vb-stats">
+    <div class="vb-stat fade-up">
+      <div class="vb-stat__number">6</div>
+      <div class="vb-stat__label">Divisions</div>
+    </div>
+    <div class="vb-stat fade-up">
+      <div class="vb-stat__number">7-14</div>
+      <div class="vb-stat__label">Ages</div>
+    </div>
+    <div class="vb-stat fade-up">
+      <div class="vb-stat__number">200+</div>
+      <div class="vb-stat__label">Players</div>
+    </div>
+    <div class="vb-stat fade-up">
+      <div class="vb-stat__number">2026</div>
+      <div class="vb-stat__label">Est.</div>
+    </div>
+  </section>
+
+  <!-- CARD GRID -->
+  <section class="vb-cards">
+    <div class="vb-cards__header fade-up">
+      <h2>What's Coming Up</h2>
+      <p>Everything you need to know about the upcoming season</p>
+    </div>
+    <div class="vb-cards__grid">
+      <div class="vb-card fade-up">
+        <div class="vb-card__badge">April 12</div>
+        <div class="vb-card__title">Tryout Day</div>
+        <p class="vb-card__text">
+          Open evaluation for all skill levels. Players rotate through hitting, fielding, and base running stations with trained evaluators scoring each drill.
+        </p>
+        <div class="vb-card__detail">
+          <span class="vb-card__detail-icon" style="background: rgba(226,61,61,0.1); color: var(--stitch-red);">&#9830;</span>
+          Harvard Park, 8:00 AM - 12:00 PM
+        </div>
+        <div class="vb-card__detail">
+          <span class="vb-card__detail-icon" style="background: rgba(74,124,89,0.1); color: var(--grass);">&#10003;</span>
+          Bring glove, bat, and water
+        </div>
+      </div>
+      <div class="vb-card fade-up">
+        <div class="vb-card__badge">Coaching</div>
+        <div class="vb-card__title">Coach Selection</div>
+        <p class="vb-card__text">
+          Experienced parent-coaches are selected based on baseball knowledge, communication skills, and commitment to player development over winning.
+        </p>
+        <div class="vb-card__detail">
+          <span class="vb-card__detail-icon" style="background: rgba(226,183,79,0.12); color: var(--bat-wood);">&#9733;</span>
+          Background checks required
+        </div>
+        <div class="vb-card__detail">
+          <span class="vb-card__detail-icon" style="background: rgba(196,149,106,0.15); color: var(--leather);">&#9679;</span>
+          Coaching clinics provided
+        </div>
+      </div>
+      <div class="vb-card fade-up">
+        <div class="vb-card__badge">Teams</div>
+        <div class="vb-card__title">Division Info</div>
+        <p class="vb-card__text">
+          Six age-based divisions from 7U to 12U ensure fair competition and appropriate skill development at every stage of a player's growth.
+        </p>
+        <div class="vb-card__detail">
+          <span class="vb-card__detail-icon" style="background: rgba(74,124,89,0.1); color: var(--grass);">&#9650;</span>
+          7U, 8U, 9U, 10U, 11U, 12U
+        </div>
+        <div class="vb-card__detail">
+          <span class="vb-card__detail-icon" style="background: rgba(166,139,107,0.15); color: var(--dirt);">&#9679;</span>
+          ~12 players per team
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- UI SAMPLES -->
+  <section class="vb-ui">
+    <div class="vb-ui__header fade-up">
+      <h2>UI Elements</h2>
+    </div>
+    <div class="vb-ui__grid">
+      <div class="vb-ui__panel fade-up">
+        <h4>Buttons</h4>
+        <div class="vb-ui__buttons">
+          <button class="vb-btn vb-btn--primary" style="font-size:13px; padding:12px 24px;">Primary</button>
+          <button class="vb-btn vb-btn--grass" style="font-size:13px; padding:12px 24px;">Active</button>
+          <button class="vb-btn vb-btn--leather" style="font-size:13px; padding:12px 24px;">Warm</button>
+          <button class="vb-btn vb-btn--stitch" style="font-size:13px; padding:10px 24px;">Stitch</button>
+        </div>
+        <h4 style="margin-top: 24px;">Badges</h4>
+        <div class="vb-ui__buttons">
+          <span class="vb-badge vb-badge--red"><span class="vb-badge__dot"></span> Tryouts Open</span>
+          <span class="vb-badge vb-badge--green"><span class="vb-badge__dot"></span> Active</span>
+          <span class="vb-badge vb-badge--gold">MVP</span>
+          <span class="vb-badge vb-badge--leather">Coach</span>
+          <span class="vb-badge vb-badge--navy">Admin</span>
+        </div>
+      </div>
+      <div class="vb-ui__panel fade-up">
+        <h4>Form Input</h4>
+        <div class="vb-input-group">
+          <input type="text" class="vb-input" placeholder="Player's full name">
+          <button class="vb-btn vb-btn--grass" style="font-size:13px; padding:12px 24px; white-space: nowrap;">Add Player</button>
+        </div>
+        <div class="vb-input-group">
+          <input type="email" class="vb-input" placeholder="Parent email address">
+        </div>
+        <h4 style="margin-top: 24px;">Data Row</h4>
+        <table class="vb-table">
+          <thead>
+            <tr><th>Player</th><th>Division</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Jake Martinez</strong></td>
+              <td>10U</td>
+              <td><span class="vb-badge vb-badge--green" style="font-size:10px; padding:3px 10px;"><span class="vb-badge__dot"></span> Registered</span></td>
+            </tr>
+            <tr>
+              <td><strong>Emma Chen</strong></td>
+              <td>8U</td>
+              <td><span class="vb-badge vb-badge--gold" style="font-size:10px; padding:3px 10px;">Pending</span></td>
+            </tr>
+            <tr>
+              <td><strong>Ryan Park</strong></td>
+              <td>12U</td>
+              <td><span class="vb-badge vb-badge--red" style="font-size:10px; padding:3px 10px;"><span class="vb-badge__dot"></span> Waitlist</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- DARK SECTION -->
+  <section class="vb-dark">
+    <div class="vb-dark__inner fade-up">
+      <h2>Built for Players,<br>Run by Parents</h2>
+      <p>Irvine All-Stars is a community-first organization where families come together to give kids the best competitive baseball experience in Orange County.</p>
+      <a href="#" class="vb-btn vb-btn--primary">Get Involved</a>
+      <div class="vb-dark__cards" style="margin-top: 48px;">
+        <div class="vb-dark__card fade-up">
+          <div class="vb-dark__card-icon">&#9918;</div>
+          <h3>Fair Play</h3>
+          <p>Balanced teams through blind evaluation scoring ensure competitive, fun games every weekend.</p>
+        </div>
+        <div class="vb-dark__card fade-up">
+          <div class="vb-dark__card-icon">&#9733;</div>
+          <h3>Skill Growth</h3>
+          <p>Structured coaching clinics and practice plans focused on fundamentals and game IQ development.</p>
+        </div>
+        <div class="vb-dark__card fade-up">
+          <div class="vb-dark__card-icon">&#127942;</div>
+          <h3>Tournament Ready</h3>
+          <p>Compete against the best All-Stars programs across Southern California and beyond.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ===================================================================
+     VERSION C: "FULL ENERGY"
+     =================================================================== -->
+<div class="version vc" id="version-c">
+
+  <!-- HERO -->
+  <section class="vc-hero">
+    <div class="vc-hero__stripe"></div>
+    <div class="vc-hero__diamond-pattern">
+      <svg viewBox="0 0 200 200" fill="none">
+        <rect x="100" y="10" width="80" height="80" transform="rotate(45 100 10)" stroke="#0F1B2D" stroke-width="1.5" fill="none"/>
+        <rect x="100" y="40" width="50" height="50" transform="rotate(45 100 40)" stroke="#0F1B2D" stroke-width="1" fill="none"/>
+        <circle cx="100" cy="155" r="6" fill="#0F1B2D" opacity="0.3"/>
+        <line x1="70" y1="155" x2="130" y2="155" stroke="#0F1B2D" stroke-width="1" opacity="0.2"/>
+      </svg>
+    </div>
+    <div class="vc-hero__chevron"></div>
+
+    <div class="vc-hero__inner">
+      <div class="vc-hero__content fade-up">
+        <div class="vc-hero__tag">Irvine Youth Baseball</div>
+        <h1 class="hero-title">IRVINE<br>ALL-STARS</h1>
+        <div class="vc-hero__subtitle">2026 Tryouts</div>
+        <p class="vc-hero__text">
+          Competitive All-Stars baseball for ages 7-14. Building skill, character, and a love for the game right here in Irvine.
+        </p>
+        <div class="vc-hero__cta-row">
+          <a href="#" class="vc-btn vc-btn--primary">Register for Tryouts</a>
+          <a href="#" class="vc-btn vc-btn--outline">Division Info</a>
+        </div>
+      </div>
+      <div class="vc-hero__visual fade-up">
+        <div class="vc-hero__circle">
+          <div class="vc-hero__circle-text">ALL<br>STARS</div>
+        </div>
+        <div class="vc-hero__floating-badge vc-hero__floating-badge--top">Ages 7-14</div>
+        <div class="vc-hero__floating-badge vc-hero__floating-badge--bottom">6 Divisions</div>
+        <div class="vc-hero__floating-badge vc-hero__floating-badge--gold">2026</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- STATS (SCOREBOARD) -->
+  <section class="vc-stats">
+    <div class="vc-stats__inner fade-up">
+      <div class="vc-stat">
+        <div class="vc-stat__number">6</div>
+        <div class="vc-stat__label">Divisions</div>
+      </div>
+      <div class="vc-stat">
+        <div class="vc-stat__number">7-14</div>
+        <div class="vc-stat__label">Ages</div>
+      </div>
+      <div class="vc-stat">
+        <div class="vc-stat__number">200+</div>
+        <div class="vc-stat__label">Players</div>
+      </div>
+      <div class="vc-stat">
+        <div class="vc-stat__number">2026</div>
+        <div class="vc-stat__label">Est.</div>
+      </div>
+    </div>
+  </section>
+
+  <!-- CARD GRID -->
+  <section class="vc-cards">
+    <div class="vc-cards__header fade-up">
+      <h2>What's Coming Up</h2>
+      <p>Everything you need to know about the upcoming season</p>
+    </div>
+    <div class="vc-cards__grid">
+      <div class="vc-card fade-up">
+        <div class="vc-card__stripe"></div>
+        <div class="vc-card__body">
+          <div class="vc-card__jersey">01</div>
+          <div class="vc-card__tag">April 12</div>
+          <div class="vc-card__title">Tryout Day</div>
+          <p class="vc-card__text">
+            Open evaluation for all skill levels. Players rotate through hitting, fielding, and base running stations with trained evaluators scoring each drill.
+          </p>
+          <div class="vc-card__meta">
+            <span style="color: var(--stitch-red);">&#9830;</span>
+            Harvard Park, 8:00 AM - 12:00 PM
+          </div>
+        </div>
+      </div>
+      <div class="vc-card fade-up">
+        <div class="vc-card__stripe"></div>
+        <div class="vc-card__body">
+          <div class="vc-card__jersey">02</div>
+          <div class="vc-card__tag">Selection</div>
+          <div class="vc-card__title">Coach Selection</div>
+          <p class="vc-card__text">
+            Experienced parent-coaches selected based on baseball knowledge, communication, and commitment to developing every player on the roster.
+          </p>
+          <div class="vc-card__meta">
+            <span style="color: var(--grass);">&#10003;</span>
+            Background checks &amp; clinics required
+          </div>
+        </div>
+      </div>
+      <div class="vc-card fade-up">
+        <div class="vc-card__stripe"></div>
+        <div class="vc-card__body">
+          <div class="vc-card__jersey">03</div>
+          <div class="vc-card__tag">Divisions</div>
+          <div class="vc-card__title">Division Info</div>
+          <p class="vc-card__text">
+            Six age-based divisions from 7U to 12U ensure fair competition and skill development at every stage. Approximately 12 players per team.
+          </p>
+          <div class="vc-card__meta">
+            <span style="color: var(--leather);">&#9650;</span>
+            7U, 8U, 9U, 10U, 11U, 12U
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- DIAGONAL DIVIDER -->
+  <div class="vc-divider">
+    <div class="vc-divider__stripes">
+      <div class="vc-divider__stripe"></div>
+      <div class="vc-divider__stripe"></div>
+      <div class="vc-divider__stripe"></div>
+      <div class="vc-divider__stripe"></div>
+      <div class="vc-divider__stripe"></div>
+    </div>
+  </div>
+
+  <!-- UI SAMPLES -->
+  <section class="vc-ui">
+    <div class="vc-ui__header fade-up">
+      <h2>UI Elements</h2>
+    </div>
+    <div class="vc-ui__grid">
+      <div class="vc-ui__panel fade-up">
+        <h4>Buttons</h4>
+        <div class="vc-ui__buttons">
+          <button class="vc-btn vc-btn--primary" style="font-size:13px; padding:12px 24px;">Primary</button>
+          <button class="vc-btn vc-btn--grass" style="font-size:13px; padding:12px 24px;">Active</button>
+          <button class="vc-btn vc-btn--gold" style="font-size:13px; padding:12px 24px;">Gold</button>
+          <button class="vc-btn vc-btn--leather" style="font-size:13px; padding:12px 24px;">Warm</button>
+          <button class="vc-btn vc-btn--outline" style="font-size:13px; padding:10px 24px;">Outline</button>
+        </div>
+        <h4 style="margin-top: 24px;">Badges</h4>
+        <div class="vc-ui__buttons">
+          <span class="vc-badge vc-badge--red">Tryouts Open</span>
+          <span class="vc-badge vc-badge--green">Active</span>
+          <span class="vc-badge vc-badge--gold">MVP</span>
+          <span class="vc-badge vc-badge--navy">Admin</span>
+          <span class="vc-badge vc-badge--leather">Coach</span>
+        </div>
+      </div>
+      <div class="vc-ui__panel fade-up">
+        <h4>Form Input</h4>
+        <div class="vc-input-group">
+          <input type="text" class="vc-input" placeholder="Player's full name">
+          <button class="vc-btn vc-btn--primary" style="font-size:13px; padding:12px 24px; white-space: nowrap;">Add Player</button>
+        </div>
+        <div class="vc-input-group">
+          <input type="email" class="vc-input" placeholder="Parent email address">
+        </div>
+        <h4 style="margin-top: 24px;">Data Row</h4>
+        <table class="vc-table">
+          <thead>
+            <tr><th>Player</th><th>Division</th><th>Status</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Jake Martinez</strong></td>
+              <td>10U</td>
+              <td><span class="vc-badge vc-badge--green" style="font-size:10px; padding:3px 10px;">Registered</span></td>
+            </tr>
+            <tr>
+              <td><strong>Emma Chen</strong></td>
+              <td>8U</td>
+              <td><span class="vc-badge vc-badge--gold" style="font-size:10px; padding:3px 10px;">Pending</span></td>
+            </tr>
+            <tr>
+              <td><strong>Ryan Park</strong></td>
+              <td>12U</td>
+              <td><span class="vc-badge vc-badge--red" style="font-size:10px; padding:3px 10px;">Waitlist</span></td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+  <!-- DARK SECTION (STADIUM AT NIGHT) -->
+  <section class="vc-dark">
+    <div class="vc-dark__inner fade-up">
+      <div class="vc-dark__eyebrow">Irvine All-Stars 2026</div>
+      <h2>Built for Players,<br>Run by Parents</h2>
+      <p>A community-first organization where families come together to give kids the best competitive baseball experience in Orange County.</p>
+      <a href="#" class="vc-btn vc-btn--gold" style="margin-bottom: 20px;">Get Involved</a>
+      <div class="vc-dark__grid" style="margin-top: 36px;">
+        <div class="vc-dark__card fade-up">
+          <div class="vc-dark__card-number">01</div>
+          <h3>Fair Play</h3>
+          <p>Balanced teams through blind evaluation scoring ensure competitive, fun games every weekend.</p>
+        </div>
+        <div class="vc-dark__card fade-up">
+          <div class="vc-dark__card-number">02</div>
+          <h3>Skill Growth</h3>
+          <p>Structured coaching clinics and practice plans focused on fundamentals and game IQ.</p>
+        </div>
+        <div class="vc-dark__card fade-up">
+          <div class="vc-dark__card-number">03</div>
+          <h3>Tournament Ready</h3>
+          <p>Compete against the best All-Stars programs across Southern California and beyond.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<!-- ========== SCRIPTS ========== -->
+<script>
+  // Version toggle
+  function showVersion(v) {
+    document.querySelectorAll('.version').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('.toggle-bar__btn').forEach(el => el.classList.remove('active'));
+    document.getElementById('version-' + v).classList.add('active');
+    event.currentTarget.classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    // Re-trigger scroll animations for newly visible version
+    setTimeout(observeAll, 100);
+  }
+
+  // Scroll-triggered fade-up animations
+  function observeAll() {
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('visible');
+        }
+      });
+    }, { threshold: 0.1, rootMargin: '0px 0px -40px 0px' });
+
+    document.querySelectorAll('.version.active .fade-up').forEach(el => {
+      // Reset and re-observe
+      if (!el.classList.contains('visible')) {
+        observer.observe(el);
+      }
+    });
+  }
+
+  // Initial observation
+  document.addEventListener('DOMContentLoaded', () => {
+    observeAll();
+    // Also observe immediately for above-the-fold elements
+    document.querySelectorAll('.version.active .fade-up').forEach(el => {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight) {
+        el.classList.add('visible');
+      }
+    });
+  });
+</script>
+</body>
+</html>

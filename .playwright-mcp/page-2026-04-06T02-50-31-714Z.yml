@@ -1,0 +1,113 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - link "★★★ Irvine All-Stars ★★★" [ref=e3] [cursor=pointer]:
+      - /url: /
+      - generic [ref=e4]: ★★★
+      - generic [ref=e5]: Irvine All-Stars
+      - generic [ref=e6]: ★★★
+    - list [ref=e7]:
+      - listitem [ref=e8]:
+        - link "FAQ" [ref=e9] [cursor=pointer]:
+          - /url: /faq
+      - listitem [ref=e31]:
+        - link "Parent Portal" [ref=e32] [cursor=pointer]:
+          - /url: /portal
+      - listitem [ref=e10]:
+        - button "Sign Out" [ref=e11]
+  - main [ref=e12]:
+    - generic [ref=e33]:
+      - generic [ref=e35]:
+        - generic [ref=e37]: 1. Player Info
+        - generic [ref=e39]: 2. Details
+        - generic [ref=e41]: 3. Submit
+      - generic [ref=e46]:
+        - generic [ref=e47]:
+          - heading "Parent & Player Info" [level=2] [ref=e48]
+          - paragraph [ref=e49]: We need a few basics to get started.
+          - generic [ref=e50]:
+            - generic [ref=e51]: Parent / Guardian Full Name*
+            - textbox "Parent / Guardian Full Name*" [ref=e52]:
+              - /placeholder: Jane Smith
+              - text: Test Mom
+          - generic [ref=e53]:
+            - generic [ref=e54]:
+              - generic [ref=e55]: Email*
+              - textbox "Email*" [ref=e56]:
+                - /placeholder: jane@email.com
+                - text: testparent@irvineallstars.com
+            - generic [ref=e57]:
+              - generic [ref=e58]: Phone*
+              - textbox "Phone*" [ref=e59]:
+                - /placeholder: (949) 555-1234
+                - text: (949) 555-1234
+          - generic [ref=e78]:
+            - generic [ref=e79]:
+              - heading "Second Parent / Guardian" [level=3] [ref=e80]
+              - button "Remove" [ref=e81]
+            - generic [ref=e82]:
+              - generic [ref=e83]: Name
+              - textbox "Name" [ref=e84]:
+                - /placeholder: John Smith
+            - generic [ref=e85]:
+              - generic [ref=e86]:
+                - generic [ref=e87]: Email
+                - textbox "Email" [ref=e88]:
+                  - /placeholder: john@email.com
+                - paragraph [ref=e89]: If provided, this parent can sign in to the portal.
+              - generic [ref=e90]:
+                - generic [ref=e91]: Phone
+                - textbox "Phone" [ref=e92]:
+                  - /placeholder: (949) 555-5678
+          - generic [ref=e62]:
+            - generic [ref=e63]:
+              - generic [ref=e64]: Player First Name*
+              - textbox "Player First Name*" [ref=e65]:
+                - /placeholder: Tommy
+                - text: Tommy
+            - generic [ref=e66]:
+              - generic [ref=e67]: Player Last Name*
+              - textbox "Player Last Name*" [ref=e68]:
+                - /placeholder: Smith
+                - text: Tester
+          - generic [ref=e69]:
+            - generic [ref=e70]:
+              - generic [ref=e71]: Player Date of Birth*
+              - textbox "Player Date of Birth*" [ref=e72]: 2015-06-15
+            - generic [ref=e73]:
+              - generic [ref=e74]: Division*
+              - combobox "Division*" [ref=e75]:
+                - option "Select division..."
+                - option "5U - Shetland"
+                - option "6U - Shetland"
+                - option "7U MP - Pinto Machine Pitch"
+                - option "7U KP - Pinto Kid Pitch"
+                - option "8U MP - Pinto Machine Pitch"
+                - option "8U KP - Pinto Kid Pitch"
+                - option "9U - Mustang"
+                - option "10U - Mustang"
+                - option "11U - Bronco" [selected]
+                - option "12U - Bronco"
+                - option "13U - Pony"
+                - option "14U - Pony"
+        - button "Next" [ref=e77]
+  - contentinfo [ref=e15]:
+    - generic [ref=e16]:
+      - generic [ref=e17]:
+        - generic [ref=e18]: ★★★
+        - generic [ref=e19]: Irvine All-Stars
+        - generic [ref=e20]: ★★★
+      - generic [ref=e21]:
+        - link "Coaches" [ref=e22] [cursor=pointer]:
+          - /url: /coaches
+        - link "Tryouts" [ref=e23] [cursor=pointer]:
+          - /url: /tryouts
+        - link "Timeline" [ref=e24] [cursor=pointer]:
+          - /url: /timeline
+        - link "Documents" [ref=e25] [cursor=pointer]:
+          - /url: /documents
+        - link "FAQ" [ref=e26] [cursor=pointer]:
+          - /url: /faq
+      - generic [ref=e27]:
+        - paragraph [ref=e28]: Irvine Pony Baseball
+        - paragraph [ref=e29]: 2026 All-Stars Season
+  - alert [ref=e30]

@@ -1,0 +1,257 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - link "★★★ Irvine All-Stars ★★★" [ref=e3] [cursor=pointer]:
+      - /url: /
+      - generic [ref=e4]: ★★★
+      - generic [ref=e5]: Irvine All-Stars
+      - generic [ref=e6]: ★★★
+    - button "Toggle menu" [ref=e7]:
+      - img [ref=e8]
+  - main [ref=e9]:
+    - generic [ref=e10]:
+      - generic: ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★ ★
+      - generic [ref=e11]:
+        - paragraph [ref=e12]: ★ Show What You've Got
+        - heading "All-Stars Tryouts" [level=1] [ref=e13]
+        - paragraph [ref=e14]: Every player gets a fair shot. Independent evaluators, a standardized 54-point rubric, and a process built on merit — not connections.
+    - generic [ref=e22]:
+      - paragraph [ref=e23]: ★ Mark Your Calendar
+      - heading "Tryout Schedule" [level=2] [ref=e24]
+      - paragraph [ref=e25]: All twelve divisions have scheduled tryout dates. Find your player's division below.
+      - generic [ref=e26]:
+        - generic [ref=e27]:
+          - generic [ref=e29]:
+            - generic [ref=e30]: 5U
+            - generic [ref=e31]: ★
+          - paragraph [ref=e32]: Ages 4-5 • Shetland
+          - generic [ref=e33]:
+            - paragraph [ref=e34]: Tryout Date
+            - paragraph [ref=e35]: April 12
+          - paragraph [ref=e36]: 12 roster spots available
+        - generic [ref=e37]:
+          - generic [ref=e39]:
+            - generic [ref=e40]: 6U
+            - generic [ref=e41]: ★
+          - paragraph [ref=e42]: Ages 5-6 • Shetland
+          - generic [ref=e43]:
+            - paragraph [ref=e44]: Tryout Date
+            - paragraph [ref=e45]: April 12
+          - paragraph [ref=e46]: 12 roster spots available
+        - generic [ref=e47]:
+          - generic [ref=e49]:
+            - generic [ref=e50]: 7U MP
+            - generic [ref=e51]: ★
+          - paragraph [ref=e52]: Ages 6-7 • Pinto Machine Pitch
+          - generic [ref=e53]:
+            - paragraph [ref=e54]: Tryout Date
+            - paragraph [ref=e55]: April 12
+          - paragraph [ref=e56]: 12 roster spots available
+        - generic [ref=e57]:
+          - generic [ref=e59]:
+            - generic [ref=e60]: 7U KP
+            - generic [ref=e61]: ★
+          - paragraph [ref=e62]: Ages 6-7 • Pinto Kid Pitch
+          - generic [ref=e63]:
+            - paragraph [ref=e64]: Tryout Date
+            - paragraph [ref=e65]: April 12
+          - paragraph [ref=e66]: 12 roster spots available
+        - generic [ref=e67]:
+          - generic [ref=e69]:
+            - generic [ref=e70]: 8U MP
+            - generic [ref=e71]: ★
+          - paragraph [ref=e72]: Ages 7-8 • Pinto Machine Pitch
+          - generic [ref=e73]:
+            - paragraph [ref=e74]: Tryout Date
+            - paragraph [ref=e75]: April 12
+          - paragraph [ref=e76]: 12 roster spots available
+        - generic [ref=e77]:
+          - generic [ref=e79]:
+            - generic [ref=e80]: 8U KP
+            - generic [ref=e81]: ★
+          - paragraph [ref=e82]: Ages 7-8 • Pinto Kid Pitch
+          - generic [ref=e83]:
+            - paragraph [ref=e84]: Tryout Date
+            - paragraph [ref=e85]: April 12
+          - paragraph [ref=e86]: 12 roster spots available
+        - generic [ref=e87]:
+          - generic [ref=e89]:
+            - generic [ref=e90]: 9U
+            - generic [ref=e91]: ★
+          - paragraph [ref=e92]: Ages 8-9 • Mustang
+          - generic [ref=e93]:
+            - paragraph [ref=e94]: Tryout Date
+            - paragraph [ref=e95]: April 12
+          - paragraph [ref=e96]: 12 roster spots available
+        - generic [ref=e97]:
+          - generic [ref=e99]:
+            - generic [ref=e100]: 10U
+            - generic [ref=e101]: ★
+          - paragraph [ref=e102]: Ages 9-10 • Mustang
+          - generic [ref=e103]:
+            - paragraph [ref=e104]: Tryout Date
+            - paragraph [ref=e105]: April 12
+          - paragraph [ref=e106]: 12 roster spots available
+        - generic [ref=e107]:
+          - generic [ref=e109]:
+            - generic [ref=e110]: 11U
+            - generic [ref=e111]: ★
+          - paragraph [ref=e112]: Ages 10-11 • Bronco
+          - generic [ref=e113]:
+            - paragraph [ref=e114]: Tryout Date
+            - paragraph [ref=e115]: April 12
+          - paragraph [ref=e116]: 12 roster spots available
+        - generic [ref=e117]:
+          - generic [ref=e119]:
+            - generic [ref=e120]: 12U
+            - generic [ref=e121]: ★
+          - paragraph [ref=e122]: Ages 11-12 • Bronco
+          - generic [ref=e123]:
+            - paragraph [ref=e124]: Tryout Date
+            - paragraph [ref=e125]: April 12
+          - paragraph [ref=e126]: 12 roster spots available
+        - generic [ref=e127]:
+          - generic [ref=e129]:
+            - generic [ref=e130]: 13U
+            - generic [ref=e131]: ★
+          - paragraph [ref=e132]: Ages 12-13 • Pony
+          - generic [ref=e133]:
+            - paragraph [ref=e134]: Tryout Date
+            - paragraph [ref=e135]: April 12
+          - paragraph [ref=e136]: 12 roster spots available
+        - generic [ref=e137]:
+          - generic [ref=e139]:
+            - generic [ref=e140]: 14U
+            - generic [ref=e141]: ★
+          - paragraph [ref=e142]: Ages 13-14 • Pony
+          - generic [ref=e143]:
+            - paragraph [ref=e144]: Tryout Date
+            - paragraph [ref=e145]: April 12
+          - paragraph [ref=e146]: 12 roster spots available
+    - generic [ref=e149]:
+      - paragraph [ref=e150]: ★ Game Day
+      - heading "What to Expect at Tryouts" [level=2] [ref=e151]
+      - paragraph [ref=e152]: Here's a walkthrough of tryout day so your player arrives confident and ready.
+      - generic [ref=e153]:
+        - generic [ref=e154]:
+          - generic [ref=e155]: "1"
+          - generic [ref=e156]:
+            - heading "Check-In & Jersey Numbers" [level=3] [ref=e157]
+            - paragraph [ref=e158]: Players check in at the registration table, receive a numbered jersey for identification, and are assigned to their evaluation group.
+        - generic [ref=e159]:
+          - generic [ref=e160]: "2"
+          - generic [ref=e161]:
+            - heading "Station Rotations" [level=3] [ref=e162]
+            - paragraph [ref=e163]: Players rotate through hitting, fielding, throwing, and running stations. Each station is run by trained evaluators who score every player independently.
+        - generic [ref=e164]:
+          - generic [ref=e165]: "3"
+          - generic [ref=e166]:
+            - heading "Independent Evaluators" [level=3] [ref=e167]
+            - paragraph [ref=e168]: All scoring is done by independent evaluators — not the coaches selecting rosters. This ensures every player gets a fair, unbiased assessment.
+        - generic [ref=e169]:
+          - generic [ref=e170]: "4"
+          - generic [ref=e171]:
+            - heading "Water Breaks & Duration" [level=3] [ref=e172]
+            - paragraph [ref=e173]: Tryouts last approximately 2 hours with scheduled water breaks. Players should arrive 15 minutes early and be ready to play.
+    - generic [ref=e175]:
+      - paragraph [ref=e176]: ★ The Rubric
+      - heading "How Players Are Scored" [level=2] [ref=e177]
+      - paragraph [ref=e178]: Every player is evaluated on the same 54-point scale across 6 categories. No subjectivity, no shortcuts — just skills.
+      - generic [ref=e179]:
+        - generic [ref=e181]:
+          - generic [ref=e182]: "9"
+          - generic [ref=e183]:
+            - heading "Hitting" [level=3] [ref=e184]
+            - paragraph [ref=e185]: Swing mechanics, bat speed, contact consistency, and ability to drive the ball. Evaluated through live batting practice and tee work.
+        - generic [ref=e187]:
+          - generic [ref=e188]: "9"
+          - generic [ref=e189]:
+            - heading "Fielding" [level=3] [ref=e190]
+            - paragraph [ref=e191]: Glove work, footwork, range, and ability to field ground balls and fly balls cleanly. Evaluated at multiple positions.
+        - generic [ref=e193]:
+          - generic [ref=e194]: "9"
+          - generic [ref=e195]:
+            - heading "Throwing" [level=3] [ref=e196]
+            - paragraph [ref=e197]: Arm strength, accuracy, and proper throwing mechanics. Measured through distance throws and positional throwing drills.
+        - generic [ref=e199]:
+          - generic [ref=e200]: "9"
+          - generic [ref=e201]:
+            - heading "Running / Speed" [level=3] [ref=e202]
+            - paragraph [ref=e203]: Base running speed, agility, and instincts. Timed sprints and base-to-base running evaluated.
+        - generic [ref=e205]:
+          - generic [ref=e206]: "9"
+          - generic [ref=e207]:
+            - heading "Effort" [level=3] [ref=e208]
+            - paragraph [ref=e209]: Hustle, intensity, and willingness to give 100% throughout the tryout. Players who compete hard on every play stand out.
+        - generic [ref=e211]:
+          - generic [ref=e212]: "9"
+          - generic [ref=e213]:
+            - heading "Attitude" [level=3] [ref=e214]
+            - paragraph [ref=e215]: Sportsmanship, coachability, and enthusiasm. How a player treats teammates, coaches, and the game matters.
+      - generic [ref=e216]:
+        - generic [ref=e217]: Total Points
+        - generic [ref=e218]: "54"
+    - generic [ref=e226]:
+      - paragraph [ref=e227]: ★ Be Prepared
+      - heading "What to Bring" [level=2] [ref=e228]
+      - paragraph [ref=e229]: Make sure your player shows up ready to compete.
+      - generic [ref=e230]:
+        - generic [ref=e231]:
+          - img [ref=e233]
+          - paragraph [ref=e235]: Baseball glove
+        - generic [ref=e236]:
+          - img [ref=e238]
+          - paragraph [ref=e240]: Cleats (no metal)
+        - generic [ref=e241]:
+          - img [ref=e243]
+          - paragraph [ref=e245]: Bat (optional -- bats provided)
+        - generic [ref=e246]:
+          - img [ref=e248]
+          - paragraph [ref=e250]: Water bottle
+        - generic [ref=e251]:
+          - img [ref=e253]
+          - paragraph [ref=e255]: Athletic clothes & cup
+        - generic [ref=e256]:
+          - img [ref=e258]
+          - paragraph [ref=e260]: A positive attitude
+    - generic [ref=e263]:
+      - paragraph [ref=e264]: ★ For the Family
+      - heading "What Parents Should Know" [level=2] [ref=e265]
+      - paragraph [ref=e266]: All-Stars is a commitment for the whole family. Here's what to expect beyond the field.
+      - generic [ref=e267]:
+        - generic [ref=e268]:
+          - img [ref=e270]
+          - heading "Time Commitment" [level=3] [ref=e273]
+          - paragraph [ref=e274]: Expect 3-4 practices per week plus weekend games and tournaments. The All-Stars season runs approximately 6-8 weeks through the summer. Full attendance is expected for all team activities.
+        - generic [ref=e275]:
+          - img [ref=e277]
+          - heading "Estimated Costs" [level=3] [ref=e279]
+          - paragraph [ref=e280]: All-Stars fees typically range from $200-$400 per player, covering tournament entry fees, uniforms, and umpire costs. Exact amounts vary by division and are communicated after roster selection.
+        - generic [ref=e281]:
+          - img [ref=e283]
+          - heading "Communication" [level=3] [ref=e285]
+          - paragraph [ref=e286]: Coaches will use team communication tools (typically TeamSnap or similar) for schedules, updates, and announcements. Parents are expected to be responsive and check for updates regularly.
+        - generic [ref=e287]:
+          - img [ref=e289]
+          - heading "Parent Conduct" [level=3] [ref=e291]
+          - paragraph [ref=e292]: We expect positive sideline behavior, respect for coaches and umpires, and support for all players — not just your own. Our program prioritizes sportsmanship from everyone involved.
+  - contentinfo [ref=e299]:
+    - generic [ref=e300]:
+      - generic [ref=e301]:
+        - generic [ref=e302]: ★★★
+        - generic [ref=e303]: Irvine All-Stars
+        - generic [ref=e304]: ★★★
+      - generic [ref=e305]:
+        - link "Coaches" [ref=e306] [cursor=pointer]:
+          - /url: /coaches
+        - link "Tryouts" [ref=e307] [cursor=pointer]:
+          - /url: /tryouts
+        - link "Timeline" [ref=e308] [cursor=pointer]:
+          - /url: /timeline
+        - link "Documents" [ref=e309] [cursor=pointer]:
+          - /url: /documents
+        - link "FAQ" [ref=e310] [cursor=pointer]:
+          - /url: /faq
+      - generic [ref=e311]:
+        - paragraph [ref=e312]: Irvine Pony Baseball
+        - paragraph [ref=e313]: 2026 All-Stars Season
+  - alert [ref=e314]

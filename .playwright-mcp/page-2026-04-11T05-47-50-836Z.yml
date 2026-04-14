@@ -1,0 +1,51 @@
+- generic [active] [ref=e1]:
+  - navigation [ref=e2]:
+    - link "★★★ Irvine All-Stars ★★★" [ref=e3] [cursor=pointer]:
+      - /url: /
+      - generic [ref=e4]: ★★★
+      - generic [ref=e5]: Irvine All-Stars
+      - generic [ref=e6]: ★★★
+    - list [ref=e7]:
+      - listitem [ref=e8]:
+        - link "Coaches" [ref=e9] [cursor=pointer]:
+          - /url: /coaches
+      - listitem [ref=e10]:
+        - link "Tryouts" [ref=e11] [cursor=pointer]:
+          - /url: /tryouts
+      - listitem [ref=e12]:
+        - link "Timeline" [ref=e13] [cursor=pointer]:
+          - /url: /timeline
+      - listitem [ref=e14]:
+        - link "Documents" [ref=e15] [cursor=pointer]:
+          - /url: /documents
+      - listitem [ref=e16]:
+        - link "FAQ" [ref=e17] [cursor=pointer]:
+          - /url: /faq
+      - listitem [ref=e18]:
+        - link "Sign In" [ref=e19] [cursor=pointer]:
+          - /url: /auth/login
+  - main [ref=e20]:
+    - generic [ref=e22]:
+      - heading "404" [level=1] [ref=e23]
+      - heading "This page could not be found." [level=2] [ref=e25]
+  - contentinfo [ref=e26]:
+    - generic [ref=e27]:
+      - generic [ref=e28]:
+        - generic [ref=e29]: ★★★
+        - generic [ref=e30]: Irvine All-Stars
+        - generic [ref=e31]: ★★★
+      - generic [ref=e32]:
+        - link "Coaches" [ref=e33] [cursor=pointer]:
+          - /url: /coaches
+        - link "Tryouts" [ref=e34] [cursor=pointer]:
+          - /url: /tryouts
+        - link "Timeline" [ref=e35] [cursor=pointer]:
+          - /url: /timeline
+        - link "Documents" [ref=e36] [cursor=pointer]:
+          - /url: /documents
+        - link "FAQ" [ref=e37] [cursor=pointer]:
+          - /url: /faq
+      - generic [ref=e38]:
+        - paragraph [ref=e39]: Irvine Pony Baseball
+        - paragraph [ref=e40]: 2026 All-Stars Season
+  - alert [ref=e41]
