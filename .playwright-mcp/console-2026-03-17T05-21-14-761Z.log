@@ -1,1 +1,0 @@
-[     411ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://owuempqaheupjyslkjlg.supabase.co/rest/v1/coach_certifications?select=certification_type&coach_id=eq.0e30f59e-8a0c-4a4c-b80d-45efb12b8b8d:0

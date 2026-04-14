@@ -1,2 +1,0 @@
-[     330ms] [VERBOSE] [DOM] Input elements should have autocomplete attributes (suggested: "current-password"): (More info: https://goo.gl/9p2vKq) %o @ https://irvineallstars.com/auth/login:0
-[   13989ms] [ERROR] Failed to load resource: the server responded with a status of 400 () @ https://owuempqaheupjyslkjlg.supabase.co/auth/v1/token?grant_type=password:0

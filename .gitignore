@@ -47,3 +47,10 @@ next-env.d.ts
 /.venv*
 __pycache__/
 *.pyc
+
+# playwright mcp artifacts
+.playwright-mcp/
+test-screenshots/
+
+# supabase cli temp
+supabase/.temp/
