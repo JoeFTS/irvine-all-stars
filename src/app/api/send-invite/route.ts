@@ -32,6 +32,7 @@ function getCoachInviteHtml(token: string, division?: string) {
 <tr><td style="background-color:#FFFFFF;padding:40px;">
 <h2 style="color:#0A2342;font-size:20px;font-weight:700;margin:0 0 16px 0;text-transform:uppercase;letter-spacing:1px;">Congratulations, Coach!</h2>
 <p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0 0 24px 0;">${division ? `You've been invited to coach the <strong>${division}</strong> division for the ` : `You've been invited to join the `}Irvine PONY All-Stars coaching portal. This is your gateway to managing your team's tournament preparation &mdash; from binder compliance and certifications to roster management and tournament rules.</p>
+<p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0 0 24px 0;">As a coach, you also have access to the <strong>Parent Portal</strong>. If your own child is trying out, you can register them there after you set up your account &mdash; no separate invite needed.</p>
 <table width="100%" cellpadding="0" cellspacing="0" style="background-color:#F5F1EB;border-radius:8px;margin:0 0 24px 0;">
 <tr><td style="padding:24px;">
 <h3 style="color:#1C1C1C;font-size:14px;font-weight:700;margin:0 0 12px 0;text-transform:uppercase;letter-spacing:1px;">Your Portal Gives You Access To</h3>
@@ -41,6 +42,7 @@ function getCoachInviteHtml(token: string, division?: string) {
 <tr><td style="padding:4px 12px 4px 0;vertical-align:top;color:#C1121F;font-size:14px;">&#9733;</td><td style="padding:4px 0;color:#4B5563;font-size:14px;line-height:1.5;">Certification uploads (Concussion & Cardiac Arrest)</td></tr>
 <tr><td style="padding:4px 12px 4px 0;vertical-align:top;color:#C1121F;font-size:14px;">&#9733;</td><td style="padding:4px 0;color:#4B5563;font-size:14px;line-height:1.5;">Pre-tournament rules & agreements</td></tr>
 <tr><td style="padding:4px 12px 4px 0;vertical-align:top;color:#C1121F;font-size:14px;">&#9733;</td><td style="padding:4px 0;color:#4B5563;font-size:14px;line-height:1.5;">Tournament updates & announcements</td></tr>
+<tr><td style="padding:4px 12px 4px 0;vertical-align:top;color:#C1121F;font-size:14px;">&#9733;</td><td style="padding:4px 0;color:#4B5563;font-size:14px;line-height:1.5;">Parent Portal access to register your own player</td></tr>
 </table></td></tr></table>
 <table cellpadding="0" cellspacing="0" style="margin:0 0 24px 0;" width="100%">
 <tr><td align="center">

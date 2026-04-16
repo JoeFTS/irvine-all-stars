@@ -497,9 +497,12 @@ export default function AdminInvitesPage() {
                   className="w-4 h-4 rounded border-gray-300 text-flag-blue focus:ring-flag-blue cursor-pointer"
                 />
                 <span className="text-sm font-semibold text-charcoal group-hover:text-flag-blue transition-colors">
-                  This coach also has a child in All-Stars
+                  Pre-register coach&apos;s child (optional)
                 </span>
               </label>
+              <p className="text-xs text-gray-500 -mt-2 ml-7">
+                Leave unchecked to let the coach self-register their child from the Parent Portal after signup.
+              </p>
 
               {coachIsParent && (
                 <div className="border border-gray-200 rounded-2xl p-4 space-y-3">

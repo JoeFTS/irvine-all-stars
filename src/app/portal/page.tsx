@@ -567,8 +567,23 @@ export default function PortalPage() {
             </div>
           ) : registrations.length === 0 ? (
             <div className="bg-white rounded-2xl border border-gray-200 p-8 text-center">
-              <p className="text-gray-500">
-                No tryout registrations found for your account. If you believe this is an error, please contact the coordinator.
+              <div className="w-14 h-14 rounded-full bg-flag-blue/10 text-flag-blue font-display text-2xl font-bold flex items-center justify-center mx-auto mb-4">
+                &#9733;
+              </div>
+              <h3 className="font-display text-xl font-bold uppercase tracking-wide mb-2">
+                Register Your Player
+              </h3>
+              <p className="text-gray-600 text-sm leading-relaxed mb-6 max-w-md mx-auto">
+                Ready to sign up your child for All-Stars tryouts? Start their registration here and it will appear in your portal once submitted.
+              </p>
+              <Link
+                href={`/apply/player?parent_email=${encodeURIComponent(user?.email || "")}&parent_name=${encodeURIComponent((user?.user_metadata?.full_name as string) || "")}`}
+                className="inline-block bg-flag-red hover:bg-flag-red-dark text-white px-6 py-3 rounded-full font-display text-sm font-semibold uppercase tracking-widest transition-colors"
+              >
+                Register Player
+              </Link>
+              <p className="text-gray-400 text-xs mt-4">
+                If you expected a registration here, please contact the coordinator.
               </p>
             </div>
           ) : (
