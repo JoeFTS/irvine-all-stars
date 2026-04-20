@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/auth-context";
 import { HelpTooltip } from "@/components/help-tooltip";
+import FileUpload from "@/components/file-upload";
 import {
   Users,
   CheckCircle2,
@@ -15,6 +16,7 @@ import {
   ExternalLink,
   Clock,
   UserCheck,
+  FileUp,
 } from "lucide-react";
 
 /* ------------------------------------------------------------------ */
@@ -105,13 +107,19 @@ function getPlayerCompliance(
     (d) => d.document_type === "birth_certificate"
   );
   const hasPhoto = regDocs.some((d) => d.document_type === "player_photo");
-  const hasContract = contracts.some((c) => c.registration_id === regId);
+  const hasSignedContract = contracts.some((c) => c.registration_id === regId);
+  const hasUploadedContract = regDocs.some(
+    (d) => d.document_type === "signed_contract"
+  );
+  const hasContract = hasSignedContract || hasUploadedContract;
   const hasMedical = regDocs.some((d) => d.document_type === "medical_release");
 
   return {
     birthCert: hasBirthCert,
     photo: hasPhoto,
     contract: hasContract,
+    contractSigned: hasSignedContract,
+    contractUploaded: hasUploadedContract,
     medical: hasMedical,
     ready: hasBirthCert && hasPhoto && hasContract && hasMedical,
   };
@@ -371,10 +379,18 @@ function PlayerCard({
         <DocBadge
           label="Contract"
           ok={compliance.contract}
-          okText="Signed"
+          okText={compliance.contractUploaded && !compliance.contractSigned ? "Uploaded" : "Signed"}
           missingText="Not Signed"
-          onClick={compliance.contract ? () => {
-            window.open(`/contract-view?id=${reg.id}`, "_blank");
+          onClick={compliance.contract ? async () => {
+            if (compliance.contractSigned) {
+              window.open(`/contract-view?id=${reg.id}`, "_blank");
+              return;
+            }
+            const doc = docs.find(d => d.registration_id === reg.id && d.document_type === "signed_contract");
+            if (doc?.file_path && supabase) {
+              const { data } = await supabase.storage.from("player-documents").createSignedUrl(doc.file_path, 300);
+              if (data?.signedUrl) window.open(data.signedUrl, "_blank");
+            }
           } : undefined}
         />
         <DocBadge
@@ -414,6 +430,7 @@ export default function CoachRosterPage() {
   const [contracts, setContracts] = useState<PlayerContract[]>([]);
   const [awaitingPlayers, setAwaitingPlayers] = useState<AwaitingPlayer[]>([]);
   const [loading, setLoading] = useState(true);
+  const [uploadOpenFor, setUploadOpenFor] = useState<string | null>(null);
   const [coachDivision, setCoachDivision] = useState<string | null>(null);
   const [coachDivisions, setCoachDivisions] = useState<string[]>([]);
   const [selectedDivision, setSelectedDivision] = useState<string | null>(null);
@@ -475,14 +492,18 @@ export default function CoachRosterPage() {
         .map((d) => d.registration_id)
     );
 
-    // Players who have signed contracts → show in roster
+    // Players with a contract on file (either e-signed online OR uploaded by coach)
     const signedRegIds = new Set(allContracts.map((c) => c.registration_id));
-    const signedRegs = allRegs.filter((r) => signedRegIds.has(r.id));
+    const uploadedContractIds = new Set(
+      allDocs.filter((d) => d.document_type === "signed_contract").map((d) => d.registration_id)
+    );
+    const rosterIds = new Set([...signedRegIds, ...uploadedContractIds]);
+    const signedRegs = allRegs.filter((r) => rosterIds.has(r.id));
     setRegistrations(signedRegs);
 
-    // Players awaiting acceptance (selected/alternate but haven't accepted OR haven't signed contract yet)
+    // Players awaiting acceptance (selected/alternate, no contract yet)
     const awaiting: AwaitingPlayer[] = allRegs
-      .filter((r) => !signedRegIds.has(r.id))
+      .filter((r) => !rosterIds.has(r.id))
       .map((r) => ({
         id: r.id,
         player_first_name: r.player_first_name,
@@ -499,6 +520,29 @@ export default function CoachRosterPage() {
     setDocuments(allDocs);
     setContracts(allContracts);
     setLoading(false);
+  }
+
+  async function handleContractUpload(
+    reg: AwaitingPlayer,
+    filePath: string,
+    fileName: string
+  ) {
+    if (!supabase || !user) return;
+    const { error } = await supabase.from("player_documents").insert({
+      registration_id: reg.id,
+      player_name: `${reg.player_first_name} ${reg.player_last_name}`,
+      division: reg.division,
+      document_type: "signed_contract",
+      file_path: filePath,
+      file_name: fileName,
+      uploaded_by: user.id,
+      status: "approved",
+    });
+    if (error) {
+      console.error("Failed to record uploaded contract:", error.message);
+      return;
+    }
+    await fetchAll();
   }
 
   /* ---- Filtered data ---- */
@@ -629,38 +673,64 @@ export default function CoachRosterPage() {
             {filteredAwaiting.map((p) => (
               <div
                 key={p.id}
-                className="bg-white border border-amber-200 rounded-2xl p-4 flex flex-wrap items-center gap-3"
+                className="bg-white border border-amber-200 rounded-2xl p-4"
               >
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <p className="text-sm font-semibold text-charcoal">
-                      {p.player_first_name} {p.player_last_name}
+                <div className="flex flex-wrap items-center gap-3">
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2 mb-1">
+                      <p className="text-sm font-semibold text-charcoal">
+                        {p.player_first_name} {p.player_last_name}
+                      </p>
+                      <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wide ${
+                        p.status === "selected"
+                          ? "bg-green-100 text-green-700"
+                          : "bg-amber-100 text-amber-700"
+                      }`}>
+                        {p.status === "selected" ? "Selected" : "Alternate"}
+                      </span>
+                    </div>
+                    <p className="text-xs text-gray-500">
+                      {p.primary_position} &middot; Parent: {p.parent_name} ({p.parent_email})
                     </p>
-                    <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wide ${
-                      p.status === "selected"
-                        ? "bg-green-100 text-green-700"
-                        : "bg-amber-100 text-amber-700"
-                    }`}>
-                      {p.status === "selected" ? "Selected" : "Alternate"}
-                    </span>
                   </div>
-                  <p className="text-xs text-gray-500">
-                    {p.primary_position} &middot; Parent: {p.parent_name} ({p.parent_email})
-                  </p>
+                  <div className="shrink-0 flex items-center gap-2">
+                    {p.accepted ? (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">
+                        <UserCheck size={14} />
+                        Accepted — Awaiting Contract
+                      </span>
+                    ) : (
+                      <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
+                        <Clock size={14} />
+                        Awaiting Parent Response
+                      </span>
+                    )}
+                    <button
+                      type="button"
+                      onClick={() => setUploadOpenFor(uploadOpenFor === p.id ? null : p.id)}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 min-h-[44px] rounded-full text-xs font-semibold text-flag-blue bg-white border border-flag-blue/30 hover:bg-flag-blue/10 transition-colors"
+                    >
+                      <FileUp size={14} />
+                      {uploadOpenFor === p.id ? "Close" : "Upload Contract"}
+                    </button>
+                  </div>
                 </div>
-                <div className="shrink-0">
-                  {p.accepted ? (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-green-100 text-green-700">
-                      <UserCheck size={14} />
-                      Accepted — Awaiting Contract
-                    </span>
-                  ) : (
-                    <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-amber-100 text-amber-700">
-                      <Clock size={14} />
-                      Awaiting Parent Response
-                    </span>
-                  )}
-                </div>
+                {uploadOpenFor === p.id && (
+                  <div className="mt-4 pt-4 border-t border-amber-200">
+                    <FileUpload
+                      bucket="player-documents"
+                      folder={`signed-contracts/${p.id}`}
+                      label="Signed Contract"
+                      description="Upload the player's signed contract (PDF or image). This will move them onto your roster."
+                      accept="image/*,.pdf"
+                      maxSizeMB={15}
+                      onUploadComplete={(filePath, fileName) => {
+                        handleContractUpload(p, filePath, fileName);
+                        setUploadOpenFor(null);
+                      }}
+                    />
+                  </div>
+                )}
               </div>
             ))}
           </div>
@@ -688,6 +758,8 @@ export default function CoachRosterPage() {
                   birthCert: false,
                   photo: false,
                   contract: false,
+                  contractSigned: false,
+                  contractUploaded: false,
                   medical: false,
                   ready: false,
                 }

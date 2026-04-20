@@ -104,12 +104,20 @@ function DocumentsPage() {
         ]);
 
         const contractData = (contractsResult.data ?? []) as PlayerContract[];
+        const allDocs = (docsResult.data ?? []) as PlayerDocument[];
         setContracts(contractData);
-        setDocuments((docsResult.data ?? []) as PlayerDocument[]);
+        setDocuments(allDocs);
 
-        // Only show players who have signed contracts
+        // Player is unlocked if contract is e-signed OR coach has uploaded one
         const signedRegIds = new Set(contractData.map((c) => c.registration_id));
-        const eligibleRegs = allRegs.filter((r) => signedRegIds.has(r.id));
+        const uploadedContractIds = new Set(
+          allDocs
+            .filter((d) => d.document_type === "signed_contract")
+            .map((d) => d.registration_id)
+        );
+        const eligibleRegs = allRegs.filter(
+          (r) => signedRegIds.has(r.id) || uploadedContractIds.has(r.id)
+        );
         setRegistrations(eligibleRegs);
       } else {
         setRegistrations([]);

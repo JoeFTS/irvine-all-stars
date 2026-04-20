@@ -54,3 +54,6 @@ test-screenshots/
 
 # supabase cli temp
 supabase/.temp/
+
+# shared content (local only, never deployed or committed)
+/shared-content
