@@ -177,12 +177,14 @@ function DocBadge({
   okText,
   missingText,
   onClick,
+  onClickMissing,
 }: {
   label: string;
   ok: boolean;
   okText: string;
   missingText: string;
   onClick?: () => void;
+  onClickMissing?: () => void;
 }) {
   const badge = ok ? (
     <span
@@ -195,6 +197,16 @@ function DocBadge({
       <CheckCircle2 size={12} />
       {okText}
       {onClick && <ExternalLink size={10} className="ml-0.5" />}
+    </span>
+  ) : onClickMissing ? (
+    <span
+      className="inline-flex items-center gap-1 px-2 py-1 min-h-[44px] rounded-full text-xs font-semibold bg-red-100 text-flag-red cursor-pointer hover:bg-red-200 transition-colors"
+      onClick={onClickMissing}
+      role="button"
+    >
+      <XCircle size={12} />
+      {missingText}
+      <FileUp size={10} className="ml-0.5" />
     </span>
   ) : (
     <span className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-xs font-semibold bg-red-100 text-flag-red">
@@ -221,11 +233,29 @@ function PlayerCard({
   reg,
   compliance,
   docs,
+  docUploadOpen,
+  onOpenUpload,
+  onCloseUpload,
+  onDocUpload,
 }: {
   reg: Registration;
   compliance: ReturnType<typeof getPlayerCompliance>;
   docs: PlayerDocument[];
+  docUploadOpen: { regId: string; docType: string } | null;
+  onOpenUpload: (regId: string, docType: string) => void;
+  onCloseUpload: () => void;
+  onDocUpload: (
+    regId: string,
+    playerName: string,
+    division: string,
+    docType: string,
+    filePath: string,
+    fileName: string
+  ) => void;
 }) {
+  const uploadingDocType =
+    docUploadOpen?.regId === reg.id ? docUploadOpen.docType : null;
+  const playerName = `${reg.player_first_name} ${reg.player_last_name}`;
   return (
     <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
       {/* Player Info Header */}
@@ -362,6 +392,7 @@ function PlayerCard({
               if (data?.signedUrl) window.open(data.signedUrl, "_blank");
             }
           } : undefined}
+          onClickMissing={!compliance.birthCert ? () => onOpenUpload(reg.id, "birth_certificate") : undefined}
         />
         <DocBadge
           label="Photo"
@@ -375,6 +406,7 @@ function PlayerCard({
               if (data?.signedUrl) window.open(data.signedUrl, "_blank");
             }
           } : undefined}
+          onClickMissing={!compliance.photo ? () => onOpenUpload(reg.id, "player_photo") : undefined}
         />
         <DocBadge
           label="Contract"
@@ -403,6 +435,63 @@ function PlayerCard({
           } : undefined}
         />
       </div>
+
+      {/* Inline upload section (coach uploading on behalf of parent) */}
+      {uploadingDocType && (
+        <div className="p-4 md:p-5 border-t border-gray-100 bg-blue-50/30">
+          <div className="flex items-center justify-between mb-3">
+            <p className="text-xs font-semibold uppercase tracking-wider text-flag-blue">
+              Upload{" "}
+              {uploadingDocType === "birth_certificate"
+                ? "Birth Certificate"
+                : "Player Photo"}{" "}
+              for {playerName}
+            </p>
+            <button
+              type="button"
+              onClick={onCloseUpload}
+              className="text-xs text-gray-500 hover:text-charcoal font-semibold uppercase tracking-wide"
+            >
+              Cancel
+            </button>
+          </div>
+          <FileUpload
+            bucket="player-documents"
+            folder={
+              uploadingDocType === "birth_certificate"
+                ? `birth-certs/${reg.id}`
+                : `player-photos/${reg.id}`
+            }
+            label={
+              uploadingDocType === "birth_certificate"
+                ? "Birth Certificate"
+                : "Player Photo"
+            }
+            description={
+              uploadingDocType === "birth_certificate"
+                ? "Upload a scan or photo of the player's birth certificate (image or PDF)."
+                : "Upload a recent headshot-style photo of the player (image only)."
+            }
+            accept={
+              uploadingDocType === "birth_certificate"
+                ? "image/*,.pdf"
+                : "image/*"
+            }
+            maxSizeMB={10}
+            onUploadComplete={(filePath, fileName) => {
+              onDocUpload(
+                reg.id,
+                playerName,
+                reg.division,
+                uploadingDocType,
+                filePath,
+                fileName
+              );
+              onCloseUpload();
+            }}
+          />
+        </div>
+      )}
     </div>
   );
 }
@@ -431,6 +520,10 @@ export default function CoachRosterPage() {
   const [awaitingPlayers, setAwaitingPlayers] = useState<AwaitingPlayer[]>([]);
   const [loading, setLoading] = useState(true);
   const [uploadOpenFor, setUploadOpenFor] = useState<string | null>(null);
+  const [docUploadOpen, setDocUploadOpen] = useState<{
+    regId: string;
+    docType: string;
+  } | null>(null);
   const [coachDivision, setCoachDivision] = useState<string | null>(null);
   const [coachDivisions, setCoachDivisions] = useState<string[]>([]);
   const [selectedDivision, setSelectedDivision] = useState<string | null>(null);
@@ -520,6 +613,32 @@ export default function CoachRosterPage() {
     setDocuments(allDocs);
     setContracts(allContracts);
     setLoading(false);
+  }
+
+  async function handleDocUpload(
+    regId: string,
+    playerName: string,
+    division: string,
+    docType: string,
+    filePath: string,
+    fileName: string
+  ) {
+    if (!supabase || !user) return;
+    const { error } = await supabase.from("player_documents").insert({
+      registration_id: regId,
+      player_name: playerName,
+      division,
+      document_type: docType,
+      file_path: filePath,
+      file_name: fileName,
+      uploaded_by: user.id,
+      status: "approved",
+    });
+    if (error) {
+      console.error("Failed to record uploaded doc:", error.message);
+      return;
+    }
+    await fetchAll();
   }
 
   async function handleContractUpload(
@@ -765,6 +884,12 @@ export default function CoachRosterPage() {
                 }
               }
               docs={documents}
+              docUploadOpen={docUploadOpen}
+              onOpenUpload={(regId, docType) =>
+                setDocUploadOpen({ regId, docType })
+              }
+              onCloseUpload={() => setDocUploadOpen(null)}
+              onDocUpload={handleDocUpload}
             />
           ))}
         </div>

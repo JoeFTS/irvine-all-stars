@@ -108,3 +108,51 @@ Coach also needs to upload **player photos** and **birth certificates** on behal
 - `src/app/portal/documents/page.tsx` — widened unlock gate
 - `.gitignore` — ignore `/shared-content` (local-only)
 - `scripts/upload-coach-ty-contracts.mjs` — new, bulk import template
+
+---
+
+# Session Continuation — Coach Birth-Cert + Player-Photo Uploads
+
+## Objective
+
+Extend yesterday's coach-uploaded-contract pattern so coaches can also upload birth certificates and player photos on behalf of parents, directly from the main roster's `PlayerCard`.
+
+## What Was Done
+
+### Feature — Coach-Uploaded Birth Cert + Player Photo
+
+`src/app/coach/roster/page.tsx`:
+
+- `DocBadge` grew an `onClickMissing` prop. When provided on a missing-state chip, the red "Missing" chip becomes a 44px-tall clickable button (adds `FileUp` icon + hover state) instead of the old static pill.
+- `PlayerCard` now accepts `docUploadOpen`, `onOpenUpload`, `onCloseUpload`, `onDocUpload` props. Clicking the red "Missing" chip for Birth Cert or Photo fires `onOpenUpload(reg.id, docType)`. While open, the card expands an inline upload section below the docs row with header ("Upload Birth Certificate for {player}" / "Upload Player Photo for {player}"), Cancel button, and the shared `FileUpload` component.
+- `CoachRosterPage` holds `docUploadOpen` state (`{regId, docType} | null`) and a `handleDocUpload` function that inserts a `player_documents` row with `status='approved'`, `uploaded_by=coach.id`, then re-fetches.
+- Storage paths match parent-portal convention: `birth-certs/{regId}/{timestamp}-{filename}` and `player-photos/{regId}/{timestamp}-{filename}` — bucket `player-documents`.
+- Accept: `image/*,.pdf` for birth cert; `image/*` only for photo. 10MB cap on both.
+- The existing green "Uploaded ✓" chip already had click-to-open signed URL logic — unchanged. Now that a coach upload produces a matching row, the chip flips green on the next render and opening it generates a 5-minute signed URL.
+
+No schema changes. No new `document_type` values. Parent portal flow untouched.
+
+### Verification
+
+- Flipped test coach `thesupplycomp@gmail.com` to `10U-Mustang`.
+- Logged in via Playwright at `localhost:3001/coach/roster`.
+- Clicked Birth Cert "Missing" chip on Ezekiel Brinnon card → inline section expanded → uploaded `Anthony.pdf` → chip flipped to green "Uploaded".
+- Clicked Photo "Missing" chip on same card → uploaded `Brayden.jpeg` → chip flipped to green "Uploaded".
+- Confirmed DB rows: `document_type='birth_certificate'` / `'player_photo'`, `status='approved'`, `uploaded_by=0e30f59e-...` (coach profile id).
+- Screenshot saved at `coach-doc-upload.png` (repo root).
+- Cleaned up the two test-upload rows (Ezekiel had no real cert/photo before this session; the uploaded files were stand-ins). Files remain in storage as orphans — harmless.
+- Reverted test coach division to `12U-Bronco`.
+
+### Deploy
+
+- Commit: `feat(roster): coaches can upload birth certs + player photos`
+- Pushed `origin/main`, deployed to VPS via standard command, verified HTTP 200 on `https://irvineallstars.com/coach/roster`.
+
+## DB State At Session End
+
+- `irvine_allstars.profiles` — test coach back to `12U-Bronco`.
+- `irvine_allstars.player_documents` — no net change from this session (test rows deleted).
+
+## Files Changed (Continuation)
+
+- `src/app/coach/roster/page.tsx` — DocBadge `onClickMissing`, PlayerCard upload section, page-level `docUploadOpen` state + `handleDocUpload`.
