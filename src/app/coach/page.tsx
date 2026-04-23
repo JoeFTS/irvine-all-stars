@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { HelpTooltip } from "@/components/help-tooltip";
 import {
@@ -23,18 +23,19 @@ import {
 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { supabase } from "@/lib/supabase";
+import { useCoachTeams } from "@/hooks/use-coach-teams";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
 /* ------------------------------------------------------------------ */
 
 interface Profile {
-  division: string | null;
   full_name: string | null;
 }
 
 interface Registration {
   id: string;
+  team_id: string | null;
 }
 
 interface PlayerDocument {
@@ -130,9 +131,13 @@ const upcomingDates = [
 
 export default function CoachDashboardPage() {
   const { user } = useAuth();
+  const {
+    teams: myTeams,
+    loaded: teamsLoaded,
+  } = useCoachTeams(user?.id);
 
   const [loading, setLoading] = useState(true);
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [, setProfile] = useState<Profile | null>(null);
   const [registrations, setRegistrations] = useState<Registration[]>([]);
   const [documents, setDocuments] = useState<PlayerDocument[]>([]);
   const [contracts, setContracts] = useState<PlayerContract[]>([]);
@@ -140,54 +145,70 @@ export default function CoachDashboardPage() {
   const [tournamentAgreements, setTournamentAgreements] = useState<TournamentAgreement[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
 
+  const myDivisions = useMemo(
+    () => [...new Set(myTeams.map((t) => t.division))],
+    [myTeams]
+  );
+
   useEffect(() => {
     if (!user || !supabase) {
       setLoading(false);
       return;
     }
+    if (!teamsLoaded) return;
 
     let cancelled = false;
 
     async function load() {
       if (!supabase || !user) return;
 
-      // 1. Coach profile
+      // 1. Coach profile (still need full_name elsewhere)
       const { data: profileData } = await supabase
         .from("profiles")
-        .select("division, full_name")
+        .select("full_name")
         .eq("id", user.id)
         .single();
 
       if (cancelled) return;
       setProfile(profileData as Profile | null);
 
-      const division = profileData?.division;
+      const teamIds = myTeams.map((t) => t.id);
 
-      // Parallel fetches
-      const [regsResult, certsResult, agreementsResult, announcementsResult] =
+      // Parallel fetches: drafted (on my teams) + undrafted pool (in my divisions, no team yet)
+      const [draftedRes, undraftedRes, certsResult, agreementsResult, announcementsResult] =
         await Promise.all([
-          // 2. Registrations in division (only selected/alternate players)
-          division
+          // 2a. Drafted players on my teams
+          teamIds.length > 0
             ? supabase
                 .from("tryout_registrations")
-                .select("id")
-                .eq("division", division)
+                .select("id, team_id")
+                .in("team_id", teamIds)
                 .in("status", ["selected", "alternate"])
             : Promise.resolve({ data: [] as Registration[] }),
 
-          // 5. Coach certifications
+          // 2b. Undrafted pool in my divisions
+          myDivisions.length > 0
+            ? supabase
+                .from("tryout_registrations")
+                .select("id, team_id")
+                .is("team_id", null)
+                .in("division", myDivisions)
+                .in("status", ["selected", "alternate"])
+            : Promise.resolve({ data: [] as Registration[] }),
+
+          // 3. Coach certifications
           supabase
             .from("coach_certifications")
             .select("cert_type")
             .eq("coach_id", user.id),
 
-          // 6. Tournament agreements
+          // 4. Tournament agreements
           supabase
             .from("tournament_agreements")
             .select("id")
             .eq("coach_id", user.id),
 
-          // 7. Announcements
+          // 5. Announcements
           supabase
             .from("announcements")
             .select("id, title, body, created_at")
@@ -197,15 +218,18 @@ export default function CoachDashboardPage() {
 
       if (cancelled) return;
 
-      const regs = (regsResult.data ?? []) as Registration[];
-      setRegistrations(regs);
+      const drafted = (draftedRes.data ?? []) as Registration[];
+      const undrafted = (undraftedRes.data ?? []) as Registration[];
+      // Dashboard "your team" stats reflect drafted players only.
+      setRegistrations(drafted);
       setCoachCerts((certsResult.data ?? []) as CoachCert[]);
       setTournamentAgreements((agreementsResult.data ?? []) as TournamentAgreement[]);
       setAnnouncements((announcementsResult.data ?? []) as Announcement[]);
 
-      // 3 & 4: Docs and contracts for those registrations
-      if (regs.length > 0) {
-        const regIds = regs.map((r) => r.id);
+      // 6. Docs and contracts for everyone the coach can see (drafted + pool)
+      const visibleRegs = [...drafted, ...undrafted];
+      if (visibleRegs.length > 0) {
+        const regIds = visibleRegs.map((r) => r.id);
 
         const [docsResult, contractsResult] = await Promise.all([
           supabase
@@ -221,6 +245,9 @@ export default function CoachDashboardPage() {
         if (cancelled) return;
         setDocuments((docsResult.data ?? []) as PlayerDocument[]);
         setContracts((contractsResult.data ?? []) as PlayerContract[]);
+      } else {
+        setDocuments([]);
+        setContracts([]);
       }
 
       setLoading(false);
@@ -230,11 +257,11 @@ export default function CoachDashboardPage() {
     return () => {
       cancelled = true;
     };
-  }, [user]);
+  }, [user, teamsLoaded, myTeams, myDivisions]);
 
   /* ---- Derived stats ---- */
 
-  const division = profile?.division ?? null;
+  const hasTeam = myTeams.length > 0;
   const playerCount = registrations.length;
 
   // Build sets for quick lookup
@@ -273,7 +300,7 @@ export default function CoachDashboardPage() {
   if (missingPhoto > 0)
     actionItems.push({ label: "players missing player photo", count: missingPhoto, href: "/coach/checklist" });
   if (missingContract > 0)
-    actionItems.push({ label: "players haven\u2019t signed contract", count: missingContract, href: "/coach/checklist" });
+    actionItems.push({ label: "players haven’t signed contract", count: missingContract, href: "/coach/checklist" });
   if (!hasConcussion)
     actionItems.push({ label: "Concussion certification not uploaded", href: "/coach/certifications" });
   if (!hasCardiac)
@@ -285,7 +312,7 @@ export default function CoachDashboardPage() {
 
   /* ---- Loading skeleton ---- */
 
-  if (loading) {
+  if (loading || !teamsLoaded) {
     return (
       <div className="p-6 md:p-10 space-y-6">
         <div>
@@ -341,25 +368,40 @@ export default function CoachDashboardPage() {
         </div>
       </div>
 
-      {/* 1. Your Team Card */}
+      {/* 1. Your Team(s) Card */}
       <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6">
         <p className="text-xs font-bold text-flag-red uppercase tracking-[2px] mb-1">
-          Your Team
+          Your {myTeams.length > 1 ? "Teams" : "Team"}
         </p>
-        {division ? (
+        {!hasTeam ? (
+          <p className="text-gray-500 mt-2">
+            No team assigned yet. Contact the league admin.
+          </p>
+        ) : (
           <>
-            <h2 className="font-display text-2xl md:text-3xl font-bold uppercase tracking-wide text-flag-blue">
-              {division}
-            </h2>
+            {myTeams.map((t, i) => (
+              <h2
+                key={t.id}
+                className={`font-display ${
+                  i === 0
+                    ? "text-2xl md:text-3xl"
+                    : "text-lg md:text-xl mt-1"
+                } font-bold uppercase tracking-wide text-flag-blue`}
+              >
+                {t.team_name}
+                {t.role === "assistant" && (
+                  <span className="text-xs ml-2 text-gray-500 normal-case font-normal">
+                    (asst)
+                  </span>
+                )}
+              </h2>
+            ))}
             <p className="text-gray-600 mt-1">
-              {playerCount} player{playerCount !== 1 ? "s" : ""} registered
+              {playerCount} player{playerCount !== 1 ? "s" : ""}{" "}
+              {playerCount === 0 ? "drafted" : "on roster"}
             </p>
             <p className="text-sm text-gray-400 mt-0.5">2026 Tournament Season</p>
           </>
-        ) : (
-          <p className="text-gray-500 mt-2">
-            Division not yet assigned. Contact the coordinator.
-          </p>
         )}
       </div>
 
@@ -368,7 +410,7 @@ export default function CoachDashboardPage() {
         <h3 className="font-display text-lg font-bold uppercase tracking-wide text-flag-blue mb-3">
           Compliance Progress
         </h3>
-        {division ? (
+        {hasTeam ? (
           <>
             <p className="text-gray-700 font-semibold mb-2">
               {completedItems} of {totalItems} items complete
@@ -391,7 +433,7 @@ export default function CoachDashboardPage() {
           </>
         ) : (
           <p className="text-gray-400 text-sm">
-            Assign a division to see your team&apos;s status.
+            Once you&apos;re assigned to a team, your team&apos;s status will appear here.
           </p>
         )}
       </div>
@@ -399,7 +441,7 @@ export default function CoachDashboardPage() {
       {/* 3. Action Items */}
       <div
         className={`bg-white border rounded-2xl p-4 sm:p-6 ${
-          division
+          hasTeam
             ? allClear
               ? "border-l-4 border-l-green-500 border-gray-200"
               : "border-l-4 border-l-flag-red border-gray-200"
@@ -409,9 +451,9 @@ export default function CoachDashboardPage() {
         <h3 className="font-display text-lg font-bold uppercase tracking-wide text-flag-blue mb-3">
           Action Items
         </h3>
-        {!division ? (
+        {!hasTeam ? (
           <p className="text-gray-400 text-sm">
-            Assign a division to see your team&apos;s status.
+            Once you&apos;re assigned to a team, your team&apos;s status will appear here.
           </p>
         ) : allClear ? (
           <div className="flex items-center gap-3 text-green-600">
@@ -563,7 +605,7 @@ export default function CoachDashboardPage() {
                   aria-hidden
                   className="absolute inset-0 text-white/[0.05] text-xl leading-[2.8rem] tracking-widest overflow-hidden pointer-events-none p-2"
                 >
-                  {"\u2605 ".repeat(80)}
+                  {"★ ".repeat(80)}
                 </div>
 
                 {/* Red accent corner ribbon */}
