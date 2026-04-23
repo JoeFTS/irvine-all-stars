@@ -35,6 +35,7 @@ interface Contract {
 }
 
 interface Team {
+  id: string;
   division: string;
   team_name: string;
   coach_id: string | null;
@@ -49,6 +50,14 @@ interface CoachCert {
 interface CoachApp {
   email: string;
   full_name: string;
+}
+
+interface TeamCoachAssignment {
+  team_id: string;
+  coach_id: string;
+  role: string;
+  email: string;
+  full_name: string | null;
 }
 
 interface TournamentAgreement {
@@ -98,6 +107,7 @@ export default function CompliancePage() {
   const [documents, setDocuments] = useState<Document[]>([]);
   const [contracts, setContracts] = useState<Contract[]>([]);
   const [teams, setTeams] = useState<Team[]>([]);
+  const [teamCoaches, setTeamCoaches] = useState<TeamCoachAssignment[]>([]);
   const [coachCerts, setCoachCerts] = useState<CoachCert[]>([]);
   const [coachApps, setCoachApps] = useState<CoachApp[]>([]);
   const [agreements, setAgreements] = useState<TournamentAgreement[]>([]);
@@ -120,7 +130,7 @@ export default function CompliancePage() {
     if (!supabase) return;
     setLoading(true);
 
-    const [regsRes, docsRes, contractsRes, teamsRes, certsRes, coachAppsRes, agreementsRes, profilesRes] = await Promise.all([
+    const [regsRes, docsRes, contractsRes, teamsRes, teamCoachesRes, certsRes, coachAppsRes, agreementsRes, profilesRes] = await Promise.all([
       supabase
         .from("tryout_registrations")
         .select("id, player_first_name, player_last_name, division, status")
@@ -131,7 +141,10 @@ export default function CompliancePage() {
         .from("player_documents")
         .select("registration_id, document_type"),
       supabase.from("player_contracts").select("registration_id"),
-      supabase.from("teams").select("division, team_name, coach_id, coach_email"),
+      supabase.from("teams").select("id, division, team_name, coach_id, coach_email"),
+      supabase
+        .from("team_coaches")
+        .select("team_id, role, coach_id, profiles!team_coaches_coach_id_fkey ( email, full_name )"),
       supabase.from("coach_certifications").select("coach_id, cert_type"),
       supabase.from("coach_applications").select("email, full_name"),
       supabase.from("tournament_agreements").select("*"),
@@ -142,6 +155,27 @@ export default function CompliancePage() {
     if (docsRes.data) setDocuments(docsRes.data);
     if (contractsRes.data) setContracts(contractsRes.data);
     if (teamsRes.data) setTeams(teamsRes.data);
+    if (teamCoachesRes.data) {
+      // Defensive normalization: Supabase may return the joined `profiles`
+      // as either a single object or an array depending on the relationship
+      // shape. Flatten to a stable TeamCoachAssignment shape.
+      const normalized: TeamCoachAssignment[] = (teamCoachesRes.data as unknown as Array<{
+        team_id: string;
+        coach_id: string;
+        role: string;
+        profiles: { email: string; full_name: string | null } | Array<{ email: string; full_name: string | null }> | null;
+      }>).map((row) => {
+        const profile = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles;
+        return {
+          team_id: row.team_id,
+          coach_id: row.coach_id,
+          role: row.role,
+          email: profile?.email ?? "",
+          full_name: profile?.full_name ?? null,
+        };
+      });
+      setTeamCoaches(normalized);
+    }
     if (certsRes.data) setCoachCerts(certsRes.data);
     if (coachAppsRes.data) setCoachApps(coachAppsRes.data);
     if (agreementsRes.data) setAgreements(agreementsRes.data);
@@ -202,27 +236,72 @@ export default function CompliancePage() {
     return map;
   }, [coachApps]);
 
-  // Coach cert status per division
+  // Coach cert status per division — built from team_coaches join table.
+  // A team is "compliant" only if ALL assigned coaches have BOTH certs.
+  // Pre-existing limitation: keying by division means only one team per
+  // division is shown when multiple teams exist (e.g. 12U-Bronco Red + White).
   const coachCertsByDivision = useMemo(() => {
-    const map = new Map<string, { teamName: string; coachName: string | null; hasConcussion: boolean; hasCardiac: boolean }>();
+    const map = new Map<string, {
+      teamName: string;
+      coachNames: string[];
+      headCoachName: string | null;
+      coachIds: string[];
+      hasConcussion: boolean;
+      hasCardiac: boolean;
+      coachCount: number;
+    }>();
+
     for (const team of teams) {
-      const coachName = team.coach_email
-        ? coachNameByEmail.get(team.coach_email.toLowerCase()) ?? team.coach_email
+      const assignments = teamCoaches.filter((tc) => tc.team_id === team.id);
+      const coachIds = assignments.map((a) => a.coach_id);
+      const headCoach = assignments.find((a) => a.role === "head");
+      const headCoachName = headCoach
+        ? (headCoach.full_name ?? headCoach.email)
         : null;
-      if (!team.coach_id) {
-        map.set(team.division, { teamName: team.team_name, coachName, hasConcussion: false, hasCardiac: false });
+      const coachNames = assignments.map((a) => a.full_name ?? a.email);
+
+      if (assignments.length === 0) {
+        // Fallback to legacy teams.coach_id path so we don't blank out teams
+        // that were created the old way and never migrated to team_coaches.
+        const legacyName = team.coach_email
+          ? (coachNameByEmail.get(team.coach_email.toLowerCase()) ?? team.coach_email)
+          : null;
+        map.set(team.division, {
+          teamName: team.team_name,
+          coachNames: legacyName ? [legacyName] : [],
+          headCoachName: legacyName,
+          coachIds: team.coach_id ? [team.coach_id] : [],
+          hasConcussion: team.coach_id
+            ? coachCerts.some((c) => c.coach_id === team.coach_id && c.cert_type === "concussion")
+            : false,
+          hasCardiac: team.coach_id
+            ? coachCerts.some((c) => c.coach_id === team.coach_id && c.cert_type === "cardiac_arrest")
+            : false,
+          coachCount: team.coach_id ? 1 : 0,
+        });
         continue;
       }
-      const certs = coachCerts.filter((c) => c.coach_id === team.coach_id);
+
+      // ALL coaches must have each cert for the team to be compliant
+      const allHaveConcussion = coachIds.every((id) =>
+        coachCerts.some((c) => c.coach_id === id && c.cert_type === "concussion")
+      );
+      const allHaveCardiac = coachIds.every((id) =>
+        coachCerts.some((c) => c.coach_id === id && c.cert_type === "cardiac_arrest")
+      );
+
       map.set(team.division, {
         teamName: team.team_name,
-        coachName,
-        hasConcussion: certs.some((c) => c.cert_type === "concussion"),
-        hasCardiac: certs.some((c) => c.cert_type === "cardiac_arrest"),
+        coachNames,
+        headCoachName,
+        coachIds,
+        hasConcussion: allHaveConcussion,
+        hasCardiac: allHaveCardiac,
+        coachCount: coachIds.length,
       });
     }
     return map;
-  }, [teams, coachCerts, coachNameByEmail]);
+  }, [teams, teamCoaches, coachCerts, coachNameByEmail]);
 
   const overallReady = divisionData.reduce((s, d) => s + d.readyCount, 0);
   const overallTotal = divisionData.reduce((s, d) => s + d.totalPlayers, 0);
@@ -281,8 +360,8 @@ export default function CompliancePage() {
           />
         </h1>
         <p className="text-gray-400 text-sm mt-1">
-          Which divisions are tournament-ready — all players have contracts,
-          birth certs, and photos.
+          Which divisions are tournament-ready. All players need contracts,
+          birth certs, and photos AND all assigned coaches need both certifications.
         </p>
       </div>
 
@@ -383,14 +462,25 @@ export default function CompliancePage() {
                         </span>
                       )}
                     </div>
-                    {coachCertsByDivision.get(div.division) && (
-                      <div className="flex flex-wrap gap-x-4 text-xs text-gray-400 mt-0.5">
-                        <span>Team: {coachCertsByDivision.get(div.division)!.teamName}</span>
-                        {coachCertsByDivision.get(div.division)!.coachName && (
-                          <span>Coach: {coachCertsByDivision.get(div.division)!.coachName}</span>
-                        )}
-                      </div>
-                    )}
+                    {(() => {
+                      const coachInfo = coachCertsByDivision.get(div.division);
+                      if (!coachInfo) return null;
+                      return (
+                        <div className="flex flex-wrap gap-x-4 text-xs text-gray-400 mt-0.5">
+                          <span>Team: {coachInfo.teamName}</span>
+                          {coachInfo.headCoachName && (
+                            <span>
+                              Coach: {coachInfo.headCoachName}
+                              {coachInfo.coachCount > 1 && (
+                                <span className="text-gray-300 ml-1">
+                                  +{coachInfo.coachCount - 1} asst
+                                </span>
+                              )}
+                            </span>
+                          )}
+                        </div>
+                      );
+                    })()}
                   </div>
 
                   {/* Progress bar */}
@@ -496,10 +586,13 @@ export default function CompliancePage() {
                     {(() => {
                       const coachInfo = coachCertsByDivision.get(div.division);
                       if (!coachInfo) return null;
+                      const coachLabel = coachInfo.coachNames.length > 0
+                        ? coachInfo.coachNames.join(", ")
+                        : null;
                       return (
                         <div className="border-t border-gray-200 bg-flag-blue/5 px-5 py-3">
                           <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">
-                            Coach Certifications {coachInfo.coachName && <span className="normal-case font-normal">— {coachInfo.coachName}</span>}
+                            Coach Certifications {coachLabel && <span className="normal-case font-normal">. {coachLabel}</span>}
                           </p>
                           <div className="flex flex-wrap gap-4">
                             <div className="flex items-center gap-1.5">
