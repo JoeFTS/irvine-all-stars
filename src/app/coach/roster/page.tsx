@@ -572,19 +572,16 @@ export default function CoachRosterPage() {
   }, [user]);
 
   useEffect(() => {
-    if (!supabase || !teamsLoaded) {
-      return;
-    }
-    fetchAll();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
+    if (!teamsLoaded) return;
+    fetchAll(myTeams);
   }, [teamsLoaded, myTeams]);
 
-  async function fetchAll() {
+  async function fetchAll(teams: MyTeam[]) {
     if (!supabase) return;
     setLoading(true);
 
-    const teamIds = myTeams.map((t) => t.id);
-    const myDivisions = [...new Set(myTeams.map((t) => t.division))];
+    const teamIds = teams.map((t) => t.id);
+    const myDivisions = [...new Set(teams.map((t) => t.division))];
 
     const [draftedRes, undraftedRes, docsRes, contractsRes] = await Promise.all([
       teamIds.length > 0
@@ -609,6 +606,17 @@ export default function CoachRosterPage() {
       supabase.from("player_documents").select("registration_id, document_type, file_path"),
       supabase.from("player_contracts").select("registration_id"),
     ]);
+
+    const fetchErr =
+      draftedRes.error ||
+      undraftedRes.error ||
+      docsRes.error ||
+      contractsRes.error;
+    if (fetchErr) {
+      setError(fetchErr.message ?? "Failed to load roster");
+      setLoading(false);
+      return;
+    }
 
     const draftedRegs = (draftedRes.data ?? []) as Registration[];
     const undraftedRegs = (undraftedRes.data ?? []) as Registration[];
@@ -681,7 +689,7 @@ export default function CoachRosterPage() {
       console.error("Failed to record uploaded doc:", insErr.message);
       return;
     }
-    await fetchAll();
+    await fetchAll(myTeams);
   }
 
   async function handleContractUpload(
@@ -704,7 +712,7 @@ export default function CoachRosterPage() {
       console.error("Failed to record uploaded contract:", insErr.message);
       return;
     }
-    await fetchAll();
+    await fetchAll(myTeams);
   }
 
   /* ---- Filtered data based on selected tab ---- */
