@@ -206,11 +206,30 @@ export default function TeamsPage() {
       }
     }
 
-    const { error } = await supabase.from("teams").insert(teamData);
+    const { data: createdTeam, error } = await supabase
+      .from("teams")
+      .insert(teamData)
+      .select("id")
+      .single();
 
     if (error) {
       setCreateError(error.message);
     } else {
+      // Mirror the assignment into team_coaches so coach sees the team via
+      // the team-scoped RLS path. If this fails, surface the error but don't
+      // undo the team creation (admin can fix via the roster manager).
+      if (createdTeam?.id && teamData.coach_id) {
+        const { error: tcErr } = await supabase.from("team_coaches").insert({
+          team_id: createdTeam.id,
+          coach_id: teamData.coach_id,
+          role: "head",
+        });
+        if (tcErr) {
+          setCreateError(
+            `Team created, but failed to add coach to team_coaches: ${tcErr.message}. You can re-add via Manage Roster.`
+          );
+        }
+      }
       setFormTeamName("");
       setFormCoachEmail("");
       await fetchAll();

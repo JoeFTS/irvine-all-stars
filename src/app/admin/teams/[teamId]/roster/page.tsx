@@ -62,7 +62,6 @@ export default function TeamRosterPage({
   // Add-coach form state
   const [selectedCoachAppId, setSelectedCoachAppId] = useState("");
   const [selectedRole, setSelectedRole] = useState<CoachRole>("assistant");
-  const [coachBusy, setCoachBusy] = useState(false);
   const [coachWarning, setCoachWarning] = useState<string | null>(null);
   const [removingCoachId, setRemovingCoachId] = useState<string | null>(null);
 
@@ -187,13 +186,13 @@ export default function TeamRosterPage({
   }
 
   async function addCoach() {
-    if (!supabase || !team || coachBusy || !selectedCoachAppId) return;
-    setCoachBusy(true);
+    if (!supabase || !team || busy || !selectedCoachAppId) return;
+    setBusy(true);
     setCoachWarning(null);
 
     const app = acceptedCoachApps.find((a) => a.id === selectedCoachAppId);
     if (!app) {
-      setCoachBusy(false);
+      setBusy(false);
       return;
     }
 
@@ -206,7 +205,7 @@ export default function TeamRosterPage({
 
     if (profErr) {
       setError(profErr.message);
-      setCoachBusy(false);
+      setBusy(false);
       return;
     }
 
@@ -214,30 +213,44 @@ export default function TeamRosterPage({
       setCoachWarning(
         `${app.full_name} (${app.email}) hasn't created an account yet. Send them an invite first.`
       );
-      setCoachBusy(false);
+      // Reset selection so it's clear the row was NOT inserted.
+      setSelectedCoachAppId("");
+      setBusy(false);
       return;
     }
+
+    // Optimistic insert
+    const newAssignment: CoachAssignment = {
+      coach_id: profile.id,
+      role: selectedRole,
+      profile: { full_name: app.full_name, email: app.email },
+    };
+    const roleToInsert = selectedRole;
+    setCoaches((prev) => [...prev, newAssignment]);
+    setSelectedCoachAppId("");
+    setSelectedRole("assistant");
 
     const { error: insErr } = await supabase.from("team_coaches").insert({
       team_id: team.id,
       coach_id: profile.id,
-      role: selectedRole,
+      role: roleToInsert,
     });
 
     if (insErr) {
       setError(insErr.message);
-    } else {
-      setSelectedCoachAppId("");
-      setSelectedRole("assistant");
+      await fetchAll();
     }
-    await fetchAll();
-    setCoachBusy(false);
+    setBusy(false);
   }
 
   async function removeCoach(coachId: string) {
-    if (!supabase || !team || coachBusy) return;
-    setCoachBusy(true);
+    if (!supabase || !team || busy) return;
+    setBusy(true);
     setCoachWarning(null);
+
+    // Optimistic remove
+    setCoaches((prev) => prev.filter((c) => c.coach_id !== coachId));
+    setRemovingCoachId(null);
 
     const { error: delErr } = await supabase
       .from("team_coaches")
@@ -247,10 +260,9 @@ export default function TeamRosterPage({
 
     if (delErr) {
       setError(delErr.message);
+      await fetchAll();
     }
-    setRemovingCoachId(null);
-    await fetchAll();
-    setCoachBusy(false);
+    setBusy(false);
   }
 
   // Filter out coach apps whose underlying profile is already assigned.
@@ -431,14 +443,14 @@ export default function TeamRosterPage({
                     </span>
                     <button
                       onClick={() => removeCoach(c.coach_id)}
-                      disabled={coachBusy}
+                      disabled={busy}
                       className="px-2.5 py-1 rounded-full text-xs font-semibold uppercase bg-flag-red text-white hover:bg-flag-red/90 transition-colors disabled:opacity-50"
                     >
                       Yes
                     </button>
                     <button
                       onClick={() => setRemovingCoachId(null)}
-                      disabled={coachBusy}
+                      disabled={busy}
                       className="px-2.5 py-1 rounded-full text-xs font-semibold uppercase bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors disabled:opacity-50"
                     >
                       No
@@ -450,7 +462,7 @@ export default function TeamRosterPage({
                       setRemovingCoachId(c.coach_id);
                       setCoachWarning(null);
                     }}
-                    disabled={coachBusy}
+                    disabled={busy}
                     className="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide bg-flag-red/10 text-flag-red hover:bg-flag-red/20 transition-colors disabled:opacity-50"
                     title="Remove coach"
                   >
@@ -505,19 +517,20 @@ export default function TeamRosterPage({
             </div>
             <button
               onClick={addCoach}
-              disabled={coachBusy || !selectedCoachAppId}
+              disabled={busy || !selectedCoachAppId}
               className="inline-flex items-center gap-2 bg-flag-blue text-white px-5 py-2 rounded-full text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors disabled:opacity-50"
             >
               <Plus size={16} />
-              {coachBusy ? "Adding..." : "Add Coach"}
+              {busy ? "Adding..." : "Add Coach"}
             </button>
           </div>
           {coachWarning && (
             <div className="mt-3 bg-star-gold/10 border border-star-gold/30 text-charcoal text-xs px-3 py-2 rounded-xl">
-              <span className="font-semibold">{coachWarning} </span>
+              <span className="font-semibold">Not added — </span>
+              {coachWarning}{" "}
               <Link
                 href="/admin/invites"
-                className="text-flag-blue font-semibold hover:underline"
+                className="text-flag-blue font-semibold hover:underline underline"
               >
                 Go to invites
               </Link>
