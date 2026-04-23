@@ -46,7 +46,7 @@ export default function TeamRosterPage({
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
-  const [busyId, setBusyId] = useState<string | null>(null);
+  const [busy, setBusy] = useState(false);
 
   useEffect(() => {
     if (!supabase) {
@@ -117,8 +117,8 @@ export default function TeamRosterPage({
   }
 
   async function moveToTeam(player: Player) {
-    if (!supabase || !team) return;
-    setBusyId(player.id);
+    if (!supabase || !team || busy) return;
+    setBusy(true);
     // Optimistic move
     setPool((prev) => prev.filter((p) => p.id !== player.id));
     setRoster((prev) =>
@@ -136,12 +136,12 @@ export default function TeamRosterPage({
       setError(upErr.message);
       await fetchAll();
     }
-    setBusyId(null);
+    setBusy(false);
   }
 
   async function removeFromTeam(player: Player) {
-    if (!supabase || !team) return;
-    setBusyId(player.id);
+    if (!supabase || !team || busy) return;
+    setBusy(true);
     // Optimistic move
     setRoster((prev) => prev.filter((p) => p.id !== player.id));
     setPool((prev) =>
@@ -159,7 +159,7 @@ export default function TeamRosterPage({
       setError(upErr.message);
       await fetchAll();
     }
-    setBusyId(null);
+    setBusy(false);
   }
 
   const q = search.trim().toLowerCase();
@@ -167,7 +167,9 @@ export default function TeamRosterPage({
     () =>
       q
         ? roster.filter((p) =>
-            `${p.player_first_name} ${p.player_last_name}`.toLowerCase().includes(q)
+            `${p.player_first_name} ${p.player_last_name} ${p.parent_name}`
+              .toLowerCase()
+              .includes(q)
           )
         : roster,
     [roster, q]
@@ -176,7 +178,9 @@ export default function TeamRosterPage({
     () =>
       q
         ? pool.filter((p) =>
-            `${p.player_first_name} ${p.player_last_name}`.toLowerCase().includes(q)
+            `${p.player_first_name} ${p.player_last_name} ${p.parent_name}`
+              .toLowerCase()
+              .includes(q)
           )
         : pool,
     [pool, q]
@@ -298,7 +302,7 @@ export default function TeamRosterPage({
             type="text"
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            placeholder="Search by player name..."
+            placeholder="Search by player or parent name..."
             className="w-full border border-gray-200 rounded-xl pl-9 pr-3 py-2 text-sm text-charcoal placeholder:text-gray-300 focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
           />
         </div>
@@ -341,7 +345,7 @@ export default function TeamRosterPage({
                 <PlayerRow
                   key={p.id}
                   player={p}
-                  busy={busyId === p.id}
+                  busy={busy}
                   actionLabel="Remove"
                   actionIcon={<Minus size={12} />}
                   actionStyle="bg-flag-red/10 text-flag-red hover:bg-flag-red/20"
@@ -384,7 +388,7 @@ export default function TeamRosterPage({
                 <PlayerRow
                   key={p.id}
                   player={p}
-                  busy={busyId === p.id}
+                  busy={busy}
                   actionLabel="Add"
                   actionIcon={<Plus size={12} />}
                   actionStyle="bg-flag-blue text-white hover:bg-flag-blue/90"
