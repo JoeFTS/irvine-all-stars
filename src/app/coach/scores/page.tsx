@@ -59,6 +59,7 @@ export default function CoachScoresPage() {
     async function load() {
       if (!supabase || !user) return;
 
+      // Division-scoped (not team): evaluator scores cover the whole division.
       const { data: profileData } = await supabase
         .from("profiles")
         .select("division, full_name")

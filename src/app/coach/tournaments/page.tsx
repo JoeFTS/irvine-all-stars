@@ -78,7 +78,7 @@ export default function CoachTournamentsPage() {
     async function load() {
       if (!supabase || !user) return;
 
-      // 1. Get coach's division
+      // 1. Get coach's division. Division-scoped (not team): tournaments span the whole division.
       const { data: profile } = await supabase
         .from("profiles")
         .select("division")

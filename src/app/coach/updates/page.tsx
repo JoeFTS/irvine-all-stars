@@ -29,7 +29,7 @@ export default function CoachUpdatesPage() {
         return;
       }
 
-      // Get coach's division
+      // Division-scoped (not team): announcements apply to the whole division.
       let division: string | null = null;
       if (role !== "admin") {
         const { data: profile } = await supabase
