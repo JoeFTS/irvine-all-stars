@@ -156,6 +156,7 @@ export default function TournamentRulesPage() {
   useEffect(() => {
     async function loadCoachDivision() {
       if (!supabase || !user || divisionLoaded) return;
+      // Division-scoped (not team): tournament rule sets differ by age group.
       const { data } = await supabase
         .from("profiles")
         .select("division")

@@ -58,6 +58,7 @@ export default function CornerTournamentsPage() {
     async function load() {
       if (!supabase || !user) return;
 
+      // Division-scoped (not team): tournaments span the whole division.
       const { data: profile } = await supabase
         .from("profiles")
         .select("division")

@@ -21,6 +21,7 @@ interface Registration {
   player_name: string;
   player_date_of_birth: string | null;
   division: string;
+  team_id: string | null;
   primary_position: string;
   status: string;
   submitted_at: string;
@@ -156,6 +157,7 @@ export default function PortalPage() {
   const router = useRouter();
   const { user, loading: authLoading } = useAuth();
   const [registrations, setRegistrations] = useState<Registration[]>([]);
+  const [teams, setTeams] = useState<Map<string, { team_name: string; division: string }>>(new Map());
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
   const [documents, setDocuments] = useState<PlayerDocument[]>([]);
   const [contracts, setContracts] = useState<PlayerContract[]>([]);
@@ -289,13 +291,30 @@ export default function PortalPage() {
       const { data: regs } = await supabase!
         .from("tryout_registrations")
         .select(
-          "id, parent_name, parent_email, player_first_name, player_last_name, player_date_of_birth, division, primary_position, status, submitted_at, secondary_parent_name, secondary_parent_email, secondary_parent_phone, volunteer_acknowledged, volunteer_acknowledged_at"
+          "id, parent_name, parent_email, player_first_name, player_last_name, player_date_of_birth, division, team_id, primary_position, status, submitted_at, secondary_parent_name, secondary_parent_email, secondary_parent_phone, volunteer_acknowledged, volunteer_acknowledged_at"
         )
         .or(`parent_email.eq.${user!.email},secondary_parent_email.eq.${user!.email}`)
         .order("submitted_at", { ascending: false });
 
       const regData = (regs ?? []) as Registration[];
       setRegistrations(regData);
+
+      // Fetch team names for any registrations that have been drafted to a team
+      const teamIds = [...new Set(regData.map((r) => r.team_id).filter((id): id is string => !!id))];
+      const teamMap = new Map<string, { team_name: string; division: string }>();
+      if (teamIds.length > 0) {
+        const { data: teamData } = await supabase!
+          .from("teams")
+          .select("id, team_name, division")
+          .in("id", teamIds);
+        for (const t of (teamData ?? [])) {
+          teamMap.set(t.id as string, {
+            team_name: t.team_name as string,
+            division: t.division as string,
+          });
+        }
+      }
+      setTeams(teamMap);
 
       // Fetch compliance data (documents + contracts) for all registrations
       if (regData.length > 0) {
@@ -610,10 +629,27 @@ export default function PortalPage() {
                         <StatusBadge status={reg.status} />
                       )}
                     </div>
+                    {reg.team_id && teams.get(reg.team_id) && (
+                      <div className="mb-2 inline-flex items-center gap-2 bg-green-50 border border-green-200 rounded-full px-3 py-1 text-xs">
+                        <svg className="w-3.5 h-3.5 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2.5}>
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
+                        </svg>
+                        <span className="font-semibold text-green-700">
+                          Drafted to: {teams.get(reg.team_id)!.team_name}
+                        </span>
+                      </div>
+                    )}
                     <div className="flex flex-wrap gap-x-6 gap-y-1 text-sm text-gray-600">
                       <span>
                         <span className="font-semibold text-charcoal">Division:</span>{" "}
-                        {reg.division}
+                        {reg.team_id && teams.get(reg.team_id) ? (
+                          <>
+                            <span className="font-semibold">{teams.get(reg.team_id)!.team_name}</span>
+                            <span className="text-gray-400 ml-1">({reg.division})</span>
+                          </>
+                        ) : (
+                          reg.division
+                        )}
                       </span>
                       {reg.primary_position && (
                         <span>
@@ -940,9 +976,16 @@ export default function PortalPage() {
                         <h3 className="font-display text-xl font-bold uppercase tracking-wide">
                           {`${reg.player_first_name || ""} ${reg.player_last_name || ""}`.trim() || "Unknown Player"}
                         </h3>
-                        <span className="inline-block text-xs uppercase tracking-wider px-2.5 py-1 rounded border font-display font-semibold bg-flag-blue/10 text-flag-blue border-flag-blue/30">
-                          {reg.division}
-                        </span>
+                        {reg.team_id && teams.get(reg.team_id) ? (
+                          <span className="inline-block text-xs uppercase tracking-wider px-2.5 py-1 rounded border font-display font-semibold bg-green-50 text-green-700 border-green-300">
+                            {teams.get(reg.team_id)!.team_name}
+                            <span className="text-green-600/60 normal-case ml-1">({reg.division})</span>
+                          </span>
+                        ) : (
+                          <span className="inline-block text-xs uppercase tracking-wider px-2.5 py-1 rounded border font-display font-semibold bg-flag-blue/10 text-flag-blue border-flag-blue/30">
+                            {reg.division}
+                          </span>
+                        )}
                       </div>
                       {allDone ? (
                         <span className="inline-flex items-center gap-1.5 text-xs font-display font-semibold uppercase tracking-wider text-green-700 bg-green-50 border border-green-300 px-2.5 py-1 rounded">
