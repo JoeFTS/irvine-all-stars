@@ -1,0 +1,21 @@
+{
+  "scenario_s1_s2": "team isolation + undrafted pool sharing",
+  "division": "10U-Mustang",
+  "staged_drafts": {
+    "gray_team_5341084b": ["Brinnon","Chen","Dennis"],
+    "white_team_723f37c4": ["Kincade","Liu","Ludwig"],
+    "undrafted": ["Ly","Mejia","Scholl","Stites","Strelzow","Tsang","Xiang"]
+  },
+  "rrstites_gray_coach_sees": {
+    "own_team_drafted": ["Brinnon","Chen","Dennis"],
+    "undrafted_pool": ["Ly","Mejia","Scholl","Stites","Strelzow","Tsang","Xiang"],
+    "white_team_visible": []
+  },
+  "tynerkincade_white_coach_sees": {
+    "own_team_drafted": ["Kincade","Liu","Ludwig"],
+    "undrafted_pool": ["Ly","Mejia","Scholl","Stites","Strelzow","Tsang","Xiang"],
+    "gray_team_visible": []
+  },
+  "result_s1": "PASS - no cross-team leak; each coach sees only own team drafted",
+  "result_s2": "PASS - identical 7-player undrafted pool for both"
+}

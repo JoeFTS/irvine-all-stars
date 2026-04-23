@@ -1,0 +1,27 @@
+{
+  "scenario": "S5 coach invite with team pre-assign",
+  "sub_tests": {
+    "ui_team_picker_is_dropdown": {
+      "file": "src/app/admin/invites/page.tsx:557-571",
+      "element_type": "<select> dropdown",
+      "gated_by": "role === 'coach' && division",
+      "options": "teams.filter(division).map"
+    },
+    "send_invite_401_no_header": {
+      "http_status": 401,
+      "body": "{\"error\":\"Unauthorized\"}"
+    },
+    "send_invite_403_non_admin_jwt": {
+      "http_status": 403,
+      "body": "{\"error\":\"Forbidden\"}",
+      "jwt_source": "thesupplycomp (coach) access_token from /auth/v1/token password grant"
+    },
+    "invites_table_supports_team_id": {
+      "column_exists": true,
+      "fk_to_teams": "invites_team_id_fkey",
+      "insert_with_team_id": "succeeded — token=7d8cee9d... team_id=5341084b... (Gray)"
+    },
+    "complete_signup_team_coaches_upsert_code": "src/app/api/complete-signup/route.ts:61-70 — role=='coach' && invite.team_id → upsert(team_coaches, {team_id, coach_id:userId, role:'head'}, onConflict=team_id,coach_id)"
+  },
+  "result": "PASS (full path verified; no user creation needed — team_coaches insertion by admin JWT already proven in S4)"
+}

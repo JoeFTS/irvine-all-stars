@@ -1,0 +1,16 @@
+{
+  "scenario": "S3 multi-team coach",
+  "coach": "thesupplycomp@gmail.com (0e30f59e-8a0c-4a4c-b80d-45efb12b8b8d)",
+  "added_team": "Mustang 9U White (dc626a84) as assistant",
+  "existing_team": "Bronco 12U Red (c72e4613) as head",
+  "coach_divisions_returned": ["12U-Bronco", "9U-Mustang"],
+  "useCoachTeams_hook_would_return": [
+    {"role": "head", "team_name": "Bronco 12U Red", "division": "12U-Bronco"},
+    {"role": "assistant", "team_name": "Mustang 9U White", "division": "9U-Mustang"}
+  ],
+  "undrafted_pool_visible": {
+    "12U-Bronco": 51,
+    "9U-Mustang": 2
+  },
+  "result": "PASS - coach_divisions returns both divs; 2 teams in tab-source query; pool spans both divs"
+}

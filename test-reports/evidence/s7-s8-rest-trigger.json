@@ -1,0 +1,27 @@
+{
+  "scenario_s7": {
+    "name": "RLS at REST layer (coach JWT)",
+    "jwt_coach": "thesupplycomp@gmail.com (coach of Bronco 12U Red, parent of Max)",
+    "rest_query": "GET /rest/v1/tryout_registrations",
+    "content_range": "0-0/51",
+    "grouping": [{"division": "12U-Bronco", "total": 51, "drafted": 0, "undrafted": 51}],
+    "expected_vs_observed": "Expected own-team (0) + undrafted 12U-Bronco (51) = 51. Observed 51. No leakage across divisions.",
+    "result": "PASS"
+  },
+  "scenario_s8": {
+    "name": "Trigger blocks team_id mutation",
+    "coach_patch_team_id": {
+      "endpoint": "PATCH /rest/v1/tryout_registrations?id=eq.<Max>",
+      "body": "{\"team_id\": \"<BroncoRed>\"}",
+      "response": {"code": "42501", "message": "Only admins may change team_id on tryout_registrations"},
+      "post_state_team_id": null
+    },
+    "admin_management_api_patch": {
+      "endpoint": "Supabase Management API /database/query",
+      "verb": "UPDATE SET team_id=...",
+      "succeeded": true,
+      "reverted_after": true
+    },
+    "result": "PASS"
+  }
+}

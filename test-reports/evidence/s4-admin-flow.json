@@ -1,0 +1,24 @@
+{
+  "scenario": "S4 admin team assignment flow",
+  "sub_tests": {
+    "draft_player_via_admin_jwt": {
+      "player": "Ly (6cf75f1e)",
+      "target_team": "Mustang 10U White",
+      "update_passed": true,
+      "verified_state": true
+    },
+    "undraft_player_via_admin_jwt": {
+      "result": "team_id -> NULL succeeded"
+    },
+    "insert_team_coaches_via_admin_jwt": {
+      "result": "INSERT + DELETE both succeed"
+    },
+    "create_team_with_auto_team_coaches": {
+      "inserted_team_id": "3cee537f (TEST-DELETE-ME, 10U-Mustang)",
+      "mirror_insert_into_team_coaches": "rrstites as head — succeeded",
+      "delete_cascade": "team delete → team_coaches row auto-removed (PK CASCADE)"
+    },
+    "search_filter": "client-side filter over first+last+parent_name (src/app/admin/teams/[teamId]/roster/page.tsx:283-305) - deterministic given data"
+  },
+  "result": "PASS"
+}

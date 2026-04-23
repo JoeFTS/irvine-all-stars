@@ -1,0 +1,18 @@
+{
+  "scenario": "S6 parent portal team pill",
+  "player": "Max Hernandez (75b902eb)",
+  "account": "thesupplycomp@gmail.com (parent+coach combined)",
+  "drafted_state": {
+    "staged_team_id": "c72e4613 (Bronco 12U Red)",
+    "ui_pill_text": "Drafted to: Bronco 12U Red",
+    "division_line": "Division: Bronco 12U Red (12U-Bronco)",
+    "screenshot": "evidence/s6-portal-drafted.png"
+  },
+  "undrafted_state": {
+    "team_id": null,
+    "ui_pill_text": null,
+    "division_line": "Division: 12U-Bronco",
+    "screenshot": "evidence/s6-portal-undrafted.png"
+  },
+  "result": "PASS"
+}
