@@ -24,7 +24,7 @@ export async function POST(request: NextRequest) {
 
     const { data: invite, error: inviteErr } = await supabase
       .from("invites")
-      .select("id, email, role, division, parent_name, child_first_name, child_last_name, current_team, used, expires_at")
+      .select("id, email, role, division, parent_name, child_first_name, child_last_name, current_team, used, expires_at, team_id")
       .eq("token", token)
       .single();
 
@@ -56,6 +56,18 @@ export async function POST(request: NextRequest) {
     }
 
     await supabase.from("invites").update({ used: true }).eq("token", token);
+
+    // If this is a coach invite pre-assigned to a team, link them in team_coaches.
+    if (invite.role === "coach" && invite.team_id) {
+      const { error: tcErr } = await supabase
+        .from("team_coaches")
+        .upsert(
+          { team_id: invite.team_id, coach_id: userId, role: "head" },
+          { onConflict: "team_id,coach_id" }
+        );
+      if (tcErr) console.error("team_coaches insert error:", tcErr);
+      // Don't fail the signup — admin can fix via roster manager.
+    }
 
     const childrenNames: string[] = [];
 

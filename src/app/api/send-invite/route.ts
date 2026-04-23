@@ -114,7 +114,7 @@ ${childLine}<p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0 0 24
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json();
-    const { email, role, division, parent_name, child_first_name, child_last_name, children, current_team } = body;
+    const { email, role, division, parent_name, child_first_name, child_last_name, children, current_team, team_id } = body;
 
     if (!email || !role || !["coach", "parent"].includes(role)) {
       return NextResponse.json(
@@ -135,6 +135,7 @@ export async function POST(request: NextRequest) {
       // 1. Create the coach invite record
       const coachInsert: Record<string, string> = { email, role: "coach" };
       if (division) coachInsert.division = division;
+      if (team_id) coachInsert.team_id = team_id;
 
       const { data: coachInvite, error: coachErr } = await supabase
         .from("invites")
@@ -306,6 +307,7 @@ export async function POST(request: NextRequest) {
     if (child_first_name) insertData.child_first_name = child_first_name;
     if (child_last_name) insertData.child_last_name = child_last_name;
     if (current_team) insertData.current_team = current_team;
+    if (team_id && role === "coach") insertData.team_id = team_id;
 
     const { data: invite, error: insertError } = await supabase
       .from("invites")
