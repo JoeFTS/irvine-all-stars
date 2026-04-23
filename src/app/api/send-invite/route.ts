@@ -113,6 +113,32 @@ ${childLine}<p style="color:#4B5563;font-size:16px;line-height:1.6;margin:0 0 24
 
 export async function POST(request: NextRequest) {
   try {
+    if (!supabase) {
+      return NextResponse.json(
+        { error: "Supabase not configured" },
+        { status: 500 }
+      );
+    }
+
+    // Auth-gate: require admin
+    const authHeader = request.headers.get("authorization");
+    const accessToken = authHeader?.replace(/^Bearer\s+/i, "");
+    if (!accessToken) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const { data: { user }, error: userErr } = await supabase.auth.getUser(accessToken);
+    if (userErr || !user) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+    const { data: profile } = await supabase
+      .from("profiles")
+      .select("role")
+      .eq("id", user.id)
+      .single();
+    if (profile?.role !== "admin") {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+
     const body = await request.json();
     const { email, role, division, parent_name, child_first_name, child_last_name, children, current_team, team_id } = body;
 
@@ -120,13 +146,6 @@ export async function POST(request: NextRequest) {
       return NextResponse.json(
         { error: "Missing or invalid required fields: email, role (coach | parent)" },
         { status: 400 }
-      );
-    }
-
-    if (!supabase) {
-      return NextResponse.json(
-        { error: "Supabase not configured" },
-        { status: 500 }
       );
     }
 

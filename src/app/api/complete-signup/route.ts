@@ -55,9 +55,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "Failed to create profile" }, { status: 500 });
     }
 
-    await supabase.from("invites").update({ used: true }).eq("token", token);
-
     // If this is a coach invite pre-assigned to a team, link them in team_coaches.
+    // Done BEFORE marking the invite used so a failure here leaves the invite
+    // re-usable on retry instead of stranding the user with a consumed token.
     if (invite.role === "coach" && invite.team_id) {
       const { error: tcErr } = await supabase
         .from("team_coaches")
@@ -68,6 +68,8 @@ export async function POST(request: NextRequest) {
       if (tcErr) console.error("team_coaches insert error:", tcErr);
       // Don't fail the signup — admin can fix via roster manager.
     }
+
+    await supabase.from("invites").update({ used: true }).eq("token", token);
 
     const childrenNames: string[] = [];
 

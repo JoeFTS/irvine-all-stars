@@ -239,6 +239,14 @@ export default function AdminInvitesPage() {
     setSending(true);
 
     try {
+      const { data: { session } } = await supabase!.auth.getSession();
+      const accessToken = session?.access_token;
+      if (!accessToken) {
+        setMessage({ type: "error", text: "Not signed in. Please refresh and log in again." });
+        setSending(false);
+        return;
+      }
+
       const payload: Record<string, unknown> = { email, role };
       if (role === "coach") {
         if (division) payload.division = division;
@@ -261,7 +269,10 @@ export default function AdminInvitesPage() {
 
       const res = await fetch("/api/send-invite", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${accessToken}`,
+        },
         body: JSON.stringify(payload),
       });
 
@@ -291,6 +302,13 @@ export default function AdminInvitesPage() {
   async function handleResend(invite: Invite) {
     setMessage(null);
     try {
+      const { data: { session } } = await supabase!.auth.getSession();
+      const accessToken = session?.access_token;
+      if (!accessToken) {
+        setMessage({ type: "error", text: "Not signed in. Please refresh and log in again." });
+        return;
+      }
+
       const payload: Record<string, string> = { email: invite.email, role: invite.role };
       if (invite.division) payload.division = invite.division;
       if (invite.parent_name) payload.parent_name = invite.parent_name;
@@ -299,7 +317,10 @@ export default function AdminInvitesPage() {
 
       const res = await fetch("/api/send-invite", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${accessToken}`,
+        },
         body: JSON.stringify(payload),
       });
 
@@ -364,6 +385,14 @@ export default function AdminInvitesPage() {
       duplicates = 0,
       failed = 0;
 
+    const { data: { session } } = await supabase!.auth.getSession();
+    const accessToken = session?.access_token;
+    if (!accessToken) {
+      setCsvSending(false);
+      setCsvResults({ sent: 0, duplicates: 0, failed: csvRows.length });
+      return;
+    }
+
     const updatedRows = [...csvRows];
 
     for (let i = 0; i < updatedRows.length; i++) {
@@ -372,7 +401,10 @@ export default function AdminInvitesPage() {
       try {
         const res = await fetch("/api/send-invite", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${accessToken}`,
+          },
           body: JSON.stringify({
             email: row.parent_email,
             role: "parent",
