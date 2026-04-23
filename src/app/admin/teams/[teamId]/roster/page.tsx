@@ -2,7 +2,7 @@
 
 import { useEffect, useMemo, useState, use } from "react";
 import Link from "next/link";
-import { ArrowLeft, ChevronRight, Plus, Minus, Search, Users } from "lucide-react";
+import { ArrowLeft, ChevronRight, Plus, Minus, Search, Users, UserPlus, X } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { HelpTooltip } from "@/components/help-tooltip";
 
@@ -29,6 +29,16 @@ interface CoachAssignment {
   profile: { full_name: string | null; email: string };
 }
 
+interface CoachApplication {
+  id: string;
+  full_name: string;
+  email: string;
+  division_preference: string;
+  status: string;
+}
+
+type CoachRole = "head" | "assistant";
+
 const PLAYER_COLS =
   "id, player_first_name, player_last_name, jersey_number, primary_position, parent_name, status";
 
@@ -41,12 +51,20 @@ export default function TeamRosterPage({
 
   const [team, setTeam] = useState<Team | null>(null);
   const [coaches, setCoaches] = useState<CoachAssignment[]>([]);
+  const [acceptedCoachApps, setAcceptedCoachApps] = useState<CoachApplication[]>([]);
   const [roster, setRoster] = useState<Player[]>([]);
   const [pool, setPool] = useState<Player[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [busy, setBusy] = useState(false);
+
+  // Add-coach form state
+  const [selectedCoachAppId, setSelectedCoachAppId] = useState("");
+  const [selectedRole, setSelectedRole] = useState<CoachRole>("assistant");
+  const [coachBusy, setCoachBusy] = useState(false);
+  const [coachWarning, setCoachWarning] = useState<string | null>(null);
+  const [removingCoachId, setRemovingCoachId] = useState<string | null>(null);
 
   useEffect(() => {
     if (!supabase) {
@@ -75,7 +93,7 @@ export default function TeamRosterPage({
     }
     setTeam(teamRow);
 
-    const [rosterRes, poolRes, coachesRes] = await Promise.all([
+    const [rosterRes, poolRes, coachesRes, coachAppsRes] = await Promise.all([
       supabase
         .from("tryout_registrations")
         .select(PLAYER_COLS)
@@ -93,10 +111,16 @@ export default function TeamRosterPage({
         .from("team_coaches")
         .select("coach_id, role, profile:profiles!team_coaches_coach_id_fkey(full_name, email)")
         .eq("team_id", teamRow.id),
+      supabase
+        .from("coach_applications")
+        .select("id, full_name, email, division_preference, status")
+        .eq("status", "accepted")
+        .order("full_name"),
     ]);
 
     if (rosterRes.data) setRoster(rosterRes.data as Player[]);
     if (poolRes.data) setPool(poolRes.data as Player[]);
+    if (coachAppsRes.data) setAcceptedCoachApps(coachAppsRes.data as CoachApplication[]);
     if (coachesRes.data) {
       // Supabase typed join may return profile as array; normalize to single object.
       const normalized: CoachAssignment[] = (coachesRes.data as unknown as Array<{
@@ -161,6 +185,88 @@ export default function TeamRosterPage({
     }
     setBusy(false);
   }
+
+  async function addCoach() {
+    if (!supabase || !team || coachBusy || !selectedCoachAppId) return;
+    setCoachBusy(true);
+    setCoachWarning(null);
+
+    const app = acceptedCoachApps.find((a) => a.id === selectedCoachAppId);
+    if (!app) {
+      setCoachBusy(false);
+      return;
+    }
+
+    // Look up profile by email (case-insensitive)
+    const { data: profile, error: profErr } = await supabase
+      .from("profiles")
+      .select("id")
+      .ilike("email", app.email)
+      .maybeSingle();
+
+    if (profErr) {
+      setError(profErr.message);
+      setCoachBusy(false);
+      return;
+    }
+
+    if (!profile) {
+      setCoachWarning(
+        `${app.full_name} (${app.email}) hasn't created an account yet. Send them an invite first.`
+      );
+      setCoachBusy(false);
+      return;
+    }
+
+    const { error: insErr } = await supabase.from("team_coaches").insert({
+      team_id: team.id,
+      coach_id: profile.id,
+      role: selectedRole,
+    });
+
+    if (insErr) {
+      setError(insErr.message);
+    } else {
+      setSelectedCoachAppId("");
+      setSelectedRole("assistant");
+    }
+    await fetchAll();
+    setCoachBusy(false);
+  }
+
+  async function removeCoach(coachId: string) {
+    if (!supabase || !team || coachBusy) return;
+    setCoachBusy(true);
+    setCoachWarning(null);
+
+    const { error: delErr } = await supabase
+      .from("team_coaches")
+      .delete()
+      .eq("team_id", team.id)
+      .eq("coach_id", coachId);
+
+    if (delErr) {
+      setError(delErr.message);
+    }
+    setRemovingCoachId(null);
+    await fetchAll();
+    setCoachBusy(false);
+  }
+
+  // Filter out coach apps whose underlying profile is already assigned.
+  // We can't know the profile id at filter time without an extra fetch, so we
+  // filter by email match against current assignments (case-insensitive).
+  const assignedEmails = useMemo(
+    () => new Set(coaches.map((c) => c.profile.email.toLowerCase())),
+    [coaches]
+  );
+  const availableCoachApps = useMemo(
+    () =>
+      acceptedCoachApps.filter(
+        (a) => !assignedEmails.has(a.email.toLowerCase())
+      ),
+    [acceptedCoachApps, assignedEmails]
+  );
 
   const q = search.trim().toLowerCase();
   const filteredRoster = useMemo(
@@ -271,25 +377,154 @@ export default function TeamRosterPage({
           <span className="inline-block px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide bg-flag-blue/10 text-flag-blue">
             {team.division}
           </span>
-          {coaches.length === 0 ? (
-            <span className="text-xs text-star-gold font-semibold">
-              No coaches assigned
-            </span>
-          ) : (
-            <span className="text-xs text-gray-500">
-              Coach{coaches.length > 1 ? "es" : ""}:{" "}
-              {coaches
-                .map(
-                  (c) =>
-                    `${c.profile.full_name ?? c.profile.email}${
-                      c.role === "assistant" ? " (asst)" : ""
-                    }`
-                )
-                .join(", ")}
-            </span>
-          )}
         </div>
       </div>
+
+      {/* Coaches section */}
+      <section className="bg-white border border-gray-200 rounded-2xl p-4 md:p-5 mb-5">
+        <header className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-2">
+            <UserPlus size={16} className="text-flag-blue" />
+            <h2 className="font-display text-sm font-semibold uppercase tracking-wider text-gray-400">
+              Coaches
+            </h2>
+          </div>
+          <span className="text-xs font-bold text-charcoal">
+            {coaches.length}
+          </span>
+        </header>
+
+        {coaches.length === 0 ? (
+          <p className="text-xs text-star-gold font-semibold mb-3">
+            No coaches assigned to this team yet.
+          </p>
+        ) : (
+          <ul className="divide-y divide-gray-100 mb-4">
+            {coaches.map((c) => (
+              <li
+                key={c.coach_id}
+                className="py-2.5 flex items-center gap-3"
+              >
+                <div className="flex-1 min-w-0">
+                  <div className="flex flex-wrap items-center gap-2">
+                    <span className="font-semibold text-sm text-charcoal truncate">
+                      {c.profile.full_name ?? c.profile.email}
+                    </span>
+                    <span
+                      className={`px-1.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide ${
+                        c.role === "head"
+                          ? "bg-flag-blue/10 text-flag-blue"
+                          : "bg-gray-100 text-gray-600"
+                      }`}
+                    >
+                      {c.role === "head" ? "Head" : "Asst"}
+                    </span>
+                  </div>
+                  <div className="text-[11px] text-gray-400 mt-0.5 truncate">
+                    {c.profile.email}
+                  </div>
+                </div>
+                {removingCoachId === c.coach_id ? (
+                  <div className="shrink-0 flex items-center gap-2">
+                    <span className="text-xs text-flag-red font-semibold">
+                      Remove?
+                    </span>
+                    <button
+                      onClick={() => removeCoach(c.coach_id)}
+                      disabled={coachBusy}
+                      className="px-2.5 py-1 rounded-full text-xs font-semibold uppercase bg-flag-red text-white hover:bg-flag-red/90 transition-colors disabled:opacity-50"
+                    >
+                      Yes
+                    </button>
+                    <button
+                      onClick={() => setRemovingCoachId(null)}
+                      disabled={coachBusy}
+                      className="px-2.5 py-1 rounded-full text-xs font-semibold uppercase bg-gray-100 text-gray-600 hover:bg-gray-200 transition-colors disabled:opacity-50"
+                    >
+                      No
+                    </button>
+                  </div>
+                ) : (
+                  <button
+                    onClick={() => {
+                      setRemovingCoachId(c.coach_id);
+                      setCoachWarning(null);
+                    }}
+                    disabled={coachBusy}
+                    className="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide bg-flag-red/10 text-flag-red hover:bg-flag-red/20 transition-colors disabled:opacity-50"
+                    title="Remove coach"
+                  >
+                    <X size={12} />
+                    Remove
+                  </button>
+                )}
+              </li>
+            ))}
+          </ul>
+        )}
+
+        {/* Add coach form */}
+        <div className="border-t border-gray-100 pt-3">
+          <div className="flex flex-col sm:flex-row flex-wrap gap-3 items-end">
+            <div className="flex-1 min-w-[200px]">
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                Coach
+              </label>
+              <select
+                value={selectedCoachAppId}
+                onChange={(e) => {
+                  setSelectedCoachAppId(e.target.value);
+                  setCoachWarning(null);
+                }}
+                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+              >
+                <option value="">
+                  {availableCoachApps.length === 0
+                    ? "No more accepted coaches available"
+                    : "Select accepted coach..."}
+                </option>
+                {availableCoachApps.map((c) => (
+                  <option key={c.id} value={c.id}>
+                    {c.full_name} — {c.email} ({c.division_preference})
+                  </option>
+                ))}
+              </select>
+            </div>
+            <div className="min-w-[140px]">
+              <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1">
+                Role
+              </label>
+              <select
+                value={selectedRole}
+                onChange={(e) => setSelectedRole(e.target.value as CoachRole)}
+                className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
+              >
+                <option value="head">Head</option>
+                <option value="assistant">Assistant</option>
+              </select>
+            </div>
+            <button
+              onClick={addCoach}
+              disabled={coachBusy || !selectedCoachAppId}
+              className="inline-flex items-center gap-2 bg-flag-blue text-white px-5 py-2 rounded-full text-sm font-semibold uppercase tracking-wide hover:bg-flag-blue/90 transition-colors disabled:opacity-50"
+            >
+              <Plus size={16} />
+              {coachBusy ? "Adding..." : "Add Coach"}
+            </button>
+          </div>
+          {coachWarning && (
+            <div className="mt-3 bg-star-gold/10 border border-star-gold/30 text-charcoal text-xs px-3 py-2 rounded-xl">
+              <span className="font-semibold">{coachWarning} </span>
+              <Link
+                href="/admin/invites"
+                className="text-flag-blue font-semibold hover:underline"
+              >
+                Go to invites
+              </Link>
+            </div>
+          )}
+        </div>
+      </section>
 
       {/* Search */}
       <div className="mb-5">
