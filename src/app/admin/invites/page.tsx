@@ -45,6 +45,13 @@ interface Invite {
   used: boolean;
   created_at: string;
   expires_at: string;
+  team_id: string | null;
+}
+
+interface TeamOption {
+  id: string;
+  team_name: string;
+  division: string;
 }
 
 interface CsvRow {
@@ -175,6 +182,8 @@ export default function AdminInvitesPage() {
   const [email, setEmail] = useState("");
   const [role, setRole] = useState<"coach" | "parent">("coach");
   const [division, setDivision] = useState<string>("");
+  const [teamId, setTeamId] = useState<string>("");
+  const [teams, setTeams] = useState<TeamOption[]>([]);
   const [parentName, setParentName] = useState("");
   const [children, setChildren] = useState<ChildEntry[]>([emptyChild()]);
   const [coachIsParent, setCoachIsParent] = useState(false);
@@ -206,15 +215,42 @@ export default function AdminInvitesPage() {
     fetchInvites();
   }, [fetchInvites]);
 
+  // Load teams once for the optional team picker
+  useEffect(() => {
+    if (!supabase) return;
+    supabase
+      .from("teams")
+      .select("id, team_name, division")
+      .order("division")
+      .order("team_name")
+      .then(({ data }) => {
+        if (data) setTeams(data as TeamOption[]);
+      });
+  }, []);
+
+  // Reset team selection when division changes (team list is filtered by division)
+  useEffect(() => {
+    setTeamId("");
+  }, [division, role]);
+
   async function handleSend(e: React.FormEvent) {
     e.preventDefault();
     setMessage(null);
     setSending(true);
 
     try {
+      const { data: { session } } = await supabase!.auth.getSession();
+      const accessToken = session?.access_token;
+      if (!accessToken) {
+        setMessage({ type: "error", text: "Not signed in. Please refresh and log in again." });
+        setSending(false);
+        return;
+      }
+
       const payload: Record<string, unknown> = { email, role };
       if (role === "coach") {
         if (division) payload.division = division;
+        if (teamId) payload.team_id = teamId;
         if (coachIsParent) {
           payload.children = children.map((c) => ({
             child_first_name: c.firstName,
@@ -233,7 +269,10 @@ export default function AdminInvitesPage() {
 
       const res = await fetch("/api/send-invite", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${accessToken}`,
+        },
         body: JSON.stringify(payload),
       });
 
@@ -245,6 +284,7 @@ export default function AdminInvitesPage() {
       setMessage({ type: "success", text: `Invite sent to ${email}!` });
       setEmail("");
       setDivision("");
+      setTeamId("");
       setParentName("");
       setChildren([emptyChild()]);
       setCoachIsParent(false);
@@ -262,6 +302,13 @@ export default function AdminInvitesPage() {
   async function handleResend(invite: Invite) {
     setMessage(null);
     try {
+      const { data: { session } } = await supabase!.auth.getSession();
+      const accessToken = session?.access_token;
+      if (!accessToken) {
+        setMessage({ type: "error", text: "Not signed in. Please refresh and log in again." });
+        return;
+      }
+
       const payload: Record<string, string> = { email: invite.email, role: invite.role };
       if (invite.division) payload.division = invite.division;
       if (invite.parent_name) payload.parent_name = invite.parent_name;
@@ -270,7 +317,10 @@ export default function AdminInvitesPage() {
 
       const res = await fetch("/api/send-invite", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Authorization": `Bearer ${accessToken}`,
+        },
         body: JSON.stringify(payload),
       });
 
@@ -335,6 +385,14 @@ export default function AdminInvitesPage() {
       duplicates = 0,
       failed = 0;
 
+    const { data: { session } } = await supabase!.auth.getSession();
+    const accessToken = session?.access_token;
+    if (!accessToken) {
+      setCsvSending(false);
+      setCsvResults({ sent: 0, duplicates: 0, failed: csvRows.length });
+      return;
+    }
+
     const updatedRows = [...csvRows];
 
     for (let i = 0; i < updatedRows.length; i++) {
@@ -343,7 +401,10 @@ export default function AdminInvitesPage() {
       try {
         const res = await fetch("/api/send-invite", {
           method: "POST",
-          headers: { "Content-Type": "application/json" },
+          headers: {
+            "Content-Type": "application/json",
+            "Authorization": `Bearer ${accessToken}`,
+          },
           body: JSON.stringify({
             email: row.parent_email,
             role: "parent",
@@ -445,6 +506,7 @@ export default function AdminInvitesPage() {
                 onChange={(e) => {
                   const newRole = e.target.value as "coach" | "parent";
                   setRole(newRole);
+                  setTeamId("");
                   if (newRole === "coach") {
                     setParentName("");
                     setChildren([emptyChild()]);
@@ -482,6 +544,36 @@ export default function AdminInvitesPage() {
               </div>
             )}
           </div>
+
+          {/* Optional team picker — only shown for coach invites once a division is selected */}
+          {role === "coach" && division && (
+            <div className="w-full sm:max-w-md">
+              <label
+                htmlFor="invite-team"
+                className="block text-sm font-semibold text-charcoal uppercase tracking-wide mb-1.5 font-display"
+              >
+                Team (optional)
+              </label>
+              <select
+                id="invite-team"
+                value={teamId}
+                onChange={(e) => setTeamId(e.target.value)}
+                className="w-full border border-gray-200 rounded-xl px-4 py-2.5 text-charcoal bg-white focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue transition-colors"
+              >
+                <option value="">No team yet (assign later on roster page)</option>
+                {teams
+                  .filter((t) => t.division === division)
+                  .map((t) => (
+                    <option key={t.id} value={t.id}>
+                      {t.team_name}
+                    </option>
+                  ))}
+              </select>
+              <p className="text-xs text-gray-500 mt-1">
+                Pre-assigns this coach to a specific team. They&apos;ll be linked automatically when they accept the invite.
+              </p>
+            </div>
+          )}
 
           {/* Coach also a parent? */}
           {role === "coach" && (

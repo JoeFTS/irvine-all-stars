@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
-import { Plus, Trash2, Shield, ShieldCheck, FileText, Pencil, Check, X } from "lucide-react";
+import { Plus, Trash2, Shield, ShieldCheck, FileText, Pencil, Check, X, Users } from "lucide-react";
 import { HelpTooltip } from "@/components/help-tooltip";
 
 interface Team {
@@ -206,11 +206,30 @@ export default function TeamsPage() {
       }
     }
 
-    const { error } = await supabase.from("teams").insert(teamData);
+    const { data: createdTeam, error } = await supabase
+      .from("teams")
+      .insert(teamData)
+      .select("id")
+      .single();
 
     if (error) {
       setCreateError(error.message);
     } else {
+      // Mirror the assignment into team_coaches so coach sees the team via
+      // the team-scoped RLS path. If this fails, surface the error but don't
+      // undo the team creation (admin can fix via the roster manager).
+      if (createdTeam?.id && teamData.coach_id) {
+        const { error: tcErr } = await supabase.from("team_coaches").insert({
+          team_id: createdTeam.id,
+          coach_id: teamData.coach_id,
+          role: "head",
+        });
+        if (tcErr) {
+          setCreateError(
+            `Team created, but failed to add coach to team_coaches: ${tcErr.message}. You can re-add via Manage Roster.`
+          );
+        }
+      }
       setFormTeamName("");
       setFormCoachEmail("");
       await fetchAll();
@@ -638,9 +657,16 @@ export default function TeamsPage() {
                           </div>
                         </div>
 
-                        {/* View Contracts Link */}
-                        {compliance.contractSigned > 0 && (
-                          <div className="mt-3 pt-3 border-t border-gray-100">
+                        {/* Action Links */}
+                        <div className="mt-3 pt-3 border-t border-gray-100 flex flex-wrap gap-2">
+                          <Link
+                            href={`/admin/teams/${team.id}/roster`}
+                            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
+                          >
+                            <Users size={14} />
+                            Manage Roster
+                          </Link>
+                          {compliance.contractSigned > 0 && (
                             <Link
                               href={`/admin/compliance?division=${encodeURIComponent(team.division)}`}
                               className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide bg-flag-blue/10 text-flag-blue hover:bg-flag-blue/20 transition-colors"
@@ -648,8 +674,8 @@ export default function TeamsPage() {
                               <FileText size={14} />
                               View Contracts ({compliance.contractSigned})
                             </Link>
-                          </div>
-                        )}
+                          )}
+                        </div>
                       </>
                     )}
                   </div>

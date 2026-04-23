@@ -18,6 +18,7 @@ import {
   AlertTriangle,
   Camera,
   Download,
+  Users,
 } from "lucide-react";
 import FileUpload from "@/components/file-upload";
 
@@ -30,7 +31,15 @@ interface Registration {
   player_first_name: string;
   player_last_name: string;
   division: string;
+  team_id: string | null;
   status: string;
+}
+
+interface MyTeam {
+  id: string;
+  division: string;
+  team_name: string;
+  role: string;
 }
 
 interface PlayerDocument {
@@ -160,70 +169,164 @@ export default function BinderChecklistPage() {
   const [coachCerts, setCoachCerts] = useState<CoachCertification[]>([]);
   const [assistantCoaches, setAssistantCoaches] = useState<AssistantCoach[]>([]);
   const [loading, setLoading] = useState(true);
+  const [myTeams, setMyTeams] = useState<MyTeam[]>([]);
+  const [teamsLoaded, setTeamsLoaded] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const isAdmin = role === "admin";
+
+  // Fetch coach's team assignments (admins skip — they see all)
+  useEffect(() => {
+    if (!supabase || !user) return;
+    if (isAdmin) {
+      setMyTeams([]);
+      setTeamsLoaded(true);
+      return;
+    }
+    (async () => {
+      const { data, error: err } = await supabase!
+        .from("team_coaches")
+        .select(
+          "role, teams!team_coaches_team_id_fkey ( id, division, team_name )"
+        )
+        .eq("coach_id", user.id);
+      if (err) {
+        setError(err.message);
+        setTeamsLoaded(true);
+        return;
+      }
+      const teams: MyTeam[] = (data ?? []).flatMap((r: unknown) => {
+        const row = r as { role: string; teams: unknown };
+        const t = Array.isArray(row.teams) ? row.teams[0] : row.teams;
+        const team = t as
+          | { id: string; division: string; team_name: string }
+          | null
+          | undefined;
+        return team
+          ? [
+              {
+                id: team.id,
+                division: team.division,
+                team_name: team.team_name,
+                role: row.role,
+              },
+            ]
+          : [];
+      });
+      teams.sort((a, b) => {
+        if (a.role !== b.role) return a.role === "head" ? -1 : 1;
+        return a.team_name.localeCompare(b.team_name);
+      });
+      setMyTeams(teams);
+      setTeamsLoaded(true);
+    })();
+  }, [user, isAdmin]);
 
   useEffect(() => {
     if (!supabase) {
       setLoading(false);
       return;
     }
-    fetchAll();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [user]);
+    if (!teamsLoaded) return;
+    fetchAll(myTeams);
+  }, [teamsLoaded, myTeams, isAdmin, user]);
 
-  async function fetchAll() {
+  async function fetchAll(teams: MyTeam[]) {
     if (!supabase) return;
     setLoading(true);
 
-    // If user is a coach (not admin), find their division from their profile
-    let coachDivision: string | null = null;
-    if (role !== "admin" && user) {
-      const { data: profile } = await supabase
-        .from("profiles")
-        .select("division")
-        .eq("id", user.id)
-        .single();
-      if (profile) {
-        coachDivision = profile.division;
-      }
+    const teamIds = teams.map((t) => t.id);
+    const myDivisions = [...new Set(teams.map((t) => t.division))];
+
+    // Registration queries: admin sees all; coach sees drafted-on-my-teams + undrafted-in-my-divisions.
+    const draftedQuery = isAdmin
+      ? supabase
+          .from("tryout_registrations")
+          .select("id, player_first_name, player_last_name, division, team_id, status")
+          .in("status", ["selected", "alternate"])
+          .order("division")
+          .order("player_last_name")
+      : teamIds.length > 0
+        ? supabase
+            .from("tryout_registrations")
+            .select("id, player_first_name, player_last_name, division, team_id, status")
+            .in("team_id", teamIds)
+            .in("status", ["selected", "alternate"])
+            .order("team_id")
+            .order("player_last_name")
+        : Promise.resolve({ data: [] as Registration[], error: null });
+
+    const undraftedQuery =
+      isAdmin
+        ? Promise.resolve({ data: [] as Registration[], error: null })
+        : myDivisions.length > 0
+          ? supabase
+              .from("tryout_registrations")
+              .select("id, player_first_name, player_last_name, division, team_id, status")
+              .is("team_id", null)
+              .in("division", myDivisions)
+              .in("status", ["selected", "alternate"])
+              .order("division")
+              .order("player_last_name")
+          : Promise.resolve({ data: [] as Registration[], error: null });
+
+    // Team docs: scope to coach's divisions + global (null) docs; admin sees all.
+    let teamDocsQuery = supabase
+      .from("team_documents")
+      .select("id, document_type, file_path, file_name, division, created_at")
+      .in("document_type", [
+        "tournament_rules",
+        "insurance_certificate",
+        "signed_medical_release",
+      ]);
+
+    if (!isAdmin && myDivisions.length > 0) {
+      // Coach sees only docs for their division(s) plus global (division IS NULL) docs.
+      const divList = myDivisions.map((d) => `"${d}"`).join(",");
+      teamDocsQuery = teamDocsQuery.or(
+        `division.is.null,division.in.(${divList})`
+      );
     }
 
-    // Build registrations query, filtered by coach's division if applicable
-    let regsQuery = supabase
-      .from("tryout_registrations")
-      .select("id, player_first_name, player_last_name, division, status")
-      .in("status", ["selected", "alternate"])
-      .order("division")
-      .order("player_last_name");
+    const [draftedRes, undraftedRes, docsRes, teamDocsRes, certsRes, assistantsRes] =
+      await Promise.all([
+        draftedQuery,
+        undraftedQuery,
+        supabase
+          .from("player_documents")
+          .select("id, registration_id, document_type, file_path"),
+        teamDocsQuery,
+        user
+          ? supabase
+              .from("coach_certifications")
+              .select("id, cert_type, cert_file_path")
+              .eq("coach_id", user.id)
+              .in("cert_type", ["concussion", "cardiac_arrest"])
+          : Promise.resolve({ data: [] }),
+        user
+          ? supabase
+              .from("assistant_coaches")
+              .select("*")
+              .eq("head_coach_id", user.id)
+          : Promise.resolve({ data: [] }),
+      ]);
 
-    if (coachDivision) {
-      regsQuery = regsQuery.eq("division", coachDivision);
+    const fetchErr =
+      draftedRes.error ||
+      undraftedRes.error ||
+      docsRes.error ||
+      teamDocsRes.error;
+    if (fetchErr) {
+      setError(fetchErr.message ?? "Failed to load checklist");
+      setLoading(false);
+      return;
     }
 
-    const [regsRes, docsRes, teamDocsRes, certsRes, assistantsRes] = await Promise.all([
-      regsQuery,
-      supabase
-        .from("player_documents")
-        .select("id, registration_id, document_type, file_path"),
-      supabase
-        .from("team_documents")
-        .select("id, document_type, file_path, file_name, division, created_at")
-        .in("document_type", ["tournament_rules", "insurance_certificate", "signed_medical_release"]),
-      user
-        ? supabase
-            .from("coach_certifications")
-            .select("id, cert_type, cert_file_path")
-            .eq("coach_id", user.id)
-            .in("cert_type", ["concussion", "cardiac_arrest"])
-        : Promise.resolve({ data: [] }),
-      user
-        ? supabase
-            .from("assistant_coaches")
-            .select("*")
-            .eq("head_coach_id", user.id)
-        : Promise.resolve({ data: [] }),
-    ]);
+    const draftedRegs = (draftedRes.data ?? []) as Registration[];
+    const undraftedRegs = (undraftedRes.data ?? []) as Registration[];
+    const merged = [...draftedRegs, ...undraftedRegs];
 
-    if (regsRes.data) setRegistrations(regsRes.data);
+    setRegistrations(merged);
     if (docsRes.data) setPlayerDocs(docsRes.data);
     if (teamDocsRes.data) setTeamDocs(teamDocsRes.data);
     if (certsRes.data) setCoachCerts(certsRes.data as CoachCertification[]);
@@ -407,6 +510,38 @@ export default function BinderChecklistPage() {
     );
   }
 
+  if (!isAdmin && myTeams.length === 0) {
+    return (
+      <div className="p-6 md:p-10 space-y-6">
+        <div>
+          <p className="font-display text-sm font-semibold text-flag-red uppercase tracking-[3px] mb-1">
+            Coach
+          </p>
+          <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide flex items-center">
+            Binder Checklist
+            <HelpTooltip
+              text="Track required documents like birth certificates, photos, and contracts for your team."
+              guideUrl="/coach/help"
+            />
+          </h1>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
+          <Users size={32} className="text-gray-300 mx-auto mb-3" />
+          <p className="font-display text-lg font-bold uppercase tracking-wide text-charcoal mb-2">
+            No Team Assigned Yet
+          </p>
+          <p className="text-gray-500 text-sm max-w-md mx-auto">
+            You haven&apos;t been assigned to a team yet. Contact your league
+            admin to get connected to your roster.
+          </p>
+          {error && (
+            <p className="text-xs text-flag-red mt-4">Error: {error}</p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-6 md:p-10 space-y-8">
       {/* ---- Header ---- */}
@@ -426,6 +561,12 @@ export default function BinderChecklistPage() {
           red means action needed.
         </p>
       </div>
+
+      {error && (
+        <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-flag-red">
+          {error}
+        </div>
+      )}
 
       {/* ---- Overall Progress ---- */}
       {registrations.length > 0 && (

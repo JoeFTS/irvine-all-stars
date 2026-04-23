@@ -52,6 +52,9 @@ __pycache__/
 .playwright-mcp/
 test-screenshots/
 
+# screenshot artifacts left in repo root by manual/scripted UI tests
+/*.png
+
 # supabase cli temp
 supabase/.temp/
 

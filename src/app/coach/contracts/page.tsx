@@ -10,6 +10,7 @@ import {
   Calendar,
   Palmtree,
   Search,
+  Users,
 } from "lucide-react";
 
 interface Contract {
@@ -23,10 +24,15 @@ interface Contract {
   signed_at: string;
 }
 
-interface Profile {
-  division: string | null;
+interface MyTeam {
+  id: string;
+  division: string;
+  team_name: string;
   role: string;
 }
+
+const POOL_TAB = "__pool__";
+const ALL_TAB = "__all__";
 
 const DIVISIONS = [
   "All",
@@ -63,61 +69,198 @@ const DIVISION_LABELS: Record<string, string> = {
 export default function CoachContractsPage() {
   const { user, role, loading: authLoading } = useAuth();
   const [contracts, setContracts] = useState<Contract[]>([]);
+  const [accessibleRegIds, setAccessibleRegIds] = useState<Set<string>>(
+    new Set()
+  );
+  const [regTeamMap, setRegTeamMap] = useState<Map<string, string | null>>(
+    new Map()
+  );
   const [loading, setLoading] = useState(true);
-  const [profile, setProfile] = useState<Profile | null>(null);
+  const [myTeams, setMyTeams] = useState<MyTeam[]>([]);
+  const [teamsLoaded, setTeamsLoaded] = useState(false);
+  // For admin: divisionFilter ("All" or specific division). For coach: tab id (team id, POOL_TAB, or ALL_TAB).
   const [divisionFilter, setDivisionFilter] = useState<string>("All");
+  const [teamFilter, setTeamFilter] = useState<string>(ALL_TAB);
   const [search, setSearch] = useState("");
-
-  useEffect(() => {
-    if (authLoading || !user || !supabase) return;
-
-    async function fetchData() {
-      // Get coach profile for division
-      const { data: profileData } = await supabase!
-        .from("profiles")
-        .select("division, role")
-        .eq("id", user!.id)
-        .single();
-
-      const prof = profileData as Profile | null;
-      setProfile(prof);
-
-      // Check URL for division override (admin linking from teams page)
-      const params = new URLSearchParams(window.location.search);
-      const divParam = params.get("division");
-
-      // Admins can see all; coaches see their division only
-      let query = supabase!
-        .from("player_contracts")
-        .select("id, registration_id, player_name, division, parent_name, parent_email, planned_vacations, signed_at")
-        .order("signed_at", { ascending: false });
-
-      if (divParam && prof?.role === "admin") {
-        // Admin linked from teams page with specific division
-        query = query.eq("division", divParam);
-        setDivisionFilter(divParam);
-      } else if (prof?.role !== "admin" && prof?.division) {
-        // Coach: filter to their division
-        query = query.eq("division", prof.division);
-      }
-
-      const { data } = await query;
-      setContracts((data as Contract[]) || []);
-      setLoading(false);
-    }
-
-    fetchData();
-  }, [user, authLoading]);
+  const [error, setError] = useState<string | null>(null);
 
   const isAdmin = role === "admin";
 
+  // Fetch coach's team assignments (skipped for admins).
+  useEffect(() => {
+    if (authLoading || !user || !supabase) return;
+    if (isAdmin) {
+      setMyTeams([]);
+      setTeamsLoaded(true);
+      return;
+    }
+    (async () => {
+      const { data, error: err } = await supabase!
+        .from("team_coaches")
+        .select(
+          "role, teams!team_coaches_team_id_fkey ( id, division, team_name )"
+        )
+        .eq("coach_id", user.id);
+      if (err) {
+        setError(err.message);
+        setTeamsLoaded(true);
+        return;
+      }
+      const teams: MyTeam[] = (data ?? []).flatMap((r: unknown) => {
+        const row = r as { role: string; teams: unknown };
+        const t = Array.isArray(row.teams) ? row.teams[0] : row.teams;
+        const team = t as
+          | { id: string; division: string; team_name: string }
+          | null
+          | undefined;
+        return team
+          ? [
+              {
+                id: team.id,
+                division: team.division,
+                team_name: team.team_name,
+                role: row.role,
+              },
+            ]
+          : [];
+      });
+      teams.sort((a, b) => {
+        if (a.role !== b.role) return a.role === "head" ? -1 : 1;
+        return a.team_name.localeCompare(b.team_name);
+      });
+      setMyTeams(teams);
+      setTeamsLoaded(true);
+    })();
+  }, [user, authLoading, isAdmin]);
+
+  useEffect(() => {
+    if (authLoading || !user || !supabase) return;
+    if (!teamsLoaded) return;
+    fetchAll(myTeams);
+  }, [user, authLoading, teamsLoaded, myTeams, isAdmin]);
+
+  async function fetchAll(teams: MyTeam[]) {
+    if (!supabase) return;
+    setLoading(true);
+
+    // Check URL for division override (admin linking from teams page).
+    const params = new URLSearchParams(window.location.search);
+    const divParam = params.get("division");
+
+    if (isAdmin) {
+      // Admin: fetch all (or override by ?division=)
+      let query = supabase
+        .from("player_contracts")
+        .select(
+          "id, registration_id, player_name, division, parent_name, parent_email, planned_vacations, signed_at"
+        )
+        .order("signed_at", { ascending: false });
+
+      if (divParam) {
+        query = query.eq("division", divParam);
+        setDivisionFilter(divParam);
+      }
+
+      const { data, error: err } = await query;
+      if (err) {
+        setError(err.message);
+        setLoading(false);
+        return;
+      }
+      setContracts((data as Contract[]) || []);
+      // Admin path doesn't use accessibleRegIds — skip building it.
+      setAccessibleRegIds(new Set());
+      setRegTeamMap(new Map());
+      setLoading(false);
+      return;
+    }
+
+    // Coach path: parallel queries for accessible registrations + contracts.
+    const teamIds = teams.map((t) => t.id);
+    const myDivisions = [...new Set(teams.map((t) => t.division))];
+
+    const [draftedRes, undraftedRes, contractsRes] = await Promise.all([
+      teamIds.length > 0
+        ? supabase
+            .from("tryout_registrations")
+            .select("id, team_id")
+            .in("team_id", teamIds)
+        : Promise.resolve({
+            data: [] as { id: string; team_id: string | null }[],
+            error: null,
+          }),
+      myDivisions.length > 0
+        ? supabase
+            .from("tryout_registrations")
+            .select("id, team_id")
+            .is("team_id", null)
+            .in("division", myDivisions)
+        : Promise.resolve({
+            data: [] as { id: string; team_id: string | null }[],
+            error: null,
+          }),
+      supabase
+        .from("player_contracts")
+        .select(
+          "id, registration_id, player_name, division, parent_name, parent_email, planned_vacations, signed_at"
+        )
+        .order("signed_at", { ascending: false }),
+    ]);
+
+    const fetchErr =
+      draftedRes.error || undraftedRes.error || contractsRes.error;
+    if (fetchErr) {
+      setError(fetchErr.message ?? "Failed to load contracts");
+      setLoading(false);
+      return;
+    }
+
+    const draftedRegs = (draftedRes.data ?? []) as {
+      id: string;
+      team_id: string | null;
+    }[];
+    const undraftedRegs = (undraftedRes.data ?? []) as {
+      id: string;
+      team_id: string | null;
+    }[];
+    const allContracts = (contractsRes.data ?? []) as Contract[];
+
+    const accessibleSet = new Set<string>();
+    const teamMap = new Map<string, string | null>();
+    for (const r of draftedRegs) {
+      accessibleSet.add(r.id);
+      teamMap.set(r.id, r.team_id);
+    }
+    for (const r of undraftedRegs) {
+      accessibleSet.add(r.id);
+      teamMap.set(r.id, r.team_id);
+    }
+
+    setAccessibleRegIds(accessibleSet);
+    setRegTeamMap(teamMap);
+    setContracts(allContracts.filter((c) => accessibleSet.has(c.registration_id)));
+    setLoading(false);
+  }
+
   const filtered = contracts.filter((c) => {
-    const matchesDivision = divisionFilter === "All" || c.division === divisionFilter;
+    // Search filter (applies to both admin and coach paths)
     const matchesSearch =
       !search ||
       c.player_name.toLowerCase().includes(search.toLowerCase()) ||
       c.parent_name.toLowerCase().includes(search.toLowerCase());
-    return matchesDivision && matchesSearch;
+    if (!matchesSearch) return false;
+
+    if (isAdmin) {
+      const matchesDivision =
+        divisionFilter === "All" || c.division === divisionFilter;
+      return matchesDivision;
+    }
+
+    // Coach: filter by selected team tab
+    if (teamFilter === ALL_TAB) return true;
+    const teamId = regTeamMap.get(c.registration_id) ?? null;
+    if (teamFilter === POOL_TAB) return teamId === null;
+    return teamId === teamFilter;
   });
 
   if (loading || authLoading) {
@@ -126,6 +269,46 @@ export default function CoachContractsPage() {
         <p className="text-gray-400 text-sm">Loading contracts...</p>
       </div>
     );
+  }
+
+  // Coach with no team assignments
+  if (!isAdmin && myTeams.length === 0) {
+    return (
+      <div className="p-6 md:p-8 max-w-5xl">
+        <div className="mb-6">
+          <h1 className="font-display text-2xl font-bold uppercase tracking-wider text-charcoal flex items-center">
+            Player Contracts
+            <HelpTooltip
+              text="Track which players have signed their participation contracts."
+              guideUrl="/coach/help"
+            />
+          </h1>
+        </div>
+        <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
+          <Users size={32} className="text-gray-300 mx-auto mb-3" />
+          <p className="font-display text-lg font-bold uppercase tracking-wide text-charcoal mb-2">
+            No Team Assigned Yet
+          </p>
+          <p className="text-gray-500 text-sm max-w-md mx-auto">
+            You haven&apos;t been assigned to a team yet. Contact your league
+            admin to get connected to your roster.
+          </p>
+          {error && (
+            <p className="text-xs text-flag-red mt-4">Error: {error}</p>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // Subtitle text
+  let subtitle = "All signed player contracts across divisions";
+  if (!isAdmin) {
+    if (myTeams.length === 1) {
+      subtitle = `Signed contracts for ${myTeams[0].team_name}`;
+    } else {
+      subtitle = `Signed contracts for your ${myTeams.length} teams`;
+    }
   }
 
   return (
@@ -139,14 +322,10 @@ export default function CoachContractsPage() {
             guideUrl="/coach/help"
           />
         </h1>
-        <p className="text-sm text-gray-500 mt-1">
-          {isAdmin
-            ? "All signed player contracts across divisions"
-            : `Signed contracts for ${profile?.division || "your division"}`}
-        </p>
+        <p className="text-sm text-gray-500 mt-1">{subtitle}</p>
       </div>
 
-      {/* Filters */}
+      {/* Admin: division filter pills */}
       {isAdmin && (
         <div className="mb-4 flex flex-wrap gap-1.5">
           {DIVISIONS.map((div) => (
@@ -165,6 +344,45 @@ export default function CoachContractsPage() {
         </div>
       )}
 
+      {/* Coach: team filter tabs (only if more than one team or there's a pool) */}
+      {!isAdmin && myTeams.length > 0 && (
+        <div className="mb-4 flex flex-wrap gap-1.5">
+          <button
+            onClick={() => setTeamFilter(ALL_TAB)}
+            className={`px-3 py-2 min-h-[44px] rounded-full text-xs font-semibold uppercase tracking-wide transition-colors ${
+              teamFilter === ALL_TAB
+                ? "bg-flag-blue text-white"
+                : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+            }`}
+          >
+            All
+          </button>
+          {myTeams.map((team) => (
+            <button
+              key={team.id}
+              onClick={() => setTeamFilter(team.id)}
+              className={`px-3 py-2 min-h-[44px] rounded-full text-xs font-semibold uppercase tracking-wide transition-colors ${
+                teamFilter === team.id
+                  ? "bg-flag-blue text-white"
+                  : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+              }`}
+            >
+              {team.team_name}
+            </button>
+          ))}
+          <button
+            onClick={() => setTeamFilter(POOL_TAB)}
+            className={`px-3 py-2 min-h-[44px] rounded-full text-xs font-semibold uppercase tracking-wide transition-colors ${
+              teamFilter === POOL_TAB
+                ? "bg-flag-blue text-white"
+                : "bg-gray-100 text-gray-500 hover:bg-gray-200"
+            }`}
+          >
+            Pool
+          </button>
+        </div>
+      )}
+
       {/* Search */}
       <div className="mb-6 relative">
         <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400" />
@@ -176,6 +394,13 @@ export default function CoachContractsPage() {
           className="w-full pl-9 pr-4 py-2.5 border border-gray-200 rounded-xl text-sm focus:outline-none focus:ring-2 focus:ring-flag-blue/20 focus:border-flag-blue"
         />
       </div>
+
+      {/* Error banner */}
+      {error && (
+        <div className="mb-4 p-3 rounded-xl bg-red-50 border border-red-200 text-xs text-flag-red">
+          {error}
+        </div>
+      )}
 
       {/* Results */}
       {filtered.length === 0 ? (
