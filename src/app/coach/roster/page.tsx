@@ -5,6 +5,7 @@ import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/auth-context";
 import { HelpTooltip } from "@/components/help-tooltip";
 import FileUpload from "@/components/file-upload";
+import { useCoachTeams, type CoachTeam as MyTeam } from "@/hooks/use-coach-teams";
 import {
   CheckCircle2,
   XCircle,
@@ -53,13 +54,6 @@ interface PlayerDocument {
 
 interface PlayerContract {
   registration_id: string;
-}
-
-interface MyTeam {
-  id: string;
-  division: string;
-  team_name: string;
-  role: string;
 }
 
 /* ------------------------------------------------------------------ */
@@ -522,54 +516,24 @@ export default function CoachRosterPage() {
     regId: string;
     docType: string;
   } | null>(null);
-  const [myTeams, setMyTeams] = useState<MyTeam[]>([]);
-  const [teamsLoaded, setTeamsLoaded] = useState(false);
+  const {
+    teams: myTeams,
+    loaded: teamsLoaded,
+    error: teamsError,
+  } = useCoachTeams(user?.id);
   const [selectedTeamId, setSelectedTeamId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch coach's team assignments
+  // Once teams load, default the active tab to first team (or pool fallback).
   useEffect(() => {
-    if (!supabase || !user) return;
-    (async () => {
-      const { data, error: err } = await supabase
-        .from("team_coaches")
-        .select(
-          "role, teams!team_coaches_team_id_fkey ( id, division, team_name )"
-        )
-        .eq("coach_id", user.id);
-      if (err) {
-        setError(err.message);
-        setTeamsLoaded(true);
-        return;
-      }
-      const teams: MyTeam[] = (data ?? []).flatMap((r: unknown) => {
-        const row = r as { role: string; teams: unknown };
-        const t = Array.isArray(row.teams) ? row.teams[0] : row.teams;
-        const team = t as
-          | { id: string; division: string; team_name: string }
-          | null
-          | undefined;
-        return team
-          ? [
-              {
-                id: team.id,
-                division: team.division,
-                team_name: team.team_name,
-                role: row.role,
-              },
-            ]
-          : [];
-      });
-      // Sort: head coach assignments first, then by team name
-      teams.sort((a, b) => {
-        if (a.role !== b.role) return a.role === "head" ? -1 : 1;
-        return a.team_name.localeCompare(b.team_name);
-      });
-      setMyTeams(teams);
-      setSelectedTeamId(teams[0]?.id ?? POOL_TAB);
-      setTeamsLoaded(true);
-    })();
-  }, [user]);
+    if (!teamsLoaded) return;
+    setSelectedTeamId((prev) => prev ?? (myTeams[0]?.id ?? POOL_TAB));
+  }, [teamsLoaded, myTeams]);
+
+  // Surface team-fetch errors through the page's error banner.
+  useEffect(() => {
+    if (teamsError) setError(teamsError);
+  }, [teamsError]);
 
   useEffect(() => {
     if (!teamsLoaded) return;

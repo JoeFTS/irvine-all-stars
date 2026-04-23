@@ -1,9 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/auth-context";
 import { HelpTooltip } from "@/components/help-tooltip";
+import { useCoachTeams, type CoachTeam as MyTeam } from "@/hooks/use-coach-teams";
 import {
   FileText,
   ExternalLink,
@@ -22,13 +23,6 @@ interface Contract {
   parent_email: string;
   planned_vacations: string | null;
   signed_at: string;
-}
-
-interface MyTeam {
-  id: string;
-  division: string;
-  team_name: string;
-  role: string;
 }
 
 const POOL_TAB = "__pool__";
@@ -76,8 +70,6 @@ export default function CoachContractsPage() {
     new Map()
   );
   const [loading, setLoading] = useState(true);
-  const [myTeams, setMyTeams] = useState<MyTeam[]>([]);
-  const [teamsLoaded, setTeamsLoaded] = useState(false);
   // For admin: divisionFilter ("All" or specific division). For coach: tab id (team id, POOL_TAB, or ALL_TAB).
   const [divisionFilter, setDivisionFilter] = useState<string>("All");
   const [teamFilter, setTeamFilter] = useState<string>(ALL_TAB);
@@ -86,52 +78,25 @@ export default function CoachContractsPage() {
 
   const isAdmin = role === "admin";
 
-  // Fetch coach's team assignments (skipped for admins).
+  // Admins skip the team_coaches fetch and use the all-divisions filter UI.
+  // Even if an admin is also assigned to specific teams via team_coaches
+  // (e.g., league president coaching their kid's team), they get the admin
+  // view here. To see their own coach view, they should switch to a non-admin
+  // account or open /coach/roster directly which uses the same skip.
+  const {
+    teams: fetchedTeams,
+    loaded: teamsLoaded,
+    error: teamsError,
+  } = useCoachTeams(isAdmin ? undefined : user?.id);
+  const myTeams: MyTeam[] = useMemo(
+    () => (isAdmin ? [] : fetchedTeams),
+    [isAdmin, fetchedTeams]
+  );
+
+  // Surface team-fetch errors through the page's error banner.
   useEffect(() => {
-    if (authLoading || !user || !supabase) return;
-    if (isAdmin) {
-      setMyTeams([]);
-      setTeamsLoaded(true);
-      return;
-    }
-    (async () => {
-      const { data, error: err } = await supabase!
-        .from("team_coaches")
-        .select(
-          "role, teams!team_coaches_team_id_fkey ( id, division, team_name )"
-        )
-        .eq("coach_id", user.id);
-      if (err) {
-        setError(err.message);
-        setTeamsLoaded(true);
-        return;
-      }
-      const teams: MyTeam[] = (data ?? []).flatMap((r: unknown) => {
-        const row = r as { role: string; teams: unknown };
-        const t = Array.isArray(row.teams) ? row.teams[0] : row.teams;
-        const team = t as
-          | { id: string; division: string; team_name: string }
-          | null
-          | undefined;
-        return team
-          ? [
-              {
-                id: team.id,
-                division: team.division,
-                team_name: team.team_name,
-                role: row.role,
-              },
-            ]
-          : [];
-      });
-      teams.sort((a, b) => {
-        if (a.role !== b.role) return a.role === "head" ? -1 : 1;
-        return a.team_name.localeCompare(b.team_name);
-      });
-      setMyTeams(teams);
-      setTeamsLoaded(true);
-    })();
-  }, [user, authLoading, isAdmin]);
+    if (teamsError) setError(teamsError);
+  }, [teamsError]);
 
   useEffect(() => {
     if (authLoading || !user || !supabase) return;
@@ -156,7 +121,10 @@ export default function CoachContractsPage() {
         )
         .order("signed_at", { ascending: false });
 
-      if (divParam) {
+      // Validate ?division= against the DIVISIONS allowlist. Unknown values
+      // are silently ignored so the page falls back to the "All" view rather
+      // than running an unfilterable query.
+      if (divParam && (DIVISIONS as readonly string[]).includes(divParam)) {
         query = query.eq("division", divParam);
         setDivisionFilter(divParam);
       }

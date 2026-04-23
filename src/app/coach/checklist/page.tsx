@@ -1,11 +1,12 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { useAuth } from "@/contexts/auth-context";
 import { HelpTooltip } from "@/components/help-tooltip";
 import { getPitchingRuleForDivision } from "@/content/pitching-rules";
+import { useCoachTeams, type CoachTeam as MyTeam } from "@/hooks/use-coach-teams";
 import {
   CheckCircle2,
   XCircle,
@@ -33,13 +34,6 @@ interface Registration {
   division: string;
   team_id: string | null;
   status: string;
-}
-
-interface MyTeam {
-  id: string;
-  division: string;
-  team_name: string;
-  role: string;
 }
 
 interface PlayerDocument {
@@ -169,58 +163,29 @@ export default function BinderChecklistPage() {
   const [coachCerts, setCoachCerts] = useState<CoachCertification[]>([]);
   const [assistantCoaches, setAssistantCoaches] = useState<AssistantCoach[]>([]);
   const [loading, setLoading] = useState(true);
-  const [myTeams, setMyTeams] = useState<MyTeam[]>([]);
-  const [teamsLoaded, setTeamsLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   const isAdmin = role === "admin";
 
-  // Fetch coach's team assignments (admins skip — they see all)
+  // Admins skip the team_coaches fetch and see all selected/alternate players
+  // for binder review. Even if an admin is also assigned to specific teams via
+  // team_coaches (e.g., league president coaching their kid's team), they get
+  // the admin view here. To see their own coach view, they should switch to a
+  // non-admin account.
+  const {
+    teams: fetchedTeams,
+    loaded: teamsLoaded,
+    error: teamsError,
+  } = useCoachTeams(isAdmin ? undefined : user?.id);
+  const myTeams: MyTeam[] = useMemo(
+    () => (isAdmin ? [] : fetchedTeams),
+    [isAdmin, fetchedTeams]
+  );
+
+  // Surface team-fetch errors through the page's error banner.
   useEffect(() => {
-    if (!supabase || !user) return;
-    if (isAdmin) {
-      setMyTeams([]);
-      setTeamsLoaded(true);
-      return;
-    }
-    (async () => {
-      const { data, error: err } = await supabase!
-        .from("team_coaches")
-        .select(
-          "role, teams!team_coaches_team_id_fkey ( id, division, team_name )"
-        )
-        .eq("coach_id", user.id);
-      if (err) {
-        setError(err.message);
-        setTeamsLoaded(true);
-        return;
-      }
-      const teams: MyTeam[] = (data ?? []).flatMap((r: unknown) => {
-        const row = r as { role: string; teams: unknown };
-        const t = Array.isArray(row.teams) ? row.teams[0] : row.teams;
-        const team = t as
-          | { id: string; division: string; team_name: string }
-          | null
-          | undefined;
-        return team
-          ? [
-              {
-                id: team.id,
-                division: team.division,
-                team_name: team.team_name,
-                role: row.role,
-              },
-            ]
-          : [];
-      });
-      teams.sort((a, b) => {
-        if (a.role !== b.role) return a.role === "head" ? -1 : 1;
-        return a.team_name.localeCompare(b.team_name);
-      });
-      setMyTeams(teams);
-      setTeamsLoaded(true);
-    })();
-  }, [user, isAdmin]);
+    if (teamsError) setError(teamsError);
+  }, [teamsError]);
 
   useEffect(() => {
     if (!supabase) {
