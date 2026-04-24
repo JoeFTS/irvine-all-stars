@@ -300,7 +300,7 @@ export default function CoachDashboardPage() {
   if (missingPhoto > 0)
     actionItems.push({ label: "players missing player photo", count: missingPhoto, href: "/coach/checklist" });
   if (missingContract > 0)
-    actionItems.push({ label: "players haven’t signed contract", count: missingContract, href: "/coach/checklist" });
+    actionItems.push({ label: "players haven't signed contract", count: missingContract, href: "/coach/checklist" });
   if (!hasConcussion)
     actionItems.push({ label: "Concussion certification not uploaded", href: "/coach/certifications" });
   if (!hasCardiac)

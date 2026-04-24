@@ -65,8 +65,15 @@ export async function POST(request: NextRequest) {
           { team_id: invite.team_id, coach_id: userId, role: "head" },
           { onConflict: "team_id,coach_id" }
         );
-      if (tcErr) console.error("team_coaches insert error:", tcErr);
-      // Don't fail the signup — admin can fix via roster manager.
+      if (tcErr) {
+        console.error("team_coaches insert error:", tcErr);
+        // Leave the invite unused so the coach can retry without being stranded
+        // with a consumed token and no team assignment.
+        return NextResponse.json(
+          { error: "Failed to assign coach to team. Please try again." },
+          { status: 500 }
+        );
+      }
     }
 
     await supabase.from("invites").update({ used: true }).eq("token", token);

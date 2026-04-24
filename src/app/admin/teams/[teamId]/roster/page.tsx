@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState, use } from "react";
+import { useCallback, useEffect, useMemo, useState, use } from "react";
 import Link from "next/link";
 import { ArrowLeft, ChevronRight, Plus, Minus, Search, Users, UserPlus, X } from "lucide-react";
 import { supabase } from "@/lib/supabase";
@@ -58,23 +58,14 @@ export default function TeamRosterPage({
   const [error, setError] = useState<string | null>(null);
   const [search, setSearch] = useState("");
   const [busy, setBusy] = useState(false);
+  const [pendingIds, setPendingIds] = useState<Set<string>>(new Set());
 
   // Add-coach form state
   const [selectedCoachAppId, setSelectedCoachAppId] = useState("");
   const [selectedRole, setSelectedRole] = useState<CoachRole>("assistant");
-  const [coachWarning, setCoachWarning] = useState<string | null>(null);
   const [removingCoachId, setRemovingCoachId] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (!supabase) {
-      setLoading(false);
-      return;
-    }
-    fetchAll();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [teamId]);
-
-  async function fetchAll() {
+  const fetchAll = useCallback(async () => {
     if (!supabase) return;
     setLoading(true);
     setError(null);
@@ -92,7 +83,7 @@ export default function TeamRosterPage({
     }
     setTeam(teamRow);
 
-    const [rosterRes, poolRes, coachesRes, coachAppsRes] = await Promise.all([
+    const [rosterRes, poolRes, coachesRes, coachAppsRes, profilesRes] = await Promise.all([
       supabase
         .from("tryout_registrations")
         .select(PLAYER_COLS)
@@ -115,11 +106,26 @@ export default function TeamRosterPage({
         .select("id, full_name, email, division_preference, status")
         .eq("status", "accepted")
         .order("full_name"),
+      supabase.from("profiles").select("email"),
     ]);
 
     if (rosterRes.data) setRoster(rosterRes.data as Player[]);
     if (poolRes.data) setPool(poolRes.data as Player[]);
-    if (coachAppsRes.data) setAcceptedCoachApps(coachAppsRes.data as CoachApplication[]);
+    if (coachAppsRes.data) {
+      // Only surface coach applications whose email matches an existing profile.
+      // Coaches without a profile yet are intentionally hidden; admins invite
+      // them from the invites page. This keeps the picker honest (no rows
+      // that would fail insertion).
+      const profileEmails = new Set(
+        ((profilesRes.data ?? []) as Array<{ email: string | null }>)
+          .map((p) => (p.email ?? "").toLowerCase())
+          .filter((e) => e.length > 0)
+      );
+      const apps = (coachAppsRes.data as CoachApplication[]).filter((a) =>
+        profileEmails.has(a.email.toLowerCase())
+      );
+      setAcceptedCoachApps(apps);
+    }
     if (coachesRes.data) {
       // Supabase typed join may return profile as array; normalize to single object.
       const normalized: CoachAssignment[] = (coachesRes.data as unknown as Array<{
@@ -137,11 +143,24 @@ export default function TeamRosterPage({
     }
 
     setLoading(false);
-  }
+  }, [teamId]);
+
+  useEffect(() => {
+    if (!supabase) {
+      setLoading(false);
+      return;
+    }
+    fetchAll();
+  }, [teamId, fetchAll]);
 
   async function moveToTeam(player: Player) {
-    if (!supabase || !team || busy) return;
-    setBusy(true);
+    if (!supabase || !team) return;
+    if (pendingIds.has(player.id)) return;
+    setPendingIds((prev) => {
+      const next = new Set(prev);
+      next.add(player.id);
+      return next;
+    });
     // Optimistic move
     setPool((prev) => prev.filter((p) => p.id !== player.id));
     setRoster((prev) =>
@@ -159,12 +178,21 @@ export default function TeamRosterPage({
       setError(upErr.message);
       await fetchAll();
     }
-    setBusy(false);
+    setPendingIds((prev) => {
+      const next = new Set(prev);
+      next.delete(player.id);
+      return next;
+    });
   }
 
   async function removeFromTeam(player: Player) {
-    if (!supabase || !team || busy) return;
-    setBusy(true);
+    if (!supabase || !team) return;
+    if (pendingIds.has(player.id)) return;
+    setPendingIds((prev) => {
+      const next = new Set(prev);
+      next.add(player.id);
+      return next;
+    });
     // Optimistic move
     setRoster((prev) => prev.filter((p) => p.id !== player.id));
     setPool((prev) =>
@@ -182,13 +210,16 @@ export default function TeamRosterPage({
       setError(upErr.message);
       await fetchAll();
     }
-    setBusy(false);
+    setPendingIds((prev) => {
+      const next = new Set(prev);
+      next.delete(player.id);
+      return next;
+    });
   }
 
   async function addCoach() {
     if (!supabase || !team || busy || !selectedCoachAppId) return;
     setBusy(true);
-    setCoachWarning(null);
 
     const app = acceptedCoachApps.find((a) => a.id === selectedCoachAppId);
     if (!app) {
@@ -196,7 +227,9 @@ export default function TeamRosterPage({
       return;
     }
 
-    // Look up profile by email (case-insensitive)
+    // Look up profile by email (case-insensitive). The picker is already
+    // filtered to apps whose email maps to a profile (see fetchAll), so the
+    // lookup is expected to succeed; treat a miss as an error.
     const { data: profile, error: profErr } = await supabase
       .from("profiles")
       .select("id")
@@ -210,11 +243,9 @@ export default function TeamRosterPage({
     }
 
     if (!profile) {
-      setCoachWarning(
-        `${app.full_name} (${app.email}) hasn't created an account yet. Send them an invite first.`
+      setError(
+        `Could not find a profile for ${app.email}. Refresh and try again.`
       );
-      // Reset selection so it's clear the row was NOT inserted.
-      setSelectedCoachAppId("");
       setBusy(false);
       return;
     }
@@ -246,7 +277,6 @@ export default function TeamRosterPage({
   async function removeCoach(coachId: string) {
     if (!supabase || !team || busy) return;
     setBusy(true);
-    setCoachWarning(null);
 
     // Optimistic remove
     setCoaches((prev) => prev.filter((c) => c.coach_id !== coachId));
@@ -460,7 +490,6 @@ export default function TeamRosterPage({
                   <button
                     onClick={() => {
                       setRemovingCoachId(c.coach_id);
-                      setCoachWarning(null);
                     }}
                     disabled={busy}
                     className="shrink-0 inline-flex items-center gap-1 px-3 py-1.5 rounded-full text-xs font-semibold uppercase tracking-wide bg-flag-red/10 text-flag-red hover:bg-flag-red/20 transition-colors disabled:opacity-50"
@@ -486,7 +515,6 @@ export default function TeamRosterPage({
                 value={selectedCoachAppId}
                 onChange={(e) => {
                   setSelectedCoachAppId(e.target.value);
-                  setCoachWarning(null);
                 }}
                 className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm text-charcoal focus:outline-none focus:ring-2 focus:ring-flag-blue/30"
               >
@@ -524,18 +552,6 @@ export default function TeamRosterPage({
               {busy ? "Adding..." : "Add Coach"}
             </button>
           </div>
-          {coachWarning && (
-            <div className="mt-3 bg-star-gold/10 border border-star-gold/30 text-charcoal text-xs px-3 py-2 rounded-xl">
-              <span className="font-semibold">Not added — </span>
-              {coachWarning}{" "}
-              <Link
-                href="/admin/invites"
-                className="text-flag-blue font-semibold hover:underline underline"
-              >
-                Go to invites
-              </Link>
-            </div>
-          )}
         </div>
       </section>
 
@@ -557,7 +573,11 @@ export default function TeamRosterPage({
       </div>
 
       {error && (
-        <div className="mb-4 bg-flag-red/5 border border-flag-red/20 text-flag-red text-xs font-semibold px-3 py-2 rounded-xl">
+        <div
+          role="alert"
+          aria-live="polite"
+          className="mb-4 bg-flag-red/5 border border-flag-red/20 text-flag-red text-xs font-semibold px-3 py-2 rounded-xl"
+        >
           {error}
         </div>
       )}
@@ -593,7 +613,7 @@ export default function TeamRosterPage({
                 <PlayerRow
                   key={p.id}
                   player={p}
-                  busy={busy}
+                  busy={pendingIds.has(p.id)}
                   actionLabel="Remove"
                   actionIcon={<Minus size={12} />}
                   actionStyle="bg-flag-red/10 text-flag-red hover:bg-flag-red/20"
@@ -636,7 +656,7 @@ export default function TeamRosterPage({
                 <PlayerRow
                   key={p.id}
                   player={p}
-                  busy={busy}
+                  busy={pendingIds.has(p.id)}
                   actionLabel="Add"
                   actionIcon={<Plus size={12} />}
                   actionStyle="bg-flag-blue text-white hover:bg-flag-blue/90"

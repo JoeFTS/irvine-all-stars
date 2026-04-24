@@ -547,7 +547,11 @@ export default function CoachRosterPage() {
     const teamIds = teams.map((t) => t.id);
     const myDivisions = [...new Set(teams.map((t) => t.division))];
 
-    const [draftedRes, undraftedRes, docsRes, contractsRes] = await Promise.all([
+    // Step 1: Fetch registrations (drafted + undrafted pool) first so we know
+    // exactly which registration_ids are visible to this coach. We then use
+    // that set to explicitly scope the documents/contracts fetches (RLS still
+    // scopes server-side; this is a perf tightening for multi-team coaches).
+    const [draftedRes, undraftedRes] = await Promise.all([
       teamIds.length > 0
         ? supabase
             .from("tryout_registrations")
@@ -567,23 +571,48 @@ export default function CoachRosterPage() {
             .order("division")
             .order("player_last_name")
         : Promise.resolve({ data: [] as Registration[], error: null }),
-      supabase.from("player_documents").select("registration_id, document_type, file_path"),
-      supabase.from("player_contracts").select("registration_id"),
     ]);
 
-    const fetchErr =
-      draftedRes.error ||
-      undraftedRes.error ||
-      docsRes.error ||
-      contractsRes.error;
-    if (fetchErr) {
-      setError(fetchErr.message ?? "Failed to load roster");
+    const regFetchErr = draftedRes.error || undraftedRes.error;
+    if (regFetchErr) {
+      setError(regFetchErr.message ?? "Failed to load roster");
       setLoading(false);
       return;
     }
 
     const draftedRegs = (draftedRes.data ?? []) as Registration[];
     const undraftedRegs = (undraftedRes.data ?? []) as Registration[];
+
+    // Step 2: Fetch documents + contracts scoped to the visible registration ids.
+    // Skip the fetch entirely when there are no visible ids, because Supabase
+    // `.in()` with an empty array is ambiguous across client versions.
+    const visibleIds = [
+      ...draftedRegs.map((r) => r.id),
+      ...undraftedRegs.map((r) => r.id),
+    ];
+
+    const [docsRes, contractsRes] = await Promise.all([
+      visibleIds.length > 0
+        ? supabase
+            .from("player_documents")
+            .select("registration_id, document_type, file_path")
+            .in("registration_id", visibleIds)
+        : Promise.resolve({ data: [] as PlayerDocument[], error: null }),
+      visibleIds.length > 0
+        ? supabase
+            .from("player_contracts")
+            .select("registration_id")
+            .in("registration_id", visibleIds)
+        : Promise.resolve({ data: [] as PlayerContract[], error: null }),
+    ]);
+
+    const fetchErr = docsRes.error || contractsRes.error;
+    if (fetchErr) {
+      setError(fetchErr.message ?? "Failed to load roster");
+      setLoading(false);
+      return;
+    }
+
     const allDocs = (docsRes.data ?? []) as PlayerDocument[];
     const allContracts = (contractsRes.data ?? []) as PlayerContract[];
 

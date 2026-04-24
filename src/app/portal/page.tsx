@@ -344,7 +344,7 @@ export default function PortalPage() {
 
         // Fetch the session details for assigned sessions
         if (assignments && assignments.length > 0) {
-          const sessionIds = [...new Set(assignments.map((a: any) => a.session_id))];
+          const sessionIds = [...new Set(assignments.map((a) => a.session_id))];
           const { data: sessions } = await supabase!
             .from("tryout_sessions")
             .select("id, division, session_date, start_time, end_time, location, field")

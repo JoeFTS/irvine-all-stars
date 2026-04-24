@@ -111,7 +111,7 @@ export default function CompliancePage() {
   const [coachCerts, setCoachCerts] = useState<CoachCert[]>([]);
   const [coachApps, setCoachApps] = useState<CoachApp[]>([]);
   const [agreements, setAgreements] = useState<TournamentAgreement[]>([]);
-  const [profiles, setProfiles] = useState<Array<{ id: string; email: string; full_name: string; division: string | null }>>([]);
+  const [profiles, setProfiles] = useState<Array<{ id: string; email: string; full_name: string }>>([]);
   const [loading, setLoading] = useState(true);
   const [viewingAgreement, setViewingAgreement] = useState<{ coach: typeof profiles[0]; agreement: TournamentAgreement } | null>(null);
   const [expandedDivisions, setExpandedDivisions] = useState<Set<string>>(
@@ -148,7 +148,7 @@ export default function CompliancePage() {
       supabase.from("coach_certifications").select("coach_id, cert_type"),
       supabase.from("coach_applications").select("email, full_name"),
       supabase.from("tournament_agreements").select("*"),
-      supabase.from("profiles").select("id, email, full_name, division").eq("role", "coach"),
+      supabase.from("profiles").select("id, email, full_name").eq("role", "coach"),
     ]);
 
     if (regsRes.data) setRegistrations(regsRes.data);
@@ -226,6 +226,26 @@ export default function CompliancePage() {
       };
     }).filter((d) => d.totalPlayers > 0 || teams.some((t) => t.division === d.division));
   }, [registrations, docsByReg, contractSet, teams]);
+
+  // Coach → distinct divisions derived from team_coaches → teams.division.
+  // A coach may be on teams across multiple divisions after the team-scoped
+  // roster refactor; profiles.division is legacy and not used here.
+  const coachDivisionsById = useMemo(() => {
+    const teamDivisionById = new Map<string, string>();
+    for (const t of teams) teamDivisionById.set(t.id, t.division);
+    const map = new Map<string, string[]>();
+    for (const tc of teamCoaches) {
+      const division = teamDivisionById.get(tc.team_id);
+      if (!division) continue;
+      const existing = map.get(tc.coach_id);
+      if (existing) {
+        if (!existing.includes(division)) existing.push(division);
+      } else {
+        map.set(tc.coach_id, [division]);
+      }
+    }
+    return map;
+  }, [teams, teamCoaches]);
 
   // Email → name lookup from coach applications
   const coachNameByEmail = useMemo(() => {
@@ -665,7 +685,7 @@ export default function CompliancePage() {
                   </div>
                   <div>
                     <span className="text-xs font-semibold text-gray-600">
-                      {coach.division || "—"}
+                      {coachDivisionsById.get(coach.id)?.join(", ") || "—"}
                     </span>
                   </div>
                   <div>
@@ -765,7 +785,7 @@ export default function CompliancePage() {
                   </div>
                   <div>
                     <p className="text-xs text-gray-400 uppercase tracking-wide font-semibold mb-0.5">Division</p>
-                    <p className="font-semibold text-charcoal">{viewingAgreement.coach.division || viewingAgreement.agreement.division}</p>
+                    <p className="font-semibold text-charcoal">{coachDivisionsById.get(viewingAgreement.coach.id)?.join(", ") || viewingAgreement.agreement.division}</p>
                   </div>
                   <div>
                     <p className="text-xs text-gray-400 uppercase tracking-wide font-semibold mb-0.5">Rules Category</p>
