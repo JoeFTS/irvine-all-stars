@@ -72,7 +72,7 @@ function getPlayerEmailHtml(name: string, playerName: string, division: string) 
 <tr><td style="padding:4px 0;color:#0A2342;font-size:14px;font-weight:700;width:80px;">March 27:</td><td style="padding:4px 0;color:#4B5563;font-size:14px;">All-Star coaches named</td></tr>
 <tr><td style="padding:4px 0;color:#0A2342;font-size:14px;font-weight:700;">April 12:</td><td style="padding:4px 0;color:#4B5563;font-size:14px;">All-Star tryouts (all Bronco &amp; Pony divisions)</td></tr>
 <tr><td style="padding:4px 0;color:#0A2342;font-size:14px;font-weight:700;">April 14:</td><td style="padding:4px 0;color:#4B5563;font-size:14px;">All-Star players notified</td></tr>
-<tr><td style="padding:4px 0;color:#0A2342;font-size:14px;font-weight:700;">Late May:</td><td style="padding:4px 0;color:#4B5563;font-size:14px;">Tournament season begins</td></tr>
+<tr><td style="padding:4px 0;color:#0A2342;font-size:14px;font-weight:700;">May 21-25:</td><td style="padding:4px 0;color:#4B5563;font-size:14px;">Memorial Day Tournament &mdash; tournament season begins</td></tr>
 </table>
 </div>
 

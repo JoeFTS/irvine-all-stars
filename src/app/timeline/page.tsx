@@ -72,7 +72,7 @@ const phases = [
     bg: "bg-flag-blue",
     current: false,
     items: [
-      "Memorial Day Tournament (league-funded)",
+      "Memorial Day Tournament — May 21–25 (league-funded)",
       "District tournaments begin (June 11\u201318)",
       "Section & Region rounds through July",
       "National or Regional track \u2014 new format for 2026",

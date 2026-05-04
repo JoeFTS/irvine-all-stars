@@ -127,7 +127,7 @@ const upcomingDates: UpcomingEvent[] = [
   { event: "Scouting Period", date: "March 28 - April 11", end: "2026-04-11" },
   { event: "All-Star Tryouts", date: "April 12", end: "2026-04-12" },
   { event: "Players Notified", date: "April 14", end: "2026-04-14" },
-  { event: "Memorial Day Tournament", date: "Late May (league-funded)", end: "2026-05-31" },
+  { event: "Memorial Day Tournament", date: "May 21 - 25 (league-funded)", end: "2026-05-25" },
   { event: "District Tournaments Begin", date: "June 11", end: "2026-06-11" },
   { event: "Binder Sign-Off Deadline", date: "Before your first tournament game", end: null },
 ];

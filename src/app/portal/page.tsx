@@ -129,7 +129,7 @@ const keyDates = [
   { date: "Mar 27", label: "All-Star coaches named" },
   { date: "Apr 12", label: "All-Star tryouts (Bronco & Pony)" },
   { date: "Apr 14", label: "All-Star players notified" },
-  { date: "Late May", label: "Memorial Day Tournament" },
+  { date: "May 21-25", label: "Memorial Day Tournament" },
   { date: "Jun 11", label: "District tournaments begin" },
   { date: "Jun-Aug", label: "Sanction play through early August" },
 ];
