@@ -242,6 +242,7 @@ export default function BinderChecklistPage() {
         "tournament_rules",
         "insurance_certificate",
         "signed_medical_release",
+        "affidavit_final",
       ]);
 
     if (!isAdmin && myDivisions.length > 0) {
@@ -383,6 +384,9 @@ export default function BinderChecklistPage() {
   const signedReleaseDoc = teamDocs.find(
     (d) => d.document_type === "signed_medical_release" && d.division === primaryDivision
   );
+  const affidavitDoc = teamDocs.find(
+    (d) => d.document_type === "affidavit_final" && d.division === primaryDivision
+  );
 
   // Coach certifications
   const concussionCert = coachCerts.find((c) => c.cert_type === "concussion");
@@ -413,30 +417,34 @@ export default function BinderChecklistPage() {
   const s3Complete = insuranceDoc ? 1 : 0;
   const s3Total = 1;
 
-  // Section 4: medical release per player
-  const s4Complete = registrations.filter((r) => playerHasDoc(r.id, "medical_release")).length;
-  const s4Total = playerCount;
+  // Section 4: tournament affidavit uploaded?
+  const s4Complete = affidavitDoc ? 1 : 0;
+  const s4Total = 1;
 
-  // Section 5: birth certificate per player
-  const s5Complete = registrations.filter((r) => playerHasDoc(r.id, "birth_certificate")).length;
+  // Section 5: medical release per player
+  const s5Complete = registrations.filter((r) => playerHasDoc(r.id, "medical_release")).length;
   const s5Total = playerCount;
 
-  // Section 6: concussion cert
-  const s6Complete = concussionCert ? 1 : 0;
-  const s6Total = 1;
+  // Section 6: birth certificate per player
+  const s6Complete = registrations.filter((r) => playerHasDoc(r.id, "birth_certificate")).length;
+  const s6Total = playerCount;
 
-  // Section 7: cardiac arrest cert
-  const s7Complete = cardiacCert ? 1 : 0;
+  // Section 7: concussion cert
+  const s7Complete = concussionCert ? 1 : 0;
   const s7Total = 1;
 
-  // Section 8: assistant coach certifications (2 certs per assistant)
-  const s8Total = assistantCoaches.length * 2;
-  const s8Complete = assistantCoaches.reduce((acc, ac) => {
+  // Section 8: cardiac arrest cert
+  const s8Complete = cardiacCert ? 1 : 0;
+  const s8Total = 1;
+
+  // Section 9: assistant coach certifications (2 certs per assistant)
+  const s9Total = assistantCoaches.length * 2;
+  const s9Complete = assistantCoaches.reduce((acc, ac) => {
     return acc + (ac.concussion_cert_path ? 1 : 0) + (ac.cardiac_cert_path ? 1 : 0);
   }, 0);
 
-  const totalItems = s1Total + s2Total + s3Total + s4Total + s5Total + s6Total + s7Total + s8Total;
-  const completedItems = s1Complete + s2Complete + s3Complete + s4Complete + s5Complete + s6Complete + s7Complete + s8Complete;
+  const totalItems = s1Total + s2Total + s3Total + s4Total + s5Total + s6Total + s7Total + s8Total + s9Total;
+  const completedItems = s1Complete + s2Complete + s3Complete + s4Complete + s5Complete + s6Complete + s7Complete + s8Complete + s9Complete;
   const progressPct = totalItems > 0 ? Math.round((completedItems / totalItems) * 100) : 0;
 
   /* ---------------------------------------------------------------- */
@@ -466,7 +474,7 @@ export default function BinderChecklistPage() {
           <div className="h-8 bg-gray-200 rounded w-56" />
           <div className="h-6 bg-gray-200 rounded w-80" />
           <div className="h-4 bg-gray-200 rounded w-full max-w-md" />
-          {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+          {[1, 2, 3, 4, 5, 6, 7, 8, 9].map((i) => (
             <div key={i} className="h-28 bg-gray-200 rounded-lg" />
           ))}
         </div>
@@ -521,7 +529,7 @@ export default function BinderChecklistPage() {
           />
         </h1>
         <p className="text-gray-500 text-sm mt-1 max-w-xl">
-          8 sections matching your physical tournament binder. Green means ready,
+          9 sections matching your physical tournament binder. Green means ready,
           red means action needed.
         </p>
       </div>
@@ -714,20 +722,153 @@ export default function BinderChecklistPage() {
       </div>
 
       {/* ================================================================ */}
-      {/*  SECTION 4: Medical Releases (per player)                        */}
+      {/*  SECTION 4: Tournament Affidavit                                 */}
       {/* ================================================================ */}
       <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
         <div className="p-5 flex items-center gap-3 border-b border-gray-100">
           <SectionNumber n={4} />
           <div className="flex-1">
             <h2 className="font-display text-lg font-bold uppercase tracking-wider">
+              Tournament Affidavit
+            </h2>
+            <p className="text-xs text-gray-400 mt-0.5">
+              Submit the affidavit at pony-affidavit.org, then upload the signed final PDF here.
+            </p>
+          </div>
+          {affidavitDoc ? (
+            <CheckCircle2 size={20} className="text-green-600" />
+          ) : (
+            <XCircle size={20} className="text-flag-red" />
+          )}
+        </div>
+        <div className="p-5 space-y-3">
+          {/* Action links */}
+          <div className="flex flex-wrap items-center gap-3 p-3 rounded-lg bg-gray-50">
+            <FileText size={18} className="text-flag-blue shrink-0" />
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-charcoal">
+                Submit &amp; Walkthrough
+              </p>
+              <p className="text-xs text-gray-400">
+                Open the PONY affidavit portal to fill it out, or follow our step-by-step guide.
+              </p>
+            </div>
+            <a
+              href="https://pony-affidavit.org"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-2 min-h-[44px] rounded-full text-xs font-semibold bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
+            >
+              <FileText size={14} />
+              Open pony-affidavit.org
+            </a>
+            <a
+              href="/docs/2026-affidavit-process-guide.pdf"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-1.5 px-3 py-2 min-h-[44px] rounded-full text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors"
+            >
+              <Eye size={14} />
+              View Walkthrough Guide
+            </a>
+          </div>
+
+          {/* Upload widget */}
+          <div className={`flex flex-wrap items-center gap-3 p-3 rounded-lg ${affidavitDoc ? "bg-green-50" : "bg-red-50"}`}>
+            {affidavitDoc ? (
+              <CheckCircle2 size={18} className="text-green-600 shrink-0" />
+            ) : (
+              <XCircle size={18} className="text-flag-red shrink-0" />
+            )}
+            <div className="flex-1 min-w-0">
+              <p className="text-sm font-semibold text-charcoal">
+                Signed Final Affidavit (PDF)
+              </p>
+              <p className="text-xs text-gray-400">
+                {affidavitDoc
+                  ? "Uploaded. Replace if you re-submit a corrected affidavit."
+                  : "Upload the signed PDF after submitting online and collecting parent signatures."}
+              </p>
+            </div>
+            {affidavitDoc ? (
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() =>
+                    affidavitDoc.file_path && handleViewDocument(affidavitDoc.file_path)
+                  }
+                  className="px-3 py-1.5 rounded-full text-xs font-semibold text-flag-blue bg-white border border-flag-blue/20 hover:bg-flag-blue/10 transition-colors"
+                >
+                  <span className="inline-flex items-center gap-1.5">
+                    <Eye size={14} />
+                    View / Print
+                  </span>
+                </button>
+                {primaryDivision && (
+                  <FileUpload
+                    bucket="player-documents"
+                    folder="team-docs/affidavit-final"
+                    accept=".pdf"
+                    maxSizeMB={10}
+                    label="Replace"
+                    onUploadComplete={(filePath, fileName) =>
+                      handleTeamDocUpload(
+                        "affidavit_final",
+                        filePath,
+                        fileName,
+                        primaryDivision
+                      )
+                    }
+                  />
+                )}
+              </div>
+            ) : primaryDivision ? (
+              <FileUpload
+                bucket="player-documents"
+                folder="team-docs/affidavit-final"
+                accept=".pdf"
+                maxSizeMB={10}
+                label="Upload Signed Affidavit"
+                description="Upload the signed final affidavit PDF (after parents sign)."
+                onUploadComplete={(filePath, fileName) =>
+                  handleTeamDocUpload(
+                    "affidavit_final",
+                    filePath,
+                    fileName,
+                    primaryDivision
+                  )
+                }
+              />
+            ) : (
+              <span className={`px-2.5 py-1 rounded-full text-xs font-semibold uppercase tracking-wide ${amberBadge()}`}>
+                Pending
+              </span>
+            )}
+          </div>
+
+          <div className="flex items-start gap-2 px-1">
+            <AlertTriangle size={14} className="text-flag-red shrink-0 mt-0.5" />
+            <p className="text-xs text-flag-red font-semibold">
+              Player names on the affidavit MUST match birth certificates exactly, including middle names and any suffix (Jr, II, III).
+            </p>
+          </div>
+        </div>
+      </div>
+
+      {/* ================================================================ */}
+      {/*  SECTION 5: Medical Releases (per player)                        */}
+      {/* ================================================================ */}
+      <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+        <div className="p-5 flex items-center gap-3 border-b border-gray-100">
+          <SectionNumber n={5} />
+          <div className="flex-1">
+            <h2 className="font-display text-lg font-bold uppercase tracking-wider">
               Medical Releases
             </h2>
             <p className="text-xs text-gray-400 mt-0.5">
-              {s4Complete} of {s4Total} players complete
+              {s5Complete} of {s5Total} players complete
             </p>
           </div>
-          {s4Complete === s4Total && s4Total > 0 ? (
+          {s5Complete === s5Total && s5Total > 0 ? (
             <CheckCircle2 size={20} className="text-green-600" />
           ) : (
             <XCircle size={20} className="text-flag-red" />
@@ -868,20 +1009,20 @@ export default function BinderChecklistPage() {
       </div>
 
       {/* ================================================================ */}
-      {/*  SECTION 5: Birth Certificates (per player)                       */}
+      {/*  SECTION 6: Birth Certificates (per player)                       */}
       {/* ================================================================ */}
       <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
         <div className="p-5 flex items-center gap-3 border-b border-gray-100">
-          <SectionNumber n={5} />
+          <SectionNumber n={6} />
           <div className="flex-1">
             <h2 className="font-display text-lg font-bold uppercase tracking-wider">
               Birth Certificates
             </h2>
             <p className="text-xs text-gray-400 mt-0.5">
-              {s5Complete} of {s5Total} birth certs uploaded
+              {s6Complete} of {s6Total} uploaded. State seal required (a copy is fine), or a US passport is accepted as an alternative.
             </p>
           </div>
-          {s5Complete === s5Total && s5Total > 0 ? (
+          {s6Complete === s6Total && s6Total > 0 ? (
             <CheckCircle2 size={20} className="text-green-600" />
           ) : (
             <XCircle size={20} className="text-flag-red" />
@@ -936,19 +1077,18 @@ export default function BinderChecklistPage() {
           <div className="flex items-start gap-2">
             <AlertTriangle size={14} className="text-flag-red shrink-0 mt-0.5" />
             <p className="text-xs text-flag-red font-semibold">
-              Name on birth certificate MUST match the affidavit exactly. Do NOT
-              leave out middle names, Jr, III, etc.
+              Player&apos;s full legal name on the document (birth certificate with state seal, or US passport) MUST match the affidavit exactly. Include middle names and any suffix such as Jr, II, or III.
             </p>
           </div>
         </div>
       </div>
 
       {/* ================================================================ */}
-      {/*  SECTION 6: Concussion Training Certificate                      */}
+      {/*  SECTION 7: Concussion Training Certificate                      */}
       {/* ================================================================ */}
       <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
         <div className="p-5 flex items-center gap-3 border-b border-gray-100">
-          <SectionNumber n={6} />
+          <SectionNumber n={7} />
           <div className="flex-1">
             <h2 className="font-display text-lg font-bold uppercase tracking-wider">
               Concussion Training Certificate
@@ -1003,11 +1143,11 @@ export default function BinderChecklistPage() {
       </div>
 
       {/* ================================================================ */}
-      {/*  SECTION 7: Sudden Cardiac Arrest Certificate                    */}
+      {/*  SECTION 8: Sudden Cardiac Arrest Certificate                    */}
       {/* ================================================================ */}
       <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
         <div className="p-5 flex items-center gap-3 border-b border-gray-100">
-          <SectionNumber n={7} />
+          <SectionNumber n={8} />
           <div className="flex-1">
             <h2 className="font-display text-lg font-bold uppercase tracking-wider">
               Sudden Cardiac Arrest Certificate
@@ -1062,21 +1202,21 @@ export default function BinderChecklistPage() {
       </div>
 
       {/* ================================================================ */}
-      {/*  SECTION 8: Assistant Coach Certifications                       */}
+      {/*  SECTION 9: Assistant Coach Certifications                       */}
       {/* ================================================================ */}
       {assistantCoaches.length > 0 && (
         <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
           <div className="p-5 flex items-center gap-3 border-b border-gray-100">
-            <SectionNumber n={8} />
+            <SectionNumber n={9} />
             <div className="flex-1">
               <h2 className="font-display text-lg font-bold uppercase tracking-wider">
                 Assistant Coach Certifications
               </h2>
               <p className="text-xs text-gray-400 mt-0.5">
-                {s8Complete} of {s8Total} certificates uploaded
+                {s9Complete} of {s9Total} certificates uploaded
               </p>
             </div>
-            {s8Complete === s8Total && s8Total > 0 ? (
+            {s9Complete === s9Total && s9Total > 0 ? (
               <CheckCircle2 size={20} className="text-green-600" />
             ) : (
               <XCircle size={20} className="text-flag-red" />

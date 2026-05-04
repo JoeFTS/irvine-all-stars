@@ -28,6 +28,12 @@ interface Registration {
   id: string;
   player_first_name: string;
   player_last_name: string;
+  player_middle_name?: string | null;
+  player_suffix?: string | null;
+  street_address?: string | null;
+  city?: string | null;
+  state?: string | null;
+  zip?: string | null;
   division: string;
   team_id: string | null;
   jersey_number: string | null;
@@ -63,7 +69,7 @@ interface PlayerContract {
 const POOL_TAB = "__pool__";
 
 const SELECT_COLS =
-  "id, player_first_name, player_last_name, division, team_id, jersey_number, primary_position, secondary_position, bats, throws, parent_name, parent_email, parent_phone, emergency_contact_name, emergency_contact_phone, secondary_parent_name, secondary_parent_email, secondary_parent_phone, status";
+  "id, player_first_name, player_last_name, player_middle_name, player_suffix, street_address, city, state, zip, division, team_id, jersey_number, primary_position, secondary_position, bats, throws, parent_name, parent_email, parent_phone, emergency_contact_name, emergency_contact_phone, secondary_parent_name, secondary_parent_email, secondary_parent_phone, status";
 
 const DIVISION_LABELS: Record<string, string> = {
   All: "All",
@@ -87,6 +93,35 @@ const DIVISION_LABELS: Record<string, string> = {
 
 function divisionShortName(division: string): string {
   return DIVISION_LABELS[division] ?? division.split("-")[0];
+}
+
+function formatPlayerName(reg: {
+  player_first_name: string;
+  player_last_name: string;
+  player_middle_name?: string | null;
+  player_suffix?: string | null;
+}): string {
+  const middle = reg.player_middle_name?.trim();
+  const suffix = reg.player_suffix?.trim();
+  const base = [reg.player_first_name, middle, reg.player_last_name]
+    .filter((part) => part && part.length > 0)
+    .join(" ");
+  return suffix ? `${base}, ${suffix}` : base;
+}
+
+function formatPlayerAddress(reg: {
+  street_address?: string | null;
+  city?: string | null;
+  state?: string | null;
+  zip?: string | null;
+}): string | null {
+  const parts = [
+    reg.street_address?.trim(),
+    reg.city?.trim(),
+    reg.state?.trim(),
+    reg.zip?.trim(),
+  ].filter((part): part is string => Boolean(part && part.length > 0));
+  return parts.length > 0 ? parts.join(", ") : null;
 }
 
 function getPlayerCompliance(
@@ -243,7 +278,8 @@ function PlayerCard({
 }) {
   const uploadingDocType =
     docUploadOpen?.regId === reg.id ? docUploadOpen.docType : null;
-  const playerName = `${reg.player_first_name} ${reg.player_last_name}`;
+  const playerName = formatPlayerName(reg);
+  const playerAddress = formatPlayerAddress(reg);
   return (
     <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
       {/* Player Info Header */}
@@ -251,7 +287,7 @@ function PlayerCard({
         <div className="flex items-center justify-between gap-3 mb-2">
           <div className="flex items-center gap-3 min-w-0">
             <h3 className="text-base font-semibold text-charcoal truncate">
-              {reg.player_first_name} {reg.player_last_name}
+              {playerName}
             </h3>
             <DivisionBadge division={reg.division} />
           </div>
@@ -283,6 +319,19 @@ function PlayerCard({
             {reg.throws?.charAt(0).toUpperCase()}
             {reg.throws?.slice(1)}
           </span>
+        </div>
+        <div className="mt-2">
+          <p className="text-xs font-semibold uppercase tracking-wider text-gray-400 mb-0.5">
+            Address (Affidavit)
+          </p>
+          {playerAddress ? (
+            <p className="text-sm text-charcoal">{playerAddress}</p>
+          ) : (
+            <p className="text-xs text-gray-400 italic">
+              Address not provided. Parent can add it in the parent portal at{" "}
+              <span className="font-mono">/portal</span>.
+            </p>
+          )}
         </div>
       </div>
 
@@ -429,7 +478,7 @@ function PlayerCard({
             bucket="player-documents"
             folder={`birth-certs/${reg.id}`}
             label="Birth Certificate"
-            description="Upload a scan or photo of the player's birth certificate (image or PDF)."
+            description="Birth certificate must show a state seal (a copy is fine). A US passport is also accepted. The name on the document must match the affidavit exactly, including middle name and suffix."
             accept="image/*,.pdf"
             maxSizeMB={10}
             onUploadComplete={(filePath, fileName) => {
@@ -458,6 +507,8 @@ interface AwaitingPlayer {
   id: string;
   player_first_name: string;
   player_last_name: string;
+  player_middle_name?: string | null;
+  player_suffix?: string | null;
   division: string;
   team_id: string | null;
   primary_position: string;
@@ -607,6 +658,8 @@ export default function CoachRosterPage() {
         id: r.id,
         player_first_name: r.player_first_name,
         player_last_name: r.player_last_name,
+        player_middle_name: r.player_middle_name,
+        player_suffix: r.player_suffix,
         division: r.division,
         team_id: r.team_id,
         primary_position: r.primary_position,
@@ -657,7 +710,7 @@ export default function CoachRosterPage() {
     if (!supabase || !user) return;
     const { error: insErr } = await supabase.from("player_documents").insert({
       registration_id: reg.id,
-      player_name: `${reg.player_first_name} ${reg.player_last_name}`,
+      player_name: formatPlayerName(reg),
       division: reg.division,
       document_type: "signed_contract",
       file_path: filePath,
@@ -892,7 +945,7 @@ export default function CoachRosterPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 mb-1">
                       <p className="text-sm font-semibold text-charcoal">
-                        {p.player_first_name} {p.player_last_name}
+                        {formatPlayerName(p)}
                       </p>
                       <span className={`inline-block px-2 py-0.5 rounded-full text-xs font-semibold uppercase tracking-wide ${
                         p.status === "selected"

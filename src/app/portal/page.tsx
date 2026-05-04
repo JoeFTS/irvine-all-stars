@@ -30,6 +30,10 @@ interface Registration {
   secondary_parent_phone: string | null;
   volunteer_acknowledged: boolean;
   volunteer_acknowledged_at: string | null;
+  street_address: string | null;
+  city: string | null;
+  state: string | null;
+  zip: string | null;
 }
 
 interface PlayerDocument {
@@ -139,6 +143,7 @@ const keyDates = [
 /* ------------------------------------------------------------------ */
 
 const quickLinks = [
+  { label: "Player Info", href: "/portal/player-info", icon: "\u2605" },
   { label: "Tournaments", href: "/portal/tournaments", icon: "\uD83C\uDFC6" },
   { label: "Help", href: "/portal/help", icon: "?" },
   { label: "Documents", href: "/portal/documents", icon: "\u2193" },
@@ -291,7 +296,7 @@ export default function PortalPage() {
       const { data: regs } = await supabase!
         .from("tryout_registrations")
         .select(
-          "id, parent_name, parent_email, player_first_name, player_last_name, player_date_of_birth, division, team_id, primary_position, status, submitted_at, secondary_parent_name, secondary_parent_email, secondary_parent_phone, volunteer_acknowledged, volunteer_acknowledged_at"
+          "id, parent_name, parent_email, player_first_name, player_last_name, player_date_of_birth, division, team_id, primary_position, status, submitted_at, secondary_parent_name, secondary_parent_email, secondary_parent_phone, volunteer_acknowledged, volunteer_acknowledged_at, street_address, city, state, zip"
         )
         .or(`parent_email.eq.${user!.email},secondary_parent_email.eq.${user!.email}`)
         .order("submitted_at", { ascending: false });
@@ -752,6 +757,29 @@ export default function PortalPage() {
                             </p>
                           )}
                         </>
+                      );
+                    })()}
+
+                    {/* Player Info (PONY affidavit) nudge */}
+                    {(() => {
+                      const missingAddress =
+                        !reg.street_address || !reg.city || !reg.state || !reg.zip;
+                      if (!missingAddress) return null;
+                      return (
+                        <div className="mt-4 bg-star-gold-bright/10 border border-star-gold/30 rounded-2xl p-4">
+                          <p className="font-display text-xs font-semibold uppercase tracking-widest text-flag-blue mb-1">
+                            &#9733; Tournament Affidavit Info Needed
+                          </p>
+                          <p className="text-sm text-charcoal mb-3">
+                            Add your player&apos;s legal middle name, suffix, and home address. Required for the PONY tournament affidavit.
+                          </p>
+                          <Link
+                            href={`/portal/player-info?player=${reg.id}`}
+                            className="inline-block bg-flag-blue hover:bg-flag-blue-mid text-white px-5 py-2.5 rounded-full font-display text-xs font-semibold uppercase tracking-widest transition-colors"
+                          >
+                            Add Player Info
+                          </Link>
+                        </div>
                       );
                     })()}
 
