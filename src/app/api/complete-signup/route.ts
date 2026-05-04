@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
+import { Resend } from "resend";
 
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
@@ -10,6 +11,63 @@ const supabase =
         auth: { persistSession: false, autoRefreshToken: false },
       })
     : null;
+
+const resend = process.env.RESEND_API_KEY ? new Resend(process.env.RESEND_API_KEY) : null;
+const SIGNUP_NOTIFY_TO = "allstars@irvinepony.com";
+
+async function notifyParentSignup(opts: {
+  parentName: string;
+  parentEmail: string;
+  childrenNames: string[];
+}) {
+  if (!resend || !supabase) return;
+  try {
+    const { data: regs } = await supabase
+      .from("tryout_registrations")
+      .select("player_first_name, player_last_name, division, team_id, teams:team_id(team_name)")
+      .or(
+        `parent_email.eq.${opts.parentEmail.toLowerCase()},secondary_parent_email.eq.${opts.parentEmail.toLowerCase()}`
+      );
+
+    type RegRow = { player_first_name: string; player_last_name: string; division: string | null; team_id: string | null; teams: { team_name: string } | { team_name: string }[] | null };
+    const teamLines = (regs ?? []).map((r) => {
+      const row = r as RegRow;
+      const teamObj = Array.isArray(row.teams) ? row.teams[0] : row.teams;
+      const team = teamObj?.team_name ?? row.division ?? "(no team)";
+      return `${row.player_first_name} ${row.player_last_name} — ${team}`;
+    });
+    const childrenList = teamLines.length > 0 ? teamLines.join("\n") : opts.childrenNames.join(", ");
+
+    const childrenLabel = opts.childrenNames.length === 1 ? "child" : "children";
+    const subject = `Parent signed up: ${opts.parentName} (${opts.childrenNames.join(", ")})`;
+    const html = `<!DOCTYPE html>
+<html><body style="margin:0;padding:0;background:#FAFAF8;font-family:system-ui,-apple-system,sans-serif;">
+<table width="100%" cellpadding="0" cellspacing="0" style="padding:32px 16px;">
+<tr><td align="center">
+<table width="560" cellpadding="0" cellspacing="0" style="max-width:560px;background:#FFF;border:1px solid #E5E7EB;border-radius:8px;">
+<tr><td style="background:#0A2342;padding:18px 24px;color:#FFF;">
+<p style="margin:0;font-size:11px;letter-spacing:2px;color:#F4B400;text-transform:uppercase;">Irvine All-Stars · Signup Alert</p>
+<h1 style="margin:6px 0 0;font-size:18px;font-weight:700;">Parent activated their account</h1>
+</td></tr>
+<tr><td style="padding:20px 24px;color:#1C1C1C;font-size:14px;line-height:1.6;">
+<p style="margin:0 0 12px;"><strong>${opts.parentName}</strong> (${opts.parentEmail}) signed up for the parent portal.</p>
+<p style="margin:0 0 6px;color:#4B5563;font-size:12px;text-transform:uppercase;letter-spacing:1px;">${childrenLabel}</p>
+<pre style="margin:0;padding:12px;background:#F5F1EB;border-radius:6px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;white-space:pre-wrap;">${childrenList}</pre>
+<p style="margin:18px 0 0;color:#9CA3AF;font-size:12px;">Sent automatically by the parent portal.</p>
+</td></tr>
+</table></td></tr></table></body></html>`;
+
+    await resend.emails.send({
+      from: "Irvine All-Stars <AllStars@irvineallstars.com>",
+      to: [SIGNUP_NOTIFY_TO],
+      subject,
+      html,
+      replyTo: SIGNUP_NOTIFY_TO,
+    });
+  } catch (err) {
+    console.error("notifyParentSignup error:", err);
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -135,6 +193,14 @@ export async function POST(request: NextRequest) {
         await processParentInvite(sib);
         await supabase.from("invites").update({ used: true }).eq("id", sib.id);
       }
+    }
+
+    if (invite.role === "parent") {
+      void notifyParentSignup({
+        parentName: name,
+        parentEmail: inviteEmail,
+        childrenNames,
+      });
     }
 
     return NextResponse.json({ success: true, children: childrenNames });
