@@ -268,13 +268,9 @@ export default function CoachDashboardPage() {
   const hasBirthCert = new Set(
     documents.filter((d) => d.document_type === "birth_certificate").map((d) => d.registration_id)
   );
-  const hasPhoto = new Set(
-    documents.filter((d) => d.document_type === "player_photo").map((d) => d.registration_id)
-  );
   const hasContract = new Set(contracts.map((c) => c.registration_id));
 
   const missingBirthCert = registrations.filter((r) => !hasBirthCert.has(r.id)).length;
-  const missingPhoto = registrations.filter((r) => !hasPhoto.has(r.id)).length;
   const missingContract = registrations.filter((r) => !hasContract.has(r.id)).length;
 
   const certTypes = new Set(coachCerts.map((c) => c.cert_type));
@@ -283,10 +279,9 @@ export default function CoachDashboardPage() {
   const hasTournamentAck = tournamentAgreements.length > 0;
 
   // Compliance calculation
-  const totalItems = playerCount * 3 + 2 + 1; // 3 per player + 2 certs + 1 agreement
+  const totalItems = playerCount * 2 + 2 + 1; // 2 per player (birth cert + contract) + 2 certs + 1 agreement
   const completedPlayerItems =
     (playerCount - missingBirthCert) +
-    (playerCount - missingPhoto) +
     (playerCount - missingContract);
   const completedCoachItems =
     (hasConcussion ? 1 : 0) + (hasCardiac ? 1 : 0) + (hasTournamentAck ? 1 : 0);
@@ -297,8 +292,6 @@ export default function CoachDashboardPage() {
   const actionItems: { label: string; count?: number; href: string }[] = [];
   if (missingBirthCert > 0)
     actionItems.push({ label: "players missing birth certificate", count: missingBirthCert, href: "/coach/checklist" });
-  if (missingPhoto > 0)
-    actionItems.push({ label: "players missing player photo", count: missingPhoto, href: "/coach/checklist" });
   if (missingContract > 0)
     actionItems.push({ label: "players haven't signed contract", count: missingContract, href: "/coach/checklist" });
   if (!hasConcussion)

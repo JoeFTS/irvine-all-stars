@@ -29,7 +29,7 @@ export const contractSections = [
   },
   {
     title: "Tournament Documentation",
-    body: "The following documents are required for tournament eligibility: birth certificate, player photo, and signed forms. All documents must be submitted before the first tournament. Failure to provide required documentation on time may result in the player being ineligible to participate.",
+    body: "The following documents are required for tournament eligibility: birth certificate and signed forms. All documents must be submitted before the first tournament. Failure to provide required documentation on time may result in the player being ineligible to participate.",
   },
   {
     title: "Conduct",

@@ -98,7 +98,6 @@ function getPlayerCompliance(
   const hasBirthCert = regDocs.some(
     (d) => d.document_type === "birth_certificate"
   );
-  const hasPhoto = regDocs.some((d) => d.document_type === "player_photo");
   const hasSignedContract = contracts.some((c) => c.registration_id === regId);
   const hasUploadedContract = regDocs.some(
     (d) => d.document_type === "signed_contract"
@@ -108,12 +107,11 @@ function getPlayerCompliance(
 
   return {
     birthCert: hasBirthCert,
-    photo: hasPhoto,
     contract: hasContract,
     contractSigned: hasSignedContract,
     contractUploaded: hasUploadedContract,
     medical: hasMedical,
-    ready: hasBirthCert && hasPhoto && hasContract && hasMedical,
+    ready: hasBirthCert && hasContract && hasMedical,
   };
 }
 
@@ -385,20 +383,6 @@ function PlayerCard({
           onClickMissing={!compliance.birthCert ? () => onOpenUpload(reg.id, "birth_certificate") : undefined}
         />
         <DocBadge
-          label="Photo"
-          ok={compliance.photo}
-          okText="Uploaded"
-          missingText="Missing"
-          onClick={compliance.photo ? async () => {
-            const doc = docs.find(d => d.registration_id === reg.id && d.document_type === "player_photo");
-            if (doc?.file_path && supabase) {
-              const { data } = await supabase.storage.from("player-documents").createSignedUrl(doc.file_path, 300);
-              if (data?.signedUrl) window.open(data.signedUrl, "_blank");
-            }
-          } : undefined}
-          onClickMissing={!compliance.photo ? () => onOpenUpload(reg.id, "player_photo") : undefined}
-        />
-        <DocBadge
           label="Contract"
           ok={compliance.contract}
           okText={compliance.contractUploaded && !compliance.contractSigned ? "Uploaded" : "Signed"}
@@ -431,11 +415,7 @@ function PlayerCard({
         <div className="p-4 md:p-5 border-t border-gray-100 bg-blue-50/30">
           <div className="flex items-center justify-between mb-3">
             <p className="text-xs font-semibold uppercase tracking-wider text-flag-blue">
-              Upload{" "}
-              {uploadingDocType === "birth_certificate"
-                ? "Birth Certificate"
-                : "Player Photo"}{" "}
-              for {playerName}
+              Upload Birth Certificate for {playerName}
             </p>
             <button
               type="button"
@@ -447,26 +427,10 @@ function PlayerCard({
           </div>
           <FileUpload
             bucket="player-documents"
-            folder={
-              uploadingDocType === "birth_certificate"
-                ? `birth-certs/${reg.id}`
-                : `player-photos/${reg.id}`
-            }
-            label={
-              uploadingDocType === "birth_certificate"
-                ? "Birth Certificate"
-                : "Player Photo"
-            }
-            description={
-              uploadingDocType === "birth_certificate"
-                ? "Upload a scan or photo of the player's birth certificate (image or PDF)."
-                : "Upload a recent headshot-style photo of the player (image only)."
-            }
-            accept={
-              uploadingDocType === "birth_certificate"
-                ? "image/*,.pdf"
-                : "image/*"
-            }
+            folder={`birth-certs/${reg.id}`}
+            label="Birth Certificate"
+            description="Upload a scan or photo of the player's birth certificate (image or PDF)."
+            accept="image/*,.pdf"
             maxSizeMB={10}
             onUploadComplete={(filePath, fileName) => {
               onDocUpload(
@@ -1005,7 +969,6 @@ export default function CoachRosterPage() {
                 compliance={
                   complianceMap.get(reg.id) ?? {
                     birthCert: false,
-                    photo: false,
                     contract: false,
                     contractSigned: false,
                     contractUploaded: false,
@@ -1058,7 +1021,6 @@ export default function CoachRosterPage() {
                       compliance={
                         complianceMap.get(reg.id) ?? {
                           birthCert: false,
-                          photo: false,
                           contract: false,
                           contractSigned: false,
                           contractUploaded: false,

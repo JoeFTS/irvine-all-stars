@@ -17,7 +17,6 @@ import {
   ShieldCheck,
   Info,
   AlertTriangle,
-  Camera,
   Download,
   Users,
 } from "lucide-react";
@@ -485,7 +484,7 @@ export default function BinderChecklistPage() {
           <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide flex items-center">
             Binder Checklist
             <HelpTooltip
-              text="Track required documents like birth certificates, photos, and contracts for your team."
+              text="Track required documents like birth certificates and contracts for your team."
               guideUrl="/coach/help"
             />
           </h1>
@@ -517,7 +516,7 @@ export default function BinderChecklistPage() {
         <h1 className="font-display text-3xl md:text-4xl font-bold uppercase tracking-wide flex items-center">
           Binder Checklist
           <HelpTooltip
-            text="Track required documents like birth certificates, photos, and contracts for your team."
+            text="Track required documents like birth certificates and contracts for your team."
             guideUrl="/coach/help"
           />
         </h1>
@@ -869,14 +868,14 @@ export default function BinderChecklistPage() {
       </div>
 
       {/* ================================================================ */}
-      {/*  SECTION 5: Birth Certificates & Player Photos (per player)      */}
+      {/*  SECTION 5: Birth Certificates (per player)                       */}
       {/* ================================================================ */}
       <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
         <div className="p-5 flex items-center gap-3 border-b border-gray-100">
           <SectionNumber n={5} />
           <div className="flex-1">
             <h2 className="font-display text-lg font-bold uppercase tracking-wider">
-              Birth Certificates &amp; Player Photos
+              Birth Certificates
             </h2>
             <p className="text-xs text-gray-400 mt-0.5">
               {s5Complete} of {s5Total} birth certs uploaded
@@ -898,7 +897,6 @@ export default function BinderChecklistPage() {
           ) : (
             registrations.map((reg) => {
               const birthCert = playerHasDoc(reg.id, "birth_certificate");
-              const photo = playerHasDoc(reg.id, "player_photo");
               const status: SectionItemStatus = birthCert ? "complete" : "pending";
               return (
                 <div
@@ -921,16 +919,6 @@ export default function BinderChecklistPage() {
                       >
                         <Eye size={14} />
                         Birth Cert
-                      </button>
-                    )}
-                    {photo?.file_path && (
-                      <button
-                        onClick={() => handleViewDocument(photo.file_path!)}
-                        className="flex items-center gap-1.5 px-3 py-2 min-h-[44px] rounded-full text-xs font-semibold bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
-                        title="View player photo"
-                      >
-                        <Camera size={14} />
-                        Photo
                       </button>
                     )}
                     <span

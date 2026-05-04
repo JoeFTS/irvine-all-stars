@@ -900,11 +900,6 @@ export default function PortalPage() {
                     d.registration_id === reg.id &&
                     d.document_type === "birth_certificate"
                 );
-                const hasPhoto = documents.some(
-                  (d) =>
-                    d.registration_id === reg.id &&
-                    d.document_type === "player_photo"
-                );
                 const hasContract = contracts.some(
                   (c) => c.registration_id === reg.id
                 );
@@ -937,12 +932,6 @@ export default function PortalPage() {
                     done: hasContract,
                     href: `/portal/contract?player=${reg.id}`,
                     locked: !hasAcceptedSelection,
-                  },
-                  {
-                    label: "Upload player photo",
-                    done: hasPhoto,
-                    href: `/portal/documents?player=${reg.id}`,
-                    locked: !hasContract,
                   },
                   {
                     label: "Upload birth certificate",

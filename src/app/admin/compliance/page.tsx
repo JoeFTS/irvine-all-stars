@@ -92,14 +92,12 @@ interface DivisionCompliance {
     name: string;
     hasContract: boolean;
     hasBirthCert: boolean;
-    hasPhoto: boolean;
     isReady: boolean;
   }>;
   totalPlayers: number;
   readyCount: number;
   contractCount: number;
   birthCertCount: number;
-  photoCount: number;
 }
 
 export default function CompliancePage() {
@@ -204,14 +202,12 @@ export default function CompliancePage() {
         const docTypes = docsByReg.get(r.id) ?? new Set();
         const hasContract = contractSet.has(r.id);
         const hasBirthCert = docTypes.has("birth_certificate");
-        const hasPhoto = docTypes.has("player_photo");
         return {
           id: r.id,
           name: `${r.player_first_name} ${r.player_last_name}`,
           hasContract,
           hasBirthCert,
-          hasPhoto,
-          isReady: hasContract && hasBirthCert && hasPhoto,
+          isReady: hasContract && hasBirthCert,
         };
       });
 
@@ -222,7 +218,6 @@ export default function CompliancePage() {
         readyCount: players.filter((p) => p.isReady).length,
         contractCount: players.filter((p) => p.hasContract).length,
         birthCertCount: players.filter((p) => p.hasBirthCert).length,
-        photoCount: players.filter((p) => p.hasPhoto).length,
       };
     }).filter((d) => d.totalPlayers > 0 || teams.some((t) => t.division === d.division));
   }, [registrations, docsByReg, contractSet, teams]);
@@ -380,8 +375,8 @@ export default function CompliancePage() {
           />
         </h1>
         <p className="text-gray-400 text-sm mt-1">
-          Which divisions are tournament-ready. All players need contracts,
-          birth certs, and photos AND all assigned coaches need both certifications.
+          Which divisions are tournament-ready. All players need contracts and
+          birth certs AND all assigned coaches need both certifications.
         </p>
       </div>
 
@@ -533,17 +528,16 @@ export default function CompliancePage() {
                 {isExpanded && (
                   <div className="border-t border-gray-100">
                     {/* Column headers */}
-                    <div className="hidden sm:grid grid-cols-[1fr_80px_80px_80px] gap-2 px-5 py-2 bg-gray-50 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
+                    <div className="hidden sm:grid grid-cols-[1fr_80px_80px] gap-2 px-5 py-2 bg-gray-50 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
                       <span>Player</span>
                       <span className="text-center">Contract</span>
                       <span className="text-center">Birth Cert</span>
-                      <span className="text-center">Photo</span>
                     </div>
 
                     {div.players.map((player) => (
                       <div
                         key={player.id}
-                        className={`grid grid-cols-1 sm:grid-cols-[1fr_80px_80px_80px] gap-2 px-5 py-3 border-b border-gray-50 last:border-0 ${
+                        className={`grid grid-cols-1 sm:grid-cols-[1fr_80px_80px] gap-2 px-5 py-3 border-b border-gray-50 last:border-0 ${
                           player.isReady ? "" : "bg-red-50/30"
                         }`}
                       >
@@ -578,19 +572,6 @@ export default function CompliancePage() {
                             Birth Cert
                           </span>
                           {player.hasBirthCert ? (
-                            <CheckCircle2
-                              size={16}
-                              className="text-green-500"
-                            />
-                          ) : (
-                            <XCircle size={16} className="text-gray-300" />
-                          )}
-                        </div>
-                        <div className="flex sm:justify-center items-center gap-1">
-                          <span className="sm:hidden text-[10px] text-gray-400 uppercase tracking-wide w-16">
-                            Photo
-                          </span>
-                          {player.hasPhoto ? (
                             <CheckCircle2
                               size={16}
                               className="text-green-500"

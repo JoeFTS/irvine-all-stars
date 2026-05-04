@@ -59,7 +59,6 @@ interface ComplianceStats {
   totalPlayers: number;
   birthCert: number;
   contractSigned: number;
-  photoUploaded: number;
   readyPercent: number;
 }
 
@@ -72,7 +71,7 @@ function computeCompliance(
   const divRegs = regs.filter((r) => r.division === division);
   const totalPlayers = divRegs.length;
   if (totalPlayers === 0) {
-    return { totalPlayers: 0, birthCert: 0, contractSigned: 0, photoUploaded: 0, readyPercent: 0 };
+    return { totalPlayers: 0, birthCert: 0, contractSigned: 0, readyPercent: 0 };
   }
 
   const regIds = new Set(divRegs.map((r) => r.id));
@@ -80,12 +79,9 @@ function computeCompliance(
   const birthCert = docs.filter(
     (d) => regIds.has(d.registration_id) && d.document_type === "birth_certificate"
   ).length;
-  const photoUploaded = docs.filter(
-    (d) => regIds.has(d.registration_id) && d.document_type === "player_photo"
-  ).length;
   const contractSigned = contracts.filter((c) => regIds.has(c.registration_id)).length;
 
-  // Ready = has all 3 docs
+  // Ready = has birth cert + signed contract
   const regDocsMap = new Map<string, Set<string>>();
   for (const d of docs) {
     if (!regIds.has(d.registration_id)) continue;
@@ -98,16 +94,14 @@ function computeCompliance(
   for (const reg of divRegs) {
     const docSet = regDocsMap.get(reg.id);
     const hasBirth = docSet?.has("birth_certificate") ?? false;
-    const hasPhoto = docSet?.has("player_photo") ?? false;
     const hasContract = contractSet.has(reg.id);
-    if (hasBirth && hasPhoto && hasContract) readyCount++;
+    if (hasBirth && hasContract) readyCount++;
   }
 
   return {
     totalPlayers,
     birthCert,
     contractSigned,
-    photoUploaded,
     readyPercent: Math.round((readyCount / totalPlayers) * 100),
   };
 }
@@ -642,17 +636,6 @@ export default function TeamsPage() {
                             </p>
                             <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
                               Contract
-                            </p>
-                          </div>
-                          <div className="text-center p-2 bg-gray-50 rounded-2xl">
-                            <p className="text-lg font-bold text-charcoal">
-                              {compliance.photoUploaded}
-                              <span className="text-xs text-gray-400 font-normal">
-                                /{compliance.totalPlayers}
-                              </span>
-                            </p>
-                            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wide">
-                              Photo
                             </p>
                           </div>
                         </div>

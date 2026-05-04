@@ -213,8 +213,8 @@ function DocumentsPage() {
             />
           </h1>
           <p className="text-white/60 text-lg md:text-xl max-w-2xl mx-auto leading-relaxed">
-            Upload a birth certificate and player photo for each registered
-            player. These are required for tournament eligibility.
+            Upload a birth certificate for each registered player. Required for
+            tournament eligibility.
           </p>
         </div>
       </section>
@@ -253,7 +253,6 @@ function DocumentsPage() {
             <div className="space-y-8">
               {registrations.map((reg) => {
                 const birthCert = getExistingDoc(reg.id, "birth_certificate");
-                const playerPhoto = getExistingDoc(reg.id, "player_photo");
 
                 return (
                   <div
@@ -299,33 +298,6 @@ function DocumentsPage() {
                         }
                       />
 
-                      {/* Player Photo */}
-                      <FileUpload
-                        bucket="player-documents"
-                        folder={`player-photos/${reg.id}`}
-                        label="Player Photo"
-                        description="Upload a recent headshot-style photo of the player (image only)"
-                        accept="image/*"
-                        maxSizeMB={10}
-                        existingFile={
-                          playerPhoto
-                            ? {
-                                path: playerPhoto.file_path,
-                                name: playerPhoto.file_name,
-                              }
-                            : null
-                        }
-                        onUploadComplete={(filePath, fileName) =>
-                          handleUploadComplete(
-                            reg.id,
-                            playerFullName(reg),
-                            reg.division,
-                            "player_photo",
-                            filePath,
-                            fileName
-                          )
-                        }
-                      />
                     </div>
                   </div>
                 );
