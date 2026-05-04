@@ -27,6 +27,8 @@ import {
 
 const RULEBOOK_PATH = "/rules/2026-pony-baseball-rulebook.pdf";
 const RULEBOOK_FILENAME = "2026-pony-baseball-rulebook.pdf";
+const AFFIDAVIT_GUIDE_PATH = "/docs/2026-affidavit-process-guide.pdf";
+const AFFIDAVIT_GUIDE_FILENAME = "2026-affidavit-process-guide.pdf";
 
 interface Tournament {
   id: string;
@@ -362,6 +364,13 @@ export default function CornerTournamentsPage() {
             description="The complete official rulebook (PDF)."
             href={RULEBOOK_PATH}
             download={RULEBOOK_FILENAME}
+          />
+          <ResourceLink
+            icon={FileText}
+            title="2026 Affidavit Process Guide"
+            description="Step-by-step walkthrough for managers/team reps to complete the Tournament Team Eligibility Affidavit (PDF)."
+            href={AFFIDAVIT_GUIDE_PATH}
+            download={AFFIDAVIT_GUIDE_FILENAME}
           />
           <ResourceLink
             icon={FileText}

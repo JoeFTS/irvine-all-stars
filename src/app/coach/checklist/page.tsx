@@ -1160,6 +1160,31 @@ export default function BinderChecklistPage() {
         </div>
       )}
 
+      {/* ---- Helpful Resources ---- */}
+      <div className="rounded-2xl bg-white border border-gray-200 p-4 sm:p-5">
+        <h3 className="font-display text-sm font-bold uppercase tracking-wide text-flag-blue mb-3">
+          Helpful Resources
+        </h3>
+        <a
+          href="/docs/2026-affidavit-process-guide.pdf"
+          download="2026-affidavit-process-guide.pdf"
+          className="flex items-start gap-3 bg-gray-50 hover:bg-flag-blue/5 border border-gray-100 rounded-xl p-4 transition-colors group min-h-[44px]"
+        >
+          <div className="bg-white text-flag-blue p-2 rounded-lg border border-gray-200 shrink-0">
+            <FileText size={18} />
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="font-semibold text-charcoal text-sm">
+              2026 Affidavit Process Guide
+            </p>
+            <p className="text-xs text-gray-500 mt-0.5">
+              Step-by-step walkthrough for completing the Tournament Team Eligibility Affidavit at pony-affidavit.org (PDF).
+            </p>
+          </div>
+          <Download size={16} className="text-gray-400 group-hover:text-flag-blue shrink-0 mt-1" />
+        </a>
+      </div>
+
       {/* ---- Footer Note ---- */}
       <div className="flex items-start gap-3 p-4 rounded-2xl bg-gray-50 border border-gray-200">
         <Info size={18} className="text-gray-400 shrink-0 mt-0.5" />

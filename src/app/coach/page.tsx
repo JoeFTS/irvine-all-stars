@@ -19,7 +19,7 @@ import {
   Trophy,
   FileSpreadsheet,
   DollarSign,
-  Sparkles,
+  FileText,
 } from "lucide-react";
 import { useAuth } from "@/contexts/auth-context";
 import { supabase } from "@/lib/supabase";
@@ -82,6 +82,7 @@ const coachesCorner: Array<{
   tagline: string;
   description: string;
   icon: typeof Trophy;
+  download?: string;
 }> = [
   {
     href: "/coach/corner/tournaments",
@@ -105,11 +106,12 @@ const coachesCorner: Array<{
     icon: DollarSign,
   },
   {
-    href: null,
-    label: "Coming Soon",
-    tagline: "More On Deck",
-    description: "More coach resources dropping throughout the season.",
-    icon: Sparkles,
+    href: "/docs/2026-affidavit-process-guide.pdf",
+    download: "2026-affidavit-process-guide.pdf",
+    label: "Affidavits",
+    tagline: "Tournament Eligibility",
+    description: "Step-by-step guide for completing the Tournament Team Eligibility Affidavit.",
+    icon: FileText,
   },
 ];
 
@@ -611,12 +613,11 @@ export default function CoachDashboardPage() {
               );
             }
 
-            return (
-              <Link
-                key={card.label}
-                href={card.href!}
-                className="group relative overflow-hidden rounded-2xl bg-flag-blue p-6 min-h-[172px] flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-flag-blue/20"
-              >
+            const cardClass =
+              "group relative overflow-hidden rounded-2xl bg-flag-blue p-6 min-h-[172px] flex flex-col justify-between transition-all duration-300 hover:-translate-y-1 hover:shadow-2xl hover:shadow-flag-blue/20";
+
+            const inner = (
+              <>
                 {/* Star pattern overlay */}
                 <div
                   aria-hidden
@@ -664,6 +665,25 @@ export default function CoachDashboardPage() {
                 <p className="relative z-10 text-xs text-white/70 leading-snug mt-4 pl-[46px]">
                   {card.description}
                 </p>
+              </>
+            );
+
+            if (card.download) {
+              return (
+                <a
+                  key={card.label}
+                  href={card.href!}
+                  download={card.download}
+                  className={cardClass}
+                >
+                  {inner}
+                </a>
+              );
+            }
+
+            return (
+              <Link key={card.label} href={card.href!} className={cardClass}>
+                {inner}
               </Link>
             );
           })}
