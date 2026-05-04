@@ -82,7 +82,7 @@ const coachesCorner: Array<{
   tagline: string;
   description: string;
   icon: typeof Trophy;
-  download?: string;
+  newTab?: boolean;
 }> = [
   {
     href: "/coach/corner/tournaments",
@@ -107,7 +107,7 @@ const coachesCorner: Array<{
   },
   {
     href: "/docs/2026-affidavit-process-guide.pdf",
-    download: "2026-affidavit-process-guide.pdf",
+    newTab: true,
     label: "Affidavits",
     tagline: "Tournament Eligibility",
     description: "Step-by-step guide for completing the Tournament Team Eligibility Affidavit.",
@@ -668,12 +668,13 @@ export default function CoachDashboardPage() {
               </>
             );
 
-            if (card.download) {
+            if (card.newTab) {
               return (
                 <a
                   key={card.label}
                   href={card.href!}
-                  download={card.download}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className={cardClass}
                 >
                   {inner}

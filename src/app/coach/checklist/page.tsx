@@ -1167,7 +1167,8 @@ export default function BinderChecklistPage() {
         </h3>
         <a
           href="/docs/2026-affidavit-process-guide.pdf"
-          download="2026-affidavit-process-guide.pdf"
+          target="_blank"
+          rel="noopener noreferrer"
           className="flex items-start gap-3 bg-gray-50 hover:bg-flag-blue/5 border border-gray-100 rounded-xl p-4 transition-colors group min-h-[44px]"
         >
           <div className="bg-white text-flag-blue p-2 rounded-lg border border-gray-200 shrink-0">
@@ -1178,7 +1179,7 @@ export default function BinderChecklistPage() {
               2026 Affidavit Process Guide
             </p>
             <p className="text-xs text-gray-500 mt-0.5">
-              Step-by-step walkthrough for completing the Tournament Team Eligibility Affidavit at pony-affidavit.org (PDF).
+              Step-by-step walkthrough for completing the Tournament Team Eligibility Affidavit at pony-affidavit.org. Opens in a new tab; download from your browser&apos;s PDF viewer.
             </p>
           </div>
           <Download size={16} className="text-gray-400 group-hover:text-flag-blue shrink-0 mt-1" />
