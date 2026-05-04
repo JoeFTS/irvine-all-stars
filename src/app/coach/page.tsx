@@ -113,17 +113,35 @@ const coachesCorner: Array<{
   },
 ];
 
-const upcomingDates = [
-  { event: "Coach Candidacy Deadline", date: "March 22" },
-  { event: "Peer Coach Voting", date: "March 24 - 26" },
-  { event: "All-Star Coaches Named", date: "March 27" },
-  { event: "Scouting Period", date: "March 28 - April 11" },
-  { event: "All-Star Tryouts", date: "April 12" },
-  { event: "Players Notified", date: "April 14" },
-  { event: "Memorial Day Tournament", date: "Late May (league-funded)" },
-  { event: "District Tournaments Begin", date: "June 11" },
-  { event: "Binder Sign-Off Deadline", date: "Before your first tournament game" },
+interface UpcomingEvent {
+  event: string;
+  date: string;
+  // end ISO date used for filtering; null = always show (open-ended)
+  end: string | null;
+}
+
+const upcomingDates: UpcomingEvent[] = [
+  { event: "Coach Candidacy Deadline", date: "March 22", end: "2026-03-22" },
+  { event: "Peer Coach Voting", date: "March 24 - 26", end: "2026-03-26" },
+  { event: "All-Star Coaches Named", date: "March 27", end: "2026-03-27" },
+  { event: "Scouting Period", date: "March 28 - April 11", end: "2026-04-11" },
+  { event: "All-Star Tryouts", date: "April 12", end: "2026-04-12" },
+  { event: "Players Notified", date: "April 14", end: "2026-04-14" },
+  { event: "Memorial Day Tournament", date: "Late May (league-funded)", end: "2026-05-31" },
+  { event: "District Tournaments Begin", date: "June 11", end: "2026-06-11" },
+  { event: "Binder Sign-Off Deadline", date: "Before your first tournament game", end: null },
 ];
+
+function filterUpcoming(events: UpcomingEvent[]): UpcomingEvent[] {
+  const now = new Date();
+  const todayStr =
+    now.getFullYear() +
+    "-" +
+    String(now.getMonth() + 1).padStart(2, "0") +
+    "-" +
+    String(now.getDate()).padStart(2, "0");
+  return events.filter((e) => e.end === null || e.end >= todayStr);
+}
 
 /* ------------------------------------------------------------------ */
 /*  Component                                                          */
@@ -488,31 +506,37 @@ export default function CoachDashboardPage() {
       </div>
 
       {/* 4. Upcoming */}
-      <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6">
-        <h3 className="font-display text-lg font-bold uppercase tracking-wide text-flag-blue mb-3">
-          Upcoming
-        </h3>
-        <ul className="space-y-3">
-          {upcomingDates.map((item, i) => (
-            <li key={i} className="flex items-start gap-3">
-              <Calendar size={18} className="text-flag-gold mt-0.5 shrink-0" />
-              <div>
-                <p className="font-semibold text-gray-800">{item.event}</p>
-                <p className="text-sm text-gray-500">{item.date}</p>
-              </div>
-            </li>
-          ))}
-        </ul>
-        <a
-          href="https://docs.google.com/spreadsheets/d/1Drx76VHKBQrb-dcL8nCfBUfxZio9pVXBVf01HHbcuh0/edit?gid=1045930144#gid=1045930144"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-flag-blue hover:text-flag-red transition-colors"
-        >
-          <ExternalLink size={14} />
-          View Full Sanction Play Schedule
-        </a>
-      </div>
+      {(() => {
+        const visible = filterUpcoming(upcomingDates);
+        if (visible.length === 0) return null;
+        return (
+          <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6">
+            <h3 className="font-display text-lg font-bold uppercase tracking-wide text-flag-blue mb-3">
+              Upcoming
+            </h3>
+            <ul className="space-y-3">
+              {visible.map((item, i) => (
+                <li key={i} className="flex items-start gap-3">
+                  <Calendar size={18} className="text-flag-gold mt-0.5 shrink-0" />
+                  <div>
+                    <p className="font-semibold text-gray-800">{item.event}</p>
+                    <p className="text-sm text-gray-500">{item.date}</p>
+                  </div>
+                </li>
+              ))}
+            </ul>
+            <a
+              href="https://docs.google.com/spreadsheets/d/1Drx76VHKBQrb-dcL8nCfBUfxZio9pVXBVf01HHbcuh0/edit?gid=1045930144#gid=1045930144"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="mt-4 inline-flex items-center gap-2 text-sm font-semibold text-flag-blue hover:text-flag-red transition-colors"
+            >
+              <ExternalLink size={14} />
+              View Full Sanction Play Schedule
+            </a>
+          </div>
+        );
+      })()}
 
       {/* 5. Announcements (if any) */}
       {announcements.length > 0 && (
