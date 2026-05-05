@@ -18,8 +18,8 @@ interface FileUploadProps {
 export default function FileUpload({
   bucket,
   folder,
-  accept = "image/*,.pdf",
-  maxSizeMB = 10,
+  accept = "image/*,.pdf,.heic,.heif",
+  maxSizeMB = 25,
   label,
   description,
   onUploadComplete,

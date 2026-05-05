@@ -275,9 +275,9 @@ function DocumentsPage() {
                         bucket="player-documents"
                         folder={`birth-certs/${reg.id}`}
                         label="Birth Certificate"
-                        description="Upload a scan or photo of the player's birth certificate (image or PDF)"
-                        accept="image/*,.pdf"
-                        maxSizeMB={10}
+                        description="Upload a scan or photo of the player's birth certificate or US passport (image or PDF)"
+                        accept="image/*,.pdf,.heic,.heif"
+                        maxSizeMB={25}
                         existingFile={
                           birthCert
                             ? {
