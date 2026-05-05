@@ -30,13 +30,58 @@ async function notifyParentSignup(opts: {
       );
 
     type RegRow = { player_first_name: string; player_last_name: string; division: string | null; team_id: string | null; teams: { team_name: string } | { team_name: string }[] | null };
-    const teamLines = (regs ?? []).map((r) => {
-      const row = r as RegRow;
+    const regRows = (regs ?? []) as RegRow[];
+    const teamLines = regRows.map((row) => {
       const teamObj = Array.isArray(row.teams) ? row.teams[0] : row.teams;
       const team = teamObj?.team_name ?? row.division ?? "(no team)";
       return `${row.player_first_name} ${row.player_last_name} — ${team}`;
     });
     const childrenList = teamLines.length > 0 ? teamLines.join("\n") : opts.childrenNames.join(", ");
+
+    // Team progress: for each unique team this parent's children are on, how many
+    // total players and how many have at least one parent who has signed up.
+    const teamIds = Array.from(
+      new Set(regRows.map((r) => r.team_id).filter((id): id is string => Boolean(id)))
+    );
+    const progressLines: string[] = [];
+    if (teamIds.length > 0) {
+      const { data: profileRows } = await supabase
+        .from("profiles")
+        .select("email")
+        .eq("role", "parent");
+      const signedUpEmails = new Set(
+        (profileRows ?? []).map((p) => (p.email || "").toLowerCase()).filter(Boolean)
+      );
+
+      const { data: teamRegs } = await supabase
+        .from("tryout_registrations")
+        .select("team_id, parent_email, secondary_parent_email, teams:team_id(team_name)")
+        .in("team_id", teamIds);
+
+      type TeamReg = { team_id: string; parent_email: string | null; secondary_parent_email: string | null; teams: { team_name: string } | { team_name: string }[] | null };
+      const byTeam = new Map<string, { name: string; total: number; signedUp: number }>();
+      for (const tr of (teamRegs ?? []) as TeamReg[]) {
+        const teamObj = Array.isArray(tr.teams) ? tr.teams[0] : tr.teams;
+        const name = teamObj?.team_name ?? "(unnamed team)";
+        const entry = byTeam.get(tr.team_id) ?? { name, total: 0, signedUp: 0 };
+        entry.total += 1;
+        const primary = (tr.parent_email || "").toLowerCase();
+        const secondary = (tr.secondary_parent_email || "").toLowerCase();
+        if ((primary && signedUpEmails.has(primary)) || (secondary && signedUpEmails.has(secondary))) {
+          entry.signedUp += 1;
+        }
+        byTeam.set(tr.team_id, entry);
+      }
+
+      for (const { name, total, signedUp } of byTeam.values()) {
+        const remaining = total - signedUp;
+        progressLines.push(`${name} — ${signedUp} of ${total} signed up (${remaining} left)`);
+      }
+    }
+    const progressBlock = progressLines.length > 0
+      ? `<p style="margin:18px 0 6px;color:#4B5563;font-size:12px;text-transform:uppercase;letter-spacing:1px;">Team progress</p>
+<pre style="margin:0;padding:12px;background:#F5F1EB;border-radius:6px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;white-space:pre-wrap;">${progressLines.join("\n")}</pre>`
+      : "";
 
     const childrenLabel = opts.childrenNames.length === 1 ? "child" : "children";
     const subject = `Parent signed up: ${opts.parentName} (${opts.childrenNames.join(", ")})`;
@@ -53,6 +98,7 @@ async function notifyParentSignup(opts: {
 <p style="margin:0 0 12px;"><strong>${opts.parentName}</strong> (${opts.parentEmail}) signed up for the parent portal.</p>
 <p style="margin:0 0 6px;color:#4B5563;font-size:12px;text-transform:uppercase;letter-spacing:1px;">${childrenLabel}</p>
 <pre style="margin:0;padding:12px;background:#F5F1EB;border-radius:6px;font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:13px;white-space:pre-wrap;">${childrenList}</pre>
+${progressBlock}
 <p style="margin:18px 0 0;color:#9CA3AF;font-size:12px;">Sent automatically by the parent portal.</p>
 </td></tr>
 </table></td></tr></table></body></html>`;
