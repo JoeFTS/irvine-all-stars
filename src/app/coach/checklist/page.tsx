@@ -21,6 +21,7 @@ import {
   Users,
 } from "lucide-react";
 import FileUpload from "@/components/file-upload";
+import { viewAndDownloadDoc } from "@/lib/storage-helpers";
 
 /* ------------------------------------------------------------------ */
 /*  Types                                                              */
@@ -40,6 +41,7 @@ interface PlayerDocument {
   registration_id: string;
   document_type: string;
   file_path: string | null;
+  file_name: string | null;
 }
 
 interface TeamDocument {
@@ -259,7 +261,7 @@ export default function BinderChecklistPage() {
         undraftedQuery,
         supabase
           .from("player_documents")
-          .select("id, registration_id, document_type, file_path"),
+          .select("id, registration_id, document_type, file_path, file_name"),
         teamDocsQuery,
         user
           ? supabase
@@ -1054,12 +1056,18 @@ export default function BinderChecklistPage() {
                     </span>
                     {birthCert?.file_path && (
                       <button
-                        onClick={() => handleViewDocument(birthCert.file_path!)}
+                        onClick={() =>
+                          viewAndDownloadDoc(
+                            birthCert.file_path!,
+                            birthCert.file_name ?? "",
+                            "player-documents"
+                          )
+                        }
                         className="flex items-center gap-1.5 px-3 py-2 min-h-[44px] rounded-full text-xs font-semibold bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
-                        title="View birth certificate"
+                        title="View and download birth certificate"
                       >
                         <Eye size={14} />
-                        Birth Cert
+                        View + Download
                       </button>
                     )}
                     <span

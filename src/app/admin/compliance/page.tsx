@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
+import { viewAndDownloadDoc } from "@/lib/storage-helpers";
 import { HelpTooltip } from "@/components/help-tooltip";
 import {
   ShieldCheck,
@@ -13,6 +14,7 @@ import {
   Eye,
   X,
   Printer,
+  FileText,
 } from "lucide-react";
 
 /* ---------- Types ---------- */
@@ -70,6 +72,14 @@ interface TournamentAgreement {
   acknowledged_at: string;
 }
 
+interface TeamAffidavit {
+  id: string;
+  division: string | null;
+  file_path: string | null;
+  file_name: string | null;
+  created_at: string | null;
+}
+
 const DIVISIONS = [
   "5U-Shetland",
   "6U-Shetland",
@@ -109,6 +119,7 @@ export default function CompliancePage() {
   const [coachCerts, setCoachCerts] = useState<CoachCert[]>([]);
   const [coachApps, setCoachApps] = useState<CoachApp[]>([]);
   const [agreements, setAgreements] = useState<TournamentAgreement[]>([]);
+  const [affidavits, setAffidavits] = useState<TeamAffidavit[]>([]);
   const [profiles, setProfiles] = useState<Array<{ id: string; email: string; full_name: string }>>([]);
   const [loading, setLoading] = useState(true);
   const [viewingAgreement, setViewingAgreement] = useState<{ coach: typeof profiles[0]; agreement: TournamentAgreement } | null>(null);
@@ -128,7 +139,7 @@ export default function CompliancePage() {
     if (!supabase) return;
     setLoading(true);
 
-    const [regsRes, docsRes, contractsRes, teamsRes, teamCoachesRes, certsRes, coachAppsRes, agreementsRes, profilesRes] = await Promise.all([
+    const [regsRes, docsRes, contractsRes, teamsRes, teamCoachesRes, certsRes, coachAppsRes, agreementsRes, profilesRes, affidavitsRes] = await Promise.all([
       supabase
         .from("tryout_registrations")
         .select("id, player_first_name, player_last_name, division, status")
@@ -147,6 +158,10 @@ export default function CompliancePage() {
       supabase.from("coach_applications").select("email, full_name"),
       supabase.from("tournament_agreements").select("*"),
       supabase.from("profiles").select("id, email, full_name").eq("role", "coach"),
+      supabase
+        .from("team_documents")
+        .select("id, division, file_path, file_name, created_at")
+        .eq("document_type", "affidavit_final"),
     ]);
 
     if (regsRes.data) setRegistrations(regsRes.data);
@@ -178,6 +193,7 @@ export default function CompliancePage() {
     if (coachAppsRes.data) setCoachApps(coachAppsRes.data);
     if (agreementsRes.data) setAgreements(agreementsRes.data);
     if (profilesRes.data) setProfiles(profilesRes.data);
+    if (affidavitsRes.data) setAffidavits(affidavitsRes.data as TeamAffidavit[]);
     setLoading(false);
   }
 
@@ -317,6 +333,25 @@ export default function CompliancePage() {
     }
     return map;
   }, [teams, teamCoaches, coachCerts, coachNameByEmail]);
+
+  // Latest affidavit per division (team_documents may carry multiple uploads
+  // if a coach replaces; pick the newest by created_at).
+  const affidavitByDivision = useMemo(() => {
+    const map = new Map<string, TeamAffidavit>();
+    for (const a of affidavits) {
+      if (!a.division) continue;
+      const existing = map.get(a.division);
+      if (
+        !existing ||
+        (a.created_at &&
+          existing.created_at &&
+          new Date(a.created_at) > new Date(existing.created_at))
+      ) {
+        map.set(a.division, a);
+      }
+    }
+    return map;
+  }, [affidavits]);
 
   const overallReady = divisionData.reduce((s, d) => s + d.readyCount, 0);
   const overallTotal = divisionData.reduce((s, d) => s + d.totalPlayers, 0);
@@ -623,6 +658,100 @@ export default function CompliancePage() {
           })}
         </div>
       )}
+
+      {/* Team Affidavits (uploaded final PDF per division) */}
+      <div className="mt-10">
+        <div className="mb-4">
+          <h2 className="font-display text-2xl font-bold uppercase tracking-wide">
+            Team Affidavits
+          </h2>
+          <p className="text-gray-400 text-sm mt-1">
+            Signed final PONY affidavit PDFs uploaded by each team. Click View
+            + Download to open in a new tab and save a copy for the coach
+            binder.
+          </p>
+        </div>
+
+        {divisionData.length === 0 ? (
+          <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
+            <p className="text-gray-400 text-sm">No divisions with teams yet.</p>
+          </div>
+        ) : (
+          <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
+            <div className="hidden sm:grid grid-cols-[180px_1fr_180px_160px] gap-2 px-5 py-3 bg-gray-50 text-[10px] font-semibold text-gray-400 uppercase tracking-wider border-b border-gray-100">
+              <span>Division</span>
+              <span>File</span>
+              <span>Uploaded</span>
+              <span className="text-right">Action</span>
+            </div>
+            {divisionData.map((div) => {
+              const aff = affidavitByDivision.get(div.division);
+              const teamInfo = coachCertsByDivision.get(div.division);
+              return (
+                <div
+                  key={div.division}
+                  className={`grid grid-cols-1 sm:grid-cols-[180px_1fr_180px_160px] gap-2 px-5 py-3 border-b border-gray-50 last:border-0 items-center ${
+                    aff ? "" : "bg-red-50/30"
+                  }`}
+                >
+                  <div>
+                    <p className="text-sm font-semibold text-charcoal">
+                      {div.division}
+                    </p>
+                    {teamInfo?.teamName && (
+                      <p className="text-xs text-gray-400">
+                        {teamInfo.teamName}
+                      </p>
+                    )}
+                  </div>
+                  <div className="min-w-0">
+                    {aff?.file_name ? (
+                      <p className="text-xs text-charcoal truncate">
+                        {aff.file_name}
+                      </p>
+                    ) : (
+                      <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-700">
+                        <XCircle size={12} />
+                        Not Uploaded
+                      </span>
+                    )}
+                  </div>
+                  <div className="text-xs text-gray-500">
+                    {aff?.created_at
+                      ? new Date(aff.created_at).toLocaleDateString()
+                      : "—"}
+                  </div>
+                  <div className="sm:text-right">
+                    {aff?.file_path ? (
+                      <button
+                        onClick={() =>
+                          viewAndDownloadDoc(
+                            aff.file_path!,
+                            aff.file_name ?? "",
+                            "player-documents"
+                          )
+                        }
+                        className="inline-flex items-center gap-1.5 px-3 py-2 min-h-[36px] rounded-full text-xs font-semibold bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
+                      >
+                        <FileText size={12} />
+                        View + Download
+                      </button>
+                    ) : (
+                      <span className="text-gray-300 text-xs">—</span>
+                    )}
+                  </div>
+                </div>
+              );
+            })}
+            <div className="px-5 py-3 bg-gray-50 border-t border-gray-200">
+              <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                {affidavitByDivision.size} of {divisionData.length} divisions
+                uploaded
+              </span>
+            </div>
+          </div>
+        )}
+      </div>
 
       {/* Coach Pre-Tournament Agreements */}
       <div className="mt-10">

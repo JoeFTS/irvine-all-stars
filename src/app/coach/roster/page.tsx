@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import { viewAndDownloadDoc } from "@/lib/storage-helpers";
 import { useAuth } from "@/contexts/auth-context";
 import { HelpTooltip } from "@/components/help-tooltip";
 import FileUpload from "@/components/file-upload";
@@ -56,6 +57,7 @@ interface PlayerDocument {
   registration_id: string;
   document_type: string;
   file_path: string | null;
+  file_name: string | null;
 }
 
 interface PlayerContract {
@@ -424,9 +426,8 @@ function PlayerCard({
           missingText="Missing"
           onClick={compliance.birthCert ? async () => {
             const doc = docs.find(d => d.registration_id === reg.id && d.document_type === "birth_certificate");
-            if (doc?.file_path && supabase) {
-              const { data } = await supabase.storage.from("player-documents").createSignedUrl(doc.file_path, 300);
-              if (data?.signedUrl) window.open(data.signedUrl, "_blank");
+            if (doc?.file_path) {
+              await viewAndDownloadDoc(doc.file_path, doc.file_name ?? "", "player-documents");
             }
           } : undefined}
           onClickMissing={!compliance.birthCert ? () => onOpenUpload(reg.id, "birth_certificate") : undefined}
@@ -610,7 +611,7 @@ export default function CoachRosterPage() {
       visibleIds.length > 0
         ? supabase
             .from("player_documents")
-            .select("registration_id, document_type, file_path")
+            .select("registration_id, document_type, file_path, file_name")
             .in("registration_id", visibleIds)
         : Promise.resolve({ data: [] as PlayerDocument[], error: null }),
       visibleIds.length > 0
