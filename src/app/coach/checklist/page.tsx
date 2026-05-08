@@ -245,6 +245,9 @@ export default function BinderChecklistPage() {
         "insurance_certificate",
         "signed_medical_release",
         "affidavit_final",
+        "affidavit_page_1",
+        "affidavit_page_2",
+        "affidavit_page_3",
       ]);
 
     if (!isAdmin && myDivisions.length > 0) {
@@ -389,6 +392,16 @@ export default function BinderChecklistPage() {
   const affidavitDoc = teamDocs.find(
     (d) => d.document_type === "affidavit_final" && d.division === primaryDivision
   );
+  const affidavitPageDocs = [1, 2, 3]
+    .map((n) => ({
+      n,
+      doc: teamDocs.find(
+        (d) =>
+          d.document_type === `affidavit_page_${n}` &&
+          d.division === primaryDivision
+      ),
+    }))
+    .filter((p) => p.doc);
 
   // Coach certifications
   const concussionCert = coachCerts.find((c) => c.cert_type === "concussion");
@@ -846,6 +859,36 @@ export default function BinderChecklistPage() {
               </span>
             )}
           </div>
+
+          {affidavitPageDocs.length > 0 && (
+            <div className="p-3 rounded-lg bg-flag-blue/5 border border-flag-blue/15">
+              <p className="text-xs font-semibold text-charcoal uppercase tracking-wide mb-2">
+                Print Individual Pages
+              </p>
+              <p className="text-xs text-gray-500 mb-3">
+                Each page split out for separate printing. Use these if you need to re-print a single page (signature page, roster page, etc).
+              </p>
+              <div className="flex flex-wrap gap-2">
+                {affidavitPageDocs.map(({ n, doc }) => (
+                  <button
+                    key={n}
+                    onClick={() =>
+                      doc?.file_path &&
+                      viewAndDownloadDoc(
+                        doc.file_path,
+                        doc.file_name ?? `affidavit-page-${n}.pdf`,
+                        "player-documents"
+                      )
+                    }
+                    className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
+                  >
+                    <Printer size={12} />
+                    Page {n}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
 
           <div className="flex items-start gap-2 px-1">
             <AlertTriangle size={14} className="text-flag-red shrink-0 mt-0.5" />

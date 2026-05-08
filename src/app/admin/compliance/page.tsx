@@ -74,6 +74,7 @@ interface TournamentAgreement {
 
 interface TeamAffidavit {
   id: string;
+  document_type: string;
   division: string | null;
   file_path: string | null;
   file_name: string | null;
@@ -160,8 +161,13 @@ export default function CompliancePage() {
       supabase.from("profiles").select("id, email, full_name").eq("role", "coach"),
       supabase
         .from("team_documents")
-        .select("id, division, file_path, file_name, created_at")
-        .eq("document_type", "affidavit_final"),
+        .select("id, document_type, division, file_path, file_name, created_at")
+        .in("document_type", [
+          "affidavit_final",
+          "affidavit_page_1",
+          "affidavit_page_2",
+          "affidavit_page_3",
+        ]),
     ]);
 
     if (regsRes.data) setRegistrations(regsRes.data);
@@ -339,7 +345,7 @@ export default function CompliancePage() {
   const affidavitByDivision = useMemo(() => {
     const map = new Map<string, TeamAffidavit>();
     for (const a of affidavits) {
-      if (!a.division) continue;
+      if (!a.division || a.document_type !== "affidavit_final") continue;
       const existing = map.get(a.division);
       if (
         !existing ||
@@ -348,6 +354,31 @@ export default function CompliancePage() {
           new Date(a.created_at) > new Date(existing.created_at))
       ) {
         map.set(a.division, a);
+      }
+    }
+    return map;
+  }, [affidavits]);
+
+  const affidavitPagesByDivision = useMemo(() => {
+    const map = new Map<string, Map<number, TeamAffidavit>>();
+    for (const a of affidavits) {
+      if (!a.division) continue;
+      const m = a.document_type.match(/^affidavit_page_(\d)$/);
+      if (!m) continue;
+      const n = parseInt(m[1], 10);
+      let pages = map.get(a.division);
+      if (!pages) {
+        pages = new Map();
+        map.set(a.division, pages);
+      }
+      const existing = pages.get(n);
+      if (
+        !existing ||
+        (a.created_at &&
+          existing.created_at &&
+          new Date(a.created_at) > new Date(existing.created_at))
+      ) {
+        pages.set(n, a);
       }
     }
     return map;
@@ -687,6 +718,12 @@ export default function CompliancePage() {
             {divisionData.map((div) => {
               const aff = affidavitByDivision.get(div.division);
               const teamInfo = coachCertsByDivision.get(div.division);
+              const pages = affidavitPagesByDivision.get(div.division);
+              const pageEntries = pages
+                ? [1, 2, 3]
+                    .map((n) => ({ n, doc: pages.get(n) }))
+                    .filter((p) => p.doc)
+                : [];
               return (
                 <div
                   key={div.division}
@@ -706,9 +743,32 @@ export default function CompliancePage() {
                   </div>
                   <div className="min-w-0">
                     {aff?.file_name ? (
-                      <p className="text-xs text-charcoal truncate">
-                        {aff.file_name}
-                      </p>
+                      <>
+                        <p className="text-xs text-charcoal truncate">
+                          {aff.file_name}
+                        </p>
+                        {pageEntries.length > 0 && (
+                          <div className="flex flex-wrap gap-1.5 mt-1.5">
+                            {pageEntries.map(({ n, doc }) => (
+                              <button
+                                key={n}
+                                onClick={() =>
+                                  doc?.file_path &&
+                                  viewAndDownloadDoc(
+                                    doc.file_path,
+                                    doc.file_name ?? `affidavit-page-${n}.pdf`,
+                                    "player-documents"
+                                  )
+                                }
+                                className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-semibold bg-flag-blue/10 text-flag-blue hover:bg-flag-blue/20 transition-colors"
+                              >
+                                <Printer size={10} />
+                                Page {n}
+                              </button>
+                            ))}
+                          </div>
+                        )}
+                      </>
                     ) : (
                       <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-semibold uppercase tracking-wide bg-amber-100 text-amber-700">
                         <XCircle size={12} />
