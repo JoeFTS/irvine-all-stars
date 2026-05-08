@@ -76,6 +76,7 @@ interface TeamAffidavit {
   id: string;
   document_type: string;
   division: string | null;
+  team_id: string | null;
   file_path: string | null;
   file_name: string | null;
   created_at: string | null;
@@ -161,7 +162,7 @@ export default function CompliancePage() {
       supabase.from("profiles").select("id, email, full_name").eq("role", "coach"),
       supabase
         .from("team_documents")
-        .select("id, document_type, division, file_path, file_name, created_at")
+        .select("id, document_type, division, team_id, file_path, file_name, created_at")
         .in("document_type", [
           "affidavit_final",
           "affidavit_page_1",
@@ -340,36 +341,38 @@ export default function CompliancePage() {
     return map;
   }, [teams, teamCoaches, coachCerts, coachNameByEmail]);
 
-  // Latest affidavit per division (team_documents may carry multiple uploads
-  // if a coach replaces; pick the newest by created_at).
-  const affidavitByDivision = useMemo(() => {
+  // Latest affidavit per team (team_documents may carry multiple uploads
+  // if a coach replaces; pick the newest by created_at). Team-scoped now that
+  // team_id is stored on the row, so divisions with multiple teams (e.g.
+  // 9U-Mustang Hopp/Bernal/Grifka) no longer collide.
+  const affidavitByTeam = useMemo(() => {
     const map = new Map<string, TeamAffidavit>();
     for (const a of affidavits) {
-      if (!a.division || a.document_type !== "affidavit_final") continue;
-      const existing = map.get(a.division);
+      if (!a.team_id || a.document_type !== "affidavit_final") continue;
+      const existing = map.get(a.team_id);
       if (
         !existing ||
         (a.created_at &&
           existing.created_at &&
           new Date(a.created_at) > new Date(existing.created_at))
       ) {
-        map.set(a.division, a);
+        map.set(a.team_id, a);
       }
     }
     return map;
   }, [affidavits]);
 
-  const affidavitPagesByDivision = useMemo(() => {
+  const affidavitPagesByTeam = useMemo(() => {
     const map = new Map<string, Map<number, TeamAffidavit>>();
     for (const a of affidavits) {
-      if (!a.division) continue;
+      if (!a.team_id) continue;
       const m = a.document_type.match(/^affidavit_page_(\d)$/);
       if (!m) continue;
       const n = parseInt(m[1], 10);
-      let pages = map.get(a.division);
+      let pages = map.get(a.team_id);
       if (!pages) {
         pages = new Map();
-        map.set(a.division, pages);
+        map.set(a.team_id, pages);
       }
       const existing = pages.get(n);
       if (
@@ -383,6 +386,17 @@ export default function CompliancePage() {
     }
     return map;
   }, [affidavits]);
+
+  // Sort teams by canonical division order, then alpha by team_name.
+  const teamsSorted = useMemo(() => {
+    const order = new Map(DIVISIONS.map((d, i) => [d, i]));
+    return [...teams].sort((a, b) => {
+      const ai = order.get(a.division) ?? 99;
+      const bi = order.get(b.division) ?? 99;
+      if (ai !== bi) return ai - bi;
+      return a.team_name.localeCompare(b.team_name);
+    });
+  }, [teams]);
 
   const overallReady = divisionData.reduce((s, d) => s + d.readyCount, 0);
   const overallTotal = divisionData.reduce((s, d) => s + d.totalPlayers, 0);
@@ -703,22 +717,21 @@ export default function CompliancePage() {
           </p>
         </div>
 
-        {divisionData.length === 0 ? (
+        {teamsSorted.length === 0 ? (
           <div className="bg-white border border-gray-200 rounded-2xl p-8 text-center">
-            <p className="text-gray-400 text-sm">No divisions with teams yet.</p>
+            <p className="text-gray-400 text-sm">No teams created yet.</p>
           </div>
         ) : (
           <div className="bg-white border border-gray-200 rounded-2xl overflow-hidden">
             <div className="hidden sm:grid grid-cols-[180px_1fr_180px_160px] gap-2 px-5 py-3 bg-gray-50 text-[10px] font-semibold text-gray-400 uppercase tracking-wider border-b border-gray-100">
-              <span>Division</span>
+              <span>Team</span>
               <span>File</span>
               <span>Uploaded</span>
               <span className="text-right">Action</span>
             </div>
-            {divisionData.map((div) => {
-              const aff = affidavitByDivision.get(div.division);
-              const teamInfo = coachCertsByDivision.get(div.division);
-              const pages = affidavitPagesByDivision.get(div.division);
+            {teamsSorted.map((team) => {
+              const aff = affidavitByTeam.get(team.id);
+              const pages = affidavitPagesByTeam.get(team.id);
               const pageEntries = pages
                 ? [1, 2, 3]
                     .map((n) => ({ n, doc: pages.get(n) }))
@@ -726,20 +739,16 @@ export default function CompliancePage() {
                 : [];
               return (
                 <div
-                  key={div.division}
+                  key={team.id}
                   className={`grid grid-cols-1 sm:grid-cols-[180px_1fr_180px_160px] gap-2 px-5 py-3 border-b border-gray-50 last:border-0 items-center ${
                     aff ? "" : "bg-red-50/30"
                   }`}
                 >
                   <div>
                     <p className="text-sm font-semibold text-charcoal">
-                      {div.division}
+                      {team.team_name}
                     </p>
-                    {teamInfo?.teamName && (
-                      <p className="text-xs text-gray-400">
-                        {teamInfo.teamName}
-                      </p>
-                    )}
+                    <p className="text-xs text-gray-400">{team.division}</p>
                   </div>
                   <div className="min-w-0">
                     {aff?.file_name ? (
@@ -805,8 +814,7 @@ export default function CompliancePage() {
             })}
             <div className="px-5 py-3 bg-gray-50 border-t border-gray-200">
               <span className="text-xs font-semibold text-gray-500 uppercase tracking-wide">
-                {affidavitByDivision.size} of {divisionData.length} divisions
-                uploaded
+                {affidavitByTeam.size} of {teamsSorted.length} teams uploaded
               </span>
             </div>
           </div>

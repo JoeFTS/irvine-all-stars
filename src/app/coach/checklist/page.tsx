@@ -50,6 +50,7 @@ interface TeamDocument {
   file_path: string | null;
   file_name: string | null;
   division: string | null;
+  team_id: string | null;
   created_at: string | null;
 }
 
@@ -239,7 +240,7 @@ export default function BinderChecklistPage() {
     // Team docs: scope to coach's divisions + global (null) docs; admin sees all.
     let teamDocsQuery = supabase
       .from("team_documents")
-      .select("id, document_type, file_path, file_name, division, created_at")
+      .select("id, document_type, file_path, file_name, division, team_id, created_at")
       .in("document_type", [
         "tournament_rules",
         "insurance_certificate",
@@ -327,16 +328,20 @@ export default function BinderChecklistPage() {
     documentType: string,
     filePath: string,
     fileName: string,
-    division: string | null = null
+    division: string | null = null,
+    teamId: string | null = null
   ) {
     if (!supabase) return;
 
     const userId = (await supabase.auth.getUser()).data.user?.id;
 
-    // Delete existing document of this type + division (upsert pattern)
-    const existing = teamDocs.find(
-      (d) => d.document_type === documentType && d.division === division
-    );
+    // Upsert pattern: team-scoped docs (affidavit_*) replace by team_id;
+    // division-scoped docs replace by division.
+    const matchKey = (d: TeamDocument) =>
+      teamId
+        ? d.document_type === documentType && d.team_id === teamId
+        : d.document_type === documentType && d.division === division;
+    const existing = teamDocs.find(matchKey);
     if (existing) {
       await supabase.from("team_documents").delete().eq("id", existing.id);
       if (existing.file_path) {
@@ -353,18 +358,14 @@ export default function BinderChecklistPage() {
         file_path: filePath,
         file_name: fileName,
         division,
+        team_id: teamId,
         uploaded_by: userId,
       })
-      .select("id, document_type, file_path, file_name, division, created_at")
+      .select("id, document_type, file_path, file_name, division, team_id, created_at")
       .single();
 
     if (!error && data) {
-      setTeamDocs((prev) => [
-        ...prev.filter(
-          (d) => !(d.document_type === documentType && d.division === division)
-        ),
-        data,
-      ]);
+      setTeamDocs((prev) => [...prev.filter((d) => !matchKey(d)), data]);
     }
   }
 
@@ -375,6 +376,10 @@ export default function BinderChecklistPage() {
   // Determine division for pitching rules
   const divisions = [...new Set(registrations.map((r) => r.division))];
   const primaryDivision = divisions.length === 1 ? divisions[0] : divisions[0] ?? "";
+  // Primary team for team-scoped docs (affidavit). Multi-team coaches default
+  // to first team; per-team selector can be added when that case actually arises.
+  const primaryTeam = myTeams[0] ?? null;
+  const primaryTeamId = primaryTeam?.id ?? null;
   const ponyName = primaryDivision ? divisionToPonyName(primaryDivision) : "";
   const pitchingRule = ponyName ? getPitchingRuleForDivision(ponyName) : null;
   const noPitchingRequired = pitchingRule ? !pitchingRule.hasPitching : false;
@@ -390,7 +395,7 @@ export default function BinderChecklistPage() {
     (d) => d.document_type === "signed_medical_release" && d.division === primaryDivision
   );
   const affidavitDoc = teamDocs.find(
-    (d) => d.document_type === "affidavit_final" && d.division === primaryDivision
+    (d) => d.document_type === "affidavit_final" && d.team_id === primaryTeamId
   );
   const affidavitPageDocs = [1, 2, 3]
     .map((n) => ({
@@ -398,7 +403,7 @@ export default function BinderChecklistPage() {
       doc: teamDocs.find(
         (d) =>
           d.document_type === `affidavit_page_${n}` &&
-          d.division === primaryDivision
+          d.team_id === primaryTeamId
       ),
     }))
     .filter((p) => p.doc);
@@ -818,10 +823,10 @@ export default function BinderChecklistPage() {
                     View / Print
                   </span>
                 </button>
-                {primaryDivision && (
+                {primaryDivision && primaryTeamId && (
                   <FileUpload
                     bucket="player-documents"
-                    folder="team-docs/affidavit-final"
+                    folder={`team-docs/affidavit-final/${primaryTeamId}`}
                     accept=".pdf"
                     maxSizeMB={10}
                     label="Replace"
@@ -830,16 +835,17 @@ export default function BinderChecklistPage() {
                         "affidavit_final",
                         filePath,
                         fileName,
-                        primaryDivision
+                        primaryDivision,
+                        primaryTeamId
                       )
                     }
                   />
                 )}
               </div>
-            ) : primaryDivision ? (
+            ) : primaryDivision && primaryTeamId ? (
               <FileUpload
                 bucket="player-documents"
-                folder="team-docs/affidavit-final"
+                folder={`team-docs/affidavit-final/${primaryTeamId}`}
                 accept=".pdf"
                 maxSizeMB={10}
                 label="Upload Signed Affidavit"
@@ -849,7 +855,8 @@ export default function BinderChecklistPage() {
                     "affidavit_final",
                     filePath,
                     fileName,
-                    primaryDivision
+                    primaryDivision,
+                    primaryTeamId
                   )
                 }
               />
