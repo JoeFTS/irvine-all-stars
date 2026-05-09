@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState, useMemo } from "react";
 import { supabase } from "@/lib/supabase";
 import { viewAndDownloadDoc } from "@/lib/storage-helpers";
@@ -15,6 +16,7 @@ import {
   X,
   Printer,
   FileText,
+  BookOpen,
 } from "lucide-react";
 
 /* ---------- Types ---------- */
@@ -679,6 +681,15 @@ export default function CompliancePage() {
                             {team.players.filter((p) => p.isReady).length}/
                             {team.players.length} ready
                           </span>
+                          {team.teamId && (
+                            <Link
+                              href={`/admin/teams/${team.teamId}/binder`}
+                              className="ml-auto inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-semibold bg-flag-blue text-white hover:bg-flag-blue/90 transition-colors"
+                            >
+                              <BookOpen size={11} />
+                              View Binder
+                            </Link>
+                          )}
                         </div>
 
                         {/* Column headers */}
