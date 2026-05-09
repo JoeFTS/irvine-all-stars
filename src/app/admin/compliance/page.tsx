@@ -24,6 +24,7 @@ interface Registration {
   player_first_name: string;
   player_last_name: string;
   division: string;
+  team_id: string | null;
   status: string;
 }
 
@@ -97,15 +98,29 @@ const DIVISIONS = [
   "14U-Pony",
 ];
 
+interface PlayerRow {
+  id: string;
+  name: string;
+  hasContract: boolean;
+  hasBirthCert: boolean;
+  isReady: boolean;
+}
+
+interface TeamGroup {
+  teamId: string | null;
+  teamName: string;
+  headCoachName: string | null;
+  coachNames: string[];
+  coachCount: number;
+  hasConcussion: boolean;
+  hasCardiac: boolean;
+  players: PlayerRow[];
+}
+
 interface DivisionCompliance {
   division: string;
-  players: Array<{
-    id: string;
-    name: string;
-    hasContract: boolean;
-    hasBirthCert: boolean;
-    isReady: boolean;
-  }>;
+  teams: TeamGroup[];
+  players: PlayerRow[]; // flat aggregate kept for header counts
   totalPlayers: number;
   readyCount: number;
   contractCount: number;
@@ -144,7 +159,7 @@ export default function CompliancePage() {
     const [regsRes, docsRes, contractsRes, teamsRes, teamCoachesRes, certsRes, coachAppsRes, agreementsRes, profilesRes, affidavitsRes] = await Promise.all([
       supabase
         .from("tryout_registrations")
-        .select("id, player_first_name, player_last_name, division, status")
+        .select("id, player_first_name, player_last_name, division, team_id, status")
         .in("status", ["selected", "confirmed", "tryout_complete", "alternate"])
         .order("division")
         .order("player_last_name"),
@@ -218,10 +233,77 @@ export default function CompliancePage() {
     return map;
   }, [documents]);
 
+  // Email → name lookup from coach applications
+  const coachNameByEmail = useMemo(() => {
+    const map = new Map<string, string>();
+    for (const app of coachApps) {
+      map.set(app.email.toLowerCase(), app.full_name);
+    }
+    return map;
+  }, [coachApps]);
+
+  // Per-team coach + cert lookup. Replaces the old division-keyed map so
+  // multi-team divisions (9U-Mustang, 12U-Bronco, etc.) attribute coaches
+  // to the right team.
+  const coachCertsByTeam = useMemo(() => {
+    const map = new Map<string, {
+      teamName: string;
+      headCoachName: string | null;
+      coachNames: string[];
+      coachCount: number;
+      hasConcussion: boolean;
+      hasCardiac: boolean;
+    }>();
+    for (const team of teams) {
+      const assignments = teamCoaches.filter((tc) => tc.team_id === team.id);
+      const coachIds = assignments.map((a) => a.coach_id);
+      const headCoach = assignments.find((a) => a.role === "head");
+      let headCoachName = headCoach
+        ? (headCoach.full_name ?? headCoach.email)
+        : null;
+      let coachNames = assignments.map((a) => a.full_name ?? a.email);
+      let coachCount = coachIds.length;
+      let hasConcussion = coachIds.length > 0 && coachIds.every((id) =>
+        coachCerts.some((c) => c.coach_id === id && c.cert_type === "concussion")
+      );
+      let hasCardiac = coachIds.length > 0 && coachIds.every((id) =>
+        coachCerts.some((c) => c.coach_id === id && c.cert_type === "cardiac_arrest")
+      );
+
+      // Fallback to legacy teams.coach_id path when team_coaches is empty.
+      if (assignments.length === 0) {
+        const legacyName = team.coach_email
+          ? (coachNameByEmail.get(team.coach_email.toLowerCase()) ?? team.coach_email)
+          : null;
+        headCoachName = legacyName;
+        coachNames = legacyName ? [legacyName] : [];
+        coachCount = team.coach_id ? 1 : 0;
+        hasConcussion = team.coach_id
+          ? coachCerts.some((c) => c.coach_id === team.coach_id && c.cert_type === "concussion")
+          : false;
+        hasCardiac = team.coach_id
+          ? coachCerts.some((c) => c.coach_id === team.coach_id && c.cert_type === "cardiac_arrest")
+          : false;
+      }
+
+      map.set(team.id, {
+        teamName: team.team_name,
+        headCoachName,
+        coachNames,
+        coachCount,
+        hasConcussion,
+        hasCardiac,
+      });
+    }
+    return map;
+  }, [teams, teamCoaches, coachCerts, coachNameByEmail]);
+
   const divisionData: DivisionCompliance[] = useMemo(() => {
     return DIVISIONS.map((division) => {
       const divRegs = registrations.filter((r) => r.division === division);
-      const players = divRegs.map((r) => {
+      const divTeams = teams.filter((t) => t.division === division);
+
+      const playerForReg = (r: Registration): PlayerRow => {
         const docTypes = docsByReg.get(r.id) ?? new Set();
         const hasContract = contractSet.has(r.id);
         const hasBirthCert = docTypes.has("birth_certificate");
@@ -232,18 +314,70 @@ export default function CompliancePage() {
           hasBirthCert,
           isReady: hasContract && hasBirthCert,
         };
-      });
+      };
+
+      const groupsByTeamId = new Map<string, PlayerRow[]>();
+      const unassigned: PlayerRow[] = [];
+      for (const r of divRegs) {
+        const row = playerForReg(r);
+        if (r.team_id) {
+          if (!groupsByTeamId.has(r.team_id)) groupsByTeamId.set(r.team_id, []);
+          groupsByTeamId.get(r.team_id)!.push(row);
+        } else {
+          unassigned.push(row);
+        }
+      }
+
+      const groups: TeamGroup[] = divTeams
+        .map((team): TeamGroup => {
+          const cert = coachCertsByTeam.get(team.id);
+          return {
+            teamId: team.id,
+            teamName: team.team_name,
+            headCoachName: cert?.headCoachName ?? null,
+            coachNames: cert?.coachNames ?? [],
+            coachCount: cert?.coachCount ?? 0,
+            hasConcussion: cert?.hasConcussion ?? false,
+            hasCardiac: cert?.hasCardiac ?? false,
+            players: groupsByTeamId.get(team.id) ?? [],
+          };
+        })
+        .sort((a, b) => a.teamName.localeCompare(b.teamName));
+
+      // Players whose team_id doesn't match any current team in the division
+      // (rare, but possible after a team was deleted). Bucket them with the
+      // unassigned group rather than dropping silently.
+      const knownTeamIds = new Set(divTeams.map((t) => t.id));
+      for (const [teamId, rows] of groupsByTeamId) {
+        if (!knownTeamIds.has(teamId)) unassigned.push(...rows);
+      }
+
+      if (unassigned.length > 0) {
+        groups.push({
+          teamId: null,
+          teamName: "Unassigned",
+          headCoachName: null,
+          coachNames: [],
+          coachCount: 0,
+          hasConcussion: false,
+          hasCardiac: false,
+          players: unassigned,
+        });
+      }
+
+      const allPlayers = groups.flatMap((g) => g.players);
 
       return {
         division,
-        players,
-        totalPlayers: players.length,
-        readyCount: players.filter((p) => p.isReady).length,
-        contractCount: players.filter((p) => p.hasContract).length,
-        birthCertCount: players.filter((p) => p.hasBirthCert).length,
+        teams: groups,
+        players: allPlayers,
+        totalPlayers: allPlayers.length,
+        readyCount: allPlayers.filter((p) => p.isReady).length,
+        contractCount: allPlayers.filter((p) => p.hasContract).length,
+        birthCertCount: allPlayers.filter((p) => p.hasBirthCert).length,
       };
     }).filter((d) => d.totalPlayers > 0 || teams.some((t) => t.division === d.division));
-  }, [registrations, docsByReg, contractSet, teams]);
+  }, [registrations, docsByReg, contractSet, teams, coachCertsByTeam]);
 
   // Coach → distinct divisions derived from team_coaches → teams.division.
   // A coach may be on teams across multiple divisions after the team-scoped
@@ -265,81 +399,6 @@ export default function CompliancePage() {
     return map;
   }, [teams, teamCoaches]);
 
-  // Email → name lookup from coach applications
-  const coachNameByEmail = useMemo(() => {
-    const map = new Map<string, string>();
-    for (const app of coachApps) {
-      map.set(app.email.toLowerCase(), app.full_name);
-    }
-    return map;
-  }, [coachApps]);
-
-  // Coach cert status per division — built from team_coaches join table.
-  // A team is "compliant" only if ALL assigned coaches have BOTH certs.
-  // Pre-existing limitation: keying by division means only one team per
-  // division is shown when multiple teams exist (e.g. 12U-Bronco Red + White).
-  const coachCertsByDivision = useMemo(() => {
-    const map = new Map<string, {
-      teamName: string;
-      coachNames: string[];
-      headCoachName: string | null;
-      coachIds: string[];
-      hasConcussion: boolean;
-      hasCardiac: boolean;
-      coachCount: number;
-    }>();
-
-    for (const team of teams) {
-      const assignments = teamCoaches.filter((tc) => tc.team_id === team.id);
-      const coachIds = assignments.map((a) => a.coach_id);
-      const headCoach = assignments.find((a) => a.role === "head");
-      const headCoachName = headCoach
-        ? (headCoach.full_name ?? headCoach.email)
-        : null;
-      const coachNames = assignments.map((a) => a.full_name ?? a.email);
-
-      if (assignments.length === 0) {
-        // Fallback to legacy teams.coach_id path so we don't blank out teams
-        // that were created the old way and never migrated to team_coaches.
-        const legacyName = team.coach_email
-          ? (coachNameByEmail.get(team.coach_email.toLowerCase()) ?? team.coach_email)
-          : null;
-        map.set(team.division, {
-          teamName: team.team_name,
-          coachNames: legacyName ? [legacyName] : [],
-          headCoachName: legacyName,
-          coachIds: team.coach_id ? [team.coach_id] : [],
-          hasConcussion: team.coach_id
-            ? coachCerts.some((c) => c.coach_id === team.coach_id && c.cert_type === "concussion")
-            : false,
-          hasCardiac: team.coach_id
-            ? coachCerts.some((c) => c.coach_id === team.coach_id && c.cert_type === "cardiac_arrest")
-            : false,
-          coachCount: team.coach_id ? 1 : 0,
-        });
-        continue;
-      }
-
-      // ALL coaches must have each cert for the team to be compliant
-      const allHaveConcussion = coachIds.every((id) =>
-        coachCerts.some((c) => c.coach_id === id && c.cert_type === "concussion")
-      );
-      const allHaveCardiac = coachIds.every((id) =>
-        coachCerts.some((c) => c.coach_id === id && c.cert_type === "cardiac_arrest")
-      );
-
-      map.set(team.division, {
-        teamName: team.team_name,
-        coachNames,
-        headCoachName,
-        coachIds,
-        hasConcussion: allHaveConcussion,
-        hasCardiac: allHaveCardiac,
-        coachCount: coachIds.length,
-      });
-    }
-    return map;
-  }, [teams, teamCoaches, coachCerts, coachNameByEmail]);
 
   // Latest affidavit per team (team_documents may carry multiple uploads
   // if a coach replaces; pick the newest by created_at). Team-scoped now that
@@ -557,25 +616,11 @@ export default function CompliancePage() {
                         </span>
                       )}
                     </div>
-                    {(() => {
-                      const coachInfo = coachCertsByDivision.get(div.division);
-                      if (!coachInfo) return null;
-                      return (
-                        <div className="flex flex-wrap gap-x-4 text-xs text-gray-400 mt-0.5">
-                          <span>Team: {coachInfo.teamName}</span>
-                          {coachInfo.headCoachName && (
-                            <span>
-                              Coach: {coachInfo.headCoachName}
-                              {coachInfo.coachCount > 1 && (
-                                <span className="text-gray-300 ml-1">
-                                  +{coachInfo.coachCount - 1} asst
-                                </span>
-                              )}
-                            </span>
-                          )}
-                        </div>
-                      );
-                    })()}
+                    {div.teams.length > 0 && (
+                      <div className="text-xs text-gray-400 mt-0.5">
+                        {div.teams.length} team{div.teams.length === 1 ? "" : "s"}
+                      </div>
+                    )}
                   </div>
 
                   {/* Progress bar */}
@@ -604,98 +649,121 @@ export default function CompliancePage() {
                   )}
                 </button>
 
-                {/* Expanded player list */}
+                {/* Expanded per-team breakdown */}
                 {isExpanded && (
                   <div className="border-t border-gray-100">
-                    {/* Column headers */}
-                    <div className="hidden sm:grid grid-cols-[1fr_80px_80px] gap-2 px-5 py-2 bg-gray-50 text-[10px] font-semibold text-gray-400 uppercase tracking-wider">
-                      <span>Player</span>
-                      <span className="text-center">Contract</span>
-                      <span className="text-center">Birth Cert</span>
-                    </div>
-
-                    {div.players.map((player) => (
+                    {div.teams.map((team) => (
                       <div
-                        key={player.id}
-                        className={`grid grid-cols-1 sm:grid-cols-[1fr_80px_80px] gap-2 px-5 py-3 border-b border-gray-50 last:border-0 ${
-                          player.isReady ? "" : "bg-red-50/30"
-                        }`}
+                        key={team.teamId ?? "unassigned"}
+                        className="border-b border-gray-100 last:border-0"
                       >
-                        {/* Player name */}
-                        <div className="flex items-center gap-2">
-                          <div
-                            className={`w-2 h-2 rounded-full shrink-0 ${
-                              player.isReady ? "bg-green-500" : "bg-amber-400"
-                            }`}
-                          />
-                          <span className="text-sm font-semibold text-charcoal">
-                            {player.name}
+                        {/* Team header */}
+                        <div className="px-5 py-3 bg-gray-50 flex flex-wrap items-center gap-x-4 gap-y-1 border-b border-gray-100">
+                          <span className="text-sm font-bold text-charcoal">
+                            {team.teamName}
                           </span>
-                        </div>
-
-                        {/* Status cells */}
-                        <div className="flex sm:justify-center items-center gap-1">
-                          <span className="sm:hidden text-[10px] text-gray-400 uppercase tracking-wide w-16">
-                            Contract
-                          </span>
-                          {player.hasContract ? (
-                            <CheckCircle2
-                              size={16}
-                              className="text-green-500"
-                            />
-                          ) : (
-                            <XCircle size={16} className="text-gray-300" />
-                          )}
-                        </div>
-                        <div className="flex sm:justify-center items-center gap-1">
-                          <span className="sm:hidden text-[10px] text-gray-400 uppercase tracking-wide w-16">
-                            Birth Cert
-                          </span>
-                          {player.hasBirthCert ? (
-                            <CheckCircle2
-                              size={16}
-                              className="text-green-500"
-                            />
-                          ) : (
-                            <XCircle size={16} className="text-gray-300" />
-                          )}
-                        </div>
-                      </div>
-                    ))}
-
-                    {/* Coach Certifications */}
-                    {(() => {
-                      const coachInfo = coachCertsByDivision.get(div.division);
-                      if (!coachInfo) return null;
-                      const coachLabel = coachInfo.coachNames.length > 0
-                        ? coachInfo.coachNames.join(", ")
-                        : null;
-                      return (
-                        <div className="border-t border-gray-200 bg-flag-blue/5 px-5 py-3">
-                          <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">
-                            Coach Certifications {coachLabel && <span className="normal-case font-normal">. {coachLabel}</span>}
-                          </p>
-                          <div className="flex flex-wrap gap-4">
-                            <div className="flex items-center gap-1.5">
-                              {coachInfo.hasConcussion ? (
-                                <CheckCircle2 size={16} className="text-green-500" />
-                              ) : (
-                                <XCircle size={16} className="text-gray-300" />
+                          {team.headCoachName && (
+                            <span className="text-xs text-gray-500">
+                              Coach: {team.headCoachName}
+                              {team.coachCount > 1 && (
+                                <span className="text-gray-400 ml-1">
+                                  +{team.coachCount - 1} asst
+                                </span>
                               )}
-                              <span className="text-xs text-charcoal">Concussion Training</span>
+                            </span>
+                          )}
+                          <span className="text-xs text-gray-400">
+                            {team.players.filter((p) => p.isReady).length}/
+                            {team.players.length} ready
+                          </span>
+                        </div>
+
+                        {/* Column headers */}
+                        <div className="hidden sm:grid grid-cols-[1fr_80px_80px] gap-2 px-5 py-2 bg-white text-[10px] font-semibold text-gray-400 uppercase tracking-wider border-b border-gray-50">
+                          <span>Player</span>
+                          <span className="text-center">Contract</span>
+                          <span className="text-center">Birth Cert</span>
+                        </div>
+
+                        {team.players.length === 0 ? (
+                          <div className="px-5 py-3 text-xs text-gray-400">
+                            No players assigned to this team yet.
+                          </div>
+                        ) : (
+                          team.players.map((player) => (
+                            <div
+                              key={player.id}
+                              className={`grid grid-cols-1 sm:grid-cols-[1fr_80px_80px] gap-2 px-5 py-3 border-b border-gray-50 last:border-0 ${
+                                player.isReady ? "" : "bg-red-50/30"
+                              }`}
+                            >
+                              <div className="flex items-center gap-2">
+                                <div
+                                  className={`w-2 h-2 rounded-full shrink-0 ${
+                                    player.isReady ? "bg-green-500" : "bg-amber-400"
+                                  }`}
+                                />
+                                <span className="text-sm font-semibold text-charcoal">
+                                  {player.name}
+                                </span>
+                              </div>
+                              <div className="flex sm:justify-center items-center gap-1">
+                                <span className="sm:hidden text-[10px] text-gray-400 uppercase tracking-wide w-16">
+                                  Contract
+                                </span>
+                                {player.hasContract ? (
+                                  <CheckCircle2 size={16} className="text-green-500" />
+                                ) : (
+                                  <XCircle size={16} className="text-gray-300" />
+                                )}
+                              </div>
+                              <div className="flex sm:justify-center items-center gap-1">
+                                <span className="sm:hidden text-[10px] text-gray-400 uppercase tracking-wide w-16">
+                                  Birth Cert
+                                </span>
+                                {player.hasBirthCert ? (
+                                  <CheckCircle2 size={16} className="text-green-500" />
+                                ) : (
+                                  <XCircle size={16} className="text-gray-300" />
+                                )}
+                              </div>
                             </div>
-                            <div className="flex items-center gap-1.5">
-                              {coachInfo.hasCardiac ? (
-                                <CheckCircle2 size={16} className="text-green-500" />
-                              ) : (
-                                <XCircle size={16} className="text-gray-300" />
+                          ))
+                        )}
+
+                        {/* Per-team coach cert status (skip for Unassigned bucket) */}
+                        {team.teamId && (
+                          <div className="bg-flag-blue/5 px-5 py-3">
+                            <p className="text-[10px] font-semibold text-gray-400 uppercase tracking-wider mb-2">
+                              Coach Certifications
+                              {team.coachNames.length > 0 && (
+                                <span className="normal-case font-normal">
+                                  . {team.coachNames.join(", ")}
+                                </span>
                               )}
-                              <span className="text-xs text-charcoal">Sudden Cardiac Arrest</span>
+                            </p>
+                            <div className="flex flex-wrap gap-4">
+                              <div className="flex items-center gap-1.5">
+                                {team.hasConcussion ? (
+                                  <CheckCircle2 size={16} className="text-green-500" />
+                                ) : (
+                                  <XCircle size={16} className="text-gray-300" />
+                                )}
+                                <span className="text-xs text-charcoal">Concussion Training</span>
+                              </div>
+                              <div className="flex items-center gap-1.5">
+                                {team.hasCardiac ? (
+                                  <CheckCircle2 size={16} className="text-green-500" />
+                                ) : (
+                                  <XCircle size={16} className="text-gray-300" />
+                                )}
+                                <span className="text-xs text-charcoal">Sudden Cardiac Arrest</span>
+                              </div>
                             </div>
                           </div>
-                        </div>
-                      );
-                    })()}
+                        )}
+                      </div>
+                    ))}
                   </div>
                 )}
               </div>
