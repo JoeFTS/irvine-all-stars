@@ -299,34 +299,44 @@ export default function CompliancePage() {
   }, [teams, teamCoaches, coachCerts, coachNameByEmail]);
 
   const divisionData: DivisionCompliance[] = useMemo(() => {
-    return DIVISIONS.map((division) => {
-      const divRegs = registrations.filter((r) => r.division === division);
-      const divTeams = teams.filter((t) => t.division === division);
-
-      const playerForReg = (r: Registration): PlayerRow => {
-        const docTypes = docsByReg.get(r.id) ?? new Set();
-        const hasContract = contractSet.has(r.id);
-        const hasBirthCert = docTypes.has("birth_certificate");
-        return {
-          id: r.id,
-          name: `${r.player_first_name} ${r.player_last_name}`,
-          hasContract,
-          hasBirthCert,
-          isReady: hasContract && hasBirthCert,
-        };
+    const playerForReg = (r: Registration): PlayerRow => {
+      const docTypes = docsByReg.get(r.id) ?? new Set();
+      const hasContract = contractSet.has(r.id);
+      const hasBirthCert = docTypes.has("birth_certificate");
+      return {
+        id: r.id,
+        name: `${r.player_first_name} ${r.player_last_name}`,
+        hasContract,
+        hasBirthCert,
+        isReady: hasContract && hasBirthCert,
       };
+    };
 
-      const groupsByTeamId = new Map<string, PlayerRow[]>();
-      const unassigned: PlayerRow[] = [];
-      for (const r of divRegs) {
-        const row = playerForReg(r);
-        if (r.team_id) {
-          if (!groupsByTeamId.has(r.team_id)) groupsByTeamId.set(r.team_id, []);
-          groupsByTeamId.get(r.team_id)!.push(row);
-        } else {
-          unassigned.push(row);
-        }
+    // Trust team_id over registration.division: a player can sign up for one
+    // division and get drafted up/down to a team in another (e.g. an 11U
+    // signup placed on a 12U team). The team's division is where they
+    // actually play, so display them there.
+    const teamById = new Map(teams.map((t) => [t.id, t]));
+    const playersByTeamId = new Map<string, PlayerRow[]>();
+    const unassignedByDivision = new Map<string, PlayerRow[]>();
+
+    for (const r of registrations) {
+      const row = playerForReg(r);
+      if (r.team_id && teamById.has(r.team_id)) {
+        if (!playersByTeamId.has(r.team_id)) playersByTeamId.set(r.team_id, []);
+        playersByTeamId.get(r.team_id)!.push(row);
+      } else {
+        // Fallback: no team or team was deleted. Use registration.division so
+        // the row at least appears somewhere instead of getting silently
+        // dropped. Per current data this bucket should be empty.
+        const div = r.division;
+        if (!unassignedByDivision.has(div)) unassignedByDivision.set(div, []);
+        unassignedByDivision.get(div)!.push(row);
       }
+    }
+
+    return DIVISIONS.map((division) => {
+      const divTeams = teams.filter((t) => t.division === division);
 
       const groups: TeamGroup[] = divTeams
         .map((team): TeamGroup => {
@@ -339,19 +349,12 @@ export default function CompliancePage() {
             coachCount: cert?.coachCount ?? 0,
             hasConcussion: cert?.hasConcussion ?? false,
             hasCardiac: cert?.hasCardiac ?? false,
-            players: groupsByTeamId.get(team.id) ?? [],
+            players: playersByTeamId.get(team.id) ?? [],
           };
         })
         .sort((a, b) => a.teamName.localeCompare(b.teamName));
 
-      // Players whose team_id doesn't match any current team in the division
-      // (rare, but possible after a team was deleted). Bucket them with the
-      // unassigned group rather than dropping silently.
-      const knownTeamIds = new Set(divTeams.map((t) => t.id));
-      for (const [teamId, rows] of groupsByTeamId) {
-        if (!knownTeamIds.has(teamId)) unassigned.push(...rows);
-      }
-
+      const unassigned = unassignedByDivision.get(division) ?? [];
       if (unassigned.length > 0) {
         groups.push({
           teamId: null,
