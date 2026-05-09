@@ -762,6 +762,35 @@ export default function BinderChecklistPage() {
           )}
         </div>
         <div className="p-5 space-y-3">
+          {/* PONY role-name decoder */}
+          <div className="p-4 rounded-lg bg-amber-50 border border-amber-200">
+            <div className="flex items-start gap-2 mb-3">
+              <Info size={16} className="text-amber-700 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-bold text-amber-900 uppercase tracking-wide">
+                  PONY Calls Coaches Different Things
+                </p>
+                <p className="text-xs text-amber-800 mt-0.5">
+                  The affidavit form has three name fields at the bottom. Here&#39;s what each one means in plain English:
+                </p>
+              </div>
+            </div>
+            <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 text-xs">
+              <div className="p-3 rounded-md bg-white border border-amber-200">
+                <p className="font-bold text-charcoal uppercase tracking-wider text-[10px] mb-1">Manager</p>
+                <p className="text-charcoal">You. The head coach.</p>
+              </div>
+              <div className="p-3 rounded-md bg-white border border-amber-200">
+                <p className="font-bold text-charcoal uppercase tracking-wider text-[10px] mb-1">Coach</p>
+                <p className="text-charcoal">Your first assistant coach.</p>
+              </div>
+              <div className="p-3 rounded-md bg-white border border-amber-200">
+                <p className="font-bold text-charcoal uppercase tracking-wider text-[10px] mb-1">Business Manager</p>
+                <p className="text-charcoal">Team parent or treasurer (often a parent volunteer, doesn&#39;t have to be a coach). Can also be a third coach.</p>
+              </div>
+            </div>
+          </div>
+
           {/* Action links */}
           <div className="flex flex-wrap items-center gap-3 p-3 rounded-lg bg-gray-50">
             <FileText size={18} className="text-flag-blue shrink-0" />
