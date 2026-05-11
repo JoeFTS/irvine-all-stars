@@ -89,17 +89,23 @@ def fetch_recent_signups(since_hours: int) -> list[dict]:
 
 
 def build_team_progress(regs: list[dict], signed: set[str]) -> dict:
-    """Group by team. For each team: total parent emails, signed-up, missing list."""
+    """Group by team. For each team: player count, parent emails, signed-up, missing list.
+
+    Player progress: a player counts as "signed up" when at least one of their
+    parent emails (primary or secondary) appears in profiles.
+    """
     teams: dict[str, dict] = {}
     for r in regs:
         team_obj = r.get("teams")
         if isinstance(team_obj, list):
             team_obj = team_obj[0] if team_obj else None
         team_name = (team_obj or {}).get("team_name") or f"({r.get('division') or 'unassigned'})"
-        t = teams.setdefault(team_name, {"primaries": {}, "secondaries": {}})
+        t = teams.setdefault(team_name, {"primaries": {}, "secondaries": {}, "players": []})
         primary = (r.get("parent_email") or "").lower().strip()
         secondary = (r.get("secondary_parent_email") or "").lower().strip()
         player = f"{r.get('player_first_name','').strip()} {r.get('player_last_name','').strip()}".strip()
+        player_signed = (primary in signed) or (bool(secondary) and secondary in signed)
+        t["players"].append({"name": player, "primary": primary, "secondary": secondary, "signed": player_signed})
         if primary:
             t["primaries"].setdefault(primary, []).append(player)
         if secondary and secondary != primary:
@@ -111,14 +117,18 @@ def build_team_progress(regs: list[dict], signed: set[str]) -> dict:
         all_emails = set(t["primaries"].keys()) | set(t["secondaries"].keys())
         signed_emails = {e for e in all_emails if e in signed}
         missing = sorted(all_emails - signed_emails)
-        # for missing, attach a kid name for context
         missing_with_kids = []
         for e in missing:
             kids = t["primaries"].get(e) or t["secondaries"].get(e) or []
             label = f"{e}" if not kids else f"{e} ({', '.join(sorted(set(kids)))})"
             missing_with_kids.append(label)
+        player_total = len(t["players"])
+        player_signed = sum(1 for p in t["players"] if p["signed"])
         out.append({
             "team": team_name,
+            "player_total": player_total,
+            "player_signed": player_signed,
+            "player_pct": round(100 * player_signed / player_total) if player_total else 0,
             "total": len(all_emails),
             "signed": len(signed_emails),
             "pct": round(100 * len(signed_emails) / len(all_emails)) if all_emails else 0,
@@ -129,27 +139,32 @@ def build_team_progress(regs: list[dict], signed: set[str]) -> dict:
 
 def render_html(progress: dict, recent: list[dict], since_hours: int) -> str:
     teams = progress["teams"]
-    total_invited = sum(t["total"] for t in teams)
-    total_signed = sum(t["signed"] for t in teams)
-    overall_pct = round(100 * total_signed / total_invited) if total_invited else 0
+    total_players = sum(t["player_total"] for t in teams)
+    players_signed = sum(t["player_signed"] for t in teams)
+    player_pct = round(100 * players_signed / total_players) if total_players else 0
+    total_emails = sum(t["total"] for t in teams)
+    emails_signed = sum(t["signed"] for t in teams)
 
     rows = []
     for t in teams:
-        bar_color = "#16A34A" if t["pct"] == 100 else ("#F4B400" if t["pct"] >= 50 else "#C1121F")
-        status = "DONE" if t["pct"] == 100 else f'{t["signed"]}/{t["total"]}'
+        # color based on player coverage
+        bar_color = "#16A34A" if t["player_pct"] == 100 else ("#F4B400" if t["player_pct"] >= 50 else "#C1121F")
+        player_cell = "DONE" if t["player_pct"] == 100 else f'{t["player_signed"]}/{t["player_total"]}'
+        email_cell = f'{t["signed"]}/{t["total"]}'
         rows.append(
             f'<tr><td style="padding:8px 12px;border-bottom:1px solid #E5E7EB;font-size:13px;">{t["team"]}</td>'
-            f'<td style="padding:8px 12px;border-bottom:1px solid #E5E7EB;font-size:13px;text-align:right;color:{bar_color};font-weight:700;">{status}</td>'
-            f'<td style="padding:8px 12px;border-bottom:1px solid #E5E7EB;font-size:13px;text-align:right;color:{bar_color};font-weight:700;">{t["pct"]}%</td></tr>'
+            f'<td style="padding:8px 12px;border-bottom:1px solid #E5E7EB;font-size:13px;text-align:right;color:{bar_color};font-weight:700;">{player_cell}</td>'
+            f'<td style="padding:8px 12px;border-bottom:1px solid #E5E7EB;font-size:13px;text-align:right;color:#4B5563;">{email_cell}</td>'
+            f'<td style="padding:8px 12px;border-bottom:1px solid #E5E7EB;font-size:13px;text-align:right;color:{bar_color};font-weight:700;">{t["player_pct"]}%</td></tr>'
         )
 
     missing_blocks = []
     for t in teams:
-        if not t["missing"] or t["pct"] == 100:
+        if not t["missing"] or t["player_pct"] == 100:
             continue
         items = "".join(f'<li style="margin:2px 0;">{m}</li>' for m in t["missing"])
         missing_blocks.append(
-            f'<p style="margin:14px 0 4px;color:#1C1C1C;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;">{t["team"]} ({t["signed"]}/{t["total"]})</p>'
+            f'<p style="margin:14px 0 4px;color:#1C1C1C;font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:1px;">{t["team"]} ({t["player_signed"]}/{t["player_total"]} players · {t["signed"]}/{t["total"]} parent emails)</p>'
             f'<ul style="margin:0;padding-left:20px;color:#4B5563;font-size:12px;line-height:1.5;">{items}</ul>'
         )
 
@@ -169,7 +184,8 @@ def render_html(progress: dict, recent: list[dict], since_hours: int) -> str:
 <table width="640" cellpadding="0" cellspacing="0" style="max-width:640px;background:#FFF;border:1px solid #E5E7EB;border-radius:8px;">
 <tr><td style="background:#0A2342;padding:22px 28px;color:#FFF;">
 <p style="margin:0;font-size:11px;letter-spacing:2px;color:#F4B400;text-transform:uppercase;">Irvine All-Stars · Parent Signup Digest</p>
-<h1 style="margin:6px 0 0;font-size:20px;font-weight:700;">{total_signed} of {total_invited} parents signed up ({overall_pct}%)</h1>
+<h1 style="margin:6px 0 0;font-size:20px;font-weight:700;">{players_signed} of {total_players} players covered ({player_pct}%)</h1>
+<p style="margin:6px 0 0;font-size:12px;color:#CBD5E1;">A player is "covered" when at least one parent email has signed up. {emails_signed}/{total_emails} unique parent emails total.</p>
 </td></tr>
 <tr><td style="padding:24px 28px;color:#1C1C1C;">
 <h2 style="margin:0 0 8px;font-size:14px;text-transform:uppercase;letter-spacing:1px;color:#0A2342;">New in last {since_hours}h</h2>
@@ -177,7 +193,8 @@ def render_html(progress: dict, recent: list[dict], since_hours: int) -> str:
 <h2 style="margin:24px 0 8px;font-size:14px;text-transform:uppercase;letter-spacing:1px;color:#0A2342;">Per-team progress</h2>
 <table width="100%" cellpadding="0" cellspacing="0" style="border:1px solid #E5E7EB;border-radius:6px;overflow:hidden;">
 <tr style="background:#F5F1EB;"><td style="padding:8px 12px;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#4B5563;">Team</td>
-<td style="padding:8px 12px;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#4B5563;text-align:right;">Signed</td>
+<td style="padding:8px 12px;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#4B5563;text-align:right;">Players</td>
+<td style="padding:8px 12px;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#4B5563;text-align:right;">Parent Emails</td>
 <td style="padding:8px 12px;font-size:11px;text-transform:uppercase;letter-spacing:1px;color:#4B5563;text-align:right;">%</td></tr>
 {"".join(rows)}
 </table>
@@ -225,17 +242,19 @@ def main() -> None:
     recent = fetch_recent_signups(args.since_hours)
     progress = build_team_progress(regs, signed)
 
-    total_invited = sum(t["total"] for t in progress["teams"])
-    total_signed = sum(t["signed"] for t in progress["teams"])
-    pct = round(100 * total_signed / total_invited) if total_invited else 0
-    subject = f"Parent Signups: {total_signed}/{total_invited} ({pct}%) — {len(recent)} new in {args.since_hours}h"
+    total_players = sum(t["player_total"] for t in progress["teams"])
+    players_signed = sum(t["player_signed"] for t in progress["teams"])
+    total_emails = sum(t["total"] for t in progress["teams"])
+    emails_signed = sum(t["signed"] for t in progress["teams"])
+    pct = round(100 * players_signed / total_players) if total_players else 0
+    subject = f"Parent Signups: {players_signed}/{total_players} players ({pct}%) — {len(recent)} new in {args.since_hours}h"
 
     html = render_html(progress, recent, args.since_hours)
 
     if args.dry_run:
         print(f"Subject: {subject}")
         print(f"To: {args.to}")
-        print(f"Teams: {len(progress['teams'])}, total invited: {total_invited}, signed: {total_signed}")
+        print(f"Teams: {len(progress['teams'])}, players signed: {players_signed}/{total_players}, emails signed: {emails_signed}/{total_emails}")
         print(f"Recent ({args.since_hours}h): {len(recent)}")
         for r in recent[:10]:
             print(f"  - {r.get('full_name')} {r.get('email')} {r.get('created_at')}")
