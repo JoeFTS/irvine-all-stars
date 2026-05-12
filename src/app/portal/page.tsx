@@ -965,13 +965,13 @@ export default function PortalPage() {
                     label: "Upload birth certificate",
                     done: hasBirthCert,
                     href: `/portal/documents?player=${reg.id}`,
-                    locked: !hasContract,
+                    locked: !isOnTeam,
                   },
                   {
                     label: "Complete medical release",
                     done: hasMedicalRelease,
                     href: `/portal/medical-release?player=${reg.id}`,
-                    locked: !hasContract,
+                    locked: !isOnTeam,
                   },
                 ] as Array<{ label: string; done: boolean; href: string; locked: boolean; acceptAction?: string }>;
 
@@ -1155,17 +1155,12 @@ export default function PortalPage() {
                     {/* Hint messages for locked items */}
                     {!isOnTeam && (
                       <p className="mt-3 text-xs text-gray-400 italic">
-                        Steps 2-6 will unlock once your player is selected for a team.
+                        Steps 2-5 will unlock once your player is selected for a team.
                       </p>
                     )}
                     {isOnTeam && !hasAcceptedSelection && (
                       <p className="mt-3 text-xs text-flag-blue italic font-medium">
-                        Accept the selection above to unlock the remaining steps.
-                      </p>
-                    )}
-                    {hasAcceptedSelection && !hasContract && (
-                      <p className="mt-3 text-xs text-gray-400 italic">
-                        Sign the player contract to unlock document uploads.
+                        Accept the selection above to unlock the contract step. Birth certificate and medical release are already available below.
                       </p>
                     )}
                   </div>
