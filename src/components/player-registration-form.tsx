@@ -362,21 +362,44 @@ export function PlayerRegistrationForm() {
     }
     setSubmitting(true);
 
-    // Check for duplicate registration (same player name + division + parent email)
+    // Check for duplicate registration. A dupe is any existing row that
+    // matches the player (same name, same DOB if provided) AND any parent
+    // email associated with this submission (form primary/secondary OR the
+    // signed-in user's email) appears on either parent slot of the existing
+    // row. This catches the case where a parent re-registers via /apply
+    // because the portal didn't surface their already-linked player.
     if (!editId && supabase) {
-      const { data: existing } = await supabase
-        .from("tryout_registrations")
-        .select("id")
-        .ilike("player_first_name", form.player_first_name.trim())
-        .ilike("player_last_name", form.player_last_name.trim())
-        .eq("division", form.division)
-        .or(`parent_email.eq.${form.parent_email.trim().toLowerCase()},secondary_parent_email.eq.${form.parent_email.trim().toLowerCase()}`)
-        .limit(1);
+      const formPri = form.parent_email.trim().toLowerCase();
+      const formSec = form.secondary_parent_email.trim().toLowerCase();
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      const authEmail = (authUser?.email || "").toLowerCase();
+      const candidateEmails = Array.from(
+        new Set([formPri, formSec, authEmail].filter(Boolean))
+      );
 
+      let query = supabase
+        .from("tryout_registrations")
+        .select("id, parent_email, secondary_parent_email, status, division")
+        .ilike("player_first_name", form.player_first_name.trim())
+        .ilike("player_last_name", form.player_last_name.trim());
+      if (form.player_dob) {
+        query = query.eq("player_date_of_birth", form.player_dob);
+      }
+      const orClauses = candidateEmails.flatMap((e) => [
+        `parent_email.eq.${e}`,
+        `secondary_parent_email.eq.${e}`,
+      ]);
+      query = query.or(orClauses.join(","));
+
+      const { data: existing } = await query.limit(1);
       if (existing && existing.length > 0) {
         setSubmitting(false);
+        const reg = existing[0];
+        const divNote = reg.division === form.division
+          ? `for ${form.division}`
+          : `(on file as ${reg.division})`;
         setErrors({
-          submit: `${form.player_first_name} ${form.player_last_name} is already registered for ${form.division}. If you need to make changes, please visit the Parent Portal or contact the coordinator.`,
+          submit: `${form.player_first_name} ${form.player_last_name} is already registered ${divNote}. Open the Parent Portal to manage this player, or email AllStars@irvinepony.com if you need help.`,
         });
         return;
       }
