@@ -305,21 +305,20 @@ export default function InviteSignupPage({
               )}
               <div className="bg-flag-blue/5 border border-flag-blue/20 rounded-2xl p-5 mb-4">
                 <p className="text-flag-blue font-semibold text-sm mb-2">
-                  Check Your Email
+                  You&apos;re All Set
                 </p>
                 <p className="text-gray-600 text-sm leading-relaxed">
-                  We&apos;ve sent a confirmation email to <strong>{inviteState.invite.email}</strong>.
-                  Please click the link in that email to verify your account before signing in.
+                  Your account for <strong>{inviteState.invite.email}</strong> is active. Sign in to upload your player&apos;s birth certificate, complete the medical release, and access the parent portal.
                 </p>
               </div>
               <p className="text-gray-400 text-xs mb-4">
-                Didn&apos;t receive it? Check your spam folder, or contact AllStars@irvinepony.com for help.
+                Need help? Email AllStars@irvinepony.com.
               </p>
               <Link
                 href="/auth/login"
                 className="inline-block bg-flag-blue hover:bg-flag-blue-mid text-white font-display font-bold uppercase tracking-wider py-3 px-6 rounded-full transition-colors text-sm"
               >
-                Go to Sign In
+                Sign In
               </Link>
             </div>
           ) : (
