@@ -176,6 +176,39 @@ export default function PortalPage() {
   const [secondParentForm, setSecondParentForm] = useState({ name: "", email: "", phone: "" });
   const [volunteerChecked, setVolunteerChecked] = useState(false);
   const [acknowledgingVolunteer, setAcknowledgingVolunteer] = useState(false);
+  const [invitingSecondParentId, setInvitingSecondParentId] = useState<string | null>(null);
+  const [secondParentInviteStatus, setSecondParentInviteStatus] = useState<Record<string, string>>({});
+
+  async function sendSecondParentInvite(regId: string) {
+    if (!supabase) return;
+    setInvitingSecondParentId(regId);
+    setSecondParentInviteStatus((p) => ({ ...p, [regId]: "" }));
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const token = session?.access_token;
+      if (!token) {
+        setSecondParentInviteStatus((p) => ({ ...p, [regId]: "Please sign in again and retry." }));
+        setInvitingSecondParentId(null);
+        return;
+      }
+      const res = await fetch("/api/invite-second-parent", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${token}` },
+        body: JSON.stringify({ regId }),
+      });
+      const payload = await res.json();
+      if (!res.ok) {
+        setSecondParentInviteStatus((p) => ({ ...p, [regId]: payload.error || "Failed to send." }));
+      } else if (payload.status === "already_has_account") {
+        setSecondParentInviteStatus((p) => ({ ...p, [regId]: "Already has an account — they can sign in directly." }));
+      } else {
+        setSecondParentInviteStatus((p) => ({ ...p, [regId]: `Invite sent to ${payload.to}.` }));
+      }
+    } catch {
+      setSecondParentInviteStatus((p) => ({ ...p, [regId]: "Network error. Please try again." }));
+    }
+    setInvitingSecondParentId(null);
+  }
 
   async function acceptSelection(regId: string) {
     if (!supabase || !user) return;
@@ -861,30 +894,46 @@ export default function PortalPage() {
                           </div>
                         </div>
                       ) : reg.secondary_parent_name || reg.secondary_parent_email || reg.secondary_parent_phone ? (
-                        <div className="flex items-start justify-between gap-2">
-                          <div className="text-sm text-gray-600 space-y-0.5">
-                            {reg.secondary_parent_name && (
-                              <p className="font-semibold text-charcoal">{reg.secondary_parent_name}</p>
-                            )}
-                            {reg.secondary_parent_email && <p>{reg.secondary_parent_email}</p>}
-                            {reg.secondary_parent_phone && <p>{reg.secondary_parent_phone}</p>}
+                        <div className="space-y-2">
+                          <div className="flex items-start justify-between gap-2">
+                            <div className="text-sm text-gray-600 space-y-0.5">
+                              {reg.secondary_parent_name && (
+                                <p className="font-semibold text-charcoal">{reg.secondary_parent_name}</p>
+                              )}
+                              {reg.secondary_parent_email && <p>{reg.secondary_parent_email}</p>}
+                              {reg.secondary_parent_phone && <p>{reg.secondary_parent_phone}</p>}
+                            </div>
+                            <button
+                              onClick={() => {
+                                setSecondParentForm({
+                                  name: reg.secondary_parent_name || "",
+                                  email: reg.secondary_parent_email || "",
+                                  phone: reg.secondary_parent_phone || "",
+                                });
+                                setEditingSecondParent(reg.id);
+                              }}
+                              className="min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-400 hover:text-flag-blue transition-colors"
+                              aria-label="Edit second parent"
+                            >
+                              <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
+                                <path d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a4 4 0 001.343-.885L17.5 5.5a2.121 2.121 0 00-3-3L3.58 13.42a4 4 0 00-.885 1.343z" />
+                              </svg>
+                            </button>
                           </div>
-                          <button
-                            onClick={() => {
-                              setSecondParentForm({
-                                name: reg.secondary_parent_name || "",
-                                email: reg.secondary_parent_email || "",
-                                phone: reg.secondary_parent_phone || "",
-                              });
-                              setEditingSecondParent(reg.id);
-                            }}
-                            className="min-h-[44px] min-w-[44px] flex items-center justify-center text-gray-400 hover:text-flag-blue transition-colors"
-                            aria-label="Edit second parent"
-                          >
-                            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
-                              <path d="M2.695 14.763l-1.262 3.154a.5.5 0 00.65.65l3.155-1.262a4 4 0 001.343-.885L17.5 5.5a2.121 2.121 0 00-3-3L3.58 13.42a4 4 0 00-.885 1.343z" />
-                            </svg>
-                          </button>
+                          {reg.secondary_parent_email && (
+                            <div className="flex items-center gap-2">
+                              <button
+                                onClick={() => sendSecondParentInvite(reg.id)}
+                                disabled={invitingSecondParentId === reg.id}
+                                className="text-xs font-semibold uppercase tracking-wider text-flag-blue hover:text-flag-blue-mid disabled:opacity-50 transition-colors"
+                              >
+                                {invitingSecondParentId === reg.id ? "Sending..." : "Send portal invite"}
+                              </button>
+                              {secondParentInviteStatus[reg.id] && (
+                                <span className="text-xs text-gray-500">{secondParentInviteStatus[reg.id]}</span>
+                              )}
+                            </div>
+                          )}
                         </div>
                       ) : (
                         <button
