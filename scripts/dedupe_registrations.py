@@ -1,8 +1,11 @@
 """De-dupe tryout_registrations.
 
-Run on 2026-05-12 to clean up 14 duplicate rows from parents who registered
-the same kid multiple times during signup (5 distinct players). The script
-is idempotent — if the dupes are already gone it's a no-op.
+First run on 2026-05-12 to clean up 14 duplicate rows from parents who
+registered the same kid multiple times during signup. Second pass on
+2026-05-12 (same day) cleaned 4 more after parents re-submitted via
+/apply/player; that loophole is now closed by the dedupe guard in
+player-registration-form.tsx. The script is idempotent — if the dupes
+are already gone it's a no-op.
 
 For each group:
 - Pick the canonical keeper (the row that's status=selected and has team_id).
@@ -143,6 +146,17 @@ PLAN = [
         "sec_name": None,
     },
 ]
+
+# Second-pass dupes cleaned 2026-05-12 (after parents re-submitted via
+# /apply/player before the form-side dedupe guard was deployed). All
+# kept parent emails were already covered by the keeper, so no email
+# preservation was needed. Recorded here for posterity; ids elide for
+# brevity since the rows are already deleted.
+#
+#   Kai Mitchell     keeper edbba4f7  drops cafd9f7f, dc3a829c, 1d391d8e
+#   Roshan Ausmus    keeper 1de45db8  drops ce105136
+#   Alexander Seto   keeper 6a608596  drops d6f7f4eb
+#   Enzo Novia       keeper 390220be  drops 9eac66cc
 
 
 def run_plan(dry_run: bool) -> None:
