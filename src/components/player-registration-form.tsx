@@ -405,7 +405,7 @@ export function PlayerRegistrationForm() {
       }
     }
 
-    const payload = {
+    const basePayload = {
       parent_name: form.parent_name.trim(),
       parent_email: form.parent_email.trim().toLowerCase(),
       parent_phone: form.parent_phone.trim(),
@@ -430,6 +430,12 @@ export function PlayerRegistrationForm() {
       parent_code_of_conduct: form.code_of_conduct,
     };
 
+    // All-Stars 2026 uses pre-formed teams: every registered player is
+    // pre-selected. Set status=selected so the portal unlocks immediately.
+    const payload = editId
+      ? basePayload
+      : { ...basePayload, status: "selected" };
+
     if (!supabase) {
       setSubmitting(false);
       setErrors({
@@ -439,23 +445,74 @@ export function PlayerRegistrationForm() {
       return;
     }
 
-    const { error } = editId
-      ? await supabase
-          .from("tryout_registrations")
-          .update(payload)
-          .eq("id", editId)
-      : await supabase
-          .from("tryout_registrations")
-          .insert(payload);
+    let newRegId: string | null = null;
+    if (editId) {
+      const { error } = await supabase
+        .from("tryout_registrations")
+        .update(payload)
+        .eq("id", editId);
+      if (error) {
+        setSubmitting(false);
+        setErrors({ submit: "Something went wrong. Please try again or contact us." });
+        return;
+      }
+    } else {
+      const { data: inserted, error } = await supabase
+        .from("tryout_registrations")
+        .insert(payload)
+        .select("id")
+        .single();
+      if (error || !inserted) {
+        setSubmitting(false);
+        setErrors({ submit: "Something went wrong. Please try again or contact us." });
+        return;
+      }
+      newRegId = inserted.id as string;
+    }
+
+    // For new registrations, auto-create the selection_acceptance doc and
+    // pre-sign the player contract. The paper contract was signed offline
+    // when the coach picked the team; the e-contract step is just a mirror.
+    if (newRegId) {
+      const { data: { user: authUser } } = await supabase.auth.getUser();
+      const playerName = `${basePayload.player_first_name} ${basePayload.player_last_name}`.trim();
+      const nowIso = new Date().toISOString();
+
+      await supabase.from("player_documents").insert({
+        registration_id: newRegId,
+        player_name: playerName,
+        division: basePayload.division,
+        document_type: "selection_acceptance",
+        file_path: "",
+        file_name: JSON.stringify({
+          accepted_by: authUser?.email || basePayload.parent_email,
+          accepted_at: nowIso,
+          source: "auto_on_register",
+        }),
+        status: "approved",
+        uploaded_by: authUser?.id ?? null,
+      });
+
+      await supabase.from("player_contracts").insert({
+        registration_id: newRegId,
+        player_name: playerName,
+        division: basePayload.division,
+        parent_name: basePayload.parent_name,
+        parent_email: basePayload.parent_email,
+        parent_phone: basePayload.parent_phone,
+        parent_signature: basePayload.parent_name,
+        acknowledge_eligibility: true,
+        acknowledge_no_travel_ball: true,
+        acknowledge_tournament_schedule: true,
+        acknowledge_fees: true,
+        acknowledge_practices: true,
+        acknowledge_conduct: true,
+        acknowledge_no_playing_guarantee: true,
+        signed_at: nowIso,
+      });
+    }
 
     setSubmitting(false);
-
-    if (error) {
-      setErrors({
-        submit: "Something went wrong. Please try again or contact us.",
-      });
-      return;
-    }
 
     // Send confirmation email
     try {
