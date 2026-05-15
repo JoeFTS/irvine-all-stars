@@ -128,7 +128,7 @@ export async function POST(request: NextRequest) {
 
     const { data: invite, error: inviteErr } = await supabase
       .from("invites")
-      .select("id, email, role, division, parent_name, child_first_name, child_last_name, current_team, used, expires_at, team_id")
+      .select("id, email, role, division, parent_name, child_first_name, child_last_name, current_team, used, expires_at, team_id, team_role")
       .eq("token", token)
       .single();
 
@@ -163,10 +163,11 @@ export async function POST(request: NextRequest) {
     // Done BEFORE marking the invite used so a failure here leaves the invite
     // re-usable on retry instead of stranding the user with a consumed token.
     if (invite.role === "coach" && invite.team_id) {
+      const teamRole = invite.team_role === "assistant" ? "assistant" : "head";
       const { error: tcErr } = await supabase
         .from("team_coaches")
         .upsert(
-          { team_id: invite.team_id, coach_id: userId, role: "head" },
+          { team_id: invite.team_id, coach_id: userId, role: teamRole },
           { onConflict: "team_id,coach_id" }
         );
       if (tcErr) {

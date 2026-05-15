@@ -62,6 +62,20 @@ interface Announcement {
   created_at: string;
 }
 
+interface TeamCoach {
+  team_id: string;
+  coach_id: string;
+  role: string;
+  full_name: string | null;
+  email: string;
+}
+
+interface PendingInvite {
+  team_id: string;
+  email: string;
+  expires_at: string;
+}
+
 /* ------------------------------------------------------------------ */
 /*  Quick-link config                                                   */
 /* ------------------------------------------------------------------ */
@@ -164,6 +178,13 @@ export default function CoachDashboardPage() {
   const [coachCerts, setCoachCerts] = useState<CoachCert[]>([]);
   const [tournamentAgreements, setTournamentAgreements] = useState<TournamentAgreement[]>([]);
   const [announcements, setAnnouncements] = useState<Announcement[]>([]);
+  const [teamCoaches, setTeamCoaches] = useState<TeamCoach[]>([]);
+  const [pendingInvites, setPendingInvites] = useState<PendingInvite[]>([]);
+  const [inviteFormTeam, setInviteFormTeam] = useState<string | null>(null);
+  const [inviteName, setInviteName] = useState("");
+  const [inviteEmail, setInviteEmail] = useState("");
+  const [inviting, setInviting] = useState(false);
+  const [inviteStatus, setInviteStatus] = useState<Record<string, string>>({});
 
   const myDivisions = useMemo(
     () => [...new Set(myTeams.map((t) => t.division))],
@@ -246,6 +267,48 @@ export default function CoachDashboardPage() {
       setTournamentAgreements((agreementsResult.data ?? []) as TournamentAgreement[]);
       setAnnouncements((announcementsResult.data ?? []) as Announcement[]);
 
+      // 5b. Coaching staff on my teams + pending invites
+      if (teamIds.length > 0) {
+        type TcRow = {
+          team_id: string;
+          coach_id: string;
+          role: string;
+          profiles: { full_name: string | null; email: string } | { full_name: string | null; email: string }[] | null;
+        };
+        const [tcRes, inviteRes] = await Promise.all([
+          supabase
+            .from("team_coaches")
+            .select("team_id, coach_id, role, profiles!team_coaches_coach_id_fkey ( full_name, email )")
+            .in("team_id", teamIds),
+          supabase
+            .from("invites")
+            .select("team_id, email, expires_at")
+            .in("team_id", teamIds)
+            .eq("team_role", "assistant")
+            .eq("used", false)
+            .gt("expires_at", new Date().toISOString()),
+        ]);
+        if (cancelled) return;
+        const tcRows = (tcRes.data ?? []) as TcRow[];
+        setTeamCoaches(
+          tcRows.flatMap((row) => {
+            const p = Array.isArray(row.profiles) ? row.profiles[0] : row.profiles;
+            if (!p) return [];
+            return [{
+              team_id: row.team_id,
+              coach_id: row.coach_id,
+              role: row.role,
+              full_name: p.full_name,
+              email: p.email,
+            }];
+          })
+        );
+        setPendingInvites((inviteRes.data ?? []) as PendingInvite[]);
+      } else {
+        setTeamCoaches([]);
+        setPendingInvites([]);
+      }
+
       // 6. Docs and contracts for everyone the coach can see (drafted + pool)
       const visibleRegs = [...drafted, ...undrafted];
       if (visibleRegs.length > 0) {
@@ -278,6 +341,54 @@ export default function CoachDashboardPage() {
       cancelled = true;
     };
   }, [user, teamsLoaded, myTeams, myDivisions]);
+
+  async function submitAssistantInvite(teamId: string) {
+    if (!supabase) return;
+    const email = inviteEmail.trim().toLowerCase();
+    if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setInviteStatus((s) => ({ ...s, [teamId]: "Enter a valid email." }));
+      return;
+    }
+    setInviting(true);
+    setInviteStatus((s) => ({ ...s, [teamId]: "" }));
+    try {
+      const { data: { session } } = await supabase.auth.getSession();
+      const accessToken = session?.access_token;
+      if (!accessToken) {
+        setInviteStatus((s) => ({ ...s, [teamId]: "Please sign in again." }));
+        setInviting(false);
+        return;
+      }
+      const res = await fetch("/api/invite-assistant", {
+        method: "POST",
+        headers: { "Content-Type": "application/json", Authorization: `Bearer ${accessToken}` },
+        body: JSON.stringify({ teamId, assistantEmail: email, assistantName: inviteName.trim() || undefined }),
+      });
+      const payload = await res.json();
+      if (!res.ok) {
+        setInviteStatus((s) => ({ ...s, [teamId]: payload.error || "Failed to invite." }));
+      } else if (payload.status === "already_on_team") {
+        setInviteStatus((s) => ({ ...s, [teamId]: "Already on this team." }));
+      } else if (payload.status === "linked_existing") {
+        setInviteStatus((s) => ({ ...s, [teamId]: `Added ${email}. They already have an account.` }));
+        setInviteEmail("");
+        setInviteName("");
+        setInviteFormTeam(null);
+      } else {
+        setInviteStatus((s) => ({ ...s, [teamId]: `Invite sent to ${email}.` }));
+        setPendingInvites((prev) => [
+          ...prev,
+          { team_id: teamId, email, expires_at: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString() },
+        ]);
+        setInviteEmail("");
+        setInviteName("");
+        setInviteFormTeam(null);
+      }
+    } catch {
+      setInviteStatus((s) => ({ ...s, [teamId]: "Network error. Try again." }));
+    }
+    setInviting(false);
+  }
 
   /* ---- Derived stats ---- */
 
@@ -381,6 +492,9 @@ export default function CoachDashboardPage() {
         </div>
       </div>
 
+      {/* 0. Helper: invite assistant */}
+      {/* Defined inline below as section "Coaching Staff" */}
+
       {/* 1. Your Team(s) Card */}
       <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6">
         <p className="text-xs font-bold text-flag-red uppercase tracking-[2px] mb-1">
@@ -417,6 +531,102 @@ export default function CoachDashboardPage() {
           </>
         )}
       </div>
+
+      {/* 1b. Coaching Staff */}
+      {hasTeam && (
+        <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6">
+          <div className="flex items-center justify-between mb-3">
+            <h3 className="font-display text-lg font-bold uppercase tracking-wide text-flag-blue">
+              Coaching Staff
+            </h3>
+          </div>
+          <p className="text-sm text-gray-500 mb-4">
+            Add assistant coaches so they can help upload contracts, birth certificates, and certifications.
+          </p>
+          {myTeams.map((team) => {
+            const staff = teamCoaches.filter((tc) => tc.team_id === team.id);
+            const pending = pendingInvites.filter((p) => p.team_id === team.id);
+            const isFormOpen = inviteFormTeam === team.id;
+            return (
+              <div key={team.id} className="mb-4 last:mb-0 pb-4 last:pb-0 border-b last:border-0 border-gray-100">
+                <p className="font-display text-sm font-bold uppercase tracking-wide text-charcoal mb-2">
+                  {team.team_name}
+                </p>
+                <ul className="space-y-1.5 mb-3">
+                  {staff.length === 0 && (
+                    <li className="text-sm text-gray-400 italic">No coaches assigned yet.</li>
+                  )}
+                  {staff.map((tc) => (
+                    <li key={tc.coach_id} className="flex items-center gap-2 text-sm">
+                      <span className={`inline-block w-2 h-2 rounded-full ${tc.role === "head" ? "bg-flag-blue" : "bg-flag-gold"}`} />
+                      <span className="font-medium text-charcoal">{tc.full_name || tc.email}</span>
+                      <span className="text-xs text-gray-500">
+                        ({tc.role === "head" ? "Head Coach" : "Assistant"})
+                      </span>
+                    </li>
+                  ))}
+                  {pending.map((p) => (
+                    <li key={`${p.team_id}-${p.email}`} className="flex items-center gap-2 text-sm">
+                      <span className="inline-block w-2 h-2 rounded-full bg-gray-300" />
+                      <span className="text-gray-500">{p.email}</span>
+                      <span className="text-xs text-gray-400">(invite sent, pending)</span>
+                    </li>
+                  ))}
+                </ul>
+                {isFormOpen ? (
+                  <div className="bg-flag-blue/5 border border-flag-blue/20 rounded-xl p-3 space-y-2">
+                    <input
+                      type="text"
+                      placeholder="Assistant's name (optional)"
+                      value={inviteName}
+                      onChange={(e) => setInviteName(e.target.value)}
+                      className="w-full min-h-[40px] px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-charcoal placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue"
+                    />
+                    <input
+                      type="email"
+                      placeholder="email@example.com"
+                      value={inviteEmail}
+                      onChange={(e) => setInviteEmail(e.target.value)}
+                      className="w-full min-h-[40px] px-3 py-2 bg-white border border-gray-200 rounded-lg text-sm text-charcoal placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-flag-blue/30 focus:border-flag-blue"
+                    />
+                    <div className="flex gap-2">
+                      <button
+                        type="button"
+                        onClick={() => submitAssistantInvite(team.id)}
+                        disabled={inviting}
+                        className="min-h-[40px] bg-flag-blue hover:bg-flag-blue-mid disabled:opacity-50 text-white px-4 py-2 rounded-full font-display text-xs font-semibold uppercase tracking-widest transition-colors"
+                      >
+                        {inviting ? "Sending..." : "Send Invite"}
+                      </button>
+                      <button
+                        type="button"
+                        onClick={() => { setInviteFormTeam(null); setInviteEmail(""); setInviteName(""); }}
+                        className="min-h-[40px] border border-gray-200 hover:border-gray-400 text-charcoal px-4 py-2 rounded-full font-display text-xs font-semibold uppercase tracking-widest transition-colors"
+                      >
+                        Cancel
+                      </button>
+                    </div>
+                    {inviteStatus[team.id] && (
+                      <p className="text-xs text-gray-600 pt-1">{inviteStatus[team.id]}</p>
+                    )}
+                  </div>
+                ) : (
+                  <button
+                    type="button"
+                    onClick={() => { setInviteFormTeam(team.id); setInviteEmail(""); setInviteName(""); }}
+                    className="text-sm font-semibold text-flag-blue hover:text-flag-blue-mid transition-colors"
+                  >
+                    + Add assistant coach
+                  </button>
+                )}
+                {inviteFormTeam !== team.id && inviteStatus[team.id] && (
+                  <p className="text-xs text-gray-600 mt-2">{inviteStatus[team.id]}</p>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      )}
 
       {/* 2. Compliance Progress */}
       <div className="bg-white border border-gray-200 rounded-2xl p-4 sm:p-6">
