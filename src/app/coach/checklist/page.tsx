@@ -762,6 +762,53 @@ export default function BinderChecklistPage() {
           )}
         </div>
         <div className="p-5 space-y-3">
+          {/* Director tips — from PONY Affidavit Director */}
+          <div className="p-4 rounded-lg bg-red-50 border border-red-200">
+            <div className="flex items-start gap-2 mb-3">
+              <AlertTriangle size={16} className="text-red-700 shrink-0 mt-0.5" />
+              <div>
+                <p className="text-sm font-bold text-red-900 uppercase tracking-wide">
+                  Director Tips. Read Before Submitting
+                </p>
+                <p className="text-xs text-red-800 mt-0.5">
+                  Common mistakes the PONY affidavit director sees. Avoid these to prevent rejections and unlock delays.
+                </p>
+              </div>
+            </div>
+            <ul className="space-y-2 text-xs text-charcoal">
+              <li className="flex gap-2">
+                <span className="font-bold text-red-700 shrink-0">1.</span>
+                <span>
+                  <span className="font-bold">Team shell name must include MP or PP.</span> Mark Machine Pitch as <code className="px-1 py-0.5 rounded bg-white border border-red-200 font-mono text-[11px]">MP</code> and Player Pitch as <code className="px-1 py-0.5 rounded bg-white border border-red-200 font-mono text-[11px]">PP</code> in the team name (e.g. <em>South Bay 8 MP Green</em>). Helps directors review without asking.
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="font-bold text-red-700 shrink-0">2.</span>
+                <span>
+                  <span className="font-bold">&quot;Reg. Season Team&quot; = regular-season team</span>, NOT the All-Star team name. Use the team the player actually played on this spring.
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="font-bold text-red-700 shrink-0">3.</span>
+                <span>
+                  <span className="font-bold">Player names must match the birth certificate exactly.</span> No nicknames, no abbreviations.
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="font-bold text-red-700 shrink-0">4.</span>
+                <span>
+                  <span className="font-bold">No middle name? Leave it blank.</span> Do NOT type &quot;N/A&quot;. &quot;N/A&quot; is not a middle name.
+                </span>
+              </li>
+              <li className="flex gap-2">
+                <span className="font-bold text-red-700 shrink-0">5.</span>
+                <span>
+                  <span className="font-bold">Unlock requests need a reason.</span> Read every prompt carefully. Many people accidentally submit an unlock request thinking it&#39;s the final step. Unlocks without a reason are rejected. Director processes legit requests within a few hours.
+                </span>
+              </li>
+            </ul>
+          </div>
+
           {/* PONY role-name decoder */}
           <div className="p-4 rounded-lg bg-amber-50 border border-amber-200">
             <div className="flex items-start gap-2 mb-3">
